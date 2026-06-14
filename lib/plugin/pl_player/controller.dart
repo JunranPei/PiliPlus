@@ -777,6 +777,13 @@ class PlPlayerController with BlockConfigMixin {
           (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
               .toString(),
       'volume-max': kMaxVolume.toString(),
+      if (hwdec != null && hwdec != 'no') 
+        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec!,
+      if (Platform.isAndroid) 'profile': 'fast',
+      if (Platform.isWindows) 'gpu-api': 'd3d11',
+      'vd-lavc-fast': 'yes',
+      'vd-lavc-dr': 'yes',
+      'vd-lavc-threads': '0',
     };
     final autosync = Pref.autosync;
     if (autosync != '0') {
@@ -797,7 +804,7 @@ class PlPlayerController with BlockConfigMixin {
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
         androidAttachSurfaceAfterVideoParameters: false,
-        hwdec: hwdec,
+        hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
 

@@ -246,23 +246,23 @@ abstract final class Pref {
 
   static String get defaultDecode => _setting.get(
     SettingBoxKey.defaultDecode,
-    defaultValue: VideoDecodeFormatType.AVC.codes.first,
+    defaultValue: VideoDecodeFormatType.HEVC.codes.first,
   );
 
   static String get secondDecode => _setting.get(
     SettingBoxKey.secondDecode,
-    defaultValue: VideoDecodeFormatType.AV1.codes.first,
+    defaultValue: VideoDecodeFormatType.AVC.codes.first,
   );
 
   static String get hardwareDecoding => _setting.get(
     SettingBoxKey.hardwareDecoding,
     defaultValue: Platform.isAndroid
-        ? HwDecType.autoSafe.hwdec
+        ? HwDecType.mediacodec.hwdec
         : HwDecType.auto.hwdec,
   );
 
   static String get videoSync =>
-      _setting.get(SettingBoxKey.videoSync, defaultValue: 'display-resample');
+      _setting.get(SettingBoxKey.videoSync, defaultValue: 'audio');
 
   static String get autosync => _setting.get(
     SettingBoxKey.autosync,
@@ -798,7 +798,7 @@ abstract final class Pref {
       _setting.get(SettingBoxKey.enableLongShowControl, defaultValue: false);
 
   static double get bufferSize =>
-      _setting.get(SettingBoxKey.bufferSize, defaultValue: 4.0);
+      _setting.get(SettingBoxKey.bufferSize, defaultValue: 32.0);
 
   static double get bufferSec =>
       _setting.get(SettingBoxKey.bufferSec, defaultValue: 16.0);
