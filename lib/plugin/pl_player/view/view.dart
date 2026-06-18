@@ -1228,12 +1228,19 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   void _onDoubleTapDown(TapDownDetails details) {
-    switch (details.kind) {
-      case ui.PointerDeviceKind.mouse when PlatformUtils.isDesktop:
+    if (PlatformUtils.isDesktop) {
+      if (plPlayerController.isDesktopPip) {
+        plPlayerController.resizeDesktopPip();
+      } else {
         plPlayerController.triggerFullScreen(status: !isFullScreen);
-      default:
-        onDoubleTapDownMobile(details);
+      }
+      return;
     }
+    if (Platform.isAndroid && AndroidHelper.isPipMode) {
+      // Android 系统小窗中，双击不做任何 Flutter 侧的操作，交给系统层 SystemUI 去处理小窗缩放
+      return;
+    }
+    onDoubleTapDownMobile(details);
   }
 
   LongPressGestureRecognizer? _longPressRecognizer;
@@ -1266,6 +1273,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   void _onPointerDown(PointerDownEvent event) {
+    if (Platform.isAndroid && AndroidHelper.isPipMode) {
+      // Android 系统小窗（画中画）模式下，不拦截、不消费任何 Pointer 事件，完全保留并交还给系统底层去响应双击切换大小等基础功能
+      return;
+    }
     if (PlatformUtils.isDesktop) {
       final buttons = event.buttons;
       final isSecondaryBtn = buttons == kSecondaryMouseButton;

@@ -278,6 +278,41 @@ class PlPlayerController with BlockConfigMixin {
     }
   }
 
+  int desktopPipSizeLevel = 0; // 0: 小, 1: 中, 2: 大
+
+  void resizeDesktopPip() {
+    if (!PlatformUtils.isDesktop || !isDesktopPip) return;
+
+    desktopPipSizeLevel = (desktopPipSizeLevel + 1) % 3;
+
+    final state = videoPlayerController!.state;
+    int width = state.width;
+    int height = state.height;
+    if (width == 0) {
+      width = this.width ?? 16;
+    }
+    if (height == 0) {
+      height = this.height ?? 9;
+    }
+
+    // 三档的基础高度/宽度调节：280.0, 380.0, 480.0
+    double baseSize = 280.0 + (desktopPipSizeLevel * 100.0);
+
+    final Size size;
+    if (height > width) {
+      size = Size(baseSize, baseSize * height / width);
+    } else {
+      size = Size(baseSize * width / height, baseSize);
+    }
+
+    // 先临时解除 AspectRatio 比例锁定，确保系统的 setSize 不会被拦截忽略
+    windowManager.setAspectRatio(0);
+    windowManager.setMinimumSize(size);
+    windowManager.setSize(size);
+    // 缩放完成后，重新锁定 AspectRatio，保证小窗画面完美比例填充且不产生畸变
+    windowManager.setAspectRatio(width / height);
+  }
+
   late bool _isAutoEnterPip = false;
   bool get isAutoEnterPip => _isAutoEnterPip;
   bool isEnteringPip = false;
