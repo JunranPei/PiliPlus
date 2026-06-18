@@ -372,6 +372,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     introController.cancelTimer();
 
+    if (videoDetailController.plPlayerController.isEnteringPip || AndroidHelper.isPipMode) {
+      return; // 正在进入画中画或已在画中画，保留播放器状态，不进行注销与暂停
+    }
+
     videoDetailController
       ..videoState.value = false
       ..cancelBlockListener()
@@ -1266,7 +1270,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           !videoDetailController.videoState.value ||
               !videoDetailController.autoPlay ||
               plPlayerController?.videoController == null
-          ? const SizedBox.shrink()
+          ? const ColoredBox(
+              color: Colors.black,
+              child: SizedBox.expand(),
+            )
           : PLVideoPlayer(
               maxWidth: width,
               maxHeight: height,
@@ -1310,7 +1317,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   Widget build(BuildContext context) {
     Widget child;
     if (videoDetailController.plPlayerController.isPipMode) {
-      child = plPlayer(width: maxWidth, height: maxHeight, isPipMode: true);
+      child = ColoredBox(
+        color: Colors.black,
+        child: plPlayer(width: maxWidth, height: maxHeight, isPipMode: true),
+      );
     } else if (!videoDetailController.horizontalScreen) {
       child = childWhenDisabled;
     } else if (maxWidth / maxHeight >= kScreenRatio) {

@@ -249,9 +249,30 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     }
   }
 
+  ui.Rect? getVideoPhysicalRect() {
+    try {
+      final renderBox = _videoKey.currentContext?.findRenderObject() as RenderBox?;
+      if (renderBox != null) {
+        final position = renderBox.localToGlobal(Offset.zero);
+        final size = renderBox.size;
+        final devicePixelRatio = MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
+        return ui.Rect.fromLTWH(
+          position.dx * devicePixelRatio,
+          position.dy * devicePixelRatio,
+          size.width * devicePixelRatio,
+          size.height * devicePixelRatio,
+        );
+      }
+    } catch (e) {
+      debugPrint("Error getting video rect: $e");
+    }
+    return null;
+  }
+
   @override
   void initState() {
     super.initState();
+    plPlayerController.getVideoRectCallback = getVideoPhysicalRect;
     addObserverMobile(this);
 
     _controlsListener = plPlayerController.showControls.listen(
@@ -329,12 +350,29 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      plPlayerController.isEnteringPip = false;
+    }
+
     if (!plPlayerController.continuePlayInBackground.value) {
       late final player = plPlayerController.videoPlayerController;
       if (const <AppLifecycleState>[.paused, .detached].contains(state)) {
+        if (plPlayerController.isEnteringPip || AndroidHelper.isPipMode) {
+          return; // 正在进入或已在画中画模式，坚决不能暂停
+        }
+
         if (player != null && player.state.playing) {
-          _pauseDueToPauseUponEnteringBackgroundMode = true;
-          player.pause();
+          if (Platform.isAndroid && plPlayerController.autoPiP) {
+            Future.delayed(const Duration(milliseconds: 200), () {
+              if (mounted && !AndroidHelper.isPipMode && !plPlayerController.isEnteringPip && player.state.playing) {
+                _pauseDueToPauseUponEnteringBackgroundMode = true;
+                player.pause();
+              }
+            });
+          } else {
+            _pauseDueToPauseUponEnteringBackgroundMode = true;
+            player.pause();
+          }
         }
       } else {
         if (_pauseDueToPauseUponEnteringBackgroundMode) {
@@ -370,6 +408,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void dispose() {
+    plPlayerController.getVideoRectCallback = null;
     removeObserverMobile(this);
     _danmakuListener?.cancel();
     _tapGestureRecognizer.dispose();

@@ -42,6 +42,11 @@ public final class AndroidHelper {
 
     public static volatile boolean isPipMode = false;
 
+    public static volatile int pipLeft = -1;
+    public static volatile int pipTop = -1;
+    public static volatile int pipWidth = -1;
+    public static volatile int pipHeight = -1;
+
     static {
         PackageManager pm = getContext().getPackageManager();
         isFoldable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE);
@@ -161,6 +166,41 @@ public final class AndroidHelper {
             PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder()
                     .setAspectRatio(new Rational(width, height));
             setPipActions(activity, builder, isLive, isPlaying);
+
+            try {
+                Rect sourceRect;
+                if (pipLeft >= 0 && pipTop >= 0 && pipWidth > 0 && pipHeight > 0) {
+                    sourceRect = new Rect(pipLeft, pipTop, pipLeft + pipWidth, pipTop + pipHeight);
+                    // 使用完后重置，避免下次使用错误的缓存值
+                    pipLeft = -1;
+                    pipTop = -1;
+                    pipWidth = -1;
+                    pipHeight = -1;
+                } else {
+                    int screenWidth;
+                    int screenHeight;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        Rect bounds = activity.getWindowManager().getCurrentWindowMetrics().getBounds();
+                        screenWidth = bounds.width();
+                        screenHeight = bounds.height();
+                    } else {
+                        Point size = new Point();
+                        activity.getWindowManager().getDefaultDisplay().getRealSize(size);
+                        screenWidth = size.x;
+                        screenHeight = size.y;
+                    }
+
+                    if (screenWidth < screenHeight) {
+                        int videoHeight = (int) ((double) screenWidth * height / width);
+                        sourceRect = new Rect(0, 0, screenWidth, videoHeight);
+                    } else {
+                        sourceRect = new Rect(0, 0, screenWidth, screenHeight);
+                    }
+                }
+                builder.setSourceRectHint(sourceRect);
+            } catch (Exception ignored) {
+            }
+
             if (autoEnter) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     builder.setAutoEnterEnabled(true);

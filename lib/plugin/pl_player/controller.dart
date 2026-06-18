@@ -38,6 +38,7 @@ import 'package:PiliPlus/utils/asset_utils.dart';
 import 'package:PiliPlus/utils/device_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/extension/box_ext.dart';
+import 'package:flutter/services.dart' show MethodChannel;
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
 import 'package:PiliPlus/utils/image_utils.dart';
@@ -279,6 +280,8 @@ class PlPlayerController with BlockConfigMixin {
 
   late bool _isAutoEnterPip = false;
   bool get isAutoEnterPip => _isAutoEnterPip;
+  bool isEnteringPip = false;
+  ui.Rect? Function()? getVideoRectCallback;
 
   static bool get _isCurrVideoPage {
     final routing = Get.routing;
@@ -294,6 +297,18 @@ class PlPlayerController with BlockConfigMixin {
 
   void enterPip({bool autoEnter = false}) {
     if (videoPlayerController != null) {
+      isEnteringPip = true;
+
+      final rect = getVideoRectCallback?.call();
+      if (rect != null) {
+        const MethodChannel('com.personal.piliplus/pip').invokeMethod('setVideoRect', {
+          'left': rect.left.toInt(),
+          'top': rect.top.toInt(),
+          'width': rect.width.toInt(),
+          'height': rect.height.toInt(),
+        });
+      }
+
       final state = videoPlayerController!.state;
       PageUtils.enterPip(
         autoEnter: autoEnter,
@@ -582,19 +597,21 @@ class PlPlayerController with BlockConfigMixin {
     }
 
     if (Platform.isAndroid && autoPiP) {
-      if (DeviceUtils.sdkInt < 31) {
-        AndroidHelper$ToDart.onUserLeaveHint = Runnable.implement(
-          $Runnable(run: _onUserLeaveHint),
-        );
-      } else {
+      AndroidHelper$ToDart.onUserLeaveHint = Runnable.implement(
+        $Runnable(run: _onUserLeaveHint),
+      );
+      if (DeviceUtils.sdkInt >= 31) {
         _isAutoEnterPip = true;
       }
     }
   }
 
   void _onUserLeaveHint() {
+    isEnteringPip = true;
     if (playerStatus.isPlaying && _isCurrVideoPage) {
-      enterPip();
+      if (DeviceUtils.sdkInt < 31) {
+        enterPip();
+      }
     }
   }
 
@@ -770,9 +787,13 @@ class PlPlayerController with BlockConfigMixin {
 
   Future<Player> _initPlayer() async {
     assert(_videoPlayerController == null);
+    String ao = Pref.audioOutput;
+    if (ao == 'opensles,aaudio,audiotrack') {
+      ao = 'audiotrack,aaudio,opensles';
+    }
     final opt = {
       'video-sync': Pref.videoSync,
-      if (Platform.isAndroid) 'ao': Pref.audioOutput,
+      if (Platform.isAndroid) 'ao': ao,
       'volume':
           (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
               .toString(),
