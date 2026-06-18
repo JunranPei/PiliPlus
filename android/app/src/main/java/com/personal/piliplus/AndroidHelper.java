@@ -47,6 +47,8 @@ public final class AndroidHelper {
     public static volatile int pipWidth = -1;
     public static volatile int pipHeight = -1;
 
+    private static volatile Rational currentAspectRatio = null;
+
     static {
         PackageManager pm = getContext().getPackageManager();
         isFoldable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE);
@@ -163,8 +165,13 @@ public final class AndroidHelper {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Activity activity = JniFlutterPlugin.getActivity(engineId);
             assert activity != null;
+            Rational aspectRatio = new Rational(width, height);
+            currentAspectRatio = aspectRatio;
             PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder()
-                    .setAspectRatio(new Rational(width, height));
+                    .setAspectRatio(aspectRatio);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                builder.setSeamlessResizeEnabled(true);
+            }
             setPipActions(activity, builder, isLive, isPlaying);
 
             try {
@@ -217,6 +224,12 @@ public final class AndroidHelper {
         Activity activity = JniFlutterPlugin.getActivity(engineId);
         assert activity != null;
         PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
+        if (currentAspectRatio != null) {
+            builder.setAspectRatio(currentAspectRatio);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setSeamlessResizeEnabled(true);
+        }
         setPipActions(activity, builder, isLive, isPlaying);
         activity.setPictureInPictureParams(builder.build());
     }
