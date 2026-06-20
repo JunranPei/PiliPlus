@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:get/get_navigation/src/routes/default_route.dart' show GetPageRoute;
 
-final routeObserver = RouteObserver<ModalRoute>();
+final routeObserver = RouteObserver<GetPageRoute>();
 
 mixin RouteAwareMixin<T extends StatefulWidget> on State<T>, RouteAware {
   bool _isSubscribed = false;
@@ -10,7 +11,7 @@ mixin RouteAwareMixin<T extends StatefulWidget> on State<T>, RouteAware {
     super.didChangeDependencies();
     if (!_isSubscribed) {
       final route = ModalRoute.of(context);
-      if (route != null) {
+      if (route is GetPageRoute) {
         routeObserver.subscribe(this, route);
         _isSubscribed = true;
       }

@@ -140,6 +140,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     PlPlayerController.setPlayCallBack(playCallBack);
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
+    plPlayerController = videoDetailController.plPlayerController;
 
     if (videoDetailController.removeSafeArea) {
       hideSystemBar();
@@ -425,7 +426,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     Worker? worker;
     worker = ever(videoDetailController.videoState, (val) {
-      if (val == true) {
+      if (val) {
         Future.delayed(const Duration(milliseconds: 350), () {
           if (mounted) {
             setState(() {
