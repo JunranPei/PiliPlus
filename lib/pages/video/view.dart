@@ -352,6 +352,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
       if (plPlayerController != null) {
         videoDetailController.makeHeartBeat();
+        plPlayerController!.pause();
         plPlayerController!.dispose();
       } else {
         PlPlayerController.updatePlayCount();
