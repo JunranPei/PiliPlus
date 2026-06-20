@@ -2119,6 +2119,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: Obx(
               () {
                 final videoFit = plPlayerController.videoFit.value;
+                final double? aspect = videoFit.aspectRatio ??
+                    ((plPlayerController.width != null &&
+                            plPlayerController.height != null &&
+                            plPlayerController.width! > 0 &&
+                            plPlayerController.height! > 0)
+                        ? (plPlayerController.width! / plPlayerController.height!)
+                        : null);
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,
                   flipY: plPlayerController.flipY.value,
@@ -2128,7 +2135,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     child: SimpleVideo(
                       controller: plPlayerController.videoController!,
                       fill: widget.fill,
-                      aspectRatio: videoFit.aspectRatio,
+                      aspectRatio: aspect,
                     ),
                   ),
                 );

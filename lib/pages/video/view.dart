@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
+import 'dart:typed_data';
+import 'package:flutter/rendering.dart';
 
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/style.dart';
@@ -81,6 +83,8 @@ class VideoDetailPageV extends StatefulWidget {
 class _VideoDetailPageVState extends State<VideoDetailPageV>
     with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
   final heroTag = Get.arguments['heroTag'];
+  final GlobalKey _videoBoundaryKey = GlobalKey();
+  Uint8List? _lastFrameScreenshot;
 
   late final VideoDetailController videoDetailController;
   late final VideoReplyController _videoReplyController;
@@ -364,6 +368,25 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     super.didPushNext();
     isShowing = false;
 
+    try {
+      final boundary = _videoBoundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary != null) {
+        boundary.toImage(pixelRatio: 1.0).then((image) {
+          image.toByteData(format: ImageByteFormat.png).then((byteData) {
+            if (byteData != null) {
+              if (mounted) {
+                setState(() {
+                  _lastFrameScreenshot = byteData.buffer.asUint8List();
+                });
+              }
+            }
+          });
+        });
+      }
+    } catch (e) {
+      debugPrint('Capture last frame error: $e');
+    }
+
     removeObserverMobile(this);
 
     if (Platform.isAndroid && !videoDetailController.setSystemBrightness) {
@@ -399,6 +422,20 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       return;
     }
 
+    Worker? worker;
+    worker = ever(videoDetailController.videoState, (val) {
+      if (val == true) {
+        Future.delayed(const Duration(milliseconds: 350), () {
+          if (mounted) {
+            setState(() {
+              _lastFrameScreenshot = null;
+            });
+          }
+        });
+        worker?.dispose();
+      }
+    });
+
     isShowing = true;
 
     addObserverMobile(this);
@@ -431,17 +468,33 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       }
     }
 
-    plPlayerController
-      ?..addStatusLister(playerListener)
-      ..addPositionListener(positionListener);
-    if (videoDetailController.autoPlay) {
-      videoDetailController.playerInit(
-        autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
-      );
-    } else if (videoDetailController.plPlayerController.preInitPlayer &&
-        !videoDetailController.isQuerying &&
-        videoDetailController.videoUrl != null) {
-      videoDetailController.playerInit();
+    if (plPlayerController?.cid == videoDetailController.cid.value &&
+        plPlayerController?.videoController != null) {
+      // 视频源没有改变，绝对不需要重新初始化
+      plPlayerController
+        ?..addStatusLister(playerListener)
+        ..addPositionListener(positionListener);
+      
+      // 恢复离开前的播放状态，如果之前是播放的就播放，是暂停的就暂停
+      if (videoDetailController.playerStatus == PlayerStatus.playing) {
+        plPlayerController?.play();
+      } else {
+        plPlayerController?.pause();
+      }
+    } else {
+      // 视频源改变了，重新初始化并加载新源
+      plPlayerController
+        ?..addStatusLister(playerListener)
+        ..addPositionListener(positionListener);
+      if (videoDetailController.autoPlay) {
+        videoDetailController.playerInit(
+          autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
+        );
+      } else if (videoDetailController.plPlayerController.preInitPlayer &&
+          !videoDetailController.isQuerying &&
+          videoDetailController.videoUrl != null) {
+        videoDetailController.playerInit();
+      }
     }
   }
 
@@ -1266,43 +1319,59 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     onPopInvokedWithResult:
         videoDetailController.plPlayerController.onPopInvokedWithResult,
     child: Obx(
-      () =>
-          !videoDetailController.videoState.value ||
+      () {
+        final bool showLoadingOrPlaceholder = !videoDetailController.videoState.value ||
               !videoDetailController.autoPlay ||
-              plPlayerController?.videoController == null
-          ? const ColoredBox(
-              color: Colors.black,
-              child: SizedBox.expand(),
-            )
-          : PLVideoPlayer(
-              maxWidth: width,
-              maxHeight: height,
-              plPlayerController: plPlayerController!,
-              videoDetailController: videoDetailController,
-              introController: introController,
-              headerControl: HeaderControl(
-                key: videoDetailController.headerCtrKey,
-                isPortrait: isPortrait,
-                controller: videoDetailController.plPlayerController,
-                videoDetailCtr: videoDetailController,
-                heroTag: heroTag,
-              ),
-              danmuWidget: isPipMode && pipNoDanmaku
-                  ? null
-                  : Obx(
-                      () => PlDanmaku(
-                        key: ValueKey(videoDetailController.cid.value),
-                        isPipMode: isPipMode,
-                        cid: videoDetailController.cid.value,
-                        playerController: plPlayerController!,
-                        isFullScreen: plPlayerController!.isFullScreen.value,
-                        isFileSource: videoDetailController.isFileSource,
-                        size: Size(width, height),
-                      ),
-                    ),
-              showEpisodes: showEpisodes,
-              showViewPoints: showViewPoints,
+              plPlayerController?.videoController == null;
+
+        if (showLoadingOrPlaceholder) {
+          if (_lastFrameScreenshot != null) {
+            return Image.memory(
+              _lastFrameScreenshot!,
+              fit: BoxFit.contain,
+              width: width,
+              height: height,
+            );
+          }
+          return const ColoredBox(
+            color: Colors.black,
+            child: SizedBox.expand(),
+          );
+        }
+
+        return RepaintBoundary(
+          key: _videoBoundaryKey,
+          child: PLVideoPlayer(
+            maxWidth: width,
+            maxHeight: height,
+            plPlayerController: plPlayerController!,
+            videoDetailController: videoDetailController,
+            introController: introController,
+            headerControl: HeaderControl(
+              key: videoDetailController.headerCtrKey,
+              isPortrait: isPortrait,
+              controller: videoDetailController.plPlayerController,
+              videoDetailCtr: videoDetailController,
+              heroTag: heroTag,
             ),
+            danmuWidget: isPipMode && pipNoDanmaku
+                ? null
+                : Obx(
+                    () => PlDanmaku(
+                      key: ValueKey(videoDetailController.cid.value),
+                      isPipMode: isPipMode,
+                      cid: videoDetailController.cid.value,
+                      playerController: plPlayerController!,
+                      isFullScreen: plPlayerController!.isFullScreen.value,
+                      isFileSource: videoDetailController.isFileSource,
+                      size: Size(width, height),
+                    ),
+                  ),
+            showEpisodes: showEpisodes,
+            showViewPoints: showViewPoints,
+          ),
+        );
+      },
     ),
   );
 

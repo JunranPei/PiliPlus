@@ -1,16 +1,20 @@
 import 'package:flutter/widgets.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:get/get_navigation/src/routes/default_route.dart'
-    show GetPageRoute;
 
-final routeObserver = RouteObserver<GetPageRoute>();
+final routeObserver = RouteObserver<ModalRoute>();
 
 mixin RouteAwareMixin<T extends StatefulWidget> on State<T>, RouteAware {
+  bool _isSubscribed = false;
+
   @override
-  void initState() {
-    super.initState();
-    routeObserver.subscribe(this, Get.routing.route as GetPageRoute);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isSubscribed) {
+      final route = ModalRoute.of(context);
+      if (route != null) {
+        routeObserver.subscribe(this, route);
+        _isSubscribed = true;
+      }
+    }
   }
 
   @override
