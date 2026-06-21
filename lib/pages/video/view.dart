@@ -379,8 +379,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         if (image != null) {
           image.toByteData(format: ImageByteFormat.png).then((byteData) {
             if (byteData != null && mounted) {
-              setState(() {
-                _lastFrameScreenshot = byteData.buffer.asUint8List();
+              final bytes = byteData.buffer.asUint8List();
+              precacheImage(MemoryImage(bytes), context).then((_) {
+                if (mounted) {
+                  setState(() {
+                    _lastFrameScreenshot = bytes;
+                  });
+                }
               });
             }
           });
@@ -459,23 +464,40 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       }
     }
 
-    plPlayerController
-      ?..addStatusLister(playerListener)
-      ..addPositionListener(positionListener);
-    // 清除截图，让播放器接管渲染
-    if (mounted) {
-      setState(() {
-        _lastFrameScreenshot = null;
-      });
-    }
-    if (videoDetailController.autoPlay) {
-      videoDetailController.playerInit(
-        autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
-      );
-    } else if (videoDetailController.plPlayerController.preInitPlayer &&
-        !videoDetailController.isQuerying &&
-        videoDetailController.videoUrl != null) {
-      videoDetailController.playerInit();
+    if (plPlayerController?.cid == videoDetailController.cid.value &&
+        plPlayerController?.videoController != null) {
+      // 视频源没有改变，说明离开期间未播放过其他视频，直接恢复状态
+      videoDetailController.videoState.value = true;
+      plPlayerController
+        ?..addStatusLister(playerListener)
+        ..addPositionListener(positionListener);
+      
+      // 清除截图并恢复播放状态
+      if (mounted) {
+        setState(() {
+          _lastFrameScreenshot = null;
+        });
+      }
+      if (videoDetailController.playerStatus == PlayerStatus.playing) {
+        plPlayerController?.play();
+      } else {
+        plPlayerController?.pause();
+      }
+    } else {
+      // 视频源改变了，重新初始化并加载新源
+      plPlayerController
+        ?..addStatusLister(playerListener)
+        ..addPositionListener(positionListener);
+      
+      if (videoDetailController.autoPlay) {
+        videoDetailController.playerInit(
+          autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
+        );
+      } else if (videoDetailController.plPlayerController.preInitPlayer &&
+          !videoDetailController.isQuerying &&
+          videoDetailController.videoUrl != null) {
+        videoDetailController.playerInit();
+      }
     }
   }
 
@@ -1309,7 +1331,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           if (_lastFrameScreenshot != null) {
             return Image.memory(
               _lastFrameScreenshot!,
-              fit: BoxFit.contain,
+              fit: plPlayerController?.videoFit.value.boxFit ?? BoxFit.contain,
               width: width,
               height: height,
             );
