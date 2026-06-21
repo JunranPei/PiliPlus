@@ -2,7 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
+import 'dart:ui' as ui;
 import 'dart:typed_data';
+
+import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/style.dart';
@@ -82,7 +85,8 @@ class VideoDetailPageV extends StatefulWidget {
 class _VideoDetailPageVState extends State<VideoDetailPageV>
     with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
   final heroTag = Get.arguments['heroTag'];
-  Uint8List? _lastFrameScreenshot;
+  ui.Image? _lastFrameScreenshot;
+  StreamSubscription? _dataStatusSubscription;
 
   late final VideoDetailController videoDetailController;
   late final VideoReplyController _videoReplyController;
@@ -352,11 +356,17 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       showSystemBar();
     }
 
+    _dataStatusSubscription?.cancel();
+    _lastFrameScreenshot?.dispose();
+
     if (!videoDetailController.plPlayerController.isCloseAll) {
       videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
       if (plPlayerController != null) {
         videoDetailController.makeHeartBeat();
-        plPlayerController!.pause();
+        final shouldPause = plPlayerController!.playerCount <= 1;
+        if (shouldPause) {
+          plPlayerController!.pause();
+        }
         plPlayerController!.dispose();
       } else {
         PlPlayerController.updatePlayCount();
@@ -376,18 +386,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     // 用 media_kit 的 screenshot() 获取纯视频帧（不含 UI 控件）
     try {
       plPlayerController?.videoPlayerController?.screenshot().then((image) {
-        if (image != null) {
-          image.toByteData(format: ImageByteFormat.png).then((byteData) {
-            if (byteData != null && mounted) {
-              final bytes = byteData.buffer.asUint8List();
-              precacheImage(MemoryImage(bytes), context).then((_) {
-                if (mounted) {
-                  setState(() {
-                    _lastFrameScreenshot = bytes;
-                  });
-                }
-              });
-            }
+        if (image != null && mounted) {
+          setState(() {
+            _lastFrameScreenshot?.dispose();
+            _lastFrameScreenshot = image;
           });
         }
       });
@@ -475,6 +477,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       // 清除截图并恢复播放状态
       if (mounted) {
         setState(() {
+          _lastFrameScreenshot?.dispose();
           _lastFrameScreenshot = null;
         });
       }
@@ -489,6 +492,22 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
       
+      // 监听 dataStatus，加载完成后清除截图
+      _dataStatusSubscription?.cancel();
+      _dataStatusSubscription = plPlayerController?.dataStatus.listen((status) {
+        if ((status == DataStatus.loaded || status == DataStatus.error) &&
+            plPlayerController?.cid == videoDetailController.cid.value) {
+          if (mounted) {
+            setState(() {
+              _lastFrameScreenshot?.dispose();
+              _lastFrameScreenshot = null;
+            });
+          }
+          _dataStatusSubscription?.cancel();
+          _dataStatusSubscription = null;
+        }
+      });
+
       if (videoDetailController.autoPlay) {
         videoDetailController.playerInit(
           autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
@@ -1329,8 +1348,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
         if (showLoadingOrPlaceholder) {
           if (_lastFrameScreenshot != null) {
-            return Image.memory(
-              _lastFrameScreenshot!,
+            return RawImage(
+              image: _lastFrameScreenshot,
               fit: plPlayerController?.videoFit.value.boxFit ?? BoxFit.contain,
               width: width,
               height: height,

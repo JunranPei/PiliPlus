@@ -107,6 +107,7 @@ class PlPlayerController with BlockConfigMixin {
   final RxInt bufferedSeconds = 0.obs;
 
   int _playerCount = 0;
+  int get playerCount => _playerCount;
 
   late double lastPlaybackSpeed = 1.0;
   final RxDouble _playbackSpeed = Pref.playSpeedDefault.obs;
