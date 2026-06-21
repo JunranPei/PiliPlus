@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'dart:typed_data';
-import 'package:flutter/rendering.dart';
 
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/style.dart';
@@ -83,7 +82,6 @@ class VideoDetailPageV extends StatefulWidget {
 class _VideoDetailPageVState extends State<VideoDetailPageV>
     with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
   final heroTag = Get.arguments['heroTag'];
-  final GlobalKey _videoBoundaryKey = GlobalKey();
   Uint8List? _lastFrameScreenshot;
 
   late final VideoDetailController videoDetailController;
@@ -190,6 +188,11 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     final isResume = state == .resumed;
     final ctr = videoDetailController.plPlayerController..visible = isResume;
     if (isResume) {
+      // 回到前台且不在画中画模式时，重置 isEnteringPip 标志
+      // 防止该标志卡死导致 didPushNext 中 pause() 永远不执行
+      if (!AndroidHelper.isPipMode) {
+        ctr.isEnteringPip = false;
+      }
       if (!ctr.showDanmaku) {
         introController.startTimer();
         ctr.showDanmaku = true;
@@ -370,24 +373,20 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     super.didPushNext();
     isShowing = false;
 
+    // 用 media_kit 的 screenshot() 获取纯视频帧（不含 UI 控件）
     try {
-      final boundary = _videoBoundaryKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary != null) {
-        boundary.toImage(pixelRatio: 1.0).then((image) {
+      plPlayerController?.videoPlayerController?.screenshot().then((image) {
+        if (image != null) {
           image.toByteData(format: ImageByteFormat.png).then((byteData) {
-            if (byteData != null) {
-              if (mounted) {
-                setState(() {
-                  _lastFrameScreenshot = byteData.buffer.asUint8List();
-                });
-              }
+            if (byteData != null && mounted) {
+              setState(() {
+                _lastFrameScreenshot = byteData.buffer.asUint8List();
+              });
             }
           });
-        });
-      }
-    } catch (e) {
-      debugPrint('Capture last frame error: $e');
-    }
+        }
+      });
+    } catch (_) {}
 
     removeObserverMobile(this);
 
@@ -397,9 +396,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     introController.cancelTimer();
 
-    if (videoDetailController.plPlayerController.isEnteringPip || AndroidHelper.isPipMode) {
-      return; // 正在进入画中画或已在画中画，保留播放器状态，不进行注销与暂停
+    // 只在确实处于画中画模式时跳过暂停，不再依赖 isEnteringPip
+    // 因为 didPushNext 是应用内页面切换触发的，不可能是"正在进入PiP"
+    if (AndroidHelper.isPipMode) {
+      return; // 已在画中画，保留播放器状态，不进行注销与暂停
     }
+    // 应用内导航，重置 PiP 标志
+    videoDetailController.plPlayerController.isEnteringPip = false;
 
     videoDetailController
       ..videoState.value = false
@@ -423,20 +426,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     if (videoDetailController.plPlayerController.isCloseAll) {
       return;
     }
-
-    Worker? worker;
-    worker = ever(videoDetailController.videoState, (val) {
-      if (val) {
-        Future.delayed(const Duration(milliseconds: 350), () {
-          if (mounted) {
-            setState(() {
-              _lastFrameScreenshot = null;
-            });
-          }
-        });
-        worker?.dispose();
-      }
-    });
 
     isShowing = true;
 
@@ -470,33 +459,23 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       }
     }
 
-    if (plPlayerController?.cid == videoDetailController.cid.value &&
-        plPlayerController?.videoController != null) {
-      // 视频源没有改变，绝对不需要重新初始化
-      plPlayerController
-        ?..addStatusLister(playerListener)
-        ..addPositionListener(positionListener);
-      
-      // 恢复离开前的播放状态，如果之前是播放的就播放，是暂停的就暂停
-      if (videoDetailController.playerStatus == PlayerStatus.playing) {
-        plPlayerController?.play();
-      } else {
-        plPlayerController?.pause();
-      }
-    } else {
-      // 视频源改变了，重新初始化并加载新源
-      plPlayerController
-        ?..addStatusLister(playerListener)
-        ..addPositionListener(positionListener);
-      if (videoDetailController.autoPlay) {
-        videoDetailController.playerInit(
-          autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
-        );
-      } else if (videoDetailController.plPlayerController.preInitPlayer &&
-          !videoDetailController.isQuerying &&
-          videoDetailController.videoUrl != null) {
-        videoDetailController.playerInit();
-      }
+    plPlayerController
+      ?..addStatusLister(playerListener)
+      ..addPositionListener(positionListener);
+    // 清除截图，让播放器接管渲染
+    if (mounted) {
+      setState(() {
+        _lastFrameScreenshot = null;
+      });
+    }
+    if (videoDetailController.autoPlay) {
+      videoDetailController.playerInit(
+        autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
+      );
+    } else if (videoDetailController.plPlayerController.preInitPlayer &&
+        !videoDetailController.isQuerying &&
+        videoDetailController.videoUrl != null) {
+      videoDetailController.playerInit();
     }
   }
 
@@ -1341,9 +1320,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           );
         }
 
-        return RepaintBoundary(
-          key: _videoBoundaryKey,
-          child: PLVideoPlayer(
+        return PLVideoPlayer(
             maxWidth: width,
             maxHeight: height,
             plPlayerController: plPlayerController!,
@@ -1371,7 +1348,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                   ),
             showEpisodes: showEpisodes,
             showViewPoints: showViewPoints,
-          ),
         );
       },
     ),
