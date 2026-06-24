@@ -85,7 +85,6 @@ class VideoDetailPageV extends StatefulWidget {
 class _VideoDetailPageVState extends State<VideoDetailPageV>
     with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
   final heroTag = Get.arguments['heroTag'];
-  ui.Image? _lastFrameScreenshot;
   StreamSubscription? _dataStatusSubscription;
 
   late final VideoDetailController videoDetailController;
@@ -357,7 +356,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     }
 
     _dataStatusSubscription?.cancel();
-    _lastFrameScreenshot?.dispose();
 
     if (!videoDetailController.plPlayerController.isCloseAll) {
       videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
@@ -383,18 +381,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     super.didPushNext();
     isShowing = false;
 
-    // 用 media_kit 的 screenshot() 获取纯视频帧（不含 UI 控件）
-    try {
-      plPlayerController?.videoPlayerController?.screenshot().then((image) {
-        if (image != null && mounted) {
-          setState(() {
-            _lastFrameScreenshot?.dispose();
-            _lastFrameScreenshot = image;
-          });
-        }
-      });
-    } catch (_) {}
-
     removeObserverMobile(this);
 
     if (Platform.isAndroid && !videoDetailController.setSystemBrightness) {
@@ -414,6 +400,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     videoDetailController
       ..videoState.value = false
       ..cancelBlockListener()
+      ..playedTime = plPlayerController?.position
       ..playerStatus = plPlayerController?.playerStatus.value
       ..brightness = plPlayerController?.brightness.value;
     if (plPlayerController != null) {
@@ -474,13 +461,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
       
-      // 清除截图并恢复播放状态
-      if (mounted) {
-        setState(() {
-          _lastFrameScreenshot?.dispose();
-          _lastFrameScreenshot = null;
-        });
-      }
       if (videoDetailController.playerStatus == PlayerStatus.playing) {
         plPlayerController?.play();
       } else {
@@ -492,17 +472,11 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
       
-      // 监听 dataStatus，加载完成后清除截图
+      // 监听 dataStatus，加载完成后清除监听
       _dataStatusSubscription?.cancel();
       _dataStatusSubscription = plPlayerController?.dataStatus.listen((status) {
         if ((status == DataStatus.loaded || status == DataStatus.error) &&
             plPlayerController?.cid == videoDetailController.cid.value) {
-          if (mounted) {
-            setState(() {
-              _lastFrameScreenshot?.dispose();
-              _lastFrameScreenshot = null;
-            });
-          }
           _dataStatusSubscription?.cancel();
           _dataStatusSubscription = null;
         }
@@ -1347,17 +1321,11 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
               plPlayerController?.videoController == null;
 
         if (showLoadingOrPlaceholder) {
-          if (_lastFrameScreenshot != null) {
-            return RawImage(
-              image: _lastFrameScreenshot,
-              fit: plPlayerController?.videoFit.value.boxFit ?? BoxFit.contain,
-              width: width,
-              height: height,
-            );
-          }
-          return const ColoredBox(
-            color: Colors.black,
-            child: SizedBox.expand(),
+          return NetworkImgLayer(
+            src: videoDetailController.cover.value,
+            fit: plPlayerController?.videoFit.value.boxFit ?? BoxFit.contain,
+            width: width,
+            height: height,
           );
         }
 

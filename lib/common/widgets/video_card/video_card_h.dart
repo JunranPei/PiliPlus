@@ -12,6 +12,7 @@ import 'package:PiliPlus/utils/date_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
+import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
 
 // 视频卡片 - 水平布局
@@ -47,6 +48,7 @@ class VideoCardH extends StatelessWidget {
             onTap:
                 onTap ??
                 () async {
+                  PlPlayerController.pauseIfExists();
                   if (videoItem.isPugv ?? false) {
                     PageUtils.viewPugv(seasonId: videoItem.seasonId);
                     return;
