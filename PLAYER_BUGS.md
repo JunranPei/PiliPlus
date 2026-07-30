@@ -25,8 +25,8 @@
 - 画面事件：纹理 ID、纹理矩形、解码尺寸、显示尺寸、旋转、像素比例和截图生命周期。
 - 首帧事件：每个视频源只记录第一条进度事件，并记录首帧等待、播放起点、拒绝原因和最终放行时机。
 - 功耗约束：不记录连续播放进度，不新增轮询或定时器；日志只在状态变化和每个视频源的首个关键事件发生时写入。
-- 当前测试包：`com.personal.piliplus.test2`，版本 `2.0.9-功耗修复`，APK 文件 `PiliPlus-test2-2.0.9-surface-v5-profile.apk`。
-- 当前测试包 SHA-256：`E5E4852A507788EE4AA7B0D03E16FE4EA84E1C0F2677795D1937C574D7F7CA98`。
+- 当前交付包：`com.personal.piliplus.test2`，版本 `2.0.9-播放器修复`，APK 文件 `PiliPlus-test2-2.0.9-player-fix-release.apk`。
+- 当前交付包 SHA-256：`04B458C1A7AB36790951D7FAD72BF380DC22919860EA659F3632A1D2EC382D6F`。
 - 2026-07-29：第五版已覆盖安装到设备 `SM-S9380`，安装时间 `15:01:36`；安装后已清空 Logcat。
 - 2026-07-29 第四版真机结果：首个视频不再闪烁但播放前会短暂停顿；第二个视频与返回页出现画面永久停留、只有音频播放且控件不可见的严重回归。
 - 2026-07-29 第三版真机结果：原问题均可复现；已读取本版 `[PLAYER_TRACE]`，日志足以定位下一轮底层修复。
@@ -372,3 +372,11 @@
 
 - 2026-07-30：用户完成真机复测并确认问题已解决，任务完成。
 - 最终源码版本名由阶段性的 `2.0.9-功耗修复` 调整为 `2.0.9-播放器修复`，仍使用测试包名 `com.personal.piliplus.test2`，避免覆盖官方应用。
+
+### 最终 Release 交付
+
+- 2026-07-30：完整 Release 构建成功，APK 大小 `66,663,727` 字节。
+- APK：`PiliPlus-test2-2.0.9-player-fix-release.apk`
+- SHA-256：`04B458C1A7AB36790951D7FAD72BF380DC22919860EA659F3632A1D2EC382D6F`
+- APK 清单核验：包名 `com.personal.piliplus.test2`、`versionCode=3`、版本名 `2.0.9-播放器修复`、`minSdk=24`、`targetSdk=36`。
+- APK 签名核验通过，使用 APK Signature Scheme v2。项目未配置私有 Release 密钥，因此按现有 Gradle 规则使用 Android Debug 证书签名；该包是 Release 优化构建，但不作为应用商店正式签名包。
