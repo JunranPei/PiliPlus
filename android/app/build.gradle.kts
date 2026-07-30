@@ -18,11 +18,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.personal.piliplus"
+        applicationId = "com.personal.piliplus.test2"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
-        versionName = "${flutter.versionName}-功耗修复"
+        versionName = "${flutter.versionName}-播放器修复"
     }
 
     packagingOptions.jniLibs.useLegacyPackaging = true

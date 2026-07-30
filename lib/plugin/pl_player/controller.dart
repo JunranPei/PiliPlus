@@ -30,6 +30,7 @@ import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/video_fit_type.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
+import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/android/android_helper.dart';
@@ -108,6 +109,164 @@ class PlPlayerController with BlockConfigMixin {
 
   int _playerCount = 0;
   int get playerCount => _playerCount;
+  int _sourceGeneration = 0;
+  int get sourceGeneration => _sourceGeneration;
+  int? _loggedFirstPositionGeneration;
+  final RxInt visualReadyGeneration = 0.obs;
+  int? _visualCandidateGeneration;
+  int? _visualCandidateWidth;
+  int? _visualCandidateHeight;
+  String? _visualCandidatePixelFormat;
+  int _visualCandidateStableSurfaceBaseline = 0;
+
+  void _tracePlayer(String event, {int? generation, String extra = ''}) {
+    final controller = _videoController;
+    final rect = controller?.rect.value;
+    final state = _videoPlayerController?.state;
+    logger.i(
+      '[PLAYER_TRACE] layer=controller event=$event '
+      'generation=${generation ?? _sourceGeneration} playerCount=$_playerCount '
+      'activeGeneration=$_sourceGeneration '
+      'cid=$cid status=${playerStatus.value.name} dataStatus=${dataStatus.value.name} '
+      'playing=${state?.playing} positionMs=${state?.position.inMilliseconds} '
+      'size=${state?.width}x${state?.height} textureId=${controller?.id.value} '
+      'rect=${rect?.width}x${rect?.height} '
+      'firstFrameCount=${controller?.firstFrameRenderedCount.value} '
+      'stableSurfaceCount=${controller?.stableSurfaceCount.value} '
+      'stableSurfaceBaseline=$_visualCandidateStableSurfaceBaseline '
+      'processing=$_processing $extra',
+    );
+  }
+
+  void _onTextureIdChanged() {
+    _tracePlayer(
+      'texture.id.changed',
+      extra: 'value=${_videoController?.id.value}',
+    );
+  }
+
+  void _onTextureRectChanged() {
+    final rect = _videoController?.rect.value;
+    _tracePlayer(
+      'texture.rect.changed',
+      extra:
+          'left=${rect?.left} top=${rect?.top} '
+          'width=${rect?.width} height=${rect?.height}',
+    );
+    _tryMarkVisualReady('texture.rect');
+  }
+
+  void _onFirstFrameRenderedCountChanged() {
+    _tracePlayer(
+      'firstFrame.native.changed',
+      extra: 'count=${_videoController?.firstFrameRenderedCount.value}',
+    );
+  }
+
+  void _onStableSurfaceCountChanged() {
+    _tracePlayer(
+      'surface.stable.changed',
+      extra: 'count=${_videoController?.stableSurfaceCount.value}',
+    );
+    _tryMarkVisualReady('surface.stable');
+  }
+
+  void _detachTextureTrace(VideoController? controller) {
+    controller?.id.removeListener(_onTextureIdChanged);
+    controller?.rect.removeListener(_onTextureRectChanged);
+    controller?.firstFrameRenderedCount.removeListener(
+      _onFirstFrameRenderedCountChanged,
+    );
+    controller?.stableSurfaceCount.removeListener(
+      _onStableSurfaceCountChanged,
+    );
+  }
+
+  void _resetVisualReadyCandidate() {
+    _visualCandidateGeneration = null;
+    _visualCandidateWidth = null;
+    _visualCandidateHeight = null;
+    _visualCandidatePixelFormat = null;
+    _visualCandidateStableSurfaceBaseline =
+        _videoController?.stableSurfaceCount.value ?? 0;
+  }
+
+  void _observeVideoParams(VideoParams event) {
+    final dw = event.dw;
+    final dh = event.dh;
+    if (dw == null || dh == null || dw <= 0 || dh <= 0) {
+      return;
+    }
+
+    if (Platform.isAndroid && event.pixelformat == 'rgba') {
+      _tracePlayer(
+        'visual.candidate.ignored',
+        extra:
+            'reason=transitionalPixelFormat '
+            'pixelFormat=${event.pixelformat} display=${dw}x$dh',
+      );
+      return;
+    }
+
+    final rotate = event.rotate ?? 0;
+    final candidateWidth = rotate == 90 || rotate == 270 ? dh : dw;
+    final candidateHeight = rotate == 90 || rotate == 270 ? dw : dh;
+    _visualCandidateGeneration = _sourceGeneration;
+    if (rotate == 90 || rotate == 270) {
+      _visualCandidateWidth = dh;
+      _visualCandidateHeight = dw;
+    } else {
+      _visualCandidateWidth = dw;
+      _visualCandidateHeight = dh;
+    }
+    _visualCandidatePixelFormat = event.pixelformat;
+    _tracePlayer(
+      'visual.candidate.accepted',
+      extra:
+          'candidate=${_visualCandidateWidth}x$_visualCandidateHeight '
+          'pixelFormat=$_visualCandidatePixelFormat',
+    );
+    _tryMarkVisualReady('videoParams');
+  }
+
+  void _tryMarkVisualReady(String reason) {
+    final generation = _visualCandidateGeneration;
+    final candidateWidth = _visualCandidateWidth;
+    final candidateHeight = _visualCandidateHeight;
+    final rect = _videoController?.rect.value;
+    final stableSurfaceCount = _videoController?.stableSurfaceCount.value ?? 0;
+    if (generation == null ||
+        generation != _sourceGeneration ||
+        candidateWidth == null ||
+        candidateHeight == null ||
+        rect == null ||
+        rect.width <= 0 ||
+        rect.height <= 0) {
+      return;
+    }
+
+    final rectMatches =
+        rect.width.round() == candidateWidth &&
+        rect.height.round() == candidateHeight;
+    final stableSurfaceReady =
+        !Platform.isAndroid ||
+        stableSurfaceCount > _visualCandidateStableSurfaceBaseline;
+    if (!rectMatches ||
+        !stableSurfaceReady ||
+        visualReadyGeneration.value == generation) {
+      return;
+    }
+
+    visualReadyGeneration.value = generation;
+    _tracePlayer(
+      'visual.ready',
+      extra:
+          'reason=$reason candidate=${candidateWidth}x$candidateHeight '
+          'pixelFormat=$_visualCandidatePixelFormat '
+          'stableSurfaceCount=$stableSurfaceCount '
+          'stableSurfaceBaseline=$_visualCandidateStableSurfaceBaseline',
+    );
+  }
 
   late double lastPlaybackSpeed = 1.0;
   final RxDouble _playbackSpeed = Pref.playSpeedDefault.obs;
@@ -337,12 +496,15 @@ class PlPlayerController with BlockConfigMixin {
 
       final rect = getVideoRectCallback?.call();
       if (rect != null) {
-        const MethodChannel('com.personal.piliplus/pip').invokeMethod('setVideoRect', {
-          'left': rect.left.toInt(),
-          'top': rect.top.toInt(),
-          'width': rect.width.toInt(),
-          'height': rect.height.toInt(),
-        });
+        const MethodChannel('com.personal.piliplus/pip').invokeMethod(
+          'setVideoRect',
+          {
+            'left': rect.left.toInt(),
+            'top': rect.top.toInt(),
+            'width': rect.width.toInt(),
+            'height': rect.height.toInt(),
+          },
+        );
       }
 
       final state = videoPlayerController!.state;
@@ -697,6 +859,15 @@ class PlPlayerController with BlockConfigMixin {
     Volume? volume,
     bool autoFullScreenFlag = false,
   }) async {
+    final generation = ++_sourceGeneration;
+    _resetVisualReadyCandidate();
+    _tracePlayer(
+      'setDataSource.begin',
+      generation: generation,
+      extra:
+          'targetCid=$cid autoplay=$autoplay sourceType=${dataSource.runtimeType} '
+          'expectedSize=${width}x$height seekToMs=${seekTo?.inMilliseconds}',
+    );
     try {
       _processing = true;
       this.isLive = isLive;
@@ -732,11 +903,13 @@ class PlPlayerController with BlockConfigMixin {
       }
       // 配置Player 音轨、字幕等等
       await _createVideoController(dataSource, seekTo, volume);
+      _tracePlayer('setDataSource.opened', generation: generation);
 
       if (_playerCount == 0) {
         _removeListeners();
         _videoPlayerController?.dispose();
         _videoPlayerController = null;
+        _detachTextureTrace(_videoController);
         _videoController = null;
         return;
       }
@@ -749,6 +922,7 @@ class PlPlayerController with BlockConfigMixin {
       updateBufferedSecond();
       // 数据加载完成
       dataStatus.value = DataStatus.loaded;
+      _tracePlayer('setDataSource.loaded', generation: generation);
 
       if (autoFullScreenFlag && autoEnterFullScreen) {
         triggerFullScreen(status: true);
@@ -756,14 +930,21 @@ class PlPlayerController with BlockConfigMixin {
 
       await _initializePlayer();
       onInit?.call();
+      _tracePlayer('setDataSource.initialized', generation: generation);
     } catch (err, stackTrace) {
       dataStatus.value = DataStatus.error;
+      _tracePlayer(
+        'setDataSource.error',
+        generation: generation,
+        extra: 'errorType=${err.runtimeType}',
+      );
       if (kDebugMode) {
         debugPrint(stackTrace.toString());
         debugPrint('plPlayer err:  $err');
       }
     } finally {
       _processing = false;
+      _tracePlayer('setDataSource.end', generation: generation);
     }
   }
 
@@ -834,7 +1015,7 @@ class PlPlayerController with BlockConfigMixin {
           (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
               .toString(),
       'volume-max': kMaxVolume.toString(),
-      if (hwdec != null && hwdec != 'no') 
+      if (hwdec != null && hwdec != 'no')
         'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec!,
       if (Platform.isAndroid) 'profile': 'fast',
       if (Platform.isWindows) 'gpu-api': 'd3d11',
@@ -860,10 +1041,20 @@ class PlPlayerController with BlockConfigMixin {
       player,
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
-        androidAttachSurfaceAfterVideoParameters: false,
+        androidAttachSurfaceAfterVideoParameters: true,
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
+    _videoController!
+      ..id.addListener(_onTextureIdChanged)
+      ..rect.addListener(_onTextureRectChanged)
+      ..firstFrameRenderedCount.addListener(
+        _onFirstFrameRenderedCountChanged,
+      )
+      ..stableSurfaceCount.addListener(
+        _onStableSurfaceCountChanged,
+      );
+    _tracePlayer('texture.controller.created');
 
     player.setMediaHeader(userAgent: BrowserUa.pc, referer: HttpString.baseUrl);
 
@@ -899,6 +1090,7 @@ class PlPlayerController with BlockConfigMixin {
         _removeListeners();
         player.dispose();
         player = null;
+        _detachTextureTrace(_videoController);
         _videoController = null;
         return;
       }
@@ -955,6 +1147,7 @@ class PlPlayerController with BlockConfigMixin {
       }
     }
 
+    _tracePlayer('player.open.begin');
     await player.open(
       Media(
         video,
@@ -963,6 +1156,7 @@ class PlPlayerController with BlockConfigMixin {
       ),
       play: false,
     );
+    _tracePlayer('player.open.end');
   }
 
   Future<void>? refreshPlayer() {
@@ -1013,6 +1207,7 @@ class PlPlayerController with BlockConfigMixin {
     final stream = player.stream;
     _subscriptions = [
       stream.playing.listen((event) {
+        _tracePlayer('stream.playing', extra: 'value=$event');
         WakelockPlus.toggle(enable: event);
         if (event) {
           if (_isAutoEnterPip) {
@@ -1042,6 +1237,7 @@ class PlPlayerController with BlockConfigMixin {
         }
       }),
       stream.completed.listen((event) {
+        _tracePlayer('stream.completed', extra: 'value=$event');
         if (event) {
           playerStatus.value = PlayerStatus.completed;
 
@@ -1055,6 +1251,13 @@ class PlPlayerController with BlockConfigMixin {
         makeHeartBeat(positionSeconds.value, type: HeartBeatType.completed);
       }),
       stream.position.listen((event) {
+        if (_loggedFirstPositionGeneration != _sourceGeneration) {
+          _loggedFirstPositionGeneration = _sourceGeneration;
+          _tracePlayer(
+            'stream.position.first',
+            extra: 'eventPositionMs=${event.inMilliseconds}',
+          );
+        }
         position = event;
         updatePositionSecond();
         if (!isSliderMoving.value) {
@@ -1071,11 +1274,29 @@ class PlPlayerController with BlockConfigMixin {
       stream.duration.listen((Duration event) {
         duration.value = event;
       }),
+      stream.size.listen((event) {
+        _tracePlayer(
+          'stream.size',
+          extra: 'eventSize=${event.$1}x${event.$2}',
+        );
+      }),
+      stream.videoParams.listen((event) {
+        _observeVideoParams(event);
+        _tracePlayer(
+          'stream.videoParams',
+          extra:
+              'decoded=${event.w}x${event.h} display=${event.dw}x${event.dh} '
+              'aspect=${event.aspect} par=${event.par} rotate=${event.rotate} '
+              'pixelFormat=${event.pixelformat} '
+              'hwPixelFormat=${event.hwPixelformat}',
+        );
+      }),
       stream.buffer.listen((Duration event) {
         buffered.value = event;
         updateBufferedSecond();
       }),
       stream.buffering.listen((bool event) {
+        _tracePlayer('stream.buffering', extra: 'value=$event');
         isBuffering.value = event;
         videoPlayerServiceHandler?.onStatusChange(
           playerStatus.value,
@@ -1092,6 +1313,10 @@ class PlPlayerController with BlockConfigMixin {
           }
         })),
       stream.error.listen((String event) {
+        _tracePlayer(
+          'stream.error',
+          extra: 'messageLength=${event.length}',
+        );
         if (dataSource is FileSource &&
             event.startsWith("Failed to open file")) {
           return;
@@ -1244,6 +1469,7 @@ class PlPlayerController with BlockConfigMixin {
 
   /// 播放视频
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
+    _tracePlayer('play.request', extra: 'repeat=$repeat');
     if (_playerCount == 0) return;
     // 播放时自动隐藏控制条
     controls = !hideControls;
@@ -1258,13 +1484,59 @@ class PlPlayerController with BlockConfigMixin {
     audioSessionHandler?.setActive(true);
 
     playerStatus.value = PlayerStatus.playing;
+    _tracePlayer('play.complete');
     // screenManager.setOverlays(false);
+  }
+
+  /// 在保持暂停的前提下解码并渲染一帧，用于恢复真实暂停画面。
+  Future<void> renderPausedFrame() async {
+    final player = _videoPlayerController;
+    if (player == null || player.state.playing) {
+      return;
+    }
+    _tracePlayer('pausedFrame.render.request');
+    try {
+      await player.command(const ['frame-step']);
+      _tracePlayer('pausedFrame.render.complete');
+    } catch (error) {
+      _tracePlayer(
+        'pausedFrame.render.error',
+        extra: 'errorType=${error.runtimeType}',
+      );
+    }
   }
 
   /// 暂停播放
   Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
-    await _videoPlayerController?.pause();
+    final requestedPosition = position;
+    _tracePlayer(
+      'pause.request',
+      extra:
+          'notify=$notify isInterrupt=$isInterrupt '
+          'requestedPositionMs=${requestedPosition.inMilliseconds}',
+    );
     playerStatus.value = PlayerStatus.paused;
+    _tracePlayer('pause.uiState.updated');
+    try {
+      await _videoPlayerController?.pause();
+    } catch (error) {
+      playerStatus.value = _videoPlayerController?.state.playing == true
+          ? PlayerStatus.playing
+          : PlayerStatus.paused;
+      _tracePlayer(
+        'pause.error',
+        extra: 'errorType=${error.runtimeType}',
+      );
+      rethrow;
+    }
+    final settledPosition = _videoPlayerController?.state.position ?? position;
+    _tracePlayer(
+      'pause.complete',
+      extra:
+          'requestedPositionMs=${requestedPosition.inMilliseconds} '
+          'settledPositionMs=${settledPosition.inMilliseconds} '
+          'deltaMs=${settledPosition.inMilliseconds - requestedPosition.inMilliseconds}',
+    );
 
     // 主动暂停时让出音频焦点
     if (!isInterrupt) {
@@ -1422,9 +1694,11 @@ class PlPlayerController with BlockConfigMixin {
   Future<void> onDoubleTapCenter() async {
     if (!isLive && _isCompleted) {
       await videoPlayerController!.seek(Duration.zero);
-      videoPlayerController!.play();
+      await play();
+    } else if (playerStatus.isPlaying) {
+      await pause();
     } else {
-      videoPlayerController!.playOrPause();
+      await play();
     }
   }
 
@@ -1730,6 +2004,7 @@ class PlPlayerController with BlockConfigMixin {
     }
     _videoPlayerController?.dispose();
     _videoPlayerController = null;
+    _detachTextureTrace(_videoController);
     _videoController = null;
     _instance = null;
     videoPlayerServiceHandler?.clear();

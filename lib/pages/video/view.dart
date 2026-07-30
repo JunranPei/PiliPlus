@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'dart:ui' as ui;
-import 'dart:typed_data';
 
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 
@@ -50,6 +49,7 @@ import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/pl_player/view/view.dart';
+import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/services/shutdown_timer_service.dart'
     show shutdownTimerService;
@@ -86,7 +86,20 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
   final heroTag = Get.arguments['heroTag'];
   ui.Image? _lastFrameScreenshot;
-  StreamSubscription? _dataStatusSubscription;
+  BoxFit? _lastFrameBoxFit;
+  StreamSubscription<DataStatus>? _dataStatusSubscription;
+  StreamSubscription<int>? _visualReadySubscription;
+  bool _waitingForFirstFrame = false;
+  bool _keepPausedScreenshot = false;
+  bool _loggedRejectedFrameEvent = false;
+  bool _sourceWaitRequiresPlaybackAdvance = true;
+  bool _waitForPlaybackAdvance = true;
+  bool _playbackAdvanced = false;
+  int _playAttempt = 0;
+  int? _waitingSourceGeneration;
+  int? _waitingCid;
+  Duration? _waitingPlayStartPosition;
+  PlayerStatus? _lastObservedPlayerStatus;
 
   late final VideoDetailController videoDetailController;
   late final VideoReplyController _videoReplyController;
@@ -136,6 +149,258 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   final videoRelatedKey = GlobalKey();
   final videoIntroKey = GlobalKey();
 
+  void _tracePage(String event, {String extra = ''}) {
+    final controller = plPlayerController;
+    final videoController = controller?.videoController;
+    final rect = videoController?.rect.value;
+    final playerState = controller?.videoPlayerController?.state;
+    logger.i(
+      '[PLAYER_TRACE] layer=page event=$event hero=$heroTag '
+      'pageCid=${videoDetailController.cid.value} playerCid=${controller?.cid} '
+      'sourceGeneration=${controller?.sourceGeneration} showing=$isShowing '
+      'autoPlay=${videoDetailController.autoPlay} '
+      'savedStatus=${videoDetailController.playerStatus?.name} '
+      'playerStatus=${controller?.playerStatus.value.name} '
+      'videoState=${videoDetailController.videoState.value} '
+      'dataStatus=${controller?.dataStatus.value.name} '
+      'visualReadyGeneration=${controller?.visualReadyGeneration.value} '
+      'nativeFirstFrameCount=${videoController?.firstFrameRenderedCount.value} '
+      'waitingFirstFrame=$_waitingForFirstFrame '
+      'keepPausedScreenshot=$_keepPausedScreenshot '
+      'waitForPlaybackAdvance=$_waitForPlaybackAdvance '
+      'playbackAdvanced=$_playbackAdvanced '
+      'hasScreenshot=${_lastFrameScreenshot != null} '
+      'textureId=${videoController?.id.value} '
+      'rect=${rect?.width}x${rect?.height} '
+      'playerSize=${playerState?.width}x${playerState?.height} '
+      'playerPositionMs=${playerState?.position.inMilliseconds} '
+      'attempt=$_playAttempt waitingGeneration=$_waitingSourceGeneration '
+      'waitingCid=$_waitingCid '
+      'playStartPositionMs=${_waitingPlayStartPosition?.inMilliseconds} '
+      'lastObservedStatus=${_lastObservedPlayerStatus?.name} $extra',
+    );
+  }
+
+  void _beginFirstFrameWait(
+    String reason, {
+    bool rebuild = true,
+    bool? requirePlaybackAdvance,
+  }) {
+    final controller = plPlayerController;
+    _waitingForFirstFrame = true;
+    _loggedRejectedFrameEvent = false;
+    _waitForPlaybackAdvance =
+        requirePlaybackAdvance ?? _sourceWaitRequiresPlaybackAdvance;
+    _playbackAdvanced = false;
+    _waitingSourceGeneration = controller?.sourceGeneration;
+    _waitingCid = videoDetailController.cid.value;
+    _waitingPlayStartPosition = null;
+    _tracePage(
+      'firstFrame.wait.begin',
+      extra:
+          'reason=$reason '
+          'requirePlaybackAdvance=$_waitForPlaybackAdvance',
+    );
+    if (rebuild && mounted) {
+      setState(() {});
+    }
+  }
+
+  void _markPlaybackStarted() {
+    if (!_waitingForFirstFrame) {
+      return;
+    }
+    final controller = plPlayerController;
+    final generationMatches =
+        controller?.sourceGeneration == _waitingSourceGeneration;
+    final sourceMatches =
+        controller?.cid == _waitingCid &&
+        controller?.cid == videoDetailController.cid.value;
+    if (!generationMatches || !sourceMatches) {
+      _tracePage(
+        'firstFrame.playing.rejected',
+        extra:
+            'generationMatches=$generationMatches '
+            'sourceMatches=$sourceMatches',
+      );
+      return;
+    }
+    _waitingPlayStartPosition =
+        controller?.videoPlayerController?.state.position;
+    _tracePage('firstFrame.playing.accepted');
+  }
+
+  void _tryFinishFirstFrameWait(String reason) {
+    if (!_waitingForFirstFrame || !mounted || !isShowing) {
+      return;
+    }
+    final controller = plPlayerController;
+    final generationMatches =
+        controller?.sourceGeneration == _waitingSourceGeneration;
+    final sourceMatches =
+        controller?.cid == _waitingCid &&
+        controller?.cid == videoDetailController.cid.value;
+    final visualReady =
+        controller?.visualReadyGeneration.value == _waitingSourceGeneration;
+    final playerPageReady =
+        controller?.dataStatus.value == DataStatus.loaded &&
+        videoDetailController.videoState.value;
+    final playbackReady = !_waitForPlaybackAdvance || _playbackAdvanced;
+    if (generationMatches &&
+        sourceMatches &&
+        visualReady &&
+        playerPageReady &&
+        playbackReady) {
+      _finishFirstFrameWait(
+        controller?.videoPlayerController?.state.position ?? Duration.zero,
+        reason: reason,
+      );
+    } else {
+      _tracePage(
+        'firstFrame.finish.deferred',
+        extra:
+            'reason=$reason generationMatches=$generationMatches '
+            'sourceMatches=$sourceMatches visualReady=$visualReady '
+            'playerPageReady=$playerPageReady playbackReady=$playbackReady',
+      );
+    }
+  }
+
+  void _finishFirstFrameWait(Duration position, {required String reason}) {
+    if (!_waitingForFirstFrame || !mounted) {
+      return;
+    }
+    final holdPausedScreenshot =
+        _keepPausedScreenshot &&
+        plPlayerController?.playerStatus.value == PlayerStatus.paused;
+    _tracePage(
+      'firstFrame.ready',
+      extra:
+          'reason=$reason positionMs=${position.inMilliseconds} '
+          'holdPausedScreenshot=$holdPausedScreenshot',
+    );
+    setState(() {
+      _waitingForFirstFrame = false;
+      if (!holdPausedScreenshot) {
+        _keepPausedScreenshot = false;
+        _lastFrameScreenshot?.dispose();
+        _lastFrameScreenshot = null;
+        _lastFrameBoxFit = null;
+      }
+      _waitingSourceGeneration = null;
+      _waitingCid = null;
+      _waitingPlayStartPosition = null;
+      _playbackAdvanced = false;
+    });
+    if (holdPausedScreenshot) {
+      _tracePage(
+        'pausedScreenshot.held',
+        extra: 'positionMs=${position.inMilliseconds}',
+      );
+    }
+  }
+
+  void _onVisualReady(int generation) {
+    _tracePage('visualReady.changed', extra: 'value=$generation');
+    _tryFinishFirstFrameWait('visualReady.changed');
+  }
+
+  void _onDataStatus(DataStatus status) {
+    _tracePage('dataStatus.changed', extra: 'value=${status.name}');
+    if (status == DataStatus.loading && isShowing) {
+      _beginFirstFrameWait(
+        'dataStatus.loading',
+        requirePlaybackAdvance: _sourceWaitRequiresPlaybackAdvance,
+      );
+    }
+  }
+
+  Future<void> _captureLastFrame({required String reason}) async {
+    final expectedCid = plPlayerController?.cid;
+    final expectedGeneration = plPlayerController?.sourceGeneration;
+    final expectedBoxFit = plPlayerController?.videoFit.value.boxFit;
+    if (_waitingForFirstFrame &&
+        expectedGeneration == _waitingSourceGeneration) {
+      _tracePage(
+        'screenshot.capture.skipped',
+        extra:
+            'reason=$reason skipReason=sourceTransition '
+            'expectedGeneration=$expectedGeneration',
+      );
+      return;
+    }
+    _tracePage(
+      'screenshot.capture.begin',
+      extra:
+          'reason=$reason expectedCid=$expectedCid '
+          'expectedGeneration=$expectedGeneration boxFit=$expectedBoxFit',
+    );
+    try {
+      final image = await plPlayerController?.videoPlayerController
+          ?.screenshot();
+      if (image == null) {
+        _tracePage('screenshot.capture.empty');
+        return;
+      }
+      if (plPlayerController?.cid != expectedCid ||
+          plPlayerController?.sourceGeneration != expectedGeneration) {
+        _tracePage(
+          'screenshot.capture.stale',
+          extra:
+              'expectedCid=$expectedCid '
+              'expectedGeneration=$expectedGeneration',
+        );
+        image.dispose();
+        return;
+      }
+      if (!mounted) {
+        image.dispose();
+        return;
+      }
+      setState(() {
+        _lastFrameScreenshot?.dispose();
+        _lastFrameScreenshot = image;
+        _lastFrameBoxFit = expectedBoxFit;
+      });
+      _tracePage(
+        'screenshot.capture.success',
+        extra: 'imageSize=${image.width}x${image.height}',
+      );
+    } catch (error) {
+      _tracePage(
+        'screenshot.capture.error',
+        extra: 'errorType=${error.runtimeType}',
+      );
+    }
+  }
+
+  void _schedulePausedFrameCapture() {
+    final expectedCid = videoDetailController.cid.value;
+    final expectedGeneration = plPlayerController?.sourceGeneration;
+    _tracePage(
+      'screenshot.capture.scheduled',
+      extra:
+          'reason=player.pause expectedCid=$expectedCid '
+          'expectedGeneration=$expectedGeneration',
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          !isShowing ||
+          plPlayerController?.cid != expectedCid ||
+          plPlayerController?.sourceGeneration != expectedGeneration ||
+          plPlayerController?.playerStatus.value != PlayerStatus.paused) {
+        _tracePage(
+          'screenshot.capture.scheduleCancelled',
+          extra:
+              'reason=stateChanged expectedCid=$expectedCid '
+              'expectedGeneration=$expectedGeneration',
+        );
+        return;
+      }
+      unawaited(_captureLastFrame(reason: 'player.pause.afterUiFrame'));
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -167,6 +432,17 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       pgcIntroController = Get.put(PgcIntroController(), tag: heroTag);
     }
 
+    _dataStatusSubscription = plPlayerController!.dataStatus.listen(
+      _onDataStatus,
+    );
+    _visualReadySubscription = plPlayerController!.visualReadyGeneration.listen(
+      _onVisualReady,
+    );
+    if (videoDetailController.autoPlay) {
+      _sourceWaitRequiresPlaybackAdvance = true;
+      _beginFirstFrameWait('initial.autoPlay', rebuild: false);
+    }
+    _tracePage('page.init');
     videoSourceInit();
 
     addObserverMobile(this);
@@ -184,11 +460,57 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   }
 
   void positionListener(Duration position) {
+    final isCurrentSource =
+        plPlayerController?.cid == videoDetailController.cid.value &&
+        plPlayerController?.videoController != null;
+    if (!isCurrentSource) {
+      if (_waitingForFirstFrame && !_loggedRejectedFrameEvent) {
+        _loggedRejectedFrameEvent = true;
+        _tracePage(
+          'position.ignored',
+          extra: 'reason=sourceMismatch positionMs=${position.inMilliseconds}',
+        );
+      }
+      return;
+    }
     videoDetailController.playedTime = position;
+    if (!_waitingForFirstFrame || !isShowing) {
+      return;
+    }
+
+    final controller = plPlayerController;
+    final generationMatches =
+        controller?.sourceGeneration == _waitingSourceGeneration;
+    final isWaitingSource = controller?.cid == _waitingCid;
+    final isPlaying = controller?.playerStatus.isPlaying == true;
+    final hasAdvanced =
+        _waitingPlayStartPosition != null &&
+        position != _waitingPlayStartPosition;
+    if (generationMatches && isWaitingSource && isPlaying && hasAdvanced) {
+      if (!_playbackAdvanced) {
+        _playbackAdvanced = true;
+        _tracePage(
+          'firstFrame.playbackAdvanced',
+          extra: 'positionMs=${position.inMilliseconds}',
+        );
+        _tryFinishFirstFrameWait('position.advanced');
+      }
+    } else if (!_loggedRejectedFrameEvent) {
+      _loggedRejectedFrameEvent = true;
+      _tracePage(
+        'firstFrame.position.rejected',
+        extra:
+            'positionMs=${position.inMilliseconds} '
+            'generationMatches=$generationMatches '
+            'isWaitingSource=$isWaitingSource isPlaying=$isPlaying '
+            'hasAdvanced=$hasAdvanced',
+      );
+    }
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    _tracePage('lifecycle.changed', extra: 'value=${state.name}');
     final isResume = state == .resumed;
     final ctr = videoDetailController.plPlayerController..visible = isResume;
     if (isResume) {
@@ -208,6 +530,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   }
 
   Future<void>? playCallBack() {
+    _tracePage('playCallback');
     if (!isShowing) {
       plPlayerController
         ?..addStatusLister(playerListener)
@@ -218,6 +541,29 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
   // 播放器状态监听
   Future<void> playerListener(PlayerStatus status) async {
+    _tracePage('playerStatus.changed', extra: 'value=${status.name}');
+    final previousStatus = _lastObservedPlayerStatus;
+    _lastObservedPlayerStatus = status;
+    if (status.isPlaying) {
+      if (_keepPausedScreenshot &&
+          !_waitingForFirstFrame &&
+          plPlayerController?.cid == videoDetailController.cid.value) {
+        _sourceWaitRequiresPlaybackAdvance = true;
+        _beginFirstFrameWait(
+          'pausedScreenshot.resume',
+          rebuild: false,
+          requirePlaybackAdvance: true,
+        );
+        _tracePage('pausedScreenshot.release.waitingForPlayback');
+      }
+      _markPlaybackStarted();
+    } else if (status == PlayerStatus.paused &&
+        previousStatus?.isPlaying == true &&
+        isShowing &&
+        plPlayerController?.cid == videoDetailController.cid.value) {
+      videoDetailController.rememberPlaybackPosition(reason: 'player.pause');
+      _schedulePausedFrameCapture();
+    }
     final isPlaying = status.isPlaying;
     try {
       if (videoDetailController.scrollCtr.hasClients) {
@@ -315,25 +661,64 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     }
     final plPlayerController = this.plPlayerController =
         videoDetailController.plPlayerController;
+    _playAttempt += 1;
+    _sourceWaitRequiresPlaybackAdvance = true;
+    _beginFirstFrameWait(
+      'handlePlay',
+      requirePlaybackAdvance: true,
+    );
     videoDetailController.autoPlay = true;
     plPlayerController
       ..addStatusLister(playerListener)
       ..addPositionListener(positionListener);
-    if (plPlayerController.preInitPlayer) {
+    final hasCurrentSource =
+        plPlayerController.cid == videoDetailController.cid.value &&
+        plPlayerController.videoController != null;
+    _tracePage(
+      'handlePlay.decision',
+      extra:
+          'preInit=${plPlayerController.preInitPlayer} '
+          'hasCurrentSource=$hasCurrentSource',
+    );
+    if (plPlayerController.preInitPlayer && hasCurrentSource) {
       if (plPlayerController.autoEnterFullScreen) {
         plPlayerController.triggerFullScreen();
       }
       return plPlayerController.play();
     } else {
-      return videoDetailController.playerInit(
-        autoplay: true,
-        autoFullScreenFlag: true,
-      );
+      return videoDetailController
+          .playerInit(
+            autoplay: true,
+            autoFullScreenFlag: true,
+          )
+          .whenComplete(
+            () => _tryFinishFirstFrameWait('handlePlay.playerInit.complete'),
+          );
     }
+  }
+
+  Future<void> _restorePlayerAfterPop({required bool autoplay}) async {
+    await videoDetailController.playerInit(autoplay: autoplay);
+    if (!mounted || !isShowing) {
+      return;
+    }
+    final controller = plPlayerController;
+    if (!autoplay &&
+        controller?.visualReadyGeneration.value !=
+            controller?.sourceGeneration) {
+      await controller?.renderPausedFrame();
+    }
+    _tracePage(
+      'route.didPopNext.playerInit.complete',
+      extra: 'autoplay=$autoplay',
+    );
+    _tryFinishFirstFrameWait('didPopNext.playerInit.complete');
   }
 
   @override
   void dispose() {
+    _tracePage('page.dispose');
+    videoDetailController.rememberPlaybackPosition(reason: 'page.dispose');
     plPlayerController
       ?..removeStatusLister(playerListener)
       ..removePositionListener(positionListener);
@@ -357,7 +742,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     }
 
     _dataStatusSubscription?.cancel();
+    _visualReadySubscription?.cancel();
     _lastFrameScreenshot?.dispose();
+    _lastFrameBoxFit = null;
 
     if (!videoDetailController.plPlayerController.isCloseAll) {
       videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
@@ -382,18 +769,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   void didPushNext() {
     super.didPushNext();
     isShowing = false;
-
-    // 用 media_kit 的 screenshot() 获取纯视频帧（不含 UI 控件）
-    try {
-      plPlayerController?.videoPlayerController?.screenshot().then((image) {
-        if (image != null && mounted) {
-          setState(() {
-            _lastFrameScreenshot?.dispose();
-            _lastFrameScreenshot = image;
-          });
-        }
-      });
-    } catch (_) {}
+    _tracePage('route.didPushNext');
 
     removeObserverMobile(this);
 
@@ -411,11 +787,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     // 应用内导航，重置 PiP 标志
     videoDetailController.plPlayerController.isEnteringPip = false;
 
+    videoDetailController.rememberPlaybackPosition(reason: 'route.didPushNext');
     videoDetailController
       ..videoState.value = false
       ..cancelBlockListener()
       ..playerStatus = plPlayerController?.playerStatus.value
       ..brightness = plPlayerController?.brightness.value;
+    _tracePage('route.didPushNext.savedState');
     if (plPlayerController != null) {
       videoDetailController.makeHeartBeat();
       plPlayerController!
@@ -423,6 +801,17 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ..removePositionListener(positionListener)
         ..pause();
     }
+  }
+
+  @override
+  void didPop() {
+    _tracePage('route.didPop');
+    videoDetailController.rememberPlaybackPosition(reason: 'route.didPop');
+    isShowing = false;
+    plPlayerController
+      ?..removeStatusLister(playerListener)
+      ..removePositionListener(positionListener);
+    super.didPop();
   }
 
   @override
@@ -435,6 +824,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     }
 
     isShowing = true;
+    _tracePage('route.didPopNext');
 
     addObserverMobile(this);
 
@@ -470,53 +860,52 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         plPlayerController?.videoController != null) {
       // 视频源没有改变，说明离开期间未播放过其他视频，直接恢复状态
       videoDetailController.videoState.value = true;
+      _waitingForFirstFrame = false;
+      _keepPausedScreenshot = false;
+      _waitingSourceGeneration = null;
+      _waitingCid = null;
+      _waitingPlayStartPosition = null;
+      _playbackAdvanced = false;
       plPlayerController
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
-      
+
       // 清除截图并恢复播放状态
       if (mounted) {
         setState(() {
           _lastFrameScreenshot?.dispose();
           _lastFrameScreenshot = null;
+          _lastFrameBoxFit = null;
         });
       }
+      _tracePage('route.didPopNext.reuseCurrentSource');
       if (videoDetailController.playerStatus == PlayerStatus.playing) {
         plPlayerController?.play();
       } else {
         plPlayerController?.pause();
       }
     } else {
-      // 视频源改变了，重新初始化并加载新源
+      // 共享播放器已被下一页切换到其他视频。
       plPlayerController
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
-      
-      // 监听 dataStatus，加载完成后清除截图
-      _dataStatusSubscription?.cancel();
-      _dataStatusSubscription = plPlayerController?.dataStatus.listen((status) {
-        if ((status == DataStatus.loaded || status == DataStatus.error) &&
-            plPlayerController?.cid == videoDetailController.cid.value) {
-          if (mounted) {
-            setState(() {
-              _lastFrameScreenshot?.dispose();
-              _lastFrameScreenshot = null;
-            });
-          }
-          _dataStatusSubscription?.cancel();
-          _dataStatusSubscription = null;
-        }
-      });
 
-      if (videoDetailController.autoPlay) {
-        videoDetailController.playerInit(
-          autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
-        );
-      } else if (videoDetailController.plPlayerController.preInitPlayer &&
-          !videoDetailController.isQuerying &&
-          videoDetailController.videoUrl != null) {
-        videoDetailController.playerInit();
-      }
+      final resumePlaying =
+          videoDetailController.playerStatus == PlayerStatus.playing;
+      // 恢复本页的真实播放器。截图只在切源窗口被动遮挡，
+      // 等当前源的稳定纹理就绪后撤除，不再承担播放器交互。
+      _keepPausedScreenshot = true;
+      _sourceWaitRequiresPlaybackAdvance = resumePlaying;
+      _beginFirstFrameWait(
+        resumePlaying ? 'didPopNext.resumePlaying' : 'didPopNext.restorePaused',
+        requirePlaybackAdvance: resumePlaying,
+      );
+      _tracePage(
+        resumePlaying
+            ? 'route.didPopNext.reloadAndResume'
+            : 'route.didPopNext.reloadPaused',
+      );
+      unawaited(_restorePlayerAfterPop(autoplay: resumePlaying));
     }
   }
 
@@ -802,21 +1191,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                                               null) {
                                         handlePlay();
                                       } else {
-                                        if (plPlayerController!
-                                            .videoPlayerController!
-                                            .state
-                                            .completed) {
-                                          await plPlayerController!
-                                              .videoPlayerController!
-                                              .seek(Duration.zero);
-                                          plPlayerController!
-                                              .videoPlayerController!
-                                              .play();
-                                        } else {
-                                          plPlayerController!
-                                              .videoPlayerController!
-                                              .playOrPause();
-                                        }
+                                        await plPlayerController!
+                                            .onDoubleTapCenter();
                                       }
                                     },
                                     behavior: HitTestBehavior.opaque,
@@ -1328,6 +1704,33 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     ],
   );
 
+  Widget _screenshotPlaceholder({
+    required double width,
+    required double height,
+  }) => IgnorePointer(
+    child: RawImage(
+      image: _lastFrameScreenshot,
+      fit: _lastFrameBoxFit ?? BoxFit.contain,
+      width: width,
+      height: height,
+    ),
+  );
+
+  Widget _coverPlaceholder({
+    required double width,
+    required double height,
+  }) => NetworkImgLayer(
+    type: .emote,
+    quality: 60,
+    src: videoDetailController.cover.value,
+    width: width,
+    height: height,
+    cacheWidth: true,
+    getPlaceHolder: () => Center(
+      child: Image.asset(Assets.loading),
+    ),
+  );
+
   Widget plPlayer({
     required double width,
     required double height,
@@ -1342,53 +1745,57 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         videoDetailController.plPlayerController.onPopInvokedWithResult,
     child: Obx(
       () {
-        final bool showLoadingOrPlaceholder = !videoDetailController.videoState.value ||
-              !videoDetailController.autoPlay ||
-              plPlayerController?.videoController == null;
+        final bool showLoadingOrPlaceholder =
+            !videoDetailController.videoState.value ||
+            !videoDetailController.autoPlay ||
+            plPlayerController?.videoController == null;
 
         if (showLoadingOrPlaceholder) {
           if (_lastFrameScreenshot != null) {
-            return RawImage(
-              image: _lastFrameScreenshot,
-              fit: plPlayerController?.videoFit.value.boxFit ?? BoxFit.contain,
+            return _screenshotPlaceholder(
               width: width,
               height: height,
             );
           }
-          return const ColoredBox(
-            color: Colors.black,
-            child: SizedBox.expand(),
+          return _coverPlaceholder(
+            width: width,
+            height: height,
           );
         }
 
         return PLVideoPlayer(
-            maxWidth: width,
-            maxHeight: height,
-            plPlayerController: plPlayerController!,
-            videoDetailController: videoDetailController,
-            introController: introController,
-            headerControl: HeaderControl(
-              key: videoDetailController.headerCtrKey,
-              isPortrait: isPortrait,
-              controller: videoDetailController.plPlayerController,
-              videoDetailCtr: videoDetailController,
-              heroTag: heroTag,
-            ),
-            danmuWidget: isPipMode && pipNoDanmaku
-                ? null
-                : Obx(
-                    () => PlDanmaku(
-                      key: ValueKey(videoDetailController.cid.value),
-                      isPipMode: isPipMode,
-                      cid: videoDetailController.cid.value,
-                      playerController: plPlayerController!,
-                      isFullScreen: plPlayerController!.isFullScreen.value,
-                      isFileSource: videoDetailController.isFileSource,
-                      size: Size(width, height),
-                    ),
+          maxWidth: width,
+          maxHeight: height,
+          plPlayerController: plPlayerController!,
+          videoDetailController: videoDetailController,
+          introController: introController,
+          videoPlaceholder: _waitingForFirstFrame || _keepPausedScreenshot
+              ? _lastFrameScreenshot != null
+                    ? _screenshotPlaceholder(width: width, height: height)
+                    : _coverPlaceholder(width: width, height: height)
+              : null,
+          headerControl: HeaderControl(
+            key: videoDetailController.headerCtrKey,
+            isPortrait: isPortrait,
+            controller: videoDetailController.plPlayerController,
+            videoDetailCtr: videoDetailController,
+            heroTag: heroTag,
+          ),
+          danmuWidget: isPipMode && pipNoDanmaku
+              ? null
+              : Obx(
+                  () => PlDanmaku(
+                    key: ValueKey(videoDetailController.cid.value),
+                    isPipMode: isPipMode,
+                    cid: videoDetailController.cid.value,
+                    playerController: plPlayerController!,
+                    isFullScreen: plPlayerController!.isFullScreen.value,
+                    isFileSource: videoDetailController.isFileSource,
+                    size: Size(width, height),
                   ),
-            showEpisodes: showEpisodes,
-            showViewPoints: showViewPoints,
+                ),
+          showEpisodes: showEpisodes,
+          showViewPoints: showViewPoints,
         );
       },
     ),
@@ -1610,16 +2017,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                 onTap: handlePlay,
                 behavior: .opaque,
                 child: Obx(
-                  () => NetworkImgLayer(
-                    type: .emote,
-                    quality: 60,
-                    src: videoDetailController.cover.value,
+                  () => _coverPlaceholder(
                     width: width,
                     height: height,
-                    cacheWidth: true,
-                    getPlaceHolder: () => Center(
-                      child: Image.asset(Assets.loading),
-                    ),
                   ),
                 ),
               ),

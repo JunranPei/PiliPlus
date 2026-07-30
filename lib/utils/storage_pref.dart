@@ -614,8 +614,7 @@ abstract final class Pref {
   static String get banWordForDyn =>
       _setting.get(SettingBoxKey.banWordForDyn, defaultValue: '');
 
-  static bool get enableLog =>
-      _setting.get(SettingBoxKey.enableLog, defaultValue: true);
+  static bool get enableLog => true;
 
   static bool get disableAudioCDN =>
       _setting.get(SettingBoxKey.disableAudioCDN, defaultValue: false);

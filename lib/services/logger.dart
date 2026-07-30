@@ -13,7 +13,7 @@ final logger = Logger(
   printer: PrettyLogPrinter(
     dateTimeFormat: PrettyLogPrinter.toEncodableFallback,
   ),
-  level: kDebugMode ? .trace : .warning,
+  level: Level.trace,
 );
 
 abstract final class LoggerUtils {

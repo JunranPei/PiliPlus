@@ -1,10 +1,8 @@
-import 'dart:async';
-
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart';
+import 'package:get/get.dart';
 
-class PlayOrPauseButton extends StatefulWidget {
+class PlayOrPauseButton extends StatelessWidget {
   final PlPlayerController plPlayerController;
 
   const PlayOrPauseButton({
@@ -13,58 +11,27 @@ class PlayOrPauseButton extends StatefulWidget {
   });
 
   @override
-  PlayOrPauseButtonState createState() => PlayOrPauseButtonState();
-}
-
-class PlayOrPauseButtonState extends State<PlayOrPauseButton>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController controller;
-  late final StreamSubscription<bool> subscription;
-  late Player player;
-
-  @override
-  void initState() {
-    super.initState();
-    player = widget.plPlayerController.videoPlayerController!;
-    controller = AnimationController(
-      vsync: this,
-      value: player.state.playing ? 1 : 0,
-      duration: const Duration(milliseconds: 200),
-    );
-    subscription = player.stream.playing.listen((playing) {
-      if (playing) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    subscription.cancel();
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 42,
-      height: 34,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.plPlayerController.onDoubleTapCenter,
-        child: Center(
-          child: AnimatedIcon(
-            semanticLabel: player.state.playing ? '暂停' : '播放',
-            progress: controller,
-            icon: AnimatedIcons.play_pause,
-            color: Colors.white,
-            size: 20,
+    return Obx(
+      () {
+        final isPlaying = plPlayerController.playerStatus.value.isPlaying;
+        return SizedBox(
+          width: 42,
+          height: 34,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: plPlayerController.onDoubleTapCenter,
+            child: Center(
+              child: Icon(
+                isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                semanticLabel: isPlaying ? '暂停' : '播放',
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -97,6 +97,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.danmuWidget,
     this.showEpisodes,
     this.showViewPoints,
+    this.videoPlaceholder,
     this.fill = Colors.black,
     this.alignment = Alignment.center,
     super.key,
@@ -120,6 +121,7 @@ class PLVideoPlayer extends StatefulWidget {
   ])?
   showEpisodes;
   final VoidCallback? showViewPoints;
+  final Widget? videoPlaceholder;
   final Color fill;
   final Alignment alignment;
 
@@ -251,11 +253,13 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   ui.Rect? getVideoPhysicalRect() {
     try {
-      final renderBox = _videoKey.currentContext?.findRenderObject() as RenderBox?;
+      final renderBox =
+          _videoKey.currentContext?.findRenderObject() as RenderBox?;
       if (renderBox != null) {
         final position = renderBox.localToGlobal(Offset.zero);
         final size = renderBox.size;
-        final devicePixelRatio = MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
+        final devicePixelRatio =
+            MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
         return ui.Rect.fromLTWH(
           position.dx * devicePixelRatio,
           position.dy * devicePixelRatio,
@@ -364,7 +368,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         if (player != null && player.state.playing) {
           if (Platform.isAndroid && plPlayerController.autoPiP) {
             Future.delayed(const Duration(milliseconds: 200), () {
-              if (mounted && !AndroidHelper.isPipMode && !plPlayerController.isEnteringPip && player.state.playing) {
+              if (mounted &&
+                  !AndroidHelper.isPipMode &&
+                  !plPlayerController.isEnteringPip &&
+                  player.state.playing) {
                 _pauseDueToPauseUponEnteringBackgroundMode = true;
                 player.pause();
               }
@@ -1424,6 +1431,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       children: <Widget>[
         _videoWidget,
 
+        if (widget.videoPlaceholder case final placeholder?)
+          Positioned.fill(
+            child: IgnorePointer(child: placeholder),
+          ),
+
         if (widget.danmuWidget case final danmaku?)
           Positioned.fill(top: 4, child: danmaku),
 
@@ -2119,12 +2131,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: Obx(
               () {
                 final videoFit = plPlayerController.videoFit.value;
-                final double? aspect = videoFit.aspectRatio ??
+                final double? aspect =
+                    videoFit.aspectRatio ??
                     ((plPlayerController.width != null &&
                             plPlayerController.height != null &&
                             plPlayerController.width! > 0 &&
                             plPlayerController.height! > 0)
-                        ? (plPlayerController.width! / plPlayerController.height!)
+                        ? (plPlayerController.width! /
+                              plPlayerController.height!)
                         : null);
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,

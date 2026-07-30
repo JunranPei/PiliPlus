@@ -50,6 +50,7 @@ import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/heart_beat_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/services/download/download_service.dart';
+import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/connectivity_utils.dart';
 import 'package:PiliPlus/utils/extension/context_ext.dart';
@@ -130,6 +131,7 @@ class VideoDetailController extends GetxController
   String? audioUrl;
   Duration? defaultST;
   Duration? playedTime;
+  String get _onlineProgressKey => 'online:${cid.value}';
   String get playedTimePos {
     final pos = playedTime?.inMilliseconds;
     return pos == null || pos == 0 ? '' : '?t=${pos / 1000}';
@@ -347,6 +349,62 @@ class VideoDetailController extends GetxController
   final isLoginVideo = Accounts.get(AccountType.video).isLogin;
 
   late final watchProgress = GStorage.watchProgress;
+
+  Duration? get cachedOnlinePlaybackPosition {
+    if (isFileSource) {
+      return null;
+    }
+    final milliseconds = watchProgress.get(_onlineProgressKey);
+    if (milliseconds == null || milliseconds <= 0) {
+      return null;
+    }
+    final total = data.timeLength;
+    if (total != null && milliseconds >= total - 1000) {
+      return Duration.zero;
+    }
+    return Duration(milliseconds: milliseconds);
+  }
+
+  void rememberPlaybackPosition({required String reason}) {
+    if (isFileSource) {
+      return;
+    }
+    final currentCid = cid.value;
+    final position =
+        plPlayerController.cid == currentCid &&
+            plPlayerController.videoController != null
+        ? plPlayerController.position
+        : playedTime;
+    if (position == null || position <= Duration.zero) {
+      return;
+    }
+
+    playedTime = position;
+    final total = data.timeLength;
+    final completed =
+        plPlayerController.cid == currentCid &&
+        plPlayerController.playerStatus.isCompleted;
+    if (completed ||
+        (total != null && position.inMilliseconds >= total - 1000)) {
+      if (watchProgress.containsKey(_onlineProgressKey)) {
+        watchProgress.delete(_onlineProgressKey);
+      }
+      logger.i(
+        '[PLAYER_PROGRESS] event=cleared cid=$currentCid reason=$reason',
+      );
+      return;
+    }
+
+    final milliseconds = position.inMilliseconds;
+    if (watchProgress.get(_onlineProgressKey) != milliseconds) {
+      watchProgress.put(_onlineProgressKey, milliseconds);
+      logger.i(
+        '[PLAYER_PROGRESS] event=saved cid=$currentCid '
+        'positionMs=$milliseconds reason=$reason',
+      );
+    }
+  }
+
   void cacheLocalProgress() {
     if (plPlayerController.playerStatus.isCompleted) {
       watchProgress.put(cid.value.toString(), entry.totalTimeMilli);
@@ -865,8 +923,22 @@ class VideoDetailController extends GetxController
         final progress = args.remove('progress');
         if (progress != null) {
           defaultST = Duration(milliseconds: progress);
+          logger.i(
+            '[PLAYER_PROGRESS] event=restore.explicit cid=${cid.value} '
+            'positionMs=$progress',
+          );
+        } else if (cachedOnlinePlaybackPosition case final cached?) {
+          defaultST = cached;
+          logger.i(
+            '[PLAYER_PROGRESS] event=restore.local cid=${cid.value} '
+            'positionMs=${cached.inMilliseconds}',
+          );
         } else {
           defaultST = Duration(milliseconds: data.lastPlayTime);
+          logger.i(
+            '[PLAYER_PROGRESS] event=restore.server cid=${cid.value} '
+            'positionMs=${data.lastPlayTime}',
+          );
         }
       }
 
@@ -1242,6 +1314,7 @@ class VideoDetailController extends GetxController
 
   @override
   void onClose() {
+    rememberPlaybackPosition(reason: 'controller.close');
     cid.close();
     if (isFileSource) {
       cacheLocalProgress();

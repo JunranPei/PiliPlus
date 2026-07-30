@@ -8,6 +8,7 @@ import 'package:PiliPlus/common/widgets/video_popup_menu.dart';
 import 'package:PiliPlus/http/search.dart';
 import 'package:PiliPlus/models/horizontal_video_model.dart';
 import 'package:PiliPlus/models_new/video/video_detail/dimension.dart';
+import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/utils/date_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
@@ -66,7 +67,12 @@ class VideoCardH extends StatelessWidget {
 
                   int? cid = videoItem.cid;
                   Dimension? dimension = videoItem.dimension;
+                  logger.i(
+                    '[PLAYER_NAV] event=related.tap cidKnown=${cid != null}',
+                  );
                   if (cid == null) {
+                    final stopwatch = Stopwatch()..start();
+                    logger.i('[PLAYER_NAV] event=related.cidLookup.begin');
                     if (await SearchHttp.ab2cWithDimension(
                           aid: videoItem.aid,
                           bvid: videoItem.bvid,
@@ -75,8 +81,16 @@ class VideoCardH extends StatelessWidget {
                       cid = res.cid;
                       dimension = res.dimension;
                     }
+                    stopwatch.stop();
+                    logger.i(
+                      '[PLAYER_NAV] event=related.cidLookup.end '
+                      'success=${cid != null} elapsedMs=${stopwatch.elapsedMilliseconds}',
+                    );
                   }
                   if (cid != null) {
+                    logger.i(
+                      '[PLAYER_NAV] event=related.navigate targetCid=$cid',
+                    );
                     PageUtils.toVideoPage(
                       bvid: videoItem.bvid,
                       cid: cid,
