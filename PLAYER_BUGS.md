@@ -25,8 +25,7 @@
 - 画面事件：纹理 ID、纹理矩形、解码尺寸、显示尺寸、旋转、像素比例和截图生命周期。
 - 首帧事件：每个视频源只记录第一条进度事件，并记录首帧等待、播放起点、拒绝原因和最终放行时机。
 - 功耗约束：不记录连续播放进度，不新增轮询或定时器；日志只在状态变化和每个视频源的首个关键事件发生时写入。
-- 当前交付包：`com.personal.piliplus.test2`，版本 `2.0.10-播放器修复`，APK 文件 `PiliPlus-test2-2.0.10-player-fix-release.apk`。
-- 当前交付包 SHA-256：`CCBA7F50758350A1145FD943E5EC57E74ABC2CD63E46CA8A1FED8FA0399DFE3D`。
+- 当前交付版本：`com.personal.piliplus.test2`，版本 `2.0.10-播放器修复`，同时提供通用版、`arm64-v8a`、`armeabi-v7a` 和 `x86_64` 四个 APK。
 - 2026-07-29：第五版已覆盖安装到设备 `SM-S9380`，安装时间 `15:01:36`；安装后已清空 Logcat。
 - 2026-07-29 第四版真机结果：首个视频不再闪烁但播放前会短暂停顿；第二个视频与返回页出现画面永久停留、只有音频播放且控件不可见的严重回归。
 - 2026-07-29 第三版真机结果：原问题均可复现；已读取本版 `[PLAYER_TRACE]`，日志足以定位下一轮底层修复。
@@ -375,8 +374,10 @@
 
 ### 最终 Release 交付
 
-- 2026-07-30：版本提升后完整 Release 构建成功，APK 大小 `66,663,731` 字节。
-- APK：`PiliPlus-test2-2.0.10-player-fix-release.apk`
-- SHA-256：`CCBA7F50758350A1145FD943E5EC57E74ABC2CD63E46CA8A1FED8FA0399DFE3D`
+- 2026-07-30：版本提升后，通用版和三个 ABI 拆分版均完成 Release 构建。
+- 通用版：`PiliPlus-test2-2.0.10-player-fix-release.apk`，`66,663,731` 字节，SHA-256 `CCBA7F50758350A1145FD943E5EC57E74ABC2CD63E46CA8A1FED8FA0399DFE3D`。
+- 64 位安卓手机：`PiliPlus-test2-2.0.10-arm64-v8a-release.apk`，`23,941,470` 字节，SHA-256 `0159205126AFE972EB9F287D098F8B3B278BF9233A37BA269BAC8CAF5A81AE61`。
+- 32 位安卓手机：`PiliPlus-test2-2.0.10-armeabi-v7a-release.apk`，`23,854,008` 字节，SHA-256 `633EEC503135B6EB1CCE095EBFB5D736957FEE35772BD119A1DAE2BC7CC92F9A`。
+- x86_64 设备或模拟器：`PiliPlus-test2-2.0.10-x86_64-release.apk`，`24,916,857` 字节，SHA-256 `A262BD7A36193279D30338CE0C24B9DC254FDE1F99398562045C21CFB6A6486E`。
 - APK 清单核验：包名 `com.personal.piliplus.test2`、`versionCode=4`、版本名 `2.0.10-播放器修复`、`minSdk=24`、`targetSdk=36`。
-- APK 签名核验通过，使用 APK Signature Scheme v2。项目未配置私有 Release 密钥，因此按现有 Gradle 规则使用 Android Debug 证书签名；该包是 Release 优化构建，但不作为应用商店正式签名包。
+- 四个 APK 的架构声明与文件名一致，签名核验均通过，使用 APK Signature Scheme v2。项目未配置私有 Release 密钥，因此按现有 Gradle 规则使用 Android Debug 证书签名；这些包是 Release 优化构建，但不作为应用商店正式签名包。
