@@ -25,7 +25,7 @@
 - 画面事件：纹理 ID、纹理矩形、解码尺寸、显示尺寸、旋转、像素比例和截图生命周期。
 - 首帧事件：每个视频源只记录第一条进度事件，并记录首帧等待、播放起点、拒绝原因和最终放行时机。
 - 功耗约束：不记录连续播放进度，不新增轮询或定时器；日志只在状态变化和每个视频源的首个关键事件发生时写入。
-- 当前交付版本：`com.personal.piliplus.test2`，版本 `2.0.10-播放器修复`，同时提供通用版、`arm64-v8a`、`armeabi-v7a` 和 `x86_64` 四个 APK。
+- 当前正式交付版本：`com.personal.piliplus`，版本 `2.0.10-播放器修复`，同时提供通用版、`arm64-v8a`、`armeabi-v7a` 和 `x86_64` 四个 APK。
 - 2026-07-29：第五版已覆盖安装到设备 `SM-S9380`，安装时间 `15:01:36`；安装后已清空 Logcat。
 - 2026-07-29 第四版真机结果：首个视频不再闪烁但播放前会短暂停顿；第二个视频与返回页出现画面永久停留、只有音频播放且控件不可见的严重回归。
 - 2026-07-29 第三版真机结果：原问题均可复现；已读取本版 `[PLAYER_TRACE]`，日志足以定位下一轮底层修复。
@@ -370,14 +370,15 @@
 ### 验证结论
 
 - 2026-07-30：用户完成真机复测并确认问题已解决，任务完成。
-- 最终源码版本由阶段性的 `2.0.9+3` 提升为 `2.0.10+4`，Android 版本名为 `2.0.10-播放器修复`；仍使用测试包名 `com.personal.piliplus.test2`，避免覆盖官方应用。
+- 最终源码版本由阶段性的 `2.0.9+3` 提升为 `2.0.10+4`，Android 版本名为 `2.0.10-播放器修复`，正式包名恢复为 `com.personal.piliplus`。
 
 ### 最终 Release 交付
 
 - 2026-07-30：版本提升后，通用版和三个 ABI 拆分版均完成 Release 构建。
-- 通用版：`PiliPlus-test2-2.0.10-player-fix-release.apk`，`66,663,731` 字节，SHA-256 `CCBA7F50758350A1145FD943E5EC57E74ABC2CD63E46CA8A1FED8FA0399DFE3D`。
-- 64 位安卓手机：`PiliPlus-test2-2.0.10-arm64-v8a-release.apk`，`23,941,470` 字节，SHA-256 `0159205126AFE972EB9F287D098F8B3B278BF9233A37BA269BAC8CAF5A81AE61`。
-- 32 位安卓手机：`PiliPlus-test2-2.0.10-armeabi-v7a-release.apk`，`23,854,008` 字节，SHA-256 `633EEC503135B6EB1CCE095EBFB5D736957FEE35772BD119A1DAE2BC7CC92F9A`。
-- x86_64 设备或模拟器：`PiliPlus-test2-2.0.10-x86_64-release.apk`，`24,916,857` 字节，SHA-256 `A262BD7A36193279D30338CE0C24B9DC254FDE1F99398562045C21CFB6A6486E`。
-- APK 清单核验：包名 `com.personal.piliplus.test2`、`versionCode=4`、版本名 `2.0.10-播放器修复`、`minSdk=24`、`targetSdk=36`。
+- 通用版：`PiliPlus-2.0.10-universal-release.apk`，`66,663,719` 字节，SHA-256 `36FA94F14A3F425ADD4BAA1CD6F1772C50C09EB37939E4E1F7E0D05811F32422`。
+- 64 位安卓手机：`PiliPlus-2.0.10-arm64-v8a-release.apk`，`23,941,458` 字节，SHA-256 `1360CA96A2FD712157A328701487F2B27E8612BD17DC175EECC2D15814F76FC1`。
+- 32 位安卓手机：`PiliPlus-2.0.10-armeabi-v7a-release.apk`，`23,853,996` 字节，SHA-256 `51599BB59677144E1DCC19197DAF274658590BAB54C6773655EAE7E66C0393BF`。
+- x86_64 设备或模拟器：`PiliPlus-2.0.10-x86_64-release.apk`，`24,916,845` 字节，SHA-256 `02CDEA2C00081C197DC456FD752325CF33E95E12F01E0AC1D0F53F94F8F03E80`。
+- APK 清单核验：四个包的正式包名均为 `com.personal.piliplus`、`versionCode=4`、版本名 `2.0.10-播放器修复`、`minSdk=24`、`targetSdk=36`。
 - 四个 APK 的架构声明与文件名一致，签名核验均通过，使用 APK Signature Scheme v2。项目未配置私有 Release 密钥，因此按现有 Gradle 规则使用 Android Debug 证书签名；这些包是 Release 优化构建，但不作为应用商店正式签名包。
+- 所有文件名含 `test2` 的 APK 均为测试包，不得上传到正式 GitHub Release。
