@@ -315,92 +315,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     }
   }
 
-  Future<void> _captureLastFrame({required String reason}) async {
-    final expectedCid = plPlayerController?.cid;
-    final expectedGeneration = plPlayerController?.sourceGeneration;
-    final expectedBoxFit = plPlayerController?.videoFit.value.boxFit;
-    if (_waitingForFirstFrame &&
-        expectedGeneration == _waitingSourceGeneration) {
-      _tracePage(
-        'screenshot.capture.skipped',
-        extra:
-            'reason=$reason skipReason=sourceTransition '
-            'expectedGeneration=$expectedGeneration',
-      );
-      return;
-    }
-    _tracePage(
-      'screenshot.capture.begin',
-      extra:
-          'reason=$reason expectedCid=$expectedCid '
-          'expectedGeneration=$expectedGeneration boxFit=$expectedBoxFit',
-    );
-    try {
-      final image = await plPlayerController?.videoPlayerController
-          ?.screenshot();
-      if (image == null) {
-        _tracePage('screenshot.capture.empty');
-        return;
-      }
-      if (plPlayerController?.cid != expectedCid ||
-          plPlayerController?.sourceGeneration != expectedGeneration) {
-        _tracePage(
-          'screenshot.capture.stale',
-          extra:
-              'expectedCid=$expectedCid '
-              'expectedGeneration=$expectedGeneration',
-        );
-        image.dispose();
-        return;
-      }
-      if (!mounted) {
-        image.dispose();
-        return;
-      }
-      setState(() {
-        _lastFrameScreenshot?.dispose();
-        _lastFrameScreenshot = image;
-        _lastFrameBoxFit = expectedBoxFit;
-      });
-      _tracePage(
-        'screenshot.capture.success',
-        extra: 'imageSize=${image.width}x${image.height}',
-      );
-    } catch (error) {
-      _tracePage(
-        'screenshot.capture.error',
-        extra: 'errorType=${error.runtimeType}',
-      );
-    }
-  }
-
-  void _schedulePausedFrameCapture() {
-    final expectedCid = videoDetailController.cid.value;
-    final expectedGeneration = plPlayerController?.sourceGeneration;
-    _tracePage(
-      'screenshot.capture.scheduled',
-      extra:
-          'reason=player.pause expectedCid=$expectedCid '
-          'expectedGeneration=$expectedGeneration',
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted ||
-          !isShowing ||
-          plPlayerController?.cid != expectedCid ||
-          plPlayerController?.sourceGeneration != expectedGeneration ||
-          plPlayerController?.playerStatus.value != PlayerStatus.paused) {
-        _tracePage(
-          'screenshot.capture.scheduleCancelled',
-          extra:
-              'reason=stateChanged expectedCid=$expectedCid '
-              'expectedGeneration=$expectedGeneration',
-        );
-        return;
-      }
-      unawaited(_captureLastFrame(reason: 'player.pause.afterUiFrame'));
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -544,6 +458,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     _tracePage('playerStatus.changed', extra: 'value=${status.name}');
     final previousStatus = _lastObservedPlayerStatus;
     _lastObservedPlayerStatus = status;
+    plPlayerController?.tracePauseEvent(
+      'page.playerStatus.changed',
+      extra:
+          'value=${status.name} previousStatus=${previousStatus?.name} '
+          'isShowing=$isShowing keepPausedScreenshot=$_keepPausedScreenshot '
+          'hasScreenshot=${_lastFrameScreenshot != null}',
+    );
     if (status.isPlaying) {
       if (_keepPausedScreenshot &&
           !_waitingForFirstFrame &&
@@ -562,7 +483,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         isShowing &&
         plPlayerController?.cid == videoDetailController.cid.value) {
       videoDetailController.rememberPlaybackPosition(reason: 'player.pause');
-      _schedulePausedFrameCapture();
     }
     final isPlaying = status.isPlaying;
     try {
@@ -785,10 +705,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       return; // 已在画中画，保留播放器状态，不进行注销与暂停
     }
     // 应用内导航，重置 PiP 标志
-    videoDetailController.plPlayerController.isEnteringPip = false;
-
-    videoDetailController.rememberPlaybackPosition(reason: 'route.didPushNext');
     videoDetailController
+      ..plPlayerController.isEnteringPip = false
+      ..rememberPlaybackPosition(reason: 'route.didPushNext')
       ..videoState.value = false
       ..cancelBlockListener()
       ..playerStatus = plPlayerController?.playerStatus.value
@@ -892,8 +811,15 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
       final resumePlaying =
           videoDetailController.playerStatus == PlayerStatus.playing;
-      // 恢复本页的真实播放器。截图只在切源窗口被动遮挡，
-      // 等当前源的稳定纹理就绪后撤除，不再承担播放器交互。
+      // 单播放器切回旧页面时直接用封面遮住切源窗口，不再截取暂停帧。
+      // 这避免高分辨率视频截图阻塞界面，也不会增加额外解码或功耗。
+      if (mounted) {
+        setState(() {
+          _lastFrameScreenshot?.dispose();
+          _lastFrameScreenshot = null;
+          _lastFrameBoxFit = null;
+        });
+      }
       _keepPausedScreenshot = true;
       _sourceWaitRequiresPlaybackAdvance = resumePlaying;
       _beginFirstFrameWait(

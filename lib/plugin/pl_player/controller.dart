@@ -1,4 +1,4 @@
-import 'dart:async' show StreamSubscription, Timer;
+import 'dart:async' show Completer, StreamSubscription, Timer;
 import 'dart:convert' show ascii;
 import 'dart:io' show Platform;
 import 'dart:math' show max, min;
@@ -73,6 +73,12 @@ typedef PlayCallback = Future<void>? Function();
 class PlPlayerController with BlockConfigMixin {
   Player? _videoPlayerController;
   VideoController? _videoController;
+  Future<void>? _pauseSettledFuture;
+
+  /// 当前暂停命令及必要的尾帧位置校正完成后结束。
+  ///
+  /// 页面截图等待该 Future，避免截到暂停确认前偶发提交的最后一帧。
+  Future<void>? get pauseSettledFuture => _pauseSettledFuture;
 
   // 添加一个私有静态变量来保存实例
   static PlPlayerController? _instance;
@@ -118,6 +124,53 @@ class PlPlayerController with BlockConfigMixin {
   int? _visualCandidateHeight;
   String? _visualCandidatePixelFormat;
   int _visualCandidateStableSurfaceBaseline = 0;
+  int _pauseTraceSequence = 0;
+  Stopwatch? _pauseTraceStopwatch;
+  int _pauseTracePositionEventCount = 0;
+
+  bool get _pauseTraceActive => _pauseTraceStopwatch != null;
+
+  void _beginPauseTrace(String origin) {
+    if (_pauseTraceActive) {
+      _tracePauseEvent('begin.ignored', extra: 'origin=$origin');
+      return;
+    }
+    _pauseTraceSequence++;
+    _pauseTracePositionEventCount = 0;
+    _pauseTraceStopwatch = Stopwatch()..start();
+    _tracePauseEvent('begin', extra: 'origin=$origin');
+  }
+
+  void _finishPauseTrace(String reason) {
+    if (!_pauseTraceActive) return;
+    _tracePauseEvent('finish', extra: 'reason=$reason');
+    _pauseTraceStopwatch?.stop();
+    _pauseTraceStopwatch = null;
+    _pauseTracePositionEventCount = 0;
+  }
+
+  void _tracePauseEvent(String event, {String extra = ''}) {
+    final stopwatch = _pauseTraceStopwatch;
+    if (stopwatch == null) return;
+    final player = _videoPlayerController;
+    final controller = _videoController;
+    final rect = controller?.rect.value;
+    debugPrint(
+      '[PLAYER_PAUSE] seq=$_pauseTraceSequence '
+      'elapsedMs=${stopwatch.elapsedMilliseconds} event=$event '
+      'cid=$cid generation=$_sourceGeneration '
+      'status=${playerStatus.value.name} playing=${player?.state.playing} '
+      'controllerPositionMs=${position.inMilliseconds} '
+      'nativePositionMs=${player?.state.position.inMilliseconds} '
+      'textureId=${controller?.id.value} '
+      'rect=${rect?.width}x${rect?.height} $extra',
+    );
+  }
+
+  /// 暂停问题专用的短事件链日志；仅在暂停至下次播放之间输出。
+  void tracePauseEvent(String event, {String extra = ''}) {
+    _tracePauseEvent(event, extra: extra);
+  }
 
   void _tracePlayer(String event, {int? generation, String extra = ''}) {
     final controller = _videoController;
@@ -143,11 +196,21 @@ class PlPlayerController with BlockConfigMixin {
       'texture.id.changed',
       extra: 'value=${_videoController?.id.value}',
     );
+    _tracePauseEvent(
+      'texture.id.changed',
+      extra: 'value=${_videoController?.id.value}',
+    );
   }
 
   void _onTextureRectChanged() {
     final rect = _videoController?.rect.value;
     _tracePlayer(
+      'texture.rect.changed',
+      extra:
+          'left=${rect?.left} top=${rect?.top} '
+          'width=${rect?.width} height=${rect?.height}',
+    );
+    _tracePauseEvent(
       'texture.rect.changed',
       extra:
           'left=${rect?.left} top=${rect?.top} '
@@ -161,10 +224,18 @@ class PlPlayerController with BlockConfigMixin {
       'firstFrame.native.changed',
       extra: 'count=${_videoController?.firstFrameRenderedCount.value}',
     );
+    _tracePauseEvent(
+      'firstFrame.native.changed',
+      extra: 'count=${_videoController?.firstFrameRenderedCount.value}',
+    );
   }
 
   void _onStableSurfaceCountChanged() {
     _tracePlayer(
+      'surface.stable.changed',
+      extra: 'count=${_videoController?.stableSurfaceCount.value}',
+    );
+    _tracePauseEvent(
       'surface.stable.changed',
       extra: 'count=${_videoController?.stableSurfaceCount.value}',
     );
@@ -209,8 +280,6 @@ class PlPlayerController with BlockConfigMixin {
     }
 
     final rotate = event.rotate ?? 0;
-    final candidateWidth = rotate == 90 || rotate == 270 ? dh : dw;
-    final candidateHeight = rotate == 90 || rotate == 270 ? dw : dh;
     _visualCandidateGeneration = _sourceGeneration;
     if (rotate == 90 || rotate == 270) {
       _visualCandidateWidth = dh;
@@ -859,6 +928,7 @@ class PlPlayerController with BlockConfigMixin {
     Volume? volume,
     bool autoFullScreenFlag = false,
   }) async {
+    _finishPauseTrace('sourceChanged');
     final generation = ++_sourceGeneration;
     _resetVisualReadyCandidate();
     _tracePlayer(
@@ -1207,7 +1277,15 @@ class PlPlayerController with BlockConfigMixin {
     final stream = player.stream;
     _subscriptions = [
       stream.playing.listen((event) {
+        final previousStatus = playerStatus.value;
+        if (!event && previousStatus.isPlaying && !_pauseTraceActive) {
+          _beginPauseTrace('stream.playing.external');
+        }
         _tracePlayer('stream.playing', extra: 'value=$event');
+        _tracePauseEvent(
+          'stream.playing',
+          extra: 'value=$event previousStatus=${previousStatus.name}',
+        );
         WakelockPlus.toggle(enable: event);
         if (event) {
           if (_isAutoEnterPip) {
@@ -1235,6 +1313,9 @@ class PlPlayerController with BlockConfigMixin {
         if (videoPlayerController!.state.position.inSeconds != 0) {
           makeHeartBeat(positionSeconds.value, type: HeartBeatType.status);
         }
+        if (event) {
+          _finishPauseTrace('playbackResumed');
+        }
       }),
       stream.completed.listen((event) {
         _tracePlayer('stream.completed', extra: 'value=$event');
@@ -1258,6 +1339,15 @@ class PlPlayerController with BlockConfigMixin {
             extra: 'eventPositionMs=${event.inMilliseconds}',
           );
         }
+        if (_pauseTraceActive && _pauseTracePositionEventCount < 16) {
+          _pauseTracePositionEventCount++;
+          _tracePauseEvent(
+            'stream.position',
+            extra:
+                'index=$_pauseTracePositionEventCount '
+                'eventPositionMs=${event.inMilliseconds}',
+          );
+        }
         position = event;
         updatePositionSecond();
         if (!isSliderMoving.value) {
@@ -1279,6 +1369,10 @@ class PlPlayerController with BlockConfigMixin {
           'stream.size',
           extra: 'eventSize=${event.$1}x${event.$2}',
         );
+        _tracePauseEvent(
+          'stream.size',
+          extra: 'eventSize=${event.$1}x${event.$2}',
+        );
       }),
       stream.videoParams.listen((event) {
         _observeVideoParams(event);
@@ -1290,6 +1384,12 @@ class PlPlayerController with BlockConfigMixin {
               'pixelFormat=${event.pixelformat} '
               'hwPixelFormat=${event.hwPixelformat}',
         );
+        _tracePauseEvent(
+          'stream.videoParams',
+          extra:
+              'display=${event.dw}x${event.dh} '
+              'pixelFormat=${event.pixelformat}',
+        );
       }),
       stream.buffer.listen((Duration event) {
         buffered.value = event;
@@ -1297,6 +1397,7 @@ class PlPlayerController with BlockConfigMixin {
       }),
       stream.buffering.listen((bool event) {
         _tracePlayer('stream.buffering', extra: 'value=$event');
+        _tracePauseEvent('stream.buffering', extra: 'value=$event');
         isBuffering.value = event;
         videoPlayerServiceHandler?.onStatusChange(
           playerStatus.value,
@@ -1508,39 +1609,72 @@ class PlPlayerController with BlockConfigMixin {
 
   /// 暂停播放
   Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
+    _beginPauseTrace(
+      isInterrupt ? 'controller.pause.interrupt' : 'controller.pause.manual',
+    );
+    final pauseSettledCompleter = Completer<void>();
+    final currentPauseSettledFuture = pauseSettledCompleter.future;
+    _pauseSettledFuture = currentPauseSettledFuture;
+    final player = _videoPlayerController;
     final requestedPosition = position;
-    _tracePlayer(
+    _tracePauseEvent(
       'pause.request',
       extra:
           'notify=$notify isInterrupt=$isInterrupt '
           'requestedPositionMs=${requestedPosition.inMilliseconds}',
     );
-    playerStatus.value = PlayerStatus.paused;
-    _tracePlayer('pause.uiState.updated');
     try {
-      await _videoPlayerController?.pause();
-    } catch (error) {
-      playerStatus.value = _videoPlayerController?.state.playing == true
-          ? PlayerStatus.playing
-          : PlayerStatus.paused;
       _tracePlayer(
-        'pause.error',
-        extra: 'errorType=${error.runtimeType}',
+        'pause.request',
+        extra:
+            'notify=$notify isInterrupt=$isInterrupt '
+            'requestedPositionMs=${requestedPosition.inMilliseconds}',
       );
-      rethrow;
-    }
-    final settledPosition = _videoPlayerController?.state.position ?? position;
-    _tracePlayer(
-      'pause.complete',
-      extra:
-          'requestedPositionMs=${requestedPosition.inMilliseconds} '
-          'settledPositionMs=${settledPosition.inMilliseconds} '
-          'deltaMs=${settledPosition.inMilliseconds - requestedPosition.inMilliseconds}',
-    );
+      playerStatus.value = PlayerStatus.paused;
+      _tracePlayer('pause.uiState.updated');
+      _tracePauseEvent('pause.uiState.updated');
+      try {
+        await player?.pause();
+      } catch (error) {
+        playerStatus.value = player?.state.playing == true
+            ? PlayerStatus.playing
+            : PlayerStatus.paused;
+        _tracePlayer(
+          'pause.error',
+          extra: 'errorType=${error.runtimeType}',
+        );
+        _tracePauseEvent(
+          'pause.error',
+          extra: 'errorType=${error.runtimeType}',
+        );
+        rethrow;
+      }
+      final settledPosition = player?.state.position ?? position;
 
-    // 主动暂停时让出音频焦点
-    if (!isInterrupt) {
-      audioSessionHandler?.setActive(false);
+      _tracePlayer(
+        'pause.complete',
+        extra:
+            'requestedPositionMs=${requestedPosition.inMilliseconds} '
+            'settledPositionMs=${settledPosition.inMilliseconds} '
+            'deltaMs=${settledPosition.inMilliseconds - requestedPosition.inMilliseconds}',
+      );
+      _tracePauseEvent(
+        'pause.complete',
+        extra:
+            'requestedPositionMs=${requestedPosition.inMilliseconds} '
+            'settledPositionMs=${settledPosition.inMilliseconds} '
+            'deltaMs=${settledPosition.inMilliseconds - requestedPosition.inMilliseconds}',
+      );
+
+      // 主动暂停时让出音频焦点
+      if (!isInterrupt) {
+        audioSessionHandler?.setActive(false);
+      }
+    } finally {
+      if (identical(_pauseSettledFuture, currentPauseSettledFuture)) {
+        _pauseSettledFuture = null;
+      }
+      pauseSettledCompleter.complete();
     }
   }
 
