@@ -20,6 +20,7 @@ import 'package:PiliPlus/pages/danmaku/danmaku_model.dart';
 import 'package:PiliPlus/pages/setting/models/play_settings.dart'
     show kMaxVolume;
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -33,17 +34,12 @@ import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/services/logger.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/android/android_helper.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/asset_utils.dart';
-import 'package:PiliPlus/utils/device_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/extension/box_ext.dart';
-import 'package:flutter/services.dart' show MethodChannel;
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
 import 'package:PiliPlus/utils/image_utils.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/path_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
@@ -441,7 +437,7 @@ class PlPlayerController with BlockConfigMixin {
 
   late final bool autoPiP = Pref.autoPiP;
   bool get isPipMode =>
-      (Platform.isAndroid && AndroidHelper.isPipMode) ||
+      (Platform.isAndroid && AndroidPip.instance.keepsVideoOnly) ||
       (PlatformUtils.isDesktop && isDesktopPip);
   late bool isDesktopPip = false;
   late Rect _lastWindowBounds;
@@ -542,9 +538,10 @@ class PlPlayerController with BlockConfigMixin {
     await windowManager.setAspectRatio(width / height);
   }
 
-  late bool _isAutoEnterPip = false;
-  bool get isAutoEnterPip => _isAutoEnterPip;
-  bool isEnteringPip = false;
+  bool get isAutoEnterPip => Platform.isAndroid && autoPiP;
+  bool get isEnteringPip =>
+      Platform.isAndroid &&
+      AndroidPip.instance.phase == AndroidPipPhase.entering;
   ui.Rect? Function()? getVideoRectCallback;
 
   static bool get _isCurrVideoPage {
@@ -559,37 +556,34 @@ class PlPlayerController with BlockConfigMixin {
     return routeName == '/videoV' || routeName == '/liveRoom';
   }
 
-  void enterPip({bool autoEnter = false}) {
-    if (videoPlayerController != null) {
-      isEnteringPip = true;
+  Future<void> enterPip({bool autoEnter = false}) async {
+    final player = videoPlayerController;
+    if (player == null || !AndroidPip.isSupported) return;
 
-      final rect = getVideoRectCallback?.call();
-      if (rect != null) {
-        const MethodChannel('com.personal.piliplus/pip').invokeMethod(
-          'setVideoRect',
-          {
-            'left': rect.left.toInt(),
-            'top': rect.top.toInt(),
-            'width': rect.width.toInt(),
-            'height': rect.height.toInt(),
-          },
-        );
-      }
+    // Manual entry hides Flutter controls before Android captures the source
+    // rectangle. Automatic entry cannot wait because it is driven by Home.
+    if (!autoEnter) {
+      controls = false;
+      await WidgetsBinding.instance.endOfFrame;
+    }
 
-      final state = videoPlayerController!.state;
-      PageUtils.enterPip(
-        autoEnter: autoEnter,
-        width: state.width == 0 ? width : state.width,
-        height: state.height == 0 ? height : state.height,
-        isLive: isLive,
-        isPlaying: playerStatus.isPlaying,
-      );
+    final state = player.state;
+    final configured = await AndroidPip.instance.configure(
+      videoWidth: state.width == 0 ? width ?? 16 : state.width,
+      videoHeight: state.height == 0 ? height ?? 9 : state.height,
+      autoEnter: autoEnter,
+      isLive: isLive,
+      isPlaying: state.playing,
+      sourceRect: getVideoRectCallback?.call(),
+    );
+    if (!autoEnter && configured) {
+      await AndroidPip.instance.enter();
     }
   }
 
   void _disableAutoEnterPip() {
-    if (_isAutoEnterPip) {
-      PiliAndroidHelper.disableAutoEnterPip();
+    if (isAutoEnterPip) {
+      AndroidPip.instance.disableAutoEnter();
     }
   }
 
@@ -861,24 +855,6 @@ class PlPlayerController with BlockConfigMixin {
 
     if (!Accounts.heartbeat.isLogin || Pref.historyPause) {
       enableHeart = false;
-    }
-
-    if (Platform.isAndroid && autoPiP) {
-      AndroidHelper$ToDart.onUserLeaveHint = Runnable.implement(
-        $Runnable(run: _onUserLeaveHint),
-      );
-      if (DeviceUtils.sdkInt >= 31) {
-        _isAutoEnterPip = true;
-      }
-    }
-  }
-
-  void _onUserLeaveHint() {
-    isEnteringPip = true;
-    if (playerStatus.isPlaying && _isCurrVideoPage) {
-      if (DeviceUtils.sdkInt < 31) {
-        enterPip();
-      }
     }
   }
 
@@ -1288,7 +1264,7 @@ class PlPlayerController with BlockConfigMixin {
         );
         WakelockPlus.toggle(enable: event);
         if (event) {
-          if (_isAutoEnterPip) {
+          if (isAutoEnterPip) {
             if (_isCurrVideoPage) {
               enterPip(autoEnter: true);
             } else {
@@ -2104,10 +2080,6 @@ class PlPlayerController with BlockConfigMixin {
     dmState.clear();
     if (showSeekPreview) {
       _clearPreview();
-    }
-    if (Platform.isAndroid) {
-      AndroidHelper$ToDart.onUserLeaveHint?.release();
-      AndroidHelper$ToDart.onUserLeaveHint = null;
     }
     _timer?.cancel();
     // _position.close();

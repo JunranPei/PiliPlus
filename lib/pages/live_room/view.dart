@@ -29,13 +29,13 @@ import 'package:PiliPlus/pages/live_room/widgets/bottom_control.dart';
 import 'package:PiliPlus/pages/live_room/widgets/chat_panel.dart';
 import 'package:PiliPlus/pages/live_room/widgets/header_control.dart';
 import 'package:PiliPlus/pages/video/widgets/player_focus.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/danmaku_options.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/pl_player/view/view.dart';
 import 'package:PiliPlus/services/service_locator.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/size_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
@@ -90,10 +90,15 @@ class _LiveRoomPageState extends State<LiveRoomPage>
     );
     plPlayerController = _liveRoomController.plPlayerController
       ..addStatusLister(playerListener);
+    AndroidPip.instance.addListener(_onAndroidPipStateChanged);
     PlPlayerController.setPlayCallBack(plPlayerController.play);
     if (plPlayerController.removeSafeArea) {
       hideSystemBar();
     }
+  }
+
+  void _onAndroidPipStateChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -175,6 +180,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   @override
   void dispose() {
     removeObserverMobile(this);
+    AndroidPip.instance.removeListener(_onAndroidPipStateChanged);
     videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
     if (Platform.isAndroid && !plPlayerController.setSystemBrightness) {
       ScreenBrightnessPlatform.instance.resetApplicationScreenBrightness();
@@ -217,7 +223,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   @override
   Widget build(BuildContext context) {
     Widget child;
-    if (Platform.isAndroid && AndroidHelper.isPipMode) {
+    if (Platform.isAndroid && AndroidPip.instance.keepsVideoOnly) {
       child = videoPlayerPanel(
         isFullScreen,
         width: maxWidth,

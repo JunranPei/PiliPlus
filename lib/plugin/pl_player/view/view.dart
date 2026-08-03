@@ -35,6 +35,7 @@ import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/post_panel/popup_menu_text.dart';
 import 'package:PiliPlus/pages/video/post_panel/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/bottom_control_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
@@ -50,7 +51,6 @@ import 'package:PiliPlus/plugin/pl_player/widgets/common_btn.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/forward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/mpv_convert_webp.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/play_pause_btn.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/cache_manager.dart';
 import 'package:PiliPlus/utils/connectivity_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
@@ -273,10 +273,33 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     return null;
   }
 
+  bool _pipLayoutSyncScheduled = false;
+
+  void _scheduleAndroidPipLayoutSync() {
+    if (!Platform.isAndroid || _pipLayoutSyncScheduled) return;
+    _pipLayoutSyncScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _pipLayoutSyncScheduled = false;
+      if (!mounted) return;
+      final rect = getVideoPhysicalRect();
+      AndroidPip.instance.updateSourceRect(rect);
+    });
+  }
+
+  void _onAndroidPipStateChanged() {
+    if (!mounted) return;
+    if (AndroidPip.instance.keepsVideoOnly) {
+      plPlayerController.controls = false;
+    }
+    _scheduleAndroidPipLayoutSync();
+  }
+
   @override
   void initState() {
     super.initState();
     plPlayerController.getVideoRectCallback = getVideoPhysicalRect;
+    AndroidPip.instance.addListener(_onAndroidPipStateChanged);
+    _scheduleAndroidPipLayoutSync();
     addObserverMobile(this);
 
     _controlsListener = plPlayerController.showControls.listen(
@@ -354,14 +377,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      plPlayerController.isEnteringPip = false;
-    }
-
     if (!plPlayerController.continuePlayInBackground.value) {
       late final player = plPlayerController.videoPlayerController;
       if (const <AppLifecycleState>[.paused, .detached].contains(state)) {
-        if (plPlayerController.isEnteringPip || AndroidHelper.isPipMode) {
+        if (AndroidPip.instance.protectsPlayback) {
           return; // 正在进入或已在画中画模式，坚决不能暂停
         }
 
@@ -369,8 +388,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
           if (Platform.isAndroid && plPlayerController.autoPiP) {
             Future.delayed(const Duration(milliseconds: 200), () {
               if (mounted &&
-                  !AndroidHelper.isPipMode &&
-                  !plPlayerController.isEnteringPip &&
+                  !AndroidPip.instance.protectsPlayback &&
                   player.state.playing) {
                 _pauseDueToPauseUponEnteringBackgroundMode = true;
                 player.pause();
@@ -416,6 +434,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void dispose() {
     plPlayerController.getVideoRectCallback = null;
+    AndroidPip.instance.removeListener(_onAndroidPipStateChanged);
     removeObserverMobile(this);
     _danmakuListener?.cancel();
     _tapGestureRecognizer.dispose();
@@ -991,14 +1010,21 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   void didChangeDependencies() {
     super.didChangeDependencies();
     colorScheme = ColorScheme.of(context);
+    _scheduleAndroidPipLayoutSync();
   }
 
   @override
   void didUpdateWidget(covariant PLVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (Platform.isAndroid && AndroidHelper.isPipMode) {
+    if (Platform.isAndroid && AndroidPip.instance.keepsVideoOnly) {
       plPlayerController.controls = false;
     }
+    _scheduleAndroidPipLayoutSync();
+  }
+
+  @override
+  void didChangeMetrics() {
+    _scheduleAndroidPipLayoutSync();
   }
 
   void _onPanStart(ScaleStartDetails details) {
@@ -1243,7 +1269,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       }
       return;
     }
-    if (Platform.isAndroid && AndroidHelper.isPipMode) {
+    if (Platform.isAndroid && AndroidPip.instance.keepsVideoOnly) {
       // Android 系统小窗中，双击不做任何 Flutter 侧的操作，交给系统层 SystemUI 去处理小窗缩放
       return;
     }
@@ -1280,7 +1306,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   void _onPointerDown(PointerDownEvent event) {
-    if (Platform.isAndroid && AndroidHelper.isPipMode) {
+    if (Platform.isAndroid && AndroidPip.instance.keepsVideoOnly) {
       // Android 系统小窗（画中画）模式下，不拦截、不消费任何 Pointer 事件，完全保留并交还给系统底层去响应双击切换大小等基础功能
       return;
     }
@@ -1413,6 +1439,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Widget build(BuildContext context) {
     maxWidth = widget.maxWidth;
     maxHeight = widget.maxHeight;
+    _scheduleAndroidPipLayoutSync();
     final isFullScreen = this.isFullScreen;
     final primary = isFullScreen && colorScheme.isLight
         ? colorScheme.inversePrimary

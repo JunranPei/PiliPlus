@@ -43,6 +43,7 @@ import 'package:PiliPlus/pages/video/reply/view.dart';
 import 'package:PiliPlus/pages/video/view_point/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/pages/video/widgets/player_focus.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
@@ -54,7 +55,6 @@ import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/services/shutdown_timer_service.dart'
     show shutdownTimerService;
 import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
@@ -322,6 +322,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     PlPlayerController.setPlayCallBack(playCallBack);
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     plPlayerController = videoDetailController.plPlayerController;
+    AndroidPip.instance.addListener(_onAndroidPipStateChanged);
 
     if (videoDetailController.removeSafeArea) {
       hideSystemBar();
@@ -360,6 +361,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     videoSourceInit();
 
     addObserverMobile(this);
+  }
+
+  void _onAndroidPipStateChanged() {
+    if (mounted) setState(() {});
   }
 
   // 获取视频资源，初始化播放器
@@ -428,11 +433,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     final isResume = state == .resumed;
     final ctr = videoDetailController.plPlayerController..visible = isResume;
     if (isResume) {
-      // 回到前台且不在画中画模式时，重置 isEnteringPip 标志
-      // 防止该标志卡死导致 didPushNext 中 pause() 永远不执行
-      if (!AndroidHelper.isPipMode) {
-        ctr.isEnteringPip = false;
-      }
       if (!ctr.showDanmaku) {
         introController.startTimer();
         ctr.showDanmaku = true;
@@ -550,7 +550,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           }
         } else {
           if (plPlayerController!.controlsLock.value &&
-              (!Platform.isAndroid || !AndroidHelper.isPipMode)) {
+              (!Platform.isAndroid || !AndroidPip.instance.keepsVideoOnly)) {
             plPlayerController!.onLockControl(false);
           }
         }
@@ -663,6 +663,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     _dataStatusSubscription?.cancel();
     _visualReadySubscription?.cancel();
+    AndroidPip.instance.removeListener(_onAndroidPipStateChanged);
     _lastFrameScreenshot?.dispose();
     _lastFrameBoxFit = null;
 
@@ -701,12 +702,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     // 只在确实处于画中画模式时跳过暂停，不再依赖 isEnteringPip
     // 因为 didPushNext 是应用内页面切换触发的，不可能是"正在进入PiP"
-    if (AndroidHelper.isPipMode) {
+    if (AndroidPip.instance.protectsPlayback) {
       return; // 已在画中画，保留播放器状态，不进行注销与暂停
     }
-    // 应用内导航，重置 PiP 标志
     videoDetailController
-      ..plPlayerController.isEnteringPip = false
       ..rememberPlaybackPosition(reason: 'route.didPushNext')
       ..videoState.value = false
       ..cancelBlockListener()
