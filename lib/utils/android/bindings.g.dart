@@ -201,6 +201,29 @@ extension type AndroidHelper._(jni$_.JObject _$this) implements jni$_.JObject {
   static core$_.bool get isFoldable =>
       _id_isFoldable.getNullable(_class, jni$_.jboolean.type) as core$_.bool;
 
+  static final _id_isPipAvailable = _class.staticFieldId(
+    r'isPipAvailable',
+    r'Z',
+  );
+
+  /// from: `static public final boolean isPipAvailable`
+  static core$_.bool get isPipAvailable =>
+      _id_isPipAvailable.getNullable(_class, jni$_.jboolean.type)
+          as core$_.bool;
+
+  static final _id_isPipMode = _class.staticFieldId(
+    r'isPipMode',
+    r'Z',
+  );
+
+  /// from: `static public volatile boolean isPipMode`
+  static core$_.bool get isPipMode =>
+      _id_isPipMode.getNullable(_class, jni$_.jboolean.type) as core$_.bool;
+
+  /// from: `static public volatile boolean isPipMode`
+  static set isPipMode(core$_.bool value) =>
+      _id_isPipMode.set(_class, jni$_.jboolean.type, value);
+
   static final _id_sdkInt = _class.staticMethodId(
     r'sdkInt',
     r'()I',
@@ -422,6 +445,141 @@ extension type AndroidHelper._(jni$_.JObject _$this) implements jni$_.JObject {
     ).boolean;
   }
 
+  static final _id_enterPip = _class.staticMethodId(
+    r'enterPip',
+    r'(JIIZZZ)V',
+  );
+
+  static final _enterPip =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<
+                  (
+                    jni$_.Int64,
+                    jni$_.Int32,
+                    jni$_.Int32,
+                    jni$_.Int32,
+                    jni$_.Int32,
+                    jni$_.Int32,
+                  )
+                >,
+              )
+            >
+          >('globalEnv_CallStaticVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              core$_.int,
+              core$_.int,
+              core$_.int,
+              core$_.int,
+              core$_.int,
+              core$_.int,
+            )
+          >();
+
+  /// from: `static public void enterPip(long engineId, int width, int height, boolean autoEnter, boolean isLive, boolean isPlaying)`
+  static void enterPip(
+    core$_.int engineId,
+    core$_.int width,
+    core$_.int height,
+    core$_.bool autoEnter,
+    core$_.bool isLive,
+    core$_.bool isPlaying,
+  ) {
+    final _$$classRef = _class.reference;
+    _enterPip(
+      _$$classRef.pointer,
+      _id_enterPip.pointer,
+      engineId,
+      width,
+      height,
+      autoEnter ? 1 : 0,
+      isLive ? 1 : 0,
+      isPlaying ? 1 : 0,
+    ).check();
+  }
+
+  static final _id_updatePipActions = _class.staticMethodId(
+    r'updatePipActions',
+    r'(JZZ)V',
+  );
+
+  static final _updatePipActions =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Int64, jni$_.Int32, jni$_.Int32)>,
+              )
+            >
+          >('globalEnv_CallStaticVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              core$_.int,
+              core$_.int,
+              core$_.int,
+            )
+          >();
+
+  /// from: `static public void updatePipActions(long engineId, boolean isLive, boolean isPlaying)`
+  static void updatePipActions(
+    core$_.int engineId,
+    core$_.bool isLive,
+    core$_.bool isPlaying,
+  ) {
+    final _$$classRef = _class.reference;
+    _updatePipActions(
+      _$$classRef.pointer,
+      _id_updatePipActions.pointer,
+      engineId,
+      isLive ? 1 : 0,
+      isPlaying ? 1 : 0,
+    ).check();
+  }
+
+  static final _id_disableAutoEnterPip = _class.staticMethodId(
+    r'disableAutoEnterPip',
+    r'(J)V',
+  );
+
+  static final _disableAutoEnterPip =
+      jni$_.ProtectedJniExtensions.lookup<
+            jni$_.NativeFunction<
+              jni$_.JThrowablePtr Function(
+                jni$_.Pointer<jni$_.Void>,
+                jni$_.JMethodIDPtr,
+                jni$_.VarArgs<(jni$_.Int64,)>,
+              )
+            >
+          >('globalEnv_CallStaticVoidMethod')
+          .asFunction<
+            jni$_.JThrowablePtr Function(
+              jni$_.Pointer<jni$_.Void>,
+              jni$_.JMethodIDPtr,
+              core$_.int,
+            )
+          >();
+
+  /// from: `static public void disableAutoEnterPip(long engineId)`
+  static void disableAutoEnterPip(
+    core$_.int engineId,
+  ) {
+    final _$$classRef = _class.reference;
+    _disableAutoEnterPip(
+      _$$classRef.pointer,
+      _id_disableAutoEnterPip.pointer,
+      engineId,
+    ).check();
+  }
+
   static final _id_maxScreenSize = _class.staticMethodId(
     r'maxScreenSize',
     r'()[I',
@@ -528,6 +686,21 @@ extension type AndroidHelper$ToDart._(jni$_.JObject _$this)
   /// The type which includes information such as the signature of this class.
   static const jni$_.JType<AndroidHelper$ToDart> type =
       $AndroidHelper$ToDart$Type$();
+  static final _id_onUserLeaveHint = _class.staticFieldId(
+    r'onUserLeaveHint',
+    r'Ljava/lang/Runnable;',
+  );
+
+  /// from: `static public volatile java.lang.Runnable onUserLeaveHint`
+  /// The returned object must be released after use, by calling the [release] method.
+  static Runnable? get onUserLeaveHint =>
+      _id_onUserLeaveHint.getNullable(_class, Runnable.type) as Runnable?;
+
+  /// from: `static public volatile java.lang.Runnable onUserLeaveHint`
+  /// The returned object must be released after use, by calling the [release] method.
+  static set onUserLeaveHint(Runnable? value) =>
+      _id_onUserLeaveHint.set(_class, Runnable.type, value);
+
   static final _id_onConfigurationChanged = _class.staticFieldId(
     r'onConfigurationChanged',
     r'Ljava/lang/Runnable;',

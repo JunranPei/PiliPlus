@@ -2,22 +2,29 @@ package com.personal.piliplus
 
 import android.content.Intent
 import android.content.res.Configuration
-import android.app.PictureInPictureUiState
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
 import com.ryanheise.audioservice.AudioServiceActivity
-import io.flutter.embedding.android.RenderMode
-import io.flutter.embedding.engine.FlutterEngine
 
 class MainActivity : AudioServiceActivity() {
-    private var pipManager: AndroidPipManager? = null
-
-    override fun getRenderMode(): RenderMode = RenderMode.texture
-
-    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+    override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        pipManager = AndroidPipManager(this, flutterEngine)
+        io.flutter.plugin.common.MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.personal.piliplus/pip").setMethodCallHandler { call, result ->
+            if (call.method == "setVideoRect") {
+                val left = call.argument<Int>("left") ?: -1
+                val top = call.argument<Int>("top") ?: -1
+                val width = call.argument<Int>("width") ?: -1
+                val height = call.argument<Int>("height") ?: -1
+                AndroidHelper.pipLeft = left
+                AndroidHelper.pipTop = top
+                AndroidHelper.pipWidth = width
+                AndroidHelper.pipHeight = height
+                result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -36,24 +43,17 @@ class MainActivity : AudioServiceActivity() {
     }
 
     override fun onDestroy() {
-        pipManager?.destroy()
-        pipManager = null
         stopService(Intent(this, com.ryanheise.audioservice.AudioService::class.java))
         super.onDestroy()
     }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        pipManager?.onUserLeaveHint()
+        AndroidHelper.ToDart.onUserLeaveHint?.run()
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        pipManager?.onPictureInPictureModeChanged(isInPictureInPictureMode)
-    }
-
-    override fun onPictureInPictureUiStateChanged(pipState: PictureInPictureUiState) {
-        super.onPictureInPictureUiStateChanged(pipState)
-        pipManager?.onPictureInPictureUiStateChanged(pipState)
+        AndroidHelper.isPipMode = isInPictureInPictureMode
     }
 }

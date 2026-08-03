@@ -1,6 +1,9 @@
 package com.personal.piliplus;
 
+import android.app.Activity;
 import android.app.PendingIntent;
+import android.app.PictureInPictureParams;
+import android.app.RemoteAction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -13,26 +16,43 @@ import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Icon;
+import android.media.session.PlaybackState;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Rational;
 import android.view.WindowManager;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.github.dart_lang.jni_flutter.JniFlutterPlugin;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 @Keep
 public final class AndroidHelper {
     public static final boolean isFoldable;
 
+    public static final boolean isPipAvailable;
+
+    public static volatile boolean isPipMode = false;
+
+    public static volatile int pipLeft = -1;
+    public static volatile int pipTop = -1;
+    public static volatile int pipWidth = -1;
+    public static volatile int pipHeight = -1;
+
+    private static volatile Rational currentAspectRatio = null;
+
     static {
         PackageManager pm = getContext().getPackageManager();
         isFoldable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && pm.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE);
+        isPipAvailable = pm.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
     }
 
     private AndroidHelper() {
@@ -141,6 +161,120 @@ public final class AndroidHelper {
         return false;
     }
 
+    public static void enterPip(long engineId, int width, int height, boolean autoEnter, boolean isLive, boolean isPlaying) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Activity activity = JniFlutterPlugin.getActivity(engineId);
+            assert activity != null;
+            Rational aspectRatio = new Rational(width, height);
+            currentAspectRatio = aspectRatio;
+            PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder()
+                    .setAspectRatio(aspectRatio);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                builder.setSeamlessResizeEnabled(true);
+            }
+            setPipActions(activity, builder, isLive, isPlaying);
+
+            try {
+                Rect sourceRect;
+                if (pipLeft >= 0 && pipTop >= 0 && pipWidth > 0 && pipHeight > 0) {
+                    sourceRect = new Rect(pipLeft, pipTop, pipLeft + pipWidth, pipTop + pipHeight);
+                    // 使用完后重置，避免下次使用错误的缓存值
+                    pipLeft = -1;
+                    pipTop = -1;
+                    pipWidth = -1;
+                    pipHeight = -1;
+                } else {
+                    int screenWidth;
+                    int screenHeight;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        Rect bounds = activity.getWindowManager().getCurrentWindowMetrics().getBounds();
+                        screenWidth = bounds.width();
+                        screenHeight = bounds.height();
+                    } else {
+                        Point size = new Point();
+                        activity.getWindowManager().getDefaultDisplay().getRealSize(size);
+                        screenWidth = size.x;
+                        screenHeight = size.y;
+                    }
+
+                    if (screenWidth < screenHeight) {
+                        int videoHeight = (int) ((double) screenWidth * height / width);
+                        sourceRect = new Rect(0, 0, screenWidth, videoHeight);
+                    } else {
+                        sourceRect = new Rect(0, 0, screenWidth, screenHeight);
+                    }
+                }
+                builder.setSourceRectHint(sourceRect);
+            } catch (Exception ignored) {
+            }
+
+            if (autoEnter) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    builder.setAutoEnterEnabled(true);
+                    activity.setPictureInPictureParams(builder.build());
+                }
+            } else {
+                activity.enterPictureInPictureMode(builder.build());
+            }
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static void updatePipActions(long engineId, boolean isLive, boolean isPlaying) {
+        Activity activity = JniFlutterPlugin.getActivity(engineId);
+        assert activity != null;
+        PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
+        if (currentAspectRatio != null) {
+            builder.setAspectRatio(currentAspectRatio);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            builder.setSeamlessResizeEnabled(true);
+        }
+        setPipActions(activity, builder, isLive, isPlaying);
+        activity.setPictureInPictureParams(builder.build());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static void setPipActions(Activity activity, PictureInPictureParams.Builder builder, boolean isLive, boolean isPlaying) {
+        ComponentName mbrComponent = MediaHelper.getMediaButtonReceiverComponent(activity);
+        if (mbrComponent == null) return;
+        ArrayList<RemoteAction> actionList = new ArrayList<>(3);
+        if (!isLive) {
+            actionList.add(getRemoteAction(mbrComponent, activity, R.drawable.ic_player_rewind_10s, "ACTION_REWIND", (int) PlaybackState.ACTION_REWIND));
+        }
+        if (isPlaying) {
+            actionList.add(getRemoteAction(mbrComponent, activity, R.drawable.ic_player_pause, "ACTION_PAUSE", (int) PlaybackState.ACTION_PAUSE));
+        } else {
+            actionList.add(getRemoteAction(mbrComponent, activity, R.drawable.ic_player_play, "ACTION_PLAY", (int) PlaybackState.ACTION_PLAY));
+        }
+        if (!isLive) {
+            actionList.add(getRemoteAction(mbrComponent, activity, R.drawable.ic_player_fast_forward_10s, "ACTION_FAST_FORWARD", (int) PlaybackState.ACTION_FAST_FORWARD));
+        }
+        builder.setActions(actionList);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static RemoteAction getRemoteAction(@NonNull ComponentName mbrComponent, Activity activity, @DrawableRes int resId, String title, int action) {
+        return new RemoteAction(
+                Icon.createWithResource(activity, resId),
+                title,
+                title,
+                Objects.requireNonNull(MediaHelper.buildMediaButtonPendingIntent(activity, mbrComponent, action))
+        );
+    }
+
+    public static void disableAutoEnterPip(long engineId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Activity activity = JniFlutterPlugin.getActivity(engineId);
+            if (activity != null) {
+                activity.setPictureInPictureParams(new PictureInPictureParams.Builder()
+                        .setAutoEnterEnabled(false)
+                        .build()
+                );
+            }
+        }
+    }
+
     public static int[] maxScreenSize() {
         Context context = getContext();
         WindowManager wm = context.getSystemService(WindowManager.class);
@@ -182,6 +316,7 @@ public final class AndroidHelper {
 
     @Keep
     public static final class ToDart {
+        public static volatile Runnable onUserLeaveHint;
         public static Runnable onConfigurationChanged;
 
         private ToDart() {
