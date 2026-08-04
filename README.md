@@ -234,9 +234,8 @@
 
 此项目（PiliPlus）是个人为了兴趣而开发，仅用于学习和测试，请于下载后24小时内删除。
 所用API皆从官方网站收集，不提供任何破解内容。
-在此致敬原作者：[guozhigq/pilipala](https://github.com/guozhigq/pilipala)
-在此致敬上游作者：[orz12/PiliPalaX](https://github.com/orz12/PiliPalaX)
-本仓库做了更激进的修改，感谢原作者的开源精神。
+
+这个版本是在 [PiliPlus](https://github.com/bggRGjQaUbCoE/PiliPlus) 的基础上继续修改的。播放器之外的大部分功能和积累，都来自原项目以及更早的 [pilipala](https://github.com/guozhigq/pilipala)、[PiliPalaX](https://github.com/orz12/PiliPalaX)。感谢几位原作者和所有参与过的贡献者，我们只是把自己日常使用时遇到的问题修了一些，希望这些改动也能帮到其他人。
 
 感谢使用
 
