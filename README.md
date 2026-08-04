@@ -8,11 +8,11 @@
     <h1>PiliPlus</h1>
 <div align="center">
     
-![GitHub repo size](https://img.shields.io/github/repo-size/bggRGjQaUbCoE/PiliPlus) 
-![GitHub Repo stars](https://img.shields.io/github/stars/bggRGjQaUbCoE/PiliPlus) 
-![GitHub all releases](https://img.shields.io/github/downloads/bggRGjQaUbCoE/PiliPlus/total) 
+![GitHub repo size](https://img.shields.io/github/repo-size/JunranPei/PiliPlus)
+![GitHub Repo stars](https://img.shields.io/github/stars/JunranPei/PiliPlus)
+![GitHub all releases](https://img.shields.io/github/downloads/JunranPei/PiliPlus/total)
 </div>
-    <p>使用Flutter开发的BiliBili第三方客户端</p>
+    <p>使用 Flutter 开发的 Bilibili 第三方客户端</p>
     
 <img src="assets/screenshots/510shots_so.png" width="32%" alt="home" />
 <img src="assets/screenshots/174shots_so.png" width="32%" alt="home" />
@@ -34,6 +34,19 @@
 - [x] Linux
 
 [![Packaging status](https://repology.org/badge/vertical-allrepos/piliplus.svg)](https://repology.org/project/piliplus/versions)
+
+## 这个版本改了什么
+
+这个仓库是在 PiliPlus 基础上维护的个人版本，最近主要在 Android 实机上折腾播放器。不是简单换了个包名，下面这些问题都做过针对性的处理：
+
+- 降低 4K 视频播放时的发热和耗电。优先选择 HEVC，并尽量走 MediaCodec 硬件解码，避免不支持 AV1 硬解的设备退回 CPU 软解。
+- 修正音频通道的占用和释放。播放视频时可以正常使用 Gemini 的歌曲识别，暂停后也不会继续占着音频焦点。
+- 修复连续打开多个视频时的黑屏、旧画面闪烁和画面比例异常，返回上一页时不再突然拉伸或放大。
+- 修复页面切换、退出视频页后仍有声音残留的问题。
+- 去掉暂停时的高分辨率截图开销。切换回旧视频时使用封面过渡，减少卡顿，也避免为了保留一帧画面增加额外功耗。
+- 修复包名调整后可能出现的启动黑屏和闪退，并提供通用版及不同架构的 Android 安装包。
+
+播放器这块仍然坚持一个原则：不靠常驻轮询、持续截图或额外开一个播放器来遮问题。遇到新问题欢迎直接提 Issue，最好附上机型、系统版本和复现步骤。
 
 ## refactor
 
@@ -213,7 +226,7 @@
 
 ## 下载
 
-可以通过右侧release进行下载或拉取代码到本地进行编译
+可以前往 [Releases](https://github.com/JunranPei/PiliPlus/releases) 下载，也可以拉取代码自行编译。
 
 <br/>
 
@@ -244,10 +257,10 @@
 
 ## Star History
 
-<a href="https://www.star-history.com/#bggRGjQaUbCoE/PiliPlus&Date">
+<a href="https://www.star-history.com/#JunranPei/PiliPlus&Date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=bggRGjQaUbCoE/PiliPlus&type=Date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=JunranPei/PiliPlus&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=JunranPei/PiliPlus&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=JunranPei/PiliPlus&type=Date" />
  </picture>
 </a>
