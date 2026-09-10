@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
-import 'dart:ui' as ui;
-import 'dart:typed_data';
 
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 
@@ -44,6 +42,7 @@ import 'package:PiliPlus/pages/video/reply/view.dart';
 import 'package:PiliPlus/pages/video/view_point/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/pages/video/widgets/player_focus.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
@@ -54,7 +53,6 @@ import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/services/shutdown_timer_service.dart'
     show shutdownTimerService;
 import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
@@ -142,6 +140,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     PlPlayerController.setPlayCallBack(playCallBack);
     videoDetailController = Get.put(VideoDetailController(), tag: heroTag);
     plPlayerController = videoDetailController.plPlayerController;
+    AndroidPipController.instance.addListener(_onPipStateChanged);
 
     if (videoDetailController.removeSafeArea) {
       hideSystemBar();
@@ -171,6 +170,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     addObserverMobile(this);
   }
 
+  void _onPipStateChanged() {
+    if (mounted) setState(() {});
+  }
+
   // 获取视频资源，初始化播放器
   void videoSourceInit() {
     videoDetailController.queryVideoUrl(autoFullScreenFlag: true);
@@ -191,11 +194,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     final isResume = state == .resumed;
     final ctr = videoDetailController.plPlayerController..visible = isResume;
     if (isResume) {
-      // 回到前台且不在画中画模式时，重置 isEnteringPip 标志
-      // 防止该标志卡死导致 didPushNext 中 pause() 永远不执行
-      if (!AndroidHelper.isPipMode) {
-        ctr.isEnteringPip = false;
-      }
       if (!ctr.showDanmaku) {
         introController.startTimer();
         ctr.showDanmaku = true;
@@ -283,7 +281,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
           }
         } else {
           if (plPlayerController!.controlsLock.value &&
-              (!Platform.isAndroid || !AndroidHelper.isPipMode)) {
+              (!Platform.isAndroid ||
+                  !AndroidPipController.instance.protectsPlayback)) {
             plPlayerController!.onLockControl(false);
           }
         }
@@ -333,6 +332,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
   @override
   void dispose() {
+    AndroidPipController.instance.removeListener(_onPipStateChanged);
     plPlayerController
       ?..removeStatusLister(playerListener)
       ..removePositionListener(positionListener);
@@ -391,11 +391,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     // 只在确实处于画中画模式时跳过暂停，不再依赖 isEnteringPip
     // 因为 didPushNext 是应用内页面切换触发的，不可能是"正在进入PiP"
-    if (AndroidHelper.isPipMode) {
+    if (AndroidPipController.instance.protectsPlayback) {
       return; // 已在画中画，保留播放器状态，不进行注销与暂停
     }
-    // 应用内导航，重置 PiP 标志
-    videoDetailController.plPlayerController.isEnteringPip = false;
 
     videoDetailController
       ..videoState.value = false
@@ -460,7 +458,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       plPlayerController
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
-      
+
       if (videoDetailController.playerStatus == PlayerStatus.playing) {
         plPlayerController?.play();
       } else {
@@ -471,7 +469,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       plPlayerController
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
-      
+
       // 监听 dataStatus，加载完成后清除监听
       _dataStatusSubscription?.cancel();
       _dataStatusSubscription = plPlayerController?.dataStatus.listen((status) {
@@ -515,8 +513,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     final shortestSide = size.shortestSide;
     final minVideoHeight = shortestSide / Style.aspectRatio16x9;
     final maxVideoHeight = max(size.longestSide * 0.65, shortestSide);
+    // Keep the pre-PiP orientation while Android is resizing the activity.
+    // Switching portrait/landscape branches here reparents PLVideoPlayer and
+    // detaches media_kit's Surface during the PiP animation.
+    if (!AndroidPipController.instance.protectsPlayback) {
+      videoDetailController.isPortrait = isPortrait = maxHeight >= maxWidth;
+    }
     videoDetailController
-      ..isPortrait = isPortrait = maxHeight >= maxWidth
       ..minVideoHeight = minVideoHeight
       ..maxVideoHeight = maxVideoHeight
       ..videoHeight = videoDetailController.isVertical.value
@@ -535,7 +538,12 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   Widget get childWhenDisabled {
     return Obx(
       () {
-        final isFullScreen = this.isFullScreen;
+        // PiP uses the same mounted player subtree, but its activity bounds
+        // are the video viewport. Keep detail slivers below that viewport
+        // instead of changing the global fullscreen state (which can trigger
+        // a second, unrelated layout transition).
+        final isFullScreen =
+            this.isFullScreen || AndroidPipController.instance.protectsPlayback;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: removeAppBar(isFullScreen)
@@ -780,16 +788,16 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                                             .videoPlayerController!
                                             .state
                                             .completed) {
-                                          await plPlayerController!
-                                              .videoPlayerController!
-                                              .seek(Duration.zero);
-                                          plPlayerController!
-                                              .videoPlayerController!
-                                              .play();
+                                          await plPlayerController!.play(
+                                            repeat: true,
+                                          );
+                                        } else if (plPlayerController!
+                                            .videoPlayerController!
+                                            .state
+                                            .playing) {
+                                          await plPlayerController!.pause();
                                         } else {
-                                          plPlayerController!
-                                              .videoPlayerController!
-                                              .playOrPause();
+                                          await plPlayerController!.play();
                                         }
                                       }
                                     },
@@ -1316,9 +1324,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         videoDetailController.plPlayerController.onPopInvokedWithResult,
     child: Obx(
       () {
-        final bool showLoadingOrPlaceholder = !videoDetailController.videoState.value ||
-              !videoDetailController.autoPlay ||
-              plPlayerController?.videoController == null;
+        final bool showLoadingOrPlaceholder =
+            !videoDetailController.videoState.value ||
+            !videoDetailController.autoPlay ||
+            plPlayerController?.videoController == null;
 
         if (showLoadingOrPlaceholder) {
           return NetworkImgLayer(
@@ -1330,33 +1339,33 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         }
 
         return PLVideoPlayer(
-            maxWidth: width,
-            maxHeight: height,
-            plPlayerController: plPlayerController!,
-            videoDetailController: videoDetailController,
-            introController: introController,
-            headerControl: HeaderControl(
-              key: videoDetailController.headerCtrKey,
-              isPortrait: isPortrait,
-              controller: videoDetailController.plPlayerController,
-              videoDetailCtr: videoDetailController,
-              heroTag: heroTag,
-            ),
-            danmuWidget: isPipMode && pipNoDanmaku
-                ? null
-                : Obx(
-                    () => PlDanmaku(
-                      key: ValueKey(videoDetailController.cid.value),
-                      isPipMode: isPipMode,
-                      cid: videoDetailController.cid.value,
-                      playerController: plPlayerController!,
-                      isFullScreen: plPlayerController!.isFullScreen.value,
-                      isFileSource: videoDetailController.isFileSource,
-                      size: Size(width, height),
-                    ),
+          maxWidth: width,
+          maxHeight: height,
+          plPlayerController: plPlayerController!,
+          videoDetailController: videoDetailController,
+          introController: introController,
+          headerControl: HeaderControl(
+            key: videoDetailController.headerCtrKey,
+            isPortrait: isPortrait,
+            controller: videoDetailController.plPlayerController,
+            videoDetailCtr: videoDetailController,
+            heroTag: heroTag,
+          ),
+          danmuWidget: isPipMode && pipNoDanmaku
+              ? null
+              : Obx(
+                  () => PlDanmaku(
+                    key: ValueKey(videoDetailController.cid.value),
+                    isPipMode: isPipMode,
+                    cid: videoDetailController.cid.value,
+                    playerController: plPlayerController!,
+                    isFullScreen: plPlayerController!.isFullScreen.value,
+                    isFileSource: videoDetailController.isFileSource,
+                    size: Size(width, height),
                   ),
-            showEpisodes: showEpisodes,
-            showViewPoints: showViewPoints,
+                ),
+          showEpisodes: showEpisodes,
+          showViewPoints: showViewPoints,
         );
       },
     ),
@@ -1368,24 +1377,29 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   late double maxHeight;
   bool isWindowMode = false;
   late EdgeInsets padding;
+  int _layoutMode = 0;
 
   @override
   Widget build(BuildContext context) {
     Widget child;
-    if (videoDetailController.plPlayerController.isPipMode) {
-      child = ColoredBox(
-        color: Colors.black,
-        child: plPlayer(width: maxWidth, height: maxHeight, isPipMode: true),
-      );
-    } else if (!videoDetailController.horizontalScreen) {
-      child = childWhenDisabled;
-    } else if (maxWidth / maxHeight >= kScreenRatio) {
-      child = childWhenDisabledLandscape;
-    } else if (maxWidth / Style.aspectRatio16x9 < 0.4 * maxHeight) {
-      child = childWhenDisabled;
-    } else {
-      child = childWhenDisabledAlmostSquare;
+    // Keep the existing player subtree mounted while Android resizes the
+    // Activity into PiP. Moving PLVideoPlayer to a separate PiP-only branch
+    // detaches media_kit's Surface and leaves SystemUI showing the app-icon
+    // placeholder until the replacement Surface produces its first frame.
+    if (!AndroidPipController.instance.protectsPlayback) {
+      _layoutMode = !videoDetailController.horizontalScreen
+          ? 0
+          : maxWidth / maxHeight >= kScreenRatio
+          ? 1
+          : maxWidth / Style.aspectRatio16x9 < 0.4 * maxHeight
+          ? 0
+          : 2;
     }
+    child = switch (_layoutMode) {
+      1 => childWhenDisabledLandscape,
+      2 => childWhenDisabledAlmostSquare,
+      _ => childWhenDisabled,
+    };
     if (videoDetailController.plPlayerController.keyboardControl) {
       child = PlayerFocus(
         plPlayerController: videoDetailController.plPlayerController,

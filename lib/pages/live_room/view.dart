@@ -29,13 +29,13 @@ import 'package:PiliPlus/pages/live_room/widgets/bottom_control.dart';
 import 'package:PiliPlus/pages/live_room/widgets/chat_panel.dart';
 import 'package:PiliPlus/pages/live_room/widgets/header_control.dart';
 import 'package:PiliPlus/pages/video/widgets/player_focus.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/danmaku_options.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/pl_player/view/view.dart';
 import 'package:PiliPlus/services/service_locator.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/size_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
@@ -90,10 +90,15 @@ class _LiveRoomPageState extends State<LiveRoomPage>
     );
     plPlayerController = _liveRoomController.plPlayerController
       ..addStatusLister(playerListener);
+    AndroidPipController.instance.addListener(_onPipStateChanged);
     PlPlayerController.setPlayCallBack(plPlayerController.play);
     if (plPlayerController.removeSafeArea) {
       hideSystemBar();
     }
+  }
+
+  void _onPipStateChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -111,7 +116,12 @@ class _LiveRoomPageState extends State<LiveRoomPage>
       width: maxWidth * plPlayerController.uiScale,
       height: maxHeight * plPlayerController.uiScale,
     );
-    isPortrait = size.isPortrait;
+    // Preserve the pre-PiP orientation while Android resizes the activity;
+    // changing the root layout during the transition reparents the player
+    // Surface and causes the app-icon placeholder.
+    if (!AndroidPipController.instance.protectsPlayback) {
+      isPortrait = size.isPortrait;
+    }
     plPlayerController.screenRatio = maxHeight / maxWidth;
   }
 
@@ -174,6 +184,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   void dispose() {
+    AndroidPipController.instance.removeListener(_onPipStateChanged);
     removeObserverMobile(this);
     videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
     if (Platform.isAndroid && !plPlayerController.setSystemBrightness) {
@@ -216,18 +227,10 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
-    if (Platform.isAndroid && AndroidHelper.isPipMode) {
-      child = videoPlayerPanel(
-        isFullScreen,
-        width: maxWidth,
-        height: maxHeight,
-        isPipMode: true,
-        needDm: !plPlayerController.pipNoDanmaku,
-      );
-    } else {
-      child = childWhenDisabled;
-    }
+    // Do not replace the mounted video subtree during the native PiP
+    // transition. Reparenting the player detaches its Surface and produces an
+    // app-icon placeholder until a new video frame arrives.
+    Widget child = childWhenDisabled;
     if (plPlayerController.keyboardControl) {
       child = PlayerFocus(
         plPlayerController: plPlayerController,

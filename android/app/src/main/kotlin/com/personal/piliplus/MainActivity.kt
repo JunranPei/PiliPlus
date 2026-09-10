@@ -1,6 +1,5 @@
 package com.personal.piliplus
 
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -8,23 +7,11 @@ import android.view.WindowManager.LayoutParams
 import com.ryanheise.audioservice.AudioServiceActivity
 
 class MainActivity : AudioServiceActivity() {
+    private var pipCoordinator: PipCoordinator? = null
+
     override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
-        io.flutter.plugin.common.MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.personal.piliplus/pip").setMethodCallHandler { call, result ->
-            if (call.method == "setVideoRect") {
-                val left = call.argument<Int>("left") ?: -1
-                val top = call.argument<Int>("top") ?: -1
-                val width = call.argument<Int>("width") ?: -1
-                val height = call.argument<Int>("height") ?: -1
-                AndroidHelper.pipLeft = left
-                AndroidHelper.pipTop = top
-                AndroidHelper.pipWidth = width
-                AndroidHelper.pipHeight = height
-                result.success(null)
-            } else {
-                result.notImplemented()
-            }
-        }
+        pipCoordinator = PipCoordinator(this, flutterEngine.dartExecutor.binaryMessenger)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -43,17 +30,28 @@ class MainActivity : AudioServiceActivity() {
     }
 
     override fun onDestroy() {
-        stopService(Intent(this, com.ryanheise.audioservice.AudioService::class.java))
+        pipCoordinator?.destroy()
+        pipCoordinator = null
+        // AudioService owns the FlutterEngine used by this Activity. Stopping
+        // it here can race FlutterActivity's detach on devices which reclaim
+        // background activities aggressively, leaving a destroyed cached
+        // engine behind for the next launcher tap. The plugin will unbind and
+        // stop the service itself when playback is inactive.
         super.onDestroy()
     }
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        AndroidHelper.ToDart.onUserLeaveHint?.run()
+        pipCoordinator?.onUserLeaveHint()
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        AndroidHelper.isPipMode = isInPictureInPictureMode
+        pipCoordinator?.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+    }
+
+    override fun onPictureInPictureUiStateChanged(state: android.app.PictureInPictureUiState) {
+        super.onPictureInPictureUiStateChanged(state)
+        pipCoordinator?.onPictureInPictureUiStateChanged(state)
     }
 }

@@ -1,3 +1,4 @@
+import 'dart:async' show unawaited;
 import 'dart:io';
 
 import 'package:PiliPlus/build_config.dart';
@@ -114,10 +115,8 @@ void main() async {
 
   if (PlatformUtils.isMobile) {
     if (Platform.isAndroid) MaxScreenSize.init();
-    await Future.wait([
-      if (Pref.horizontalScreen) ?fullMode() else ?portraitUpMode(),
-      setupServiceLocator(),
-    ]);
+    unawaited(_initializePlaybackServices());
+    await (Pref.horizontalScreen ? fullMode() : portraitUpMode());
   } else if (Platform.isWindows) {
     if (await WebViewEnvironment.getAvailableVersion() != null) {
       webViewEnvironment = await WebViewEnvironment.create(
@@ -127,7 +126,7 @@ void main() async {
       );
     }
   } else if (Platform.isMacOS) {
-    await setupServiceLocator();
+    unawaited(_initializePlaybackServices());
   }
 
   Request();
@@ -209,6 +208,17 @@ void main() async {
     );
   } else {
     runApp(const MyApp());
+  }
+}
+
+Future<void> _initializePlaybackServices() async {
+  try {
+    await setupServiceLocator();
+  } catch (error, stackTrace) {
+    if (kDebugMode) {
+      debugPrint('playback service init error: $error');
+      debugPrintStack(stackTrace: stackTrace);
+    }
   }
 }
 

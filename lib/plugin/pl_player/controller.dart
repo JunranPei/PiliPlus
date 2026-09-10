@@ -1,4 +1,4 @@
-import 'dart:async' show StreamSubscription, Timer;
+import 'dart:async' show StreamSubscription, Timer, unawaited;
 import 'dart:convert' show ascii;
 import 'dart:io' show Platform;
 import 'dart:math' show max, min;
@@ -20,6 +20,7 @@ import 'package:PiliPlus/pages/danmaku/danmaku_model.dart';
 import 'package:PiliPlus/pages/setting/models/play_settings.dart'
     show kMaxVolume;
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
+import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -32,17 +33,12 @@ import 'package:PiliPlus/plugin/pl_player/models/video_fit_type.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/android/android_helper.dart';
-import 'package:PiliPlus/utils/android/bindings.g.dart';
 import 'package:PiliPlus/utils/asset_utils.dart';
-import 'package:PiliPlus/utils/device_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/extension/box_ext.dart';
-import 'package:flutter/services.dart' show MethodChannel;
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
 import 'package:PiliPlus/utils/image_utils.dart';
-import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/path_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
@@ -72,6 +68,11 @@ typedef PlayCallback = Future<void>? Function();
 class PlPlayerController with BlockConfigMixin {
   Player? _videoPlayerController;
   VideoController? _videoController;
+
+  static const _androidPausedRecoveryDelay = Duration(seconds: 30);
+  DateTime? _androidBackgroundedAt;
+  int? _androidBackgroundedPlayerHandle;
+  bool _recoverAndroidVideoOnNextPlay = false;
 
   // 添加一个私有静态变量来保存实例
   static PlPlayerController? _instance;
@@ -213,7 +214,7 @@ class PlPlayerController with BlockConfigMixin {
 
   late final bool autoPiP = Pref.autoPiP;
   bool get isPipMode =>
-      (Platform.isAndroid && AndroidHelper.isPipMode) ||
+      (Platform.isAndroid && AndroidPipController.instance.protectsPlayback) ||
       (PlatformUtils.isDesktop && isDesktopPip);
   late bool isDesktopPip = false;
   late Rect _lastWindowBounds;
@@ -316,7 +317,9 @@ class PlPlayerController with BlockConfigMixin {
 
   late bool _isAutoEnterPip = false;
   bool get isAutoEnterPip => _isAutoEnterPip;
-  bool isEnteringPip = false;
+  bool get isEnteringPip =>
+      Platform.isAndroid && AndroidPipController.instance.isEntering;
+  set isEnteringPip(bool _) {}
   ui.Rect? Function()? getVideoRectCallback;
 
   static bool get _isCurrVideoPage {
@@ -331,34 +334,29 @@ class PlPlayerController with BlockConfigMixin {
     return routeName == '/videoV' || routeName == '/liveRoom';
   }
 
-  void enterPip({bool autoEnter = false}) {
-    if (videoPlayerController != null) {
-      isEnteringPip = true;
+  Future<bool> enterPip({bool autoEnter = false}) async {
+    final player = videoPlayerController;
+    if (player == null || !player.state.playing) return false;
 
-      final rect = getVideoRectCallback?.call();
-      if (rect != null) {
-        const MethodChannel('com.personal.piliplus/pip').invokeMethod('setVideoRect', {
-          'left': rect.left.toInt(),
-          'top': rect.top.toInt(),
-          'width': rect.width.toInt(),
-          'height': rect.height.toInt(),
-        });
-      }
-
-      final state = videoPlayerController!.state;
-      PageUtils.enterPip(
-        autoEnter: autoEnter,
-        width: state.width == 0 ? width : state.width,
-        height: state.height == 0 ? height : state.height,
-        isLive: isLive,
-        isPlaying: playerStatus.isPlaying,
-      );
-    }
+    final state = player.state;
+    final configured = await AndroidPipController.instance.configure(
+      autoEnter: autoEnter,
+      width: state.width == 0 ? (width ?? 16) : state.width,
+      height: state.height == 0 ? (height ?? 9) : state.height,
+      isLive: isLive,
+      // media_kit's player state is updated before the derived Rx status;
+      // use it here so an auto-entry request is never armed as paused during
+      // the short play-state propagation window.
+      isPlaying: player.state.playing,
+      sourceRect: getVideoRectCallback?.call(),
+    );
+    if (!configured || autoEnter) return configured;
+    return AndroidPipController.instance.enter();
   }
 
   void _disableAutoEnterPip() {
     if (_isAutoEnterPip) {
-      PiliAndroidHelper.disableAutoEnterPip();
+      unawaited(AndroidPipController.instance.disableAutoEnter());
     }
   }
 
@@ -632,23 +630,7 @@ class PlPlayerController with BlockConfigMixin {
       enableHeart = false;
     }
 
-    if (Platform.isAndroid && autoPiP) {
-      AndroidHelper$ToDart.onUserLeaveHint = Runnable.implement(
-        $Runnable(run: _onUserLeaveHint),
-      );
-      if (DeviceUtils.sdkInt >= 31) {
-        _isAutoEnterPip = true;
-      }
-    }
-  }
-
-  void _onUserLeaveHint() {
-    isEnteringPip = true;
-    if (playerStatus.isPlaying && _isCurrVideoPage) {
-      if (DeviceUtils.sdkInt < 31) {
-        enterPip();
-      }
-    }
+    _isAutoEnterPip = Platform.isAndroid && autoPiP;
   }
 
   // 获取实例 传参
@@ -704,6 +686,9 @@ class PlPlayerController with BlockConfigMixin {
       this.width = width;
       this.height = height;
       this.dataSource = dataSource;
+      _androidBackgroundedAt = null;
+      _androidBackgroundedPlayerHandle = null;
+      _recoverAndroidVideoOnNextPlay = false;
       _autoPlay = autoplay;
       // 初始化视频倍速
       // _playbackSpeed.value = speed;
@@ -834,7 +819,7 @@ class PlPlayerController with BlockConfigMixin {
           (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
               .toString(),
       'volume-max': kMaxVolume.toString(),
-      if (hwdec != null && hwdec != 'no') 
+      if (hwdec != null && hwdec != 'no')
         'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec!,
       if (Platform.isAndroid) 'profile': 'fast',
       if (Platform.isWindows) 'gpu-api': 'd3d11',
@@ -1253,12 +1238,72 @@ class PlPlayerController with BlockConfigMixin {
       await seekTo(Duration.zero, isSeek: false);
     }
 
+    await _recoverAndroidVideoIfNeeded();
     await _videoPlayerController?.play();
 
     audioSessionHandler?.setActive(true);
 
     playerStatus.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
+  }
+
+  /// Records a paused Android decoder before the Activity loses its surface.
+  /// Some OEM MediaCodec implementations do not recover that decoder after a
+  /// long suspension even though audio and the mpv clock continue normally.
+  void onAppBackgrounded() {
+    if (!Platform.isAndroid || isLive || onlyPlayAudio.value) return;
+    final player = _videoPlayerController;
+    if (player == null || player.state.playing) {
+      _androidBackgroundedAt = null;
+      _androidBackgroundedPlayerHandle = null;
+      return;
+    }
+    _androidBackgroundedAt ??= DateTime.now();
+    _androidBackgroundedPlayerHandle = player.handle;
+  }
+
+  void onAppForegrounded() {
+    final backgroundedAt = _androidBackgroundedAt;
+    final player = _videoPlayerController;
+    _androidBackgroundedAt = null;
+    if (!Platform.isAndroid ||
+        backgroundedAt == null ||
+        player == null ||
+        player.handle != _androidBackgroundedPlayerHandle) {
+      _androidBackgroundedPlayerHandle = null;
+      return;
+    }
+    _androidBackgroundedPlayerHandle = null;
+    if (!player.state.playing &&
+        DateTime.now().difference(backgroundedAt) >=
+            _androidPausedRecoveryDelay) {
+      _recoverAndroidVideoOnNextPlay = true;
+    }
+  }
+
+  Future<void> _recoverAndroidVideoIfNeeded() async {
+    if (!_recoverAndroidVideoOnNextPlay) return;
+    _recoverAndroidVideoOnNextPlay = false;
+    final player = _videoPlayerController;
+    if (player == null ||
+        player.state.playing ||
+        isLive ||
+        onlyPlayAudio.value) {
+      return;
+    }
+
+    final resumePosition = player.state.position;
+    try {
+      // Recreate only the video decoder. This preserves the media source,
+      // audio track, quality selection and controller/widget identities.
+      await player.command(const ['video-reload']);
+      if (resumePosition > Duration.zero && !player.state.completed) {
+        await player.seek(resumePosition);
+      }
+    } catch (error) {
+      // Playback must remain usable even on mpv builds without video-reload.
+      if (kDebugMode) debugPrint('Android video recovery failed: $error');
+    }
   }
 
   /// 暂停播放
@@ -1421,10 +1466,11 @@ class PlPlayerController with BlockConfigMixin {
   // 双击播放、暂停
   Future<void> onDoubleTapCenter() async {
     if (!isLive && _isCompleted) {
-      await videoPlayerController!.seek(Duration.zero);
-      videoPlayerController!.play();
+      await play(repeat: true);
+    } else if (videoPlayerController!.state.playing) {
+      await pause();
     } else {
-      videoPlayerController!.playOrPause();
+      await play();
     }
   }
 
@@ -1696,10 +1742,6 @@ class PlPlayerController with BlockConfigMixin {
     dmState.clear();
     if (showSeekPreview) {
       _clearPreview();
-    }
-    if (Platform.isAndroid) {
-      AndroidHelper$ToDart.onUserLeaveHint?.release();
-      AndroidHelper$ToDart.onUserLeaveHint = null;
     }
     _timer?.cancel();
     // _position.close();
