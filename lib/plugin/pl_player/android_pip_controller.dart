@@ -27,6 +27,9 @@ final class AndroidPipController extends ChangeNotifier {
   int _generation = 0;
   String? _lastReason;
   Future<void> _lastCommand = Future<void>.value();
+  Rect? _sourceRect;
+
+  Rect? get sourceRect => _sourceRect;
 
   AndroidPipPhase get phase => _phase;
   int get generation => _generation;
@@ -97,6 +100,7 @@ final class AndroidPipController extends ChangeNotifier {
     Rect? sourceRect,
   }) async {
     if (!Platform.isAndroid) return false;
+    if (!protectsPlayback && sourceRect != null) _sourceRect = sourceRect;
     final result = await _invoke<bool>('configure', {
       'width': width,
       'height': height,
@@ -110,6 +114,8 @@ final class AndroidPipController extends ChangeNotifier {
 
   Future<bool> setSourceRect(Rect rect) async {
     if (!Platform.isAndroid) return false;
+    if (protectsPlayback) return false;
+    _sourceRect = rect;
     return (await _invoke<bool>('setSourceRect', _rectMap(rect))) ?? false;
   }
 

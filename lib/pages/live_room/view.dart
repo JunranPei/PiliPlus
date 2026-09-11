@@ -116,12 +116,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
       width: maxWidth * plPlayerController.uiScale,
       height: maxHeight * plPlayerController.uiScale,
     );
-    // Preserve the pre-PiP orientation while Android resizes the activity;
-    // changing the root layout during the transition reparents the player
-    // Surface and causes the app-icon placeholder.
-    if (!AndroidPipController.instance.protectsPlayback) {
-      isPortrait = size.isPortrait;
-    }
+    isPortrait = size.isPortrait;
     plPlayerController.screenRatio = maxHeight / maxWidth;
   }
 
@@ -227,9 +222,6 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   Widget build(BuildContext context) {
-    // Do not replace the mounted video subtree during the native PiP
-    // transition. Reparenting the player detaches its Surface and produces an
-    // app-icon placeholder until a new video frame arrives.
     Widget child = childWhenDisabled;
     if (plPlayerController.keyboardControl) {
       child = PlayerFocus(
@@ -285,13 +277,16 @@ class _LiveRoomPageState extends State<LiveRoomPage>
               liveRoomCtr: _liveRoomController,
               onRefresh: _liveRoomController.queryLiveUrl,
             ),
-            danmuWidget: !needDm
+            danmuWidget:
+                !needDm ||
+                    (plPlayerController.isPipMode &&
+                        plPlayerController.pipNoDanmaku)
                 ? null
                 : LiveDanmaku(
                     liveRoomController: _liveRoomController,
                     plPlayerController: plPlayerController,
                     isFullScreen: isFullScreen,
-                    isPipMode: plPlayerController.isDesktopPip || isPipMode,
+                    isPipMode: plPlayerController.isPipMode || isPipMode,
                     size: Size(width, height),
                   ),
           );

@@ -513,13 +513,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     final shortestSide = size.shortestSide;
     final minVideoHeight = shortestSide / Style.aspectRatio16x9;
     final maxVideoHeight = max(size.longestSide * 0.65, shortestSide);
-    // Keep the pre-PiP orientation while Android is resizing the activity.
-    // Switching portrait/landscape branches here reparents PLVideoPlayer and
-    // detaches media_kit's Surface during the PiP animation.
-    if (!AndroidPipController.instance.protectsPlayback) {
-      videoDetailController.isPortrait = isPortrait = maxHeight >= maxWidth;
-    }
     videoDetailController
+      ..isPortrait = isPortrait = maxHeight >= maxWidth
       ..minVideoHeight = minVideoHeight
       ..maxVideoHeight = maxVideoHeight
       ..videoHeight = videoDetailController.isVertical.value
@@ -538,12 +533,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   Widget get childWhenDisabled {
     return Obx(
       () {
-        // PiP uses the same mounted player subtree, but its activity bounds
-        // are the video viewport. Keep detail slivers below that viewport
-        // instead of changing the global fullscreen state (which can trigger
-        // a second, unrelated layout transition).
-        final isFullScreen =
-            this.isFullScreen || AndroidPipController.instance.protectsPlayback;
+        final isFullScreen = this.isFullScreen;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: removeAppBar(isFullScreen)
@@ -1351,12 +1341,12 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
             videoDetailCtr: videoDetailController,
             heroTag: heroTag,
           ),
-          danmuWidget: isPipMode && pipNoDanmaku
+          danmuWidget: plPlayerController!.isPipMode && pipNoDanmaku
               ? null
               : Obx(
                   () => PlDanmaku(
                     key: ValueKey(videoDetailController.cid.value),
-                    isPipMode: isPipMode,
+                    isPipMode: plPlayerController!.isPipMode,
                     cid: videoDetailController.cid.value,
                     playerController: plPlayerController!,
                     isFullScreen: plPlayerController!.isFullScreen.value,
@@ -1377,29 +1367,19 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   late double maxHeight;
   bool isWindowMode = false;
   late EdgeInsets padding;
-  int _layoutMode = 0;
 
   @override
   Widget build(BuildContext context) {
     Widget child;
-    // Keep the existing player subtree mounted while Android resizes the
-    // Activity into PiP. Moving PLVideoPlayer to a separate PiP-only branch
-    // detaches media_kit's Surface and leaves SystemUI showing the app-icon
-    // placeholder until the replacement Surface produces its first frame.
-    if (!AndroidPipController.instance.protectsPlayback) {
-      _layoutMode = !videoDetailController.horizontalScreen
-          ? 0
-          : maxWidth / maxHeight >= kScreenRatio
-          ? 1
-          : maxWidth / Style.aspectRatio16x9 < 0.4 * maxHeight
-          ? 0
-          : 2;
+    if (!videoDetailController.horizontalScreen) {
+      child = childWhenDisabled;
+    } else if (maxWidth / maxHeight >= kScreenRatio) {
+      child = childWhenDisabledLandscape;
+    } else if (maxWidth / Style.aspectRatio16x9 < 0.4 * maxHeight) {
+      child = childWhenDisabled;
+    } else {
+      child = childWhenDisabledAlmostSquare;
     }
-    child = switch (_layoutMode) {
-      1 => childWhenDisabledLandscape,
-      2 => childWhenDisabledAlmostSquare,
-      _ => childWhenDisabled,
-    };
     if (videoDetailController.plPlayerController.keyboardControl) {
       child = PlayerFocus(
         plPlayerController: videoDetailController.plPlayerController,

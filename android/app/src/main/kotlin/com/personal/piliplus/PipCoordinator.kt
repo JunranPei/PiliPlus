@@ -70,9 +70,13 @@ class PipCoordinator(
                 result.success(true)
             }
             "setSourceRect" -> {
-                sourceRect = parseRect(call.arguments)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && phase != Phase.ACTIVE) {
-                    applyParams()
+                // Layout callbacks from the shrinking window must not replace
+                // the rectangle Android uses to crop the entry animation.
+                if (phase == Phase.IDLE) {
+                    sourceRect = parseRect(call.arguments)
+                    entrySourceRect = sourceRect?.let(::Rect)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) applyParams()
+                    Log.d(TAG, "sourceRect=$sourceRect phase=idle")
                 }
                 result.success(true)
             }
@@ -158,7 +162,7 @@ class PipCoordinator(
     private fun buildParams(autoEnter: Boolean): PictureInPictureParams {
         val builder = PictureInPictureParams.Builder()
             .setAspectRatio(android.util.Rational(aspectWidth, aspectHeight))
-        val rect = (if (phase == Phase.ACTIVE) entrySourceRect else sourceRect)
+        val rect = (if (phase != Phase.IDLE) entrySourceRect else sourceRect)
         rect?.let { builder.setSourceRectHint(Rect(it)) }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             builder.setSeamlessResizeEnabled(true)
@@ -221,6 +225,7 @@ class PipCoordinator(
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun onPictureInPictureUiStateChanged(state: android.app.PictureInPictureUiState) {
         if (state.isTransitioningToPip) {
+            if (phase == Phase.IDLE) entrySourceRect = sourceRect?.let(::Rect)
             setPhase(Phase.ENTERING, "ui-transition")
         }
     }

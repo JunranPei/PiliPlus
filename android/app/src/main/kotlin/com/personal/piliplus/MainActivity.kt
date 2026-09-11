@@ -9,6 +9,7 @@ import com.ryanheise.audioservice.AudioServiceActivity
 class MainActivity : AudioServiceActivity() {
     private var pipCoordinator: PipCoordinator? = null
 
+
     override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         pipCoordinator = PipCoordinator(this, flutterEngine.dartExecutor.binaryMessenger)

@@ -77,6 +77,7 @@ import 'package:PiliPlus/pages/webview/view.dart';
 import 'package:PiliPlus/pages/whisper/view.dart';
 import 'package:PiliPlus/pages/whisper_detail/view.dart';
 import 'package:get/get.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
 
 class Routes {
   static final List<GetPage<dynamic>> getPages = [
@@ -86,7 +87,10 @@ class Routes {
     // 热门
     GetPage(name: '/hot', page: () => const HotPage()),
     // 视频详情
-    GetPage(name: '/videoV', page: () => const VideoDetailPageV()),
+    GetPage(
+      name: '/videoV',
+      page: () => const AndroidPipViewport(child: VideoDetailPageV()),
+    ),
     //
     GetPage(name: '/webview', page: () => const WebviewPage()),
     // 设置
@@ -112,7 +116,10 @@ class Routes {
     // 粉丝
     GetPage(name: '/fan', page: () => const FansPage()),
     // 直播详情
-    GetPage(name: '/liveRoom', page: () => const LiveRoomPage()),
+    GetPage(
+      name: '/liveRoom',
+      page: () => const AndroidPipViewport(child: LiveRoomPage()),
+    ),
     // 用户中心
     GetPage(name: '/member', page: () => const MemberPage()),
     GetPage(name: '/memberSearch', page: () => const MemberSearchPage()),

@@ -51,6 +51,7 @@ import 'package:PiliPlus/plugin/pl_player/widgets/common_btn.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/forward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/mpv_convert_webp.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/play_pause_btn.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_source_rect.dart';
 import 'package:PiliPlus/utils/cache_manager.dart';
 import 'package:PiliPlus/utils/connectivity_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
@@ -137,6 +138,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   final _playerKey = GlobalKey();
   final _videoKey = GlobalKey();
+  final _pipContentKey = GlobalKey();
+  ui.Rect? _lastPipSourceRect;
 
   final RxDouble _brightnessValue = 0.0.obs;
   final RxBool _brightnessIndicator = false.obs;
@@ -250,31 +253,37 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   ui.Rect? getVideoPhysicalRect() {
-    try {
-      final renderBox =
-          _videoKey.currentContext?.findRenderObject() as RenderBox?;
-      if (renderBox != null) {
-        final position = renderBox.localToGlobal(Offset.zero);
-        final size = renderBox.size;
-        final devicePixelRatio =
-            MediaQuery.maybeDevicePixelRatioOf(context) ?? 1.0;
-        return ui.Rect.fromLTWH(
-          position.dx * devicePixelRatio,
-          position.dy * devicePixelRatio,
-          size.width * devicePixelRatio,
-          size.height * devicePixelRatio,
-        );
-      }
-    } catch (e) {
-      debugPrint("Error getting video rect: $e");
+    return pipSourceRect(
+      _pipContentKey.currentContext?.findRenderObject() as RenderBox?,
+      _videoKey.currentContext?.findRenderObject() as RenderBox?,
+      MediaQuery.devicePixelRatioOf(context),
+    );
+  }
+
+  void _reportPipSourceRect() {
+    if (!mounted ||
+        !Platform.isAndroid ||
+        AndroidPipController.instance.protectsPlayback) {
+      return;
     }
-    return null;
+    final rect = getVideoPhysicalRect();
+    if (rect == null || rect.isEmpty || rect == _lastPipSourceRect) return;
+    _lastPipSourceRect = rect;
+    unawaited(AndroidPipController.instance.setSourceRect(rect));
+  }
+
+  void _onPipPhaseChanged() {
+    // Native clears the old entry hint on exit. Re-publish even if this page
+    // returns to exactly the same rectangle as before entry.
+    _lastPipSourceRect = null;
+    WidgetsBinding.instance.addPostFrameCallback((_) => _reportPipSourceRect());
   }
 
   @override
   void initState() {
     super.initState();
     plPlayerController.getVideoRectCallback = getVideoPhysicalRect;
+    AndroidPipController.instance.addListener(_onPipPhaseChanged);
     addObserverMobile(this);
 
     _controlsListener = plPlayerController.showControls.listen(
@@ -417,6 +426,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void dispose() {
+    AndroidPipController.instance.removeListener(_onPipPhaseChanged);
     plPlayerController.getVideoRectCallback = null;
     removeObserverMobile(this);
     _danmakuListener?.cancel();
@@ -2143,10 +2153,14 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   child: FittedBox(
                     fit: videoFit.boxFit,
                     alignment: widget.alignment,
-                    child: SimpleVideo(
-                      controller: plPlayerController.videoController!,
-                      fill: widget.fill,
-                      aspectRatio: aspect,
+                    child: PipSourceRectObserver(
+                      key: _pipContentKey,
+                      onPaint: _reportPipSourceRect,
+                      child: SimpleVideo(
+                        controller: plPlayerController.videoController!,
+                        fill: widget.fill,
+                        aspectRatio: aspect,
+                      ),
                     ),
                   ),
                 );
