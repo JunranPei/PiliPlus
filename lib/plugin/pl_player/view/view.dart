@@ -98,6 +98,7 @@ class PLVideoPlayer extends StatefulWidget {
     this.danmuWidget,
     this.showEpisodes,
     this.showViewPoints,
+    this.videoOnly = false,
     this.fill = Colors.black,
     this.alignment = Alignment.center,
     super.key,
@@ -121,6 +122,13 @@ class PLVideoPlayer extends StatefulWidget {
   ])?
   showEpisodes;
   final VoidCallback? showViewPoints;
+
+  /// Keeps only the existing video surface mounted for Android PiP.
+  ///
+  /// Android owns the PiP window transform. The Flutter controls, danmaku,
+  /// subtitles, and gesture layers must not be part of that surface while the
+  /// system is resizing it.
+  final bool videoOnly;
   final Color fill;
   final Alignment alignment;
 
@@ -1439,6 +1447,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Widget build(BuildContext context) {
     maxWidth = widget.maxWidth;
     maxHeight = widget.maxHeight;
+    if (widget.videoOnly) return _videoWidget;
     final isFullScreen = this.isFullScreen;
     final primary = isFullScreen && colorScheme.isLight
         ? colorScheme.inversePrimary

@@ -35,6 +35,7 @@ import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/danmaku_options.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/pl_player/view/view.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/size_ext.dart';
@@ -222,6 +223,20 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   Widget build(BuildContext context) {
+    if (PipWindowScope.of(context)) {
+      return Theme(
+        data: ThemeUtils.darkTheme,
+        child: SizedBox.expand(
+          child: videoPlayerPanel(
+            false,
+            width: maxWidth,
+            height: maxHeight,
+            isPipMode: true,
+            needDm: false,
+          ),
+        ),
+      );
+    }
     Widget child = childWhenDisabled;
     if (plPlayerController.keyboardControl) {
       child = PlayerFocus(
@@ -289,6 +304,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
                     isPipMode: plPlayerController.isPipMode || isPipMode,
                     size: Size(width, height),
                   ),
+            videoOnly: isPipMode,
           );
         }
         return const SizedBox.shrink();
