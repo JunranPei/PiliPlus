@@ -62,25 +62,37 @@ class _PipViewportState extends State<PipViewport> {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final protecting = widget.phase != AndroidPipPhase.idle;
     return LayoutBuilder(
       builder: (context, constraints) {
         final window = constraints.biggest;
+        final source = _sourceSize;
+        // Android can resize the Activity before the asynchronous native
+        // phase callback reaches Dart. Keep the original page metrics in that
+        // gap, otherwise the first PiP frame is laid out from the small
+        // window's top-left corner and appears zoomed/cropped.
+        final inferredPipResize =
+            source != null &&
+            window.width < source.width * 0.75 &&
+            window.height < source.height * 0.75;
+        final protecting =
+            widget.phase != AndroidPipPhase.idle || inferredPipResize;
         if (!protecting || _sourceMedia == null) {
           _sourceMedia = media;
           _sourceSize = window;
           _entryRect = widget.sourceRect;
         }
+
         final sourceSize = _sourceSize!;
         final pixelRect = _entryRect;
         final transform = Matrix4.identity();
         Rect? crop;
         // During the native entry animation the full-size app is still the
         // source. Crop only when Android gives us the destination bounds.
-        if (widget.phase == AndroidPipPhase.active &&
+        if (protecting &&
             pixelRect != null &&
             !pixelRect.isEmpty &&
-            window != sourceSize) {
+            window.width < sourceSize.width * 0.75 &&
+            window.height < sourceSize.height * 0.75) {
           final dpr = _sourceMedia!.devicePixelRatio;
           final rect = Rect.fromLTRB(
             pixelRect.left / dpr,

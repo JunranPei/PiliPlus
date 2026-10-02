@@ -260,6 +260,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     );
   }
 
+  Size? _lastNormalPipWindowSize;
+
   void _reportPipSourceRect() {
     if (!mounted ||
         !Platform.isAndroid ||
@@ -268,6 +270,18 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     }
     final rect = getVideoPhysicalRect();
     if (rect == null || rect.isEmpty || rect == _lastPipSourceRect) return;
+
+    // onPictureInPictureModeChanged(false) arrives before Flutter has laid
+    // the activity back out at full size. Do not publish that transient
+    // PiP-sized rectangle as the next sourceRectHint.
+    final window = MediaQuery.sizeOf(context);
+    final normalWindow = _lastNormalPipWindowSize;
+    if (normalWindow != null &&
+        window.width * window.height <
+            normalWindow.width * normalWindow.height * 0.45) {
+      return;
+    }
+    _lastNormalPipWindowSize = window;
     _lastPipSourceRect = rect;
     unawaited(AndroidPipController.instance.setSourceRect(rect));
   }

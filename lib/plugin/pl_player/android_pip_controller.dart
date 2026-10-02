@@ -26,6 +26,7 @@ final class AndroidPipController extends ChangeNotifier {
   AndroidPipPhase _phase = AndroidPipPhase.idle;
   int _generation = 0;
   String? _lastReason;
+  bool _autoEnterPending = false;
   Future<void> _lastCommand = Future<void>.value();
   Rect? _sourceRect;
 
@@ -36,7 +37,8 @@ final class AndroidPipController extends ChangeNotifier {
   String? get lastReason => _lastReason;
   bool get isActive => _phase == AndroidPipPhase.active;
   bool get isEntering => _phase == AndroidPipPhase.entering;
-  bool get protectsPlayback => _phase != AndroidPipPhase.idle;
+  bool get protectsPlayback =>
+      _phase != AndroidPipPhase.idle || _autoEnterPending;
 
   Future<void> _loadState() async {
     try {
@@ -64,12 +66,17 @@ final class AndroidPipController extends ChangeNotifier {
     };
     final generation = (state['generation'] as num?)?.toInt() ?? _generation;
     final reason = state['reason'] as String?;
-    if (next == _phase && generation == _generation && reason == _lastReason) {
+    final autoEnterPending = state['autoEnterPending'] as bool? ?? false;
+    if (next == _phase &&
+        generation == _generation &&
+        reason == _lastReason &&
+        autoEnterPending == _autoEnterPending) {
       return;
     }
     _phase = next;
     _generation = generation;
     _lastReason = reason;
+    _autoEnterPending = autoEnterPending;
     debugPrint(
       '[PIP_V2] phase=${_phase.name} generation=$_generation reason=$reason',
     );

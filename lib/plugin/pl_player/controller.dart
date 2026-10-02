@@ -845,7 +845,11 @@ class PlPlayerController with BlockConfigMixin {
       player,
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
-        androidAttachSurfaceAfterVideoParameters: false,
+        // Wait for the decoder's video parameters before attaching the
+        // Android Texture surface.  Attaching the default 1x1 surface first
+        // races PiP's window resize and can leave one frame scaled from the
+        // top-left corner.  This is also the media_kit default path.
+        androidAttachSurfaceAfterVideoParameters: true,
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );

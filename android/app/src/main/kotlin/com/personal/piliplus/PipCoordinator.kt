@@ -43,6 +43,10 @@ class PipCoordinator(
     private var isLive = false
     private var isPlaying = false
     private var autoEnterRequested = false
+    // onUserLeaveHint is also delivered when the user opens Recent Apps. Keep
+    // playback alive while auto-enter is armed, but do not expose PiP geometry
+    // to Flutter until SystemUI confirms the actual PiP transition.
+    private var autoEnterPending = false
     private var sourceRect: Rect? = null
     private var entrySourceRect: Rect? = null
     private var destroyed = false
@@ -132,6 +136,11 @@ class PipCoordinator(
             Log.w(TAG, "reject enter while paused")
             return false
         }
+        // This path is used for an explicit/manual request (and for the
+        // pre-Android-12 fallback). Do not leave the automatic-enter flag
+        // armed after the same gesture has already requested PiP.
+        autoEnterRequested = false
+        setAutoEnterPending(false, "manual-enter")
         entrySourceRect = sourceRect?.let(::Rect)
         setPhase(Phase.ENTERING, reason)
         return try {
@@ -200,21 +209,47 @@ class PipCoordinator(
     }
 
     fun onUserLeaveHint() {
-        // Android 12+ performs the transition itself when auto-enter is armed.
-        // Calling enterPictureInPictureMode here would race that system gesture.
-        if (Build.VERSION.SDK_INT in Build.VERSION_CODES.O until Build.VERSION_CODES.S &&
-            autoEnterRequested && isPlaying && phase == Phase.IDLE
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
+            !autoEnterRequested ||
+            !isPlaying ||
+            phase != Phase.IDLE
         ) {
+            return
+        }
+
+        // Mark the transition before Activity.onPause reaches Flutter.  The
+        // player uses this phase to avoid its delayed background pause.  On
+        // Android 12+ the system performs the actual transition itself when
+        // auto-enter is armed, so calling enterPictureInPictureMode here would
+        // race that system gesture.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             enter("legacy-user-leave")
+        } else {
+            setAutoEnterPending(true, "user-leave-pending")
+            Log.i(TAG, "auto-enter pending api=${Build.VERSION.SDK_INT}")
+        }
+    }
+
+    fun onResume() {
+        setAutoEnterPending(false, "resume")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
+            phase == Phase.ENTERING &&
+            !activity.isInPictureInPictureMode
+        ) {
+            entrySourceRect = null
+            setPhase(Phase.IDLE, "resume-without-pip")
+            applyParams()
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         if (isInPictureInPictureMode) {
+            setAutoEnterPending(false, "mode-active")
             setPhase(Phase.ACTIVE, "mode-changed")
             AndroidHelper.isPipMode = true
         } else {
+            setAutoEnterPending(false, "mode-exited")
             setPhase(Phase.IDLE, "mode-changed")
             sourceRect = null
             entrySourceRect = null
@@ -224,8 +259,13 @@ class PipCoordinator(
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun onPictureInPictureUiStateChanged(state: android.app.PictureInPictureUiState) {
-        if (state.isTransitioningToPip) {
-            if (phase == Phase.IDLE) entrySourceRect = sourceRect?.let(::Rect)
+        // Ui-state callbacks can arrive late or out of order around the
+        // WindowManager resize. Once mode-changed has reported ACTIVE, a late
+        // transition callback must not send Dart back through ENTERING and
+        // apply the entry geometry a second time.
+        if (state.isTransitioningToPip && phase == Phase.IDLE) {
+            setAutoEnterPending(false, "ui-transition")
+            entrySourceRect = sourceRect?.let(::Rect)
             setPhase(Phase.ENTERING, "ui-transition")
         }
     }
@@ -238,11 +278,19 @@ class PipCoordinator(
         channel.invokeMethod("stateChanged", stateMap(reason))
     }
 
+    private fun setAutoEnterPending(value: Boolean, reason: String) {
+        if (autoEnterPending == value) return
+        autoEnterPending = value
+        Log.i(TAG, "autoEnterPending=$value reason=$reason")
+        channel.invokeMethod("stateChanged", stateMap(reason))
+    }
+
     private fun stateMap(reason: String? = null): Map<String, Any?> = mapOf(
         "phase" to phase.name.lowercase(),
         "generation" to generation,
         "reason" to reason,
         "isInPip" to (phase == Phase.ACTIVE),
+        "autoEnterPending" to autoEnterPending,
     )
 
     private fun parseRect(value: Any?): Rect? {

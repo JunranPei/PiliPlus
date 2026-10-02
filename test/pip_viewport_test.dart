@@ -141,6 +141,16 @@ void main() {
         tester.getRect(find.byKey(videoKey)),
         const Rect.fromLTWH(0, 24, 400, 225),
       );
+      // Android can commit the PiP surface size before its mode-change
+      // callback reaches Dart. The first small frame must already show the
+      // entire video, and receiving `active` must not move it again.
+      const destination = Size(200, 112.5);
+      await show(AndroidPipPhase.idle, destination);
+      expect(tester.getRect(find.byKey(videoKey)), Offset.zero & destination);
+      expect(tester.state(find.byType(_Page)), same(state));
+      expect(state.layoutSize, source);
+      await show(AndroidPipPhase.active, destination);
+      expect(tester.getRect(find.byKey(videoKey)), Offset.zero & destination);
       for (final size in [const Size(200, 112.5), const Size(280, 157.5)]) {
         await show(AndroidPipPhase.active, size);
         expect(tester.state(find.byType(_Page)), same(state));

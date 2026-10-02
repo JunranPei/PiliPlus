@@ -46,6 +46,11 @@ class MainActivity : AudioServiceActivity() {
         pipCoordinator?.onUserLeaveHint()
     }
 
+    override fun onResume() {
+        super.onResume()
+        pipCoordinator?.onResume()
+    }
+
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         pipCoordinator?.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
