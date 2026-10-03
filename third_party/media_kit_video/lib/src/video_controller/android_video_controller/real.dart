@@ -294,6 +294,33 @@ class AndroidVideoController extends PlatformVideoController {
           debugPrint(call.method.toString());
           debugPrint(call.arguments.toString());
           switch (call.method) {
+            case 'VideoOutput.Resize':
+              {
+                final int handle = call.arguments['handle'];
+                final int id = call.arguments['id'];
+                final int wid = call.arguments['wid'];
+                final finalRect = call.arguments['rect'];
+                final controller = _controllers[handle];
+                if (controller != null) {
+                  controller.id.value = id;
+                  if (wid != 0) {
+                    controller._wid = wid;
+                  }
+                  if (finalRect is Map) {
+                    controller.rect.value = Rect.fromLTRB(
+                      (finalRect['left'] as num).toDouble(),
+                      (finalRect['top'] as num).toDouble(),
+                      ((finalRect['left'] as num) +
+                              (finalRect['width'] as num))
+                          .toDouble(),
+                      ((finalRect['top'] as num) +
+                              (finalRect['height'] as num))
+                          .toDouble(),
+                    );
+                  }
+                }
+                break;
+              }
             case 'VideoOutput.WaitUntilFirstFrameRenderedNotify':
               {
                 // Notify about updated texture ID & [Rect].
