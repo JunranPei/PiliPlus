@@ -51,6 +51,7 @@ import 'package:PiliPlus/plugin/pl_player/widgets/common_btn.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/forward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/mpv_convert_webp.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/play_pause_btn.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_simple_video.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/pip_source_rect.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
 import 'package:PiliPlus/utils/cache_manager.dart';
@@ -2183,7 +2184,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     child: PipSourceRectObserver(
                       key: _pipContentKey,
                       onPaint: _reportPipSourceRect,
-                      child: SimpleVideo(
+                      child: PipSimpleVideo(
                         controller: plPlayerController.videoController!,
                         fill: widget.fill,
                         aspectRatio: aspect,
