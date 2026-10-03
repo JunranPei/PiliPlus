@@ -226,6 +226,13 @@ public class VideoOutput implements PlatformView {
                         "dispose handle=%d retiredWid=%d", id, retired));
                 notifyTextureUpdateLocked(0, actualBufferWidthLocked(), actualBufferHeightLocked(), retired);
             }
+            // A PlatformView can be removed and recreated while Flutter is
+            // changing routes or PiP constraints.  SurfaceView's SurfaceControl
+            // teardown is asynchronous; hide the old view immediately so its
+            // previous full-window layer cannot remain visible underneath the
+            // replacement native view for a frame (or longer).
+            surfaceView.setVisibility(View.GONE);
+            surfaceView.setAlpha(0f);
             surfaceView.getHolder().removeCallback(surfaceCallback);
             detachWindowListenerLocked();
         }
@@ -304,37 +311,18 @@ public class VideoOutput implements PlatformView {
     }
 
     private void applyWindowScaleLocked() {
-        if (activity == null || surfaceView.getWidth() <= 0 || surfaceView.getHeight() <= 0 ||
-                windowWidth <= 0 || windowHeight <= 0) {
-            return;
-        }
-        if (!activity.isInPictureInPictureMode()) {
-            if (surfaceView.getScaleX() != 1f || surfaceView.getScaleY() != 1f) {
-                surfaceView.setPivotX(0f);
-                surfaceView.setPivotY(0f);
-                surfaceView.setScaleX(1f);
-                surfaceView.setScaleY(1f);
-                Log.i(TAG, String.format(Locale.ENGLISH,
-                        "window scale reset handle=%d view=%dx%d",
-                        id, surfaceView.getWidth(), surfaceView.getHeight()));
-            }
-            return;
-        }
-        // Keep the existing SurfaceView aspect ratio while the Flutter
-        // platform-view layout catches up. Independent X/Y scaling would
-        // stretch the transitional frame; fitting the old view inside the new
-        // window prevents both stretching and top-left cropping.
-        final float scale = Math.min(
-                windowWidth / (float) surfaceView.getWidth(),
-                windowHeight / (float) surfaceView.getHeight());
-        surfaceView.setPivotX(0f);
-        surfaceView.setPivotY(0f);
-        surfaceView.setScaleX(scale);
-        surfaceView.setScaleY(scale);
+        // Flutter's hybrid-composition platform-view wrapper owns the native
+        // view bounds.  Applying a second transform here races that layout:
+        // the decor callback can still contain the old full-window bounds when
+        // PiP has already been entered, producing a left/top-origin jump.  We
+        // only observe the two geometries for diagnostics and leave all
+        // positioning to the single Flutter layout pass.
+        if (surfaceView.getWidth() <= 0 || surfaceView.getHeight() <= 0 ||
+                windowWidth <= 0 || windowHeight <= 0) return;
         Log.i(TAG, String.format(Locale.ENGLISH,
-                "window scale handle=%d window=%dx%d view=%dx%d scale=%.4f",
+                "window geometry handle=%d window=%dx%d view=%dx%d scaleX=%.4f scaleY=%.4f",
                 id, windowWidth, windowHeight, surfaceView.getWidth(), surfaceView.getHeight(),
-                scale));
+                surfaceView.getScaleX(), surfaceView.getScaleY()));
     }
 
     private void detachWindowListenerLocked() {

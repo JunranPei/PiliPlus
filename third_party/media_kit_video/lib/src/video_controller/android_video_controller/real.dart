@@ -82,6 +82,14 @@ class AndroidVideoController extends PlatformVideoController {
 
         if (_current != current) {
           _current = current;
+          // A new media item starts a new output-size epoch.  During one
+          // item mpv can briefly report a smaller transitional decoder size
+          // (for example 960x540) between two reports of the final size
+          // (1920x1080).  Clear the guard here so an actual source switch to
+          // a smaller video is still allowed, while transient shrink events
+          // in the same item cannot resize the native surface underneath a
+          // PiP window.
+          _surfaceSizePublished = false;
           // The native platform view owns one SurfaceView for this player.
           // Reusing it across media items and PiP avoids a second output
           // being created during the Activity resize.
@@ -149,6 +157,16 @@ class AndroidVideoController extends PlatformVideoController {
           width = event.dh ?? 0;
           height = event.dw ?? 0;
         }
+
+        // Publish one fixed buffer geometry for each loaded media item. mpv
+        // can emit several decoder/intermediate sizes before settling; every
+        // native setFixedSize call creates a new BLAST SurfaceControl and can
+        // leave a stale frame visible during PiP entry/exit. The media-load
+        // hook resets this gate for a real source change.
+        if (_surfaceSizePublished) {
+          return;
+        }
+        _surfaceSizePublished = true;
 
         // Keep one native SurfaceView and update only its fixed buffer size.
         // The Activity can resize the view for PiP without replacing this
@@ -270,6 +288,7 @@ class AndroidVideoController extends PlatformVideoController {
   Future<void> _dispose() async {
     // Dispose the [StreamSubscription]s.
     await _subscription?.cancel();
+    _surfaceSizePublished = false;
     // Release the native resources.
     final handle = player.handle;
     try {
@@ -284,6 +303,8 @@ class AndroidVideoController extends PlatformVideoController {
 
   /// Pointer address to the global object reference of `android.view.Surface` i.e. `(intptr_t)(*android.view.Surface)`.
   int? _wid;
+
+  bool _surfaceSizePublished = false;
 
   /// [Lock] used to synchronize the [_widthStreamSubscription] & [_heightStreamSubscription].
   final _lock = Lock();
