@@ -18,8 +18,8 @@ import java.util.HashSet;
  */
 public final class PipSurfaceBridge {
     private static final String TAG = "PipSurfaceBridge";
-    private static final Method NEW_GLOBAL_OBJECT_REF;
-    private static final Method DELETE_GLOBAL_OBJECT_REF;
+    private static Method NEW_GLOBAL_OBJECT_REF;
+    private static Method DELETE_GLOBAL_OBJECT_REF;
     private static final HashMap<Long, Long> REFERENCES = new HashMap<>();
     private static final HashMap<Long, Surface> SURFACES = new HashMap<>();
     private static final HashSet<Long> DELETED = new HashSet<>();
@@ -34,7 +34,11 @@ public final class PipSurfaceBridge {
             NEW_GLOBAL_OBJECT_REF.setAccessible(true);
             DELETE_GLOBAL_OBJECT_REF.setAccessible(true);
         } catch (Throwable error) {
-            throw new ExceptionInInitializerError(error);
+            // Keep the normal Flutter Texture path usable if the optional JNI
+            // helper is unavailable in a custom media_kit build.
+            Log.w(TAG, "JNI global-reference helper unavailable", error);
+            NEW_GLOBAL_OBJECT_REF = null;
+            DELETE_GLOBAL_OBJECT_REF = null;
         }
     }
 
@@ -43,6 +47,7 @@ public final class PipSurfaceBridge {
     /** Returns a global JNI reference suitable for mpv's --wid option. */
     public static synchronized long attach(long handle, Surface surface) {
         if (surface == null || !surface.isValid()) return 0;
+        if (NEW_GLOBAL_OBJECT_REF == null) return 0;
         final Long existing = REFERENCES.get(handle);
         if (existing != null && SURFACES.get(handle) == surface) {
             return existing;
@@ -75,7 +80,7 @@ public final class PipSurfaceBridge {
     }
 
     private static void delete(long reference) {
-        if (reference == 0 || DELETED.contains(reference)) return;
+        if (reference == 0 || DELETE_GLOBAL_OBJECT_REF == null || DELETED.contains(reference)) return;
         if (DELETED.size() > 100) DELETED.clear();
         DELETED.add(reference);
         try {
