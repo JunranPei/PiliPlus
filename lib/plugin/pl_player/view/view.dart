@@ -1448,7 +1448,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Widget build(BuildContext context) {
     maxWidth = widget.maxWidth;
     maxHeight = widget.maxHeight;
-    if (widget.videoOnly || PipWindowScope.of(context)) return _videoWidget;
+    final pipWindow = widget.videoOnly || PipWindowScope.of(context);
     final isFullScreen = this.isFullScreen;
     final primary = isFullScreen && colorScheme.isLight
         ? colorScheme.inversePrimary
@@ -1466,6 +1466,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       key: _playerKey,
       children: <Widget>[
         _videoWidget,
+        // Keep the Texture's parent Stack mounted while native PiP resizes.
+        if (!pipWindow) ...[
 
         if (widget.danmuWidget case final danmaku?)
           Positioned.fill(top: 4, child: danmaku),
@@ -2111,6 +2113,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   )
                 : const SizedBox.shrink();
           }),
+        ],
       ],
     );
     if (PlatformUtils.isDesktop) {
