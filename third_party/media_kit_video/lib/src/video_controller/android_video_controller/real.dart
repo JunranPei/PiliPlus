@@ -102,6 +102,13 @@ class AndroidVideoController extends PlatformVideoController {
 
         // Assign --wid here if --vo is not "gpu" or "null" i.e. custom vo/hwdec was passed through [VideoControllerConfiguration].
         try {
+          if (_nativePipWid != null) {
+            // PiP owns the real SurfaceView while it is active.  Keep the
+            // Flutter output untouched until native PiP asks us to restore it.
+            player.setOption('wid', _nativePipWid.toString());
+            player.setOption('vo', 'gpu');
+            return;
+          }
           // ----------------------------------------------
           if (!androidAttachSurfaceAfterVideoParameters) {
             player.setOption('wid', _wid.toString());
@@ -157,15 +164,40 @@ class AndroidVideoController extends PlatformVideoController {
         // PiP frame; the final rect below is enough to update its layout.
         try {
           if (vo == 'gpu') {
+            if (_nativePipWid != null) {
+              final nativeSize = _nativePipSurfaceSize;
+              if (nativeSize != null) {
+                player.setOption('android-surface-size', nativeSize);
+              }
+              player.setOption('wid', _nativePipWid.toString());
+              player.setOption('vo', 'gpu');
+              rect.value = Rect.fromLTRB(
+                0.0,
+                0.0,
+                width.toDouble(),
+                height.toDouble(),
+              );
+              return;
+            }
             // NOTE: Only required for --vo=gpu
             // With --vo=gpu, we need to update the android.graphics.SurfaceTexture size & notify libmpv to re-create vo.
             // In native Android, this kind of rendering is done with android.view.SurfaceView + android.view.SurfaceHolder, which offers onSurfaceChanged to handle this.
-            await _channel
+            final surfaceData = await _channel
                 .invokeMethod('VideoOutputManager.SetSurfaceTextureSize', {
                   'handle': player.handle.toString(),
                   'width': width.toString(),
                   'height': height.toString(),
                 });
+
+            // SurfaceProducer may replace the backing Surface while the PiP
+            // bounds change. Use the new native reference before reattaching
+            // libmpv, otherwise one frame can still target the old Surface.
+            if (surfaceData is Map) {
+              final nativeWid = surfaceData['wid'];
+              if (nativeWid is num && nativeWid != 0) {
+                _wid = nativeWid.toInt();
+              }
+            }
 
             // ----------------------------------------------
             player.setOption('android-surface-size', '${width}x$height');
@@ -276,6 +308,10 @@ class AndroidVideoController extends PlatformVideoController {
   /// Pointer address to the global object reference of `android.view.Surface` i.e. `(intptr_t)(*android.view.Surface)`.
   int? _wid;
 
+  /// Global reference and size of the native SurfaceView used in PiP.
+  int? _nativePipWid;
+  String? _nativePipSurfaceSize;
+
   /// [Lock] used to synchronize the [_widthStreamSubscription] & [_heightStreamSubscription].
   final _lock = Lock();
 
@@ -284,6 +320,53 @@ class AndroidVideoController extends PlatformVideoController {
 
   /// Currently created [AndroidVideoController]s.
   static final _controllers = HashMap<int, AndroidVideoController>();
+
+  /// Switch libmpv to/from the Activity-owned PiP SurfaceView.
+  static Future<void> applyNativePipSurface(Map<String, dynamic> data) async {
+    final handle = (data['handle'] as num?)?.toInt();
+    final wid = (data['wid'] as num?)?.toInt() ?? 0;
+    if (handle == null) return;
+    final controller = _controllers[handle];
+    if (controller == null) return;
+    await controller._lock.synchronized(() async {
+      try {
+        if (wid != 0 && data['visible'] == true) {
+          controller._nativePipWid = wid;
+          final width = (data['width'] as num?)?.toInt() ?? 0;
+          final height = (data['height'] as num?)?.toInt() ?? 0;
+          if (width > 0 && height > 0) {
+            controller._nativePipSurfaceSize = '${width}x$height';
+            controller.player.setOption(
+              'android-surface-size',
+              controller._nativePipSurfaceSize!,
+            );
+          }
+          controller.player.setOption('wid', wid.toString());
+          controller.player.setOption('vo', 'gpu');
+        } else {
+          controller._nativePipWid = null;
+          controller._nativePipSurfaceSize = null;
+          controller.player.setOption('vo', 'null');
+          controller.player.setOption('wid', '0');
+          if (controller._wid != null) {
+            final width = controller.player.state.width;
+            final height = controller.player.state.height;
+            if (width > 0 && height > 0) {
+              controller.player.setOption(
+                'android-surface-size',
+                '${width}x$height',
+              );
+            }
+            controller.player.setOption('wid', controller._wid.toString());
+            controller.player.setOption('vo', 'gpu');
+          }
+        }
+      } catch (error, stacktrace) {
+        debugPrint(error.toString());
+        debugPrint(stacktrace.toString());
+      }
+    });
+  }
 
   /// [MethodChannel] for invoking platform specific native implementation.
   static final _channel =
@@ -303,18 +386,14 @@ class AndroidVideoController extends PlatformVideoController {
                 final controller = _controllers[handle];
                 if (controller != null) {
                   controller.id.value = id;
-                  if (wid != 0) {
-                    controller._wid = wid;
-                  }
+                  controller._wid = wid == 0 ? null : wid;
                   if (finalRect is Map) {
                     controller.rect.value = Rect.fromLTRB(
                       (finalRect['left'] as num).toDouble(),
                       (finalRect['top'] as num).toDouble(),
-                      ((finalRect['left'] as num) +
-                              (finalRect['width'] as num))
+                      ((finalRect['left'] as num) + (finalRect['width'] as num))
                           .toDouble(),
-                      ((finalRect['top'] as num) +
-                              (finalRect['height'] as num))
+                      ((finalRect['top'] as num) + (finalRect['height'] as num))
                           .toDouble(),
                     );
                   }

@@ -57,7 +57,7 @@ public class VideoOutputManager {
         }
     }
 
-    public void setSurfaceSize(long handle, int width, int height) {
+    public VideoOutput setSurfaceSize(long handle, int width, int height) {
         synchronized (lock) {
             Log.i(TAG, String.format(Locale.ENGLISH,
                     "com.alexmercerind.media_kit_video.VideoOutputManager.setSurfaceSize: %d %d %d",
@@ -66,6 +66,7 @@ public class VideoOutputManager {
             if (output != null) {
                 output.setSurfaceSize(width, height);
             }
+            return output;
         }
     }
 }

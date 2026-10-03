@@ -73,8 +73,13 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
                     final long handle = Long.parseLong(String.valueOf(call.argument("handle")));
                     final int width = Integer.parseInt(String.valueOf(call.argument("width")));
                     final int height = Integer.parseInt(String.valueOf(call.argument("height")));
-                    videoOutputManager.setSurfaceSize(handle, width, height);
-                    result.success(null);
+                    final VideoOutput output = videoOutputManager.setSurfaceSize(handle, width, height);
+                    final HashMap<String, Long> data = new HashMap<>();
+                    if (output != null) {
+                        data.put("id", output.id);
+                        data.put("wid", output.wid);
+                    }
+                    result.success(data);
                     break;
                 }
                 case "VideoOutputManager.Dispose": {
