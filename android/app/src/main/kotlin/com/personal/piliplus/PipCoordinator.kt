@@ -9,16 +9,9 @@ import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.media.session.PlaybackState
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import android.view.View
-import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
-import com.alexmercerind.media_kit_video.PipSurfaceBridge
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 
@@ -58,47 +51,25 @@ class PipCoordinator(
     private var sourceRect: Rect? = null
     private var entrySourceRect: Rect? = null
     private var destroyed = false
-    private var playerHandle: Long? = null
-    private val pipSurfaceView = SurfaceView(activity)
-    private var pipSurfaceVisible = false
-    private var pipSurface: Surface? = null
-    private var nativePipRequested = false
-    private val mainHandler = Handler(Looper.getMainLooper())
+    private val rootLayoutListener = View.OnLayoutChangeListener { view, left, top, right, bottom,
+                                                                  oldLeft, oldTop, oldRight, oldBottom ->
+        val bounds = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity.windowManager.currentWindowMetrics.bounds
+        } else {
+            Rect(0, 0, activity.resources.displayMetrics.widthPixels, activity.resources.displayMetrics.heightPixels)
+        }
+        Log.i(
+            TAG,
+            "rootLayout new=${right - left}x${bottom - top}@($left,$top) " +
+                "old=${oldRight - oldLeft}x${oldBottom - oldTop}@($oldLeft,$oldTop) " +
+                "view=${view.width}x${view.height} metrics=${bounds.width()}x${bounds.height()} " +
+                "phase=${phase.name.lowercase()} inPip=${activity.isInPictureInPictureMode}",
+        )
+    }
 
     init {
         channel.setMethodCallHandler(this)
-        pipSurfaceView.visibility = View.INVISIBLE
-        pipSurfaceView.isClickable = false
-        pipSurfaceView.isFocusable = false
-        pipSurfaceView.setZOrderMediaOverlay(true)
-        pipSurfaceView.holder.addCallback(object : SurfaceHolder.Callback {
-            override fun surfaceCreated(holder: SurfaceHolder) {
-                pipSurface = holder.surface
-                publishNativeSurface()
-            }
-
-            override fun surfaceChanged(
-                holder: SurfaceHolder,
-                format: Int,
-                width: Int,
-                height: Int,
-            ) {
-                pipSurface = holder.surface
-                publishNativeSurface()
-            }
-
-            override fun surfaceDestroyed(holder: SurfaceHolder) {
-                pipSurface = null
-                publishNativeSurface()
-            }
-        })
-        activity.addContentView(
-            pipSurfaceView,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT,
-            ),
-        )
+        activity.window.decorView.addOnLayoutChangeListener(rootLayoutListener)
         Log.i(TAG, "created api=${Build.VERSION.SDK_INT}")
     }
 
@@ -148,7 +119,6 @@ class PipCoordinator(
     }
 
     private fun configure(args: Map<*, *>?) {
-        playerHandle = args?.long("playerHandle")
         val width = args?.int("width") ?: 16
         val height = args?.int("height") ?: 9
         val ratio = width.toDouble() / height.toDouble().coerceAtLeast(1.0)
@@ -189,7 +159,6 @@ class PipCoordinator(
         autoEnterRequested = false
         setAutoEnterPending(false, "manual-enter")
         entrySourceRect = sourceRect?.let(::Rect)
-        prepareNativeSurface()
         setPhase(Phase.ENTERING, reason)
         return try {
             // Manual entry must not leave auto-enter armed for the same gesture.
@@ -273,7 +242,6 @@ class PipCoordinator(
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             enter("legacy-user-leave")
         } else {
-            prepareNativeSurface()
             setAutoEnterPending(true, "user-leave-pending")
             Log.i(TAG, "auto-enter pending api=${Build.VERSION.SDK_INT}")
         }
@@ -287,7 +255,6 @@ class PipCoordinator(
         ) {
             entrySourceRect = null
             setPhase(Phase.IDLE, "resume-without-pip")
-            hideNativeSurface()
             applyParams()
         }
     }
@@ -297,21 +264,12 @@ class PipCoordinator(
         if (isInPictureInPictureMode) {
             setAutoEnterPending(false, "mode-active")
             setPhase(Phase.ACTIVE, "mode-changed")
-            pipSurfaceView.visibility = View.VISIBLE
-            pipSurfaceView.alpha = 0f
-            publishNativeSurface()
-            mainHandler.postDelayed({
-                if (phase == Phase.ACTIVE && nativePipRequested) {
-                    pipSurfaceView.alpha = 1f
-                }
-            }, 150L)
             AndroidHelper.isPipMode = true
         } else {
             setAutoEnterPending(false, "mode-exited")
             setPhase(Phase.IDLE, "mode-changed")
             sourceRect = null
             entrySourceRect = null
-            hideNativeSurface()
             AndroidHelper.isPipMode = false
         }
     }
@@ -333,7 +291,17 @@ class PipCoordinator(
         if (phase == next && reason != "ui-transition") return
         phase = next
         generation += 1
-        Log.i(TAG, "phase=${phase.name.lowercase()} generation=$generation reason=$reason")
+        val bounds = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity.windowManager.currentWindowMetrics.bounds
+        } else {
+            Rect(0, 0, activity.resources.displayMetrics.widthPixels, activity.resources.displayMetrics.heightPixels)
+        }
+        Log.i(
+            TAG,
+            "phase=${phase.name.lowercase()} generation=$generation reason=$reason " +
+                "activity=${activity.window.decorView.width}x${activity.window.decorView.height} " +
+                "metrics=${bounds.width()}x${bounds.height()} inPip=${activity.isInPictureInPictureMode}",
+        )
         channel.invokeMethod("stateChanged", stateMap(reason))
     }
 
@@ -342,62 +310,6 @@ class PipCoordinator(
         autoEnterPending = value
         Log.i(TAG, "autoEnterPending=$value reason=$reason")
         channel.invokeMethod("stateChanged", stateMap(reason))
-    }
-
-    /** Attach the real SurfaceView only after Android confirms PiP is active. */
-    private fun publishNativeSurface() {
-        val handle = playerHandle ?: return
-        if (!nativePipRequested) return
-        val surface = pipSurface
-        if (surface == null || !surface.isValid) {
-            if (pipSurfaceVisible) {
-                PipSurfaceBridge.detach(handle)
-                channel.invokeMethod(
-                    "nativeSurfaceChanged",
-                    mapOf("handle" to handle, "wid" to 0L, "width" to 0, "height" to 0, "visible" to false),
-                )
-                pipSurfaceVisible = false
-            }
-            return
-        }
-        val wid = PipSurfaceBridge.attach(handle, surface)
-        if (wid == 0L) return
-        pipSurfaceVisible = true
-        channel.invokeMethod(
-            "nativeSurfaceChanged",
-            mapOf(
-                "handle" to handle,
-                "wid" to wid,
-                "width" to pipSurfaceView.width,
-                "height" to pipSurfaceView.height,
-                "visible" to true,
-            ),
-        )
-        Log.i(TAG, "native surface active handle=$handle wid=$wid size=${pipSurfaceView.width}x${pipSurfaceView.height}")
-    }
-
-    private fun hideNativeSurface() {
-        val handle = playerHandle
-        if (handle != null) {
-            PipSurfaceBridge.detach(handle)
-            channel.invokeMethod(
-                "nativeSurfaceChanged",
-                mapOf("handle" to handle, "wid" to 0L, "width" to 0, "height" to 0, "visible" to false),
-            )
-        }
-        pipSurfaceVisible = false
-        nativePipRequested = false
-        pipSurfaceView.alpha = 0f
-        pipSurfaceView.visibility = View.INVISIBLE
-    }
-
-    /** Prepare the native surface before SystemUI starts the PiP transition. */
-    private fun prepareNativeSurface() {
-        if (playerHandle == null) return
-        nativePipRequested = true
-        pipSurfaceView.alpha = 0f
-        pipSurfaceView.visibility = View.VISIBLE
-        publishNativeSurface()
     }
 
     private fun stateMap(reason: String? = null): Map<String, Any?> = mapOf(
@@ -428,14 +340,12 @@ class PipCoordinator(
     }
 
     private fun Map<*, *>.int(key: String): Int? = (get(key) as? Number)?.toInt()
-    private fun Map<*, *>.long(key: String): Long? = (get(key) as? Number)?.toLong()
     private fun Map<*, *>.bool(key: String): Boolean? = get(key) as? Boolean
 
     fun destroy() {
         if (destroyed) return
         destroyed = true
-        hideNativeSurface()
-        (pipSurfaceView.parent as? android.view.ViewGroup)?.removeView(pipSurfaceView)
+        activity.window.decorView.removeOnLayoutChangeListener(rootLayoutListener)
         channel.setMethodCallHandler(null)
         Log.i(TAG, "destroyed")
     }

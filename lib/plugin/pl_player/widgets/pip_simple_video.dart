@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -75,6 +76,32 @@ class _PipSimpleVideoState extends State<PipSimpleVideo> {
         final rawRectIsZero =
             rawRect == null || rawRect.width <= 0 || rawRect.height <= 0;
         final rect = rawRectIsZero ? _lastNonZeroRect : rawRect;
+        if (Platform.isAndroid) {
+          // Android uses one native SurfaceView for the whole playback
+          // lifetime.  It remains in the Flutter layout while the Activity
+          // enters PiP, so no Texture ID or second surface is swapped during
+          // the system resize.
+          final state = ctr.player.state;
+          final nativeRect = rect ??
+              ((state.width > 0 && state.height > 0)
+                  ? Rect.fromLTWH(
+                      0,
+                      0,
+                      state.width.toDouble(),
+                      state.height.toDouble(),
+                    )
+                  : null);
+          if (_visible && nativeRect != null) {
+            return SizedBox(
+              width: widget.aspectRatio == null
+                  ? nativeRect.width / _devicePixelRatio
+                  : nativeRect.height / _devicePixelRatio * widget.aspectRatio!,
+              height: nativeRect.height / _devicePixelRatio,
+              child: NativeVideoView(controller: ctr),
+            );
+          }
+          return const SizedBox();
+        }
         if (id != null && rect != null && _visible) {
           return SizedBox(
             width: widget.aspectRatio == null

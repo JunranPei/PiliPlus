@@ -38,15 +38,6 @@ abstract class PlatformVideoController {
   /// {@macro platform_video_controller}
   PlatformVideoController(this.player, this.configuration);
 
-  /// Applies a native Android PiP SurfaceView attachment.
-  ///
-  /// This is a no-op on non-Android implementations and keeps applications
-  /// from importing the package's platform implementation files directly.
-  static Future<void> applyNativePipSurface(Map<String, dynamic> data) {
-    if (!Platform.isAndroid) return Future<void>.value();
-    return AndroidVideoController.applyNativePipSurface(data);
-  }
-
   /// Sets the required size of the video output.
   /// This may yield substantial performance improvements if a small [width] & [height] is specified.
   ///

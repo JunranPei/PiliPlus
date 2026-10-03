@@ -2175,22 +2175,36 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         ? (plPlayerController.width! /
                               plPlayerController.height!)
                         : null);
+                final videoContent = PipSourceRectObserver(
+                  key: _pipContentKey,
+                  onPaint: _reportPipSourceRect,
+                  child: PipSimpleVideo(
+                    controller: plPlayerController.videoController!,
+                    fill: widget.fill,
+                    aspectRatio: aspect,
+                  ),
+                );
+                // Hybrid-composition Android views do not participate in a
+                // Flutter FittedBox transform. If the native SurfaceView is
+                // left at the video's intrinsic 1920x1080 size, Android PiP
+                // clips its top-left corner when the Activity becomes 598x336.
+                // Give the native view the actual window bounds; its Surface
+                // buffer remains fixed independently in VideoOutput.
+                final fittedVideo = Platform.isAndroid
+                    ? SizedBox(
+                        width: maxWidth,
+                        height: maxHeight,
+                        child: videoContent,
+                      )
+                    : FittedBox(
+                        fit: videoFit.boxFit,
+                        alignment: widget.alignment,
+                        child: videoContent,
+                      );
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,
                   flipY: plPlayerController.flipY.value,
-                  child: FittedBox(
-                    fit: videoFit.boxFit,
-                    alignment: widget.alignment,
-                    child: PipSourceRectObserver(
-                      key: _pipContentKey,
-                      onPaint: _reportPipSourceRect,
-                      child: PipSimpleVideo(
-                        controller: plPlayerController.videoController!,
-                        fill: widget.fill,
-                        aspectRatio: aspect,
-                      ),
-                    ),
-                  ),
+                  child: fittedVideo,
                 );
               },
             ),

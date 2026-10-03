@@ -7,18 +7,22 @@
  */
 package com.alexmercerind.media_kit_video;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.StandardMessageCodec;
+import io.flutter.plugin.platform.PlatformViewFactory;
 
 /** MediaKitVideoPlugin. */
-public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
+public class MediaKitVideoPlugin implements FlutterPlugin, MethodChannel.MethodCallHandler {
+    private static final String NATIVE_VIEW_TYPE = "com.alexmercerind/media_kit_video/native";
+
     private MethodChannel channel;
     private VideoOutputManager videoOutputManager;
 
@@ -27,11 +31,14 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
         channel = new MethodChannel(binding.getBinaryMessenger(),
                 "com.alexmercerind/media_kit_video");
         channel.setMethodCallHandler(this);
-        videoOutputManager = new VideoOutputManager(binding.getTextureRegistry());
+        videoOutputManager = new VideoOutputManager(binding.getApplicationContext());
+        binding.getPlatformViewRegistry().registerViewFactory(
+                NATIVE_VIEW_TYPE,
+                new NativeViewFactory(videoOutputManager));
     }
 
     @Override
-    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
         if (videoOutputManager == null) {
             result.error("NOT_ATTACHED", "Video output manager is not attached", null);
             return;
@@ -39,13 +46,14 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
         try {
             switch (call.method) {
                 case "VideoOutputManager.Create": {
-                    final long handle = Long.parseLong(String.valueOf(call.argument("handle")));
+                    final long handle = Long.parseLong(String.valueOf(call.<Object>argument("handle")));
                     final VideoOutput output = videoOutputManager.create(handle,
-                            (id, wid, width, height) -> {
+                            (id, wid, width, height, retiredWid) -> {
                                 final HashMap<String, Object> data = new HashMap<>();
                                 data.put("handle", handle);
                                 data.put("id", id);
                                 data.put("wid", wid);
+                                data.put("retiredWid", retiredWid);
                                 final HashMap<String, Object> rect = new HashMap<>();
                                 rect.put("left", 0);
                                 rect.put("top", 0);
@@ -55,14 +63,16 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
                                 channel.invokeMethod("VideoOutput.Resize", data);
                             });
                     final HashMap<String, Long> data = new HashMap<>();
+                    // The native PlatformView owns the output; this sentinel is
+                    // retained for callers using media_kit_video's old API.
                     data.put("id", output.id);
                     result.success(data);
                     break;
                 }
-                // Kept for the 1.2.x Dart controller.  SurfaceProducer already
-                // owns the Surface; this returns its current global reference.
+                // Kept for the 1.2.x Dart controller. The native SurfaceView is
+                // mounted by the PlatformView before a valid wid is available.
                 case "VideoOutputManager.CreateSurface": {
-                    final long handle = Long.parseLong(String.valueOf(call.argument("handle")));
+                    final long handle = Long.parseLong(String.valueOf(call.<Object>argument("handle")));
                     final HashMap<String, Long> data = new HashMap<>();
                     data.put("wid", videoOutputManager.createSurface(handle));
                     result.success(data);
@@ -70,9 +80,9 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
                 }
                 case "VideoOutputManager.SetSurfaceSize":
                 case "VideoOutputManager.SetSurfaceTextureSize": {
-                    final long handle = Long.parseLong(String.valueOf(call.argument("handle")));
-                    final int width = Integer.parseInt(String.valueOf(call.argument("width")));
-                    final int height = Integer.parseInt(String.valueOf(call.argument("height")));
+                    final long handle = Long.parseLong(String.valueOf(call.<Object>argument("handle")));
+                    final int width = Integer.parseInt(String.valueOf(call.<Object>argument("width")));
+                    final int height = Integer.parseInt(String.valueOf(call.<Object>argument("height")));
                     final VideoOutput output = videoOutputManager.setSurfaceSize(handle, width, height);
                     final HashMap<String, Long> data = new HashMap<>();
                     if (output != null) {
@@ -82,8 +92,18 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
                     result.success(data);
                     break;
                 }
+                case "VideoOutputManager.ReleaseSurfaceRef": {
+                    final Object rawReference = call.arguments instanceof Map
+                            ? (((Map<?, ?>) call.arguments).containsKey("wid")
+                            ? ((Map<?, ?>) call.arguments).get("wid")
+                            : ((Map<?, ?>) call.arguments).get("ref"))
+                            : call.arguments;
+                    final long reference = Long.parseLong(String.valueOf(rawReference));
+                    result.success(videoOutputManager.releaseSurfaceRef(reference));
+                    break;
+                }
                 case "VideoOutputManager.Dispose": {
-                    final long handle = Long.parseLong(String.valueOf(call.argument("handle")));
+                    final long handle = Long.parseLong(String.valueOf(call.<Object>argument("handle")));
                     videoOutputManager.dispose(handle);
                     result.success(null);
                     break;
@@ -102,10 +122,42 @@ public class MediaKitVideoPlugin implements FlutterPlugin, MethodCallHandler {
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        if (channel != null) {
-            channel.setMethodCallHandler(null);
-        }
+        if (channel != null) channel.setMethodCallHandler(null);
         channel = null;
         videoOutputManager = null;
+    }
+
+    private static final class NativeViewFactory extends PlatformViewFactory {
+        private final VideoOutputManager videoOutputManager;
+
+        NativeViewFactory(VideoOutputManager videoOutputManager) {
+            super(StandardMessageCodec.INSTANCE);
+            this.videoOutputManager = videoOutputManager;
+        }
+
+        @Override
+        public io.flutter.plugin.platform.PlatformView create(Context context, int viewId, Object args) {
+            final long handle = parseHandle(args);
+            final VideoOutput output = videoOutputManager.get(handle);
+            if (output == null) {
+                throw new IllegalStateException("No VideoOutput exists for handle " + handle);
+            }
+            // The PlatformView factory receives the Activity context. Pass it
+            // to the output so the native SurfaceView can react to the PiP
+            // window resize before Flutter delivers its next layout frame.
+            output.attachWindowContext(context);
+            return output;
+        }
+
+        private static long parseHandle(Object args) {
+            if (args instanceof Map) {
+                final Object handle = ((Map<?, ?>) args).get("handle");
+                if (handle instanceof Number) return ((Number) handle).longValue();
+                if (handle != null) return Long.parseLong(String.valueOf(handle));
+            }
+            if (args instanceof Number) return ((Number) args).longValue();
+            if (args != null) return Long.parseLong(String.valueOf(args));
+            throw new IllegalArgumentException("Native video PlatformView requires a handle");
+        }
     }
 }

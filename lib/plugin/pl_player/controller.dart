@@ -340,7 +340,6 @@ class PlPlayerController with BlockConfigMixin {
 
     final state = player.state;
     final configured = await AndroidPipController.instance.configure(
-      playerHandle: player.handle,
       autoEnter: autoEnter,
       width: state.width == 0 ? (width ?? 16) : state.width,
       height: state.height == 0 ? (height ?? 9) : state.height,

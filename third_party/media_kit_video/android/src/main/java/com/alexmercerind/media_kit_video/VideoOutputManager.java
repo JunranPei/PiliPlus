@@ -3,33 +3,35 @@
  */
 package com.alexmercerind.media_kit_video;
 
+import android.content.Context;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-
-import io.flutter.view.TextureRegistry;
 
 public class VideoOutputManager {
     private static final String TAG = "VideoOutputManager";
 
     private final HashMap<Long, VideoOutput> videoOutputs = new HashMap<>();
-    private final TextureRegistry textureRegistryReference;
+    private final List<VideoOutput> retiredOutputs = new ArrayList<>();
+    private final Context applicationContext;
     private final Object lock = new Object();
 
-    VideoOutputManager(TextureRegistry textureRegistryReference) {
-        this.textureRegistryReference = textureRegistryReference;
+    VideoOutputManager(Context applicationContext) {
+        this.applicationContext = applicationContext.getApplicationContext();
     }
 
     public VideoOutput create(long handle, TextureUpdateCallback callback) {
         synchronized (lock) {
-            Log.i(TAG, String.format(Locale.ENGLISH,
-                    "com.alexmercerind.media_kit_video.VideoOutputManager.create: %d", handle));
-            if (!videoOutputs.containsKey(handle)) {
-                videoOutputs.put(handle, new VideoOutput(textureRegistryReference, callback));
-            }
-            return videoOutputs.get(handle);
+            Log.i(TAG, String.format(Locale.ENGLISH, "create handle=%d", handle));
+            final VideoOutput existing = videoOutputs.get(handle);
+            if (existing != null && !existing.isDisposed()) return existing;
+            if (existing != null) retiredOutputs.add(existing);
+            final VideoOutput output = new VideoOutput(applicationContext, handle, callback);
+            videoOutputs.put(handle, output);
+            return output;
         }
     }
 
@@ -41,11 +43,11 @@ public class VideoOutputManager {
 
     public void dispose(long handle) {
         synchronized (lock) {
-            Log.i(TAG, String.format(Locale.ENGLISH,
-                    "com.alexmercerind.media_kit_video.VideoOutputManager.dispose: %d", handle));
-            if (videoOutputs.containsKey(handle)) {
-                Objects.requireNonNull(videoOutputs.get(handle)).dispose();
-                videoOutputs.remove(handle);
+            Log.i(TAG, String.format(Locale.ENGLISH, "dispose handle=%d", handle));
+            final VideoOutput output = videoOutputs.get(handle);
+            if (output != null) {
+                output.dispose();
+                if (output.isFullyReleased()) videoOutputs.remove(handle);
             }
         }
     }
@@ -60,13 +62,28 @@ public class VideoOutputManager {
     public VideoOutput setSurfaceSize(long handle, int width, int height) {
         synchronized (lock) {
             Log.i(TAG, String.format(Locale.ENGLISH,
-                    "com.alexmercerind.media_kit_video.VideoOutputManager.setSurfaceSize: %d %d %d",
-                    handle, width, height));
+                    "setSurfaceSize handle=%d buffer=%dx%d", handle, width, height));
             final VideoOutput output = videoOutputs.get(handle);
-            if (output != null) {
-                output.setSurfaceSize(width, height);
-            }
+            if (output != null) output.setSurfaceSize(width, height);
             return output;
+        }
+    }
+
+    /** Called after Dart has set mpv vo=null and wid=0 for the retired ref. */
+    public boolean releaseSurfaceRef(long reference) {
+        synchronized (lock) {
+            boolean released = false;
+            for (VideoOutput output : new ArrayList<>(videoOutputs.values())) {
+                released |= output.releaseSurfaceRef(reference);
+                if (output.isFullyReleased() && videoOutputs.get(output.id) == output) {
+                    videoOutputs.remove(output.id);
+                }
+            }
+            for (VideoOutput output : new ArrayList<>(retiredOutputs)) {
+                released |= output.releaseSurfaceRef(reference);
+                if (output.isFullyReleased()) retiredOutputs.remove(output);
+            }
+            return released;
         }
     }
 }

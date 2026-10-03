@@ -7,168 +7,379 @@
  */
 package com.alexmercerind.media_kit_video;
 
-import android.os.Handler;
-import android.os.Looper;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.app.Activity;
 import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.View;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Objects;
 
-import io.flutter.view.TextureRegistry;
+import io.flutter.plugin.platform.PlatformView;
 
 /**
- * Owns one Android SurfaceProducer and its current libmpv Surface reference.
- * SurfaceTextureEntry is deliberately not used here: a SurfaceProducer lets
- * Flutter replace the backing surface during a resize or PiP transition while
- * keeping the texture id stable.
+ * Owns the one native SurfaceView used by both the normal Flutter layout and
+ * Android PiP. Keeping one SurfaceView avoids switching libmpv between a
+ * SurfaceProducer and a second PiP-only surface during a window transition.
  */
-public class VideoOutput implements TextureRegistry.SurfaceProducer.Callback {
+public class VideoOutput implements PlatformView {
     private static final String TAG = "VideoOutput";
-    private static final Method newGlobalObjectRef;
-    private static final Method deleteGlobalObjectRef;
-    private static final HashSet<Long> deletedGlobalObjectRefs = new HashSet<>();
-    private static final Handler handler = new Handler(Looper.getMainLooper());
+    private static final Method NEW_GLOBAL_OBJECT_REF;
+    private static final Method DELETE_GLOBAL_OBJECT_REF;
 
     static {
         try {
             final Class<?> helper = Class.forName(
                     "com.alexmercerind.mediakitandroidhelper.MediaKitAndroidHelper");
-            newGlobalObjectRef = helper.getDeclaredMethod("newGlobalObjectRef", Object.class);
-            deleteGlobalObjectRef = helper.getDeclaredMethod("deleteGlobalObjectRef", long.class);
-            newGlobalObjectRef.setAccessible(true);
-            deleteGlobalObjectRef.setAccessible(true);
+            NEW_GLOBAL_OBJECT_REF = helper.getDeclaredMethod("newGlobalObjectRef", Object.class);
+            DELETE_GLOBAL_OBJECT_REF = helper.getDeclaredMethod("deleteGlobalObjectRef", long.class);
+            NEW_GLOBAL_OBJECT_REF.setAccessible(true);
+            DELETE_GLOBAL_OBJECT_REF.setAccessible(true);
         } catch (Throwable e) {
-            Log.i("media_kit", "package:media_kit_libs_android_video missing. Make sure you have added it to pubspec.yaml.");
-            throw new RuntimeException("Failed to initialize com.alexmercerind.media_kit_video.VideoOutput.");
+            Log.i(TAG, "package:media_kit_libs_android_video missing. Make sure it is in pubspec.yaml.", e);
+            throw new RuntimeException("Failed to initialize the media_kit Android JNI helper.", e);
         }
     }
 
-    /** Current Flutter texture id, kept public for the legacy Dart create response. */
-    public long id = 0;
-    /** Current global reference to the Android Surface passed to libmpv. */
+    /** A stable sentinel accepted by the existing Dart controller. */
+    public final long id;
+
+    /** Current global reference passed to libmpv, or zero before mount. */
     public long wid = 0;
 
     private final TextureUpdateCallback textureUpdateCallback;
-    private final TextureRegistry.SurfaceProducer surfaceProducer;
+    private final SurfaceView surfaceView;
+    private final SurfaceHolder.Callback surfaceCallback;
     private final Object lock = new Object();
+    private final HashSet<Long> retainedReferences = new HashSet<>();
+    private Surface currentSurface;
+    private Activity activity;
+    private View decorView;
+    private View.OnLayoutChangeListener windowLayoutListener;
+    private int windowWidth;
+    private int windowHeight;
+    private int videoWidth = 1;
+    private int videoHeight = 1;
+    private boolean disposed = false;
 
-    VideoOutput(TextureRegistry textureRegistryReference,
-                TextureUpdateCallback textureUpdateCallback) {
+    VideoOutput(Context applicationContext, long handle, TextureUpdateCallback textureUpdateCallback) {
+        this.id = handle;
         this.textureUpdateCallback = textureUpdateCallback;
-        surfaceProducer = textureRegistryReference.createSurfaceProducer();
-        surfaceProducer.setCallback(this);
-    }
-
-    public void dispose() {
-        synchronized (lock) {
-            try {
-                surfaceProducer.getSurface().release();
-            } catch (Throwable e) {
-                Log.e(TAG, "dispose surface", e);
+        final Context context = applicationContext.getApplicationContext();
+        surfaceView = new SurfaceView(context);
+        surfaceView.setFocusable(false);
+        surfaceView.setClickable(false);
+        surfaceView.addOnAttachStateChangeListener(new android.view.View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(android.view.View view) {
+                Log.i(TAG, String.format(Locale.ENGLISH,
+                        "view attached handle=%d size=%dx%d measured=%dx%d",
+                        id, view.getWidth(), view.getHeight(), view.getMeasuredWidth(), view.getMeasuredHeight()));
             }
-            try {
-                surfaceProducer.release();
-            } catch (Throwable e) {
-                Log.e(TAG, "dispose producer", e);
+
+            @Override
+            public void onViewDetachedFromWindow(android.view.View view) {
+                Log.i(TAG, String.format(Locale.ENGLISH,
+                        "view detached handle=%d size=%dx%d measured=%dx%d",
+                        id, view.getWidth(), view.getHeight(), view.getMeasuredWidth(), view.getMeasuredHeight()));
             }
-            onSurfaceCleanup();
-        }
-    }
-
-    public void setSurfaceSize(int width, int height) {
-        setSurfaceSize(width, height, false);
-    }
-
-    private void setSurfaceSize(int width, int height, boolean force) {
-        synchronized (lock) {
-            try {
-                if (!force && surfaceProducer.getWidth() == width
-                        && surfaceProducer.getHeight() == height) {
-                    return;
+        });
+        surfaceView.addOnLayoutChangeListener((view, left, top, right, bottom,
+                oldLeft, oldTop, oldRight, oldBottom) -> {
+            synchronized (lock) {
+                final android.graphics.Rect frame = surfaceView.getHolder().getSurfaceFrame();
+                Log.i(TAG, String.format(Locale.ENGLISH,
+                        "layout handle=%d new=%dx%d@(%d,%d) old=%dx%d@(%d,%d) " +
+                                "measured=%dx%d frame=%dx%d fixed=%dx%d wid=%d surface=%d",
+                        id,
+                        right - left, bottom - top, left, top,
+                        oldRight - oldLeft, oldBottom - oldTop, oldLeft, oldTop,
+                        view.getMeasuredWidth(), view.getMeasuredHeight(),
+                        frame.width(), frame.height(), videoWidth, videoHeight,
+                        wid, currentSurface == null ? 0 : System.identityHashCode(currentSurface)));
+                applyWindowScaleLocked();
+            }
+        });
+        surfaceCallback = new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                synchronized (lock) {
+                    final android.graphics.Rect frame = holder.getSurfaceFrame();
+                    Log.i(TAG, String.format(Locale.ENGLISH,
+                            "surfaceCreated handle=%d callbackFrame=%dx%d fixed=%dx%d surface=%d",
+                            id, frame.width(), frame.height(), videoWidth, videoHeight,
+                            System.identityHashCode(holder.getSurface())));
+                    attachSurfaceLocked(holder.getSurface(), frame.width(), frame.height(), "created");
                 }
-                surfaceProducer.setSize(width, height);
-                // Some Flutter engine versions only deliver the callback on a
-                // subsequent frame. Publish the new Surface synchronously so
-                // Dart can update --wid before it re-attaches --vo=gpu.
-                onSurfaceAvailable();
-            } catch (Throwable e) {
-                Log.e(TAG, "setSurfaceSize", e);
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                synchronized (lock) {
+                    final android.graphics.Rect frame = holder.getSurfaceFrame();
+                    final int actualWidth = width > 0 ? width : frame.width();
+                    final int actualHeight = height > 0 ? height : frame.height();
+                    Log.i(TAG, String.format(Locale.ENGLISH,
+                            "surfaceChanged handle=%d callback=%dx%d frame=%dx%d fixed=%dx%d " +
+                                    "view=%dx%d surface=%d wid=%d",
+                            id, width, height, frame.width(), frame.height(), videoWidth, videoHeight,
+                            surfaceView.getWidth(), surfaceView.getHeight(),
+                            System.identityHashCode(holder.getSurface()), wid));
+                    attachSurfaceLocked(holder.getSurface(), actualWidth, actualHeight, "changed");
+                }
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+                synchronized (lock) {
+                    final long retired = wid;
+                    currentSurface = null;
+                    wid = 0;
+                    if (retired != 0) {
+                        Log.i(TAG, String.format(Locale.ENGLISH,
+                                "surface destroyed handle=%d retiredWid=%d", id, retired));
+                    }
+                    notifyTextureUpdateLocked(0, actualBufferWidthLocked(), actualBufferHeightLocked(), retired);
+                }
+            }
+        };
+        surfaceView.getHolder().addCallback(surfaceCallback);
+        Log.i(TAG, String.format(Locale.ENGLISH, "created handle=%d", id));
+    }
+
+    @Override
+    public android.view.View getView() {
+        return surfaceView;
+    }
+
+    /** Attach to the Activity window so PiP scaling is applied before Flutter's next frame. */
+    public void attachWindowContext(Context context) {
+        synchronized (lock) {
+            Activity next = findActivity(context);
+            if (next == activity && decorView != null) return;
+            detachWindowListenerLocked();
+            activity = next;
+            if (activity == null) return;
+            decorView = activity.getWindow().getDecorView();
+            windowLayoutListener = (view, left, top, right, bottom,
+                    oldLeft, oldTop, oldRight, oldBottom) -> {
+                synchronized (lock) {
+                    windowWidth = right - left;
+                    windowHeight = bottom - top;
+                    Log.i(TAG, String.format(Locale.ENGLISH,
+                            "window layout handle=%d new=%dx%d old=%dx%d inPip=%s view=%dx%d",
+                            id, windowWidth, windowHeight,
+                            oldRight - oldLeft, oldBottom - oldTop,
+                            activity.isInPictureInPictureMode(),
+                            surfaceView.getWidth(), surfaceView.getHeight()));
+                    applyWindowScaleLocked();
+                }
+            };
+            decorView.addOnLayoutChangeListener(windowLayoutListener);
+            windowWidth = decorView.getWidth();
+            windowHeight = decorView.getHeight();
+            applyWindowScaleLocked();
+        }
+    }
+
+    /** Update the fixed video buffer size while allowing the view to resize. */
+    public void setSurfaceSize(int width, int height) {
+        synchronized (lock) {
+            videoWidth = Math.max(1, width);
+            videoHeight = Math.max(1, height);
+            final android.graphics.Rect frame = surfaceView.getHolder().getSurfaceFrame();
+            Log.i(TAG, String.format(Locale.ENGLISH,
+                    "setFixedSize handle=%d requested=%dx%d view=%dx%d frame=%dx%d wid=%d",
+                    id, videoWidth, videoHeight, surfaceView.getWidth(), surfaceView.getHeight(),
+                    frame.width(), frame.height(), wid));
+            try {
+                surfaceView.getHolder().setFixedSize(videoWidth, videoHeight);
+            } catch (Throwable error) {
+                Log.w(TAG, "setFixedSize failed", error);
             }
         }
     }
 
-    /** Legacy API used by media_kit_video 1.2.x. */
+    /** Returns the current Surface reference, or zero before PlatformView mount. */
     public long createSurface() {
         synchronized (lock) {
-            if (wid == 0) {
-                onSurfaceAvailable();
-            }
             return wid;
         }
     }
 
+    /** Called by VideoOutputManager.Dispose and PlatformView.dispose. */
     @Override
-    public void onSurfaceAvailable() {
+    public void dispose() {
         synchronized (lock) {
-            Log.i(TAG, "onSurfaceAvailable");
-            id = surfaceProducer.id();
-            final long previousWid = wid;
-            wid = newGlobalObjectRef(surfaceProducer.getSurface());
-            if (previousWid != 0 && previousWid != wid) {
-                final long staleWid = previousWid;
-                handler.postDelayed(() -> deleteGlobalObjectRef(staleWid), 5000);
+            if (disposed) return;
+            disposed = true;
+            final long retired = wid;
+            currentSurface = null;
+            wid = 0;
+            if (retired != 0) {
+                Log.i(TAG, String.format(Locale.ENGLISH,
+                        "dispose handle=%d retiredWid=%d", id, retired));
+                notifyTextureUpdateLocked(0, actualBufferWidthLocked(), actualBufferHeightLocked(), retired);
             }
-            textureUpdateCallback.onTextureUpdate(
-                    id, wid, surfaceProducer.getWidth(), surfaceProducer.getHeight());
+            surfaceView.getHolder().removeCallback(surfaceCallback);
+            detachWindowListenerLocked();
         }
     }
 
-    @Override
-    public void onSurfaceCleanup() {
+    public boolean isDisposed() {
         synchronized (lock) {
-            Log.i(TAG, "onSurfaceCleanup");
-            textureUpdateCallback.onTextureUpdate(
-                    id, 0, surfaceProducer.getWidth(), surfaceProducer.getHeight());
-            if (wid != 0) {
-                final long widReference = wid;
-                wid = 0;
-                handler.postDelayed(() -> deleteGlobalObjectRef(widReference), 5000);
-            }
+            return disposed;
         }
+    }
+
+    /** True only after Dart has acknowledged every retired JNI reference. */
+    public boolean isFullyReleased() {
+        synchronized (lock) {
+            return disposed && retainedReferences.isEmpty() && wid == 0;
+        }
+    }
+
+    /**
+     * Release a reference only after Dart has synchronously set mpv vo=null
+     * and wid=0. There is intentionally no timer here.
+     */
+    public boolean releaseSurfaceRef(long reference) {
+        synchronized (lock) {
+            if (reference == 0 || reference == wid || !retainedReferences.remove(reference)) {
+                return false;
+            }
+            deleteGlobalObjectRef(reference);
+            Log.i(TAG, String.format(Locale.ENGLISH,
+                    "released handle=%d wid=%d remaining=%d", id, reference, retainedReferences.size()));
+            return true;
+        }
+    }
+
+    private void attachSurfaceLocked(Surface surface, int width, int height, String reason) {
+        if (disposed || surface == null || !surface.isValid()) return;
+        // Do not attach the full Activity-sized buffer before mpv has
+        // published the video's dimensions.  SetSurfaceSize will trigger the
+        // first attach with the fixed video buffer; this avoids an initial
+        // full-window output followed by a second resize.
+        if (videoWidth <= 1 || videoHeight <= 1) {
+            Log.d(TAG, "surface " + reason + " waiting for video size handle=" + id);
+            return;
+        }
+        if (currentSurface == surface && wid != 0) {
+            // SurfaceHolder reports the current SurfaceView/window size here.
+            // During a PiP transition that value briefly becomes the expanding
+            // Activity window. It is not the video buffer size and must never
+            // be sent to mpv or Dart as a new video rectangle.
+            return;
+        }
+
+        final long retired = wid;
+        final long next = newGlobalObjectRef(surface);
+        if (next == 0) return;
+        retainedReferences.add(next);
+        currentSurface = surface;
+        wid = next;
+        Log.i(TAG, String.format(Locale.ENGLISH,
+                "surface %s handle=%d wid=%d retiredWid=%d buffer=%dx%d",
+                reason, id, next, retired, videoWidth, videoHeight));
+        // SetSurfaceSize is authoritative. The holder callback dimensions are
+        // deliberately ignored because they describe the resizable view, not
+        // the fixed video buffer.
+        notifyTextureUpdateLocked(next, videoWidth, videoHeight, retired);
+    }
+
+    private int actualBufferWidthLocked() {
+        final android.graphics.Rect frame = surfaceView.getHolder().getSurfaceFrame();
+        return frame.width() > 0 ? frame.width() : videoWidth;
+    }
+
+    private int actualBufferHeightLocked() {
+        final android.graphics.Rect frame = surfaceView.getHolder().getSurfaceFrame();
+        return frame.height() > 0 ? frame.height() : videoHeight;
+    }
+
+    private void applyWindowScaleLocked() {
+        if (activity == null || surfaceView.getWidth() <= 0 || surfaceView.getHeight() <= 0 ||
+                windowWidth <= 0 || windowHeight <= 0) {
+            return;
+        }
+        if (!activity.isInPictureInPictureMode()) {
+            if (surfaceView.getScaleX() != 1f || surfaceView.getScaleY() != 1f) {
+                surfaceView.setPivotX(0f);
+                surfaceView.setPivotY(0f);
+                surfaceView.setScaleX(1f);
+                surfaceView.setScaleY(1f);
+                Log.i(TAG, String.format(Locale.ENGLISH,
+                        "window scale reset handle=%d view=%dx%d",
+                        id, surfaceView.getWidth(), surfaceView.getHeight()));
+            }
+            return;
+        }
+        // Keep the existing SurfaceView aspect ratio while the Flutter
+        // platform-view layout catches up. Independent X/Y scaling would
+        // stretch the transitional frame; fitting the old view inside the new
+        // window prevents both stretching and top-left cropping.
+        final float scale = Math.min(
+                windowWidth / (float) surfaceView.getWidth(),
+                windowHeight / (float) surfaceView.getHeight());
+        surfaceView.setPivotX(0f);
+        surfaceView.setPivotY(0f);
+        surfaceView.setScaleX(scale);
+        surfaceView.setScaleY(scale);
+        Log.i(TAG, String.format(Locale.ENGLISH,
+                "window scale handle=%d window=%dx%d view=%dx%d scale=%.4f",
+                id, windowWidth, windowHeight, surfaceView.getWidth(), surfaceView.getHeight(),
+                scale));
+    }
+
+    private void detachWindowListenerLocked() {
+        if (decorView != null && windowLayoutListener != null) {
+            decorView.removeOnLayoutChangeListener(windowLayoutListener);
+        }
+        decorView = null;
+        windowLayoutListener = null;
+        activity = null;
+        windowWidth = 0;
+        windowHeight = 0;
+    }
+
+    private static Activity findActivity(Context context) {
+        Context current = context;
+        while (current instanceof ContextWrapper) {
+            if (current instanceof Activity) return (Activity) current;
+            final Context base = ((ContextWrapper) current).getBaseContext();
+            if (base == current) break;
+            current = base;
+        }
+        return current instanceof Activity ? (Activity) current : null;
+    }
+
+    private void notifyTextureUpdateLocked(long nextWid, int width, int height, long retiredWid) {
+        textureUpdateCallback.onTextureUpdate(id, nextWid, width, height, retiredWid);
     }
 
     private static long newGlobalObjectRef(Object object) {
-        Log.i(TAG, String.format(Locale.ENGLISH, "newGlobalRef: object = %s", object));
         try {
-            return (long) Objects.requireNonNull(newGlobalObjectRef.invoke(null, object));
+            final Object value = NEW_GLOBAL_OBJECT_REF.invoke(null, object);
+            return value instanceof Number ? ((Number) value).longValue() : 0;
         } catch (Throwable e) {
-            Log.e(TAG, "newGlobalRef", e);
+            Log.e(TAG, "newGlobalRef failed", e);
             return 0;
         }
     }
 
-    private static void deleteGlobalObjectRef(long ref) {
-        if (ref == 0) {
-            return;
-        }
-        synchronized (deletedGlobalObjectRefs) {
-            if (deletedGlobalObjectRefs.contains(ref)) {
-                Log.i(TAG, String.format(Locale.ENGLISH,
-                        "deleteGlobalObjectRef: ref = %d ALREADY DELETED", ref));
-                return;
-            }
-            if (deletedGlobalObjectRefs.size() > 100) {
-                deletedGlobalObjectRefs.clear();
-            }
-            deletedGlobalObjectRefs.add(ref);
-        }
-        Log.i(TAG, String.format(Locale.ENGLISH, "deleteGlobalObjectRef: ref = %d", ref));
+    private static void deleteGlobalObjectRef(long reference) {
+        if (reference == 0) return;
         try {
-            deleteGlobalObjectRef.invoke(null, ref);
+            DELETE_GLOBAL_OBJECT_REF.invoke(null, reference);
         } catch (Throwable e) {
-            Log.e(TAG, "deleteGlobalObjectRef", e);
+            Log.e(TAG, String.format(Locale.ENGLISH,
+                    "deleteGlobalRef failed ref=%d", reference), e);
         }
     }
 }
