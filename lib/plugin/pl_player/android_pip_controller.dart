@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:PiliPlus/plugin/pl_player/pip_diagnostics.dart';
 
 enum AndroidPipPhase { idle, entering, active }
 
@@ -27,6 +28,7 @@ final class AndroidPipController extends ChangeNotifier {
   int _generation = 0;
   String? _lastReason;
   bool _autoEnterPending = false;
+  bool _renderHostLocked = false;
   Future<void> _lastCommand = Future<void>.value();
   Rect? _sourceRect;
 
@@ -37,8 +39,9 @@ final class AndroidPipController extends ChangeNotifier {
   String? get lastReason => _lastReason;
   bool get isActive => _phase == AndroidPipPhase.active;
   bool get isEntering => _phase == AndroidPipPhase.entering;
+  bool get renderHostLocked => _renderHostLocked;
   bool get protectsPlayback =>
-      _phase != AndroidPipPhase.idle || _autoEnterPending;
+      _phase != AndroidPipPhase.idle || _autoEnterPending || _renderHostLocked;
 
   Future<void> _loadState() async {
     try {
@@ -59,6 +62,12 @@ final class AndroidPipController extends ChangeNotifier {
   }
 
   void _applyState(Map<String, dynamic> state) {
+    PipDiagnostics.arm('stateChanged');
+    PipDiagnostics.event('state.receive', {
+      'before': _phase.name,
+      'beforeGeneration': _generation,
+      'native': state,
+    });
     final next = switch (state['phase']) {
       'entering' => AndroidPipPhase.entering,
       'active' => AndroidPipPhase.active,
@@ -67,26 +76,40 @@ final class AndroidPipController extends ChangeNotifier {
     final generation = (state['generation'] as num?)?.toInt() ?? _generation;
     final reason = state['reason'] as String?;
     final autoEnterPending = state['autoEnterPending'] as bool? ?? false;
+    final renderHostLocked = state['renderHostLocked'] as bool? ?? false;
     if (next == _phase &&
         generation == _generation &&
         reason == _lastReason &&
-        autoEnterPending == _autoEnterPending) {
+        autoEnterPending == _autoEnterPending &&
+        renderHostLocked == _renderHostLocked) {
       return;
     }
     _phase = next;
     _generation = generation;
     _lastReason = reason;
     _autoEnterPending = autoEnterPending;
+    _renderHostLocked = renderHostLocked;
     debugPrint(
       '[PIP_V2] phase=${_phase.name} generation=$_generation reason=$reason',
     );
     notifyListeners();
+    PipDiagnostics.snapshot('state.notified');
   }
 
   Future<T?> _invoke<T>(String method, [Object? arguments]) {
+    PipDiagnostics.event('command.queued', {
+      'method': method,
+      'arguments': arguments,
+    });
     final command = _lastCommand.then((_) async {
       try {
-        return await _channel.invokeMethod<T>(method, arguments);
+        PipDiagnostics.event('command.begin', {'method': method});
+        final result = await _channel.invokeMethod<T>(method, arguments);
+        PipDiagnostics.event('command.end', {
+          'method': method,
+          'result': result,
+        });
+        return result;
       } on MissingPluginException {
         return null;
       } on PlatformException catch (error) {
@@ -94,7 +117,15 @@ final class AndroidPipController extends ChangeNotifier {
         return null;
       }
     });
-    _lastCommand = command.then<void>((_) {});
+    // A failed command still reports its error to its own caller. Do not let
+    // that error permanently poison the queue for all later PiP commands.
+    _lastCommand = command.then<void>((_) {}, onError: (Object error, StackTrace stack) {
+      PipDiagnostics.event('command.failure', {
+        'method': method,
+        'error': error.toString(),
+        'stack': stack.toString(),
+      });
+    });
     return command;
   }
 

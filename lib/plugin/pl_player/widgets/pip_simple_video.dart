@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:PiliPlus/plugin/pl_player/pip_diagnostics.dart';
 
 /// A media_kit texture widget that keeps the last non-zero video rectangle
 /// during an Android surface resize. media_kit 1.2.x briefly publishes
@@ -38,7 +38,15 @@ class _PipSimpleVideoState extends State<PipSimpleVideo> {
   @override
   void initState() {
     super.initState();
+    PipDiagnostics.event('texture.mount', {
+      'state': identityHashCode(this),
+      'controller': identityHashCode(widget.controller),
+    });
     _subscription = widget.controller.player.stream.size.listen((value) {
+      PipDiagnostics.event('texture.sizeEvent', {
+        'state': identityHashCode(this),
+        'size': value.toString(),
+      });
       final visible = value.$1 > 0 && value.$2 > 0;
       // A zero size is part of media_kit 1.2.x Android surface replacement.
       // Keep the existing Texture mounted until a new non-zero size arrives.
@@ -51,7 +59,19 @@ class _PipSimpleVideoState extends State<PipSimpleVideo> {
   }
 
   @override
+  void didUpdateWidget(PipSimpleVideo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    PipDiagnostics.event('texture.widgetUpdate', {
+      'state': identityHashCode(this),
+      'oldController': identityHashCode(oldWidget.controller),
+      'controller': identityHashCode(widget.controller),
+      'oldAspect': oldWidget.aspectRatio, 'aspect': widget.aspectRatio,
+    });
+  }
+
+  @override
   void dispose() {
+    PipDiagnostics.event('texture.dispose', {'state': identityHashCode(this)});
     _subscription.cancel();
     super.dispose();
   }
@@ -76,32 +96,15 @@ class _PipSimpleVideoState extends State<PipSimpleVideo> {
         final rawRectIsZero =
             rawRect == null || rawRect.width <= 0 || rawRect.height <= 0;
         final rect = rawRectIsZero ? _lastNonZeroRect : rawRect;
-        if (Platform.isAndroid) {
-          // Android uses one native SurfaceView for the whole playback
-          // lifetime.  It remains in the Flutter layout while the Activity
-          // enters PiP, so no Texture ID or second surface is swapped during
-          // the system resize.
-          final state = ctr.player.state;
-          final nativeRect = rect ??
-              ((state.width > 0 && state.height > 0)
-                  ? Rect.fromLTWH(
-                      0,
-                      0,
-                      state.width.toDouble(),
-                      state.height.toDouble(),
-                    )
-                  : null);
-          if (_visible && nativeRect != null) {
-            return SizedBox(
-              width: widget.aspectRatio == null
-                  ? nativeRect.width / _devicePixelRatio
-                  : nativeRect.height / _devicePixelRatio * widget.aspectRatio!,
-              height: nativeRect.height / _devicePixelRatio,
-              child: NativeVideoView(controller: ctr),
-            );
-          }
-          return const SizedBox();
-        }
+        PipDiagnostics.event('texture.build', {
+          'state': identityHashCode(this),
+          'texture': id,
+          'rawRect': rawRect?.toString(),
+          'effectiveRect': rect?.toString(),
+          'visible': _visible,
+          'dpr': _devicePixelRatio,
+          'aspectRatio': widget.aspectRatio,
+        });
         if (id != null && rect != null && _visible) {
           return SizedBox(
             width: widget.aspectRatio == null

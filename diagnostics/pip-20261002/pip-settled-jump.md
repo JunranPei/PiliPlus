@@ -1,5 +1,58 @@
 # PiliPlus Android PiP 落定后跳动记录
 
+## 当前状态：2026-10-06（固定根画布方案已验收）
+
+### 当前阶段已验收：原生固定根画布方案
+
+用户先确认“目前已经不再闪烁了”，随后明确确认 **直接上滑进入 PiP、最近任务进入 PiP、PiP 返回播放页三种均已正常**。以下旧的失败/未验收状态均为历史，不代表这一版的结果。
+
+- 已安装 `native-fixed-root-null-safe-and-exit-guard`。Activity 照常缩小，Flutter 根画布保留正常尺寸，原生容器持续对进入前的视频区域缩放、裁切；退出后恢复原生变换，在正常窗口与系统栏恢复后解除锁定。播放器和纹理不因 PiP 重建。
+- 已解决实验容器的 null clip 日志崩溃；诊断收集与发送受异常边界保护。旋转返回的测量请求移到布局完成后的消息队列，测试使用实际附着的 Android View，避免 detached View 的 post 不执行造成测试失真。
+- 返回仍锁定时，Dart playback/sourceRect 保护延续到原生释放；原生也拒绝此期间写入临时尺寸的源矩形。
+- 验证：5 项原生单测、4 项 Flutter viewport 测试通过，相关 Dart analyze 无问题，APK 构建及覆盖安装成功；当前用户已提供三种路径的视觉通过结果。没有截图/录屏，以连续系统元数据和用户人工结果验收。
+- 可恢复基线保存在 `../pip-20261006/native-fixed-root-baseline/`：APK、带哈希的 build.json、源码快照 ZIP（包含新增原生文件及 JUnit XML）、tracked-source.patch。新包运行文本证据在 `../pip-20261006/native-fixed-root-user-verified/`，JSONL 12,207 条、损坏与序号缺口均为 0。
+- 当前阶段完成。功耗增幅尚未测量；用户已明确接受先采用固定大画布，再考虑小尺寸缓冲区同步交接优化。后续优化必须保留本基线并重新覆盖三种路径，不能覆盖已确认正常的包后失去回退依据。
+
+- 按用户“每一帧的大小”要求，已增加连续 Perfetto 系统合成监听，当前恢复版 APK 不变。`MODE_ACTIVE + TRACE_FLAG_BUFFERS/COMPOSITION/HWC` 同时采集 SurfaceFlinger、FrameTimeline、WindowManager 按帧状态和 WM Shell 转场。4 秒采集实际得到 118 个图层时点、117 条实际帧时序；导出含应用及祖先的 1,770 条图层记录、236 个缓冲样本、119 个不同图层/帧号组合，损失统计为空。反复显示的相同缓冲会在多个时点出现，不能把全部缓冲样本称作新视频帧。证据目录为 `../pip-20261006/pip-frame-listener-check-extracted/`。
+- 新工具 `tool/pip_layer_trace.py` 输出 `buffer-frames.jsonl`（tsNs、layer id、curr_frame、active_buffer 宽高、父链引用、原始裁切/变换/显示区域）、`layers.jsonl`（应用及每个父图层的所有原始字段）、实际帧时序、转场信息和损失统计。缺失字段不擅自补成单位矩阵，不从元数据推断视觉成功。系统实际呈现和逐缓冲变化信息已可取得，下一步需要覆盖用户看见的“正常→异常→正常”。
+- 连续手工测试监听已启动，后台输出 PID 10689，文件已实际写到 45,487,250 字节。kill -0 返回 Permission denied，不能宣称该方式验证成功；以进程列表及 Perfetto session query 核验运行。元数据索引 `../pip-20261006/frame-listener-live.json`。限制 180 秒或 128 MiB，防止再次耗尽模拟器空间；全过程无截图、无录屏、无程序手势、无重装。此采集模式有额外开销，不能把采集时延直接归为原始 bug 的开销。
+
+- 用户进一步指出：转场全程已有正常且尺寸随动画变化的小窗，落定后才出现一次异常再恢复。因此撤销“转场只缩放、落定时窗口才变小”的绝对顺序说法，也不能仅以 Flutter 布局更新延迟解释整段“正常→异常→正常”。Android 窗口变化、应用缓冲提交和合成变换需要逐次对齐，必须定位正常画面之后的错误提交，才能建立直接因果。
+- 新增系统合成元数据调查：Perfetto 数据源已确认可用；`MODE_GENERATED` 输出 943 字节，经判断未得到历史图层，不能当成回溯证据。`MODE_DUMP` 取到 1 个快照、101 个图层（43,082 字节），保存在 `../pip-20261006/pip-layers-dump.pftrace`。已使用官方 trace_processor_shell v58.2 解析（SHA256 `adfa6bad3d72be3ba9b83fa2b17b69fa13b3ab1cad0f42e52b86188bd5f0f997`）。当前落定 Flutter BLAST 图层 #774 的 active_buffer、source_bounds、destination_frame 都为 598×336，screen_bounds 为 (440,1527)-(1038,1863)，curr_frame=27289。这仅是当前正常稳态，无法证明异常瞬间。原始字段见 `../pip-20261006/current-layer-geometry.csv`。未截图或录屏。
+- 原生单测首次完成：5 项中 4 项通过，1 项发现旋转返回后的子 view 测量尺寸仍为 400×900，未恢复为 900×400。原因是 onLayout 内 requestLayout 的标志可在 View.layout 收尾时清除。已改为 post 后重新请求子 view 和容器测量，测试也推进真实主线程消息队列后检查结果，正在复跑。实验根容器继续禁用，不能把测试问题修正当成当前 PiP 视觉问题已经解决。
+
+- 用户随后补充这轮恢复版“没有改善”。因此上述恢复版操作的人工视觉结果明确为失败，不再写“等待补充”；无新 crash 仅说明实验容器的崩溃已撤回，绝不等于原 PiP 问题解决。当前具体根因尚未查实，窗口尺寸与 Flutter 帧提交不同步是已记录的现象及主排查方向；它与可见放大之间的直接因果、错误帧实际来自哪层仍未证明。
+
+- 恢复版 `root-host-disabled-serial-trace` 的新一轮人工操作已取回，存于 `../pip-20261006/restored-manual-snapshot/` 和 `restored-manual-android/`：应用 PID 8980；Flutter 文件 6,503 条完整记录，损坏 0、序号缺口 0；5 次进入、4 次返回，当前进程 crash buffer 无新异常。Texture 挂载 1 次、卸载 0 次。首轮进入有三次 RenderFlex 溢出（30、23、25 像素）；最大 build 401,787 微秒。Activity 根 Surface 仍在 1080×2400 与 598×336 间切换，Flutter 几何随后才更新；所有已记录的落定 PiP 内容矩阵均为正常 0.311111 等比适配，没有日志证据证明后续错误矩阵。人工画面结果尚未补充，不能因无闪退就判 PiP 跳动通过。
+- 当前源码新增原生 JVM 回归检查（Robolectric SDK 28、LEGACY graphics）：覆盖这次“进入但尚未缩窗”的 null clip 崩溃路径、保留子 view 大窗口测量尺寸、返回和旋转恢复，以及诊断回调抛异常不影响布局；这些不是实际 Flutter Surface 合成或模拟器画面测试。原生日志的数据收集与发送改为受异常边界保护；PiP 队列也在单条异常后释放后续指令。尚未把这些后续源码改动部署到模拟器，安装版仍为恢复版。测试框架配置移除了布局测试不需要的原生图形库依赖，测试结果须以生成的 JUnit XML 为准。
+
+- **最新反馈：进入 PiP 整个 app 闪退。** crash buffer 连续记录 PID 7937、8499、8715 相同异常：`NullPointerException`，`PipRenderHost.onLayout(PipRenderHost.kt:107)`。`FlutterView.clipBounds` 是 Android Java platform type，可为 null，直接调用其 `toString()` 在进入后仍为正常大窗口的那次布局崩溃。已修成安全调用，同时撤销 MainActivity 中 `installRenderHost()` 的调用，实验根容器不再安装或执行。该候选未通过，不能作为根 Surface 固定成功的证据。原始堆栈保存于 `../pip-20261006/native-root-host-crash.log`。恢复版保留串行文件日志器；原 PiP 闪烁尚未解决。
+
+- 新候选版：`fixed-root-native-crop-serial-file-writer`，构建成功并覆盖安装。新增 Android `PipRenderHost`，进入时锁定已有 FlutterView 的正常测量尺寸和视频源矩形，Activity 缩小时仅通过原生 view 的 scale/translation/clip 适配小窗；保持同一 Flutter 根 Surface 的缓冲尺寸。返回时还原原生变换，等待正常窗口及系统栏可见性恢复再释放锁。Dart 镜像 `renderHostLocked`，锁定期间保留原 MediaQuery 和页面布局，不再按 PiP 窗口重排播放器。仍为 Flutter Texture 视频合成，不是纯原生播放器。
+- 4 项 viewport 测试通过，包括原生锁定期间进入、活动、退出各阶段不重挂载子节点、不改变原边距，及既有回退路径。这只验证 Dart 布局约束，未证明 native Surface 合成或实际画面没有闪烁。
+- 运行时发现异步日志器的回归：在 IOSink.flush 未完成时调用 write 抛出 `Bad state: StreamSink is bound to a stream`，使 `command.begin` 的诊断异常阻断 PiP 方法调用，并让部分播放器挂载不完整。已改成生产端只追加 StringBuffer，单个串行 flusher 才访问 sink；event 捕获诊断自身异常，不能再向播放逻辑抛出。修正包 PID 7937 已实际记录 `command.end`，完整 JSONL 可读取，未再观察到该 PID 的 bound-stream 报错。旧 PID 7490 的运行不能用作 PiP 候选修复结果，因为没有真正进入 PiP。
+- 本轮未捕获图像。曾做一次正常播放和 Home 的日志检查，但首次检查时播放已暂停，未触发 PiP，因此未证明新原生尺寸锁定的不变量。后来播放恢复后 Home 的检查受上述旧日志器故障阻断，也不算通过。最终串行 writer 包已安装，实际 PiP 进入/返回的根 Surface 尺寸和人工视觉结果仍待核验，不提前宣告修复。该方案保持 PiP 内全尺寸 Flutter 画布，渲染成本可能高于缩小画布的实现。
+
+- 本轮人工三种操作已分析并冻结证据，见 [逐段时序和证据边界](../pip-20261006/manual-three-cases-analysis.md)。当前安装版已更新为 `async-file-full-trace`：保留全部 Dart 记录，异步写私有 JSONL，避免同步分段刷屏增加主线程延迟；mpv 和原生窗口采集保留。该修改通过静态检查、构建并成功覆盖安装，仍是诊断修正，不是已验收的 PiP 修复。
+
+- 最新人工反馈（10-06）：路径一、退出恢复的问题仍在，路径二再次回归。用户进一步明确现象是“左上角放大”。三项均未通过；此前“只剩黑闪”的描述已过时。
+- 用户后来明确要求停止截图和录屏，以人工观察为准；下文旧录屏只保留作历史证据。后续只收集状态、布局和 Surface 日志，不生成新截图。
+- 当前未提交架构为 `libmpv → SurfaceProducer → Flutter Texture`，已移除视频 PlatformView 注册和使用。它仍经 Flutter 合成，不是完整的原生视频界面。不能据此断言 Flutter 引擎已被证实有缺陷。
+- 10-03 诊断日志显示 `active` 回调在 Activity 仍为 `1080×2400` 时到达，随后才变成 `598×336`。一个中间版本在此期间把 Flutter 视频布局从 `411×231` 改成 `411×914`，再改成 `228×128`。这是已确认的额外布局过程，是否直接导致黑帧仍是待验证假设。
+- 已撤回上一轮新增的 `entering` 时提前切换及边距清零，保留按长、短边判断返回尺寸的逻辑。回归前代码另存 `../pip-20261006/regressed-pip-viewport.dart` 和 `regressed-pip-viewport-test.dart`，便于后续比较。
+- `test/pip_viewport_test.dart` 的 3 项测试通过。它们只证明简化组件的状态和布局行为，未覆盖真实详情页/播放器树，是此前验证的缺口，不能当作无闪烁的证据。
+- 新增详细诊断：原生 `PiliPlusPiPTrace` 逐 vsync 读取窗口、配置、insets、Flutter 根 view、SurfaceView 尺寸及 Surface 生命周期；Dart `PIP_TRACE` 记录实际 Flutter 帧、raster 时序、视频节点矩形、完整变换矩阵、Texture/controller/state 身份、挂载卸载、指令排队和回调。每次进入/退出相关回调后密集跟踪 8 秒，不主动请求绘制或捕获图像。完整 Flutter 异常保留原错误处理器并按编号分段，避免大诊断文本被 logcat 截断。
+- 应用户要求扩大日志密度：记录解码/渲染底层日志以及 playing、buffering、position、size、videoParams 和 error 原始事件；随播放器既有订阅一起释放。最初把全部 mpv trace 推到 Dart 队列产生了 20,608 次 overflow，不能用这份受采集干扰的日志判断转场原因。现已将 Dart 桥恢复为 warn，将完整 `all=trace` 写入 mpv 原生文件 `files/pip-diagnostics/mpv-<UTC微秒>.log`，保留底层细节同时避免消息队列被 trace 填满。此为诊断包，不是已验收修复包。当前日志及 APK 哈希索引：`../pip-20261006/current-build.json`。
+- 已实测 Android Dart 控制台约 1 KB 截断，旧的大几何记录失效。现按 700 字节阈值、120 字符分段，附序号、分段号和总段数；`tool/pip_trace.py` 重组原始记录并明确报告损坏与缺段。最新一次采集校验得到 3,838 条完整记录、226 条几何记录，损坏 0、缺段 0；结果保存在 `../pip-20261006/segmented-trace-extracted/summary.json`。这只证明采集完整，不证明画面正常。
+- 当前安装版为 `native-mpv-file-and-segmented-flutter-trace`。文本监听文件为 `../pip-20261006/20261006-203607-segmented-trace.log`；已取回的 mpv 原生文件为 `../pip-20261006/mpv-native/mpv-1791290225556640.log`，约 1.25 MB。传输验证使用了 1080×1920 竖视频，未执行新的 PiP 手势；不能冒充用户原先横视频的两条入口和退出验收。诊断日志可能影响时序，也不能承诺零开销。
+- 后续复查原生 mpv 文件：`10.910 s Resize: 1080x1920` 之前是 `pause=true`、`stop`、`playlist-clear`，之后是解码器卸载；尺寸未变。这一条不能当成 PiP 内部错误缩放。新完整日志当前只含启动和播放的传输验证，没有进入 PiP 的记录。
+- 为区分尺寸通知与布局提交，再增加 `player.metrics`：直接读取 FlutterView 的物理尺寸、DPR、各项 insets，并同时保留尚未更新的 MediaQuery 尺寸。几何样本亦包含真实 engine view 数据。新增 `layout.ancestorChain` 在祖先链变化时记录最多 40 层 RenderObject 身份、约束、尺寸、parentData、paintBounds 和到根的矩阵，覆盖视频到滚动页、根布局；相同链不重复发送。这些信息用于辨别是谁修改了视频的坐标或约束，不预先认定引擎、播放器或页面哪一层有错。
+- 上述补充已通过 `flutter analyze --no-pub lib/plugin/pl_player/view/view.dart`，x86_64 Debug APK 构建成功并覆盖安装，应用进程 6516 启动、原文本监听进程 25956 继续收到该进程的新记录。最新安装版名为 `engine-metrics-and-render-ancestor-trace`，以 `current-build.json` 为准。未再执行 PiP 复测、截图或录屏；原问题仍未验收。
+- 完整诊断包安装记录：通用 APK 更新曾报 `INSTALL_FAILED_INSUFFICIENT_STORAGE`。已构建并成功安装 `build/app/outputs/flutter-apk/app-x86_64-debug.apk`（85,348,256 字节）；模拟器同一 AVD 已恢复前台，原数据保留。日志 `../pip-20261006/20261006-202612-full-trace.log` 已实际写入约 2.28 MB，原生 trace 序号达到 1675，监听 PID 5308 在核验时存活。安装和日志写入已验证，PiP 修复仍未验证。
+- 本次人工日志保存到 `../pip-20261006/regressed-three-cases.log`。它显示一次 Texture/Surface 创建，此后多次 PiP 进入/退出没有视频 Surface 重建，同时出现 RenderFlex 溢出。溢出和裁切的因果关系未被证明。
+- 实际运行时渲染树已通过 Dart VM 文本接口保存到 `../pip-20261006/render-tree-pip.txt`：已落定的根和播放器约为 `227.8×128`；Texture 的局部原始尺寸 `731.4×411.4` 位于 `FittedBox(contain)` 内。这种原始尺寸本身不等于异常，必须和完整变换、原生实际提交帧对齐；一个已落定的树不能证明转场中间帧。
+- 最终验收仍须分别确认路径一、路径二、退出恢复、首次播放和切换视频；编译、安装、状态日志都不代替视觉结果。
+
 - 记录日期：2026-10-02
 - 分支：`pip`
 - 应用：`com.personal.piliplus`

@@ -51,6 +51,12 @@ class PipCoordinator(
     private var sourceRect: Rect? = null
     private var entrySourceRect: Rect? = null
     private var destroyed = false
+    private var renderHost: PipRenderHost? = null
+    private val diagnostics = PipDiagnostics(activity) { stateMap() + mapOf(
+        "sourceRect" to sourceRect?.toString(), "entryRect" to entrySourceRect?.toString(),
+        "ratio" to "$aspectWidth:$aspectHeight", "playing" to isPlaying,
+        "autoEnter" to autoEnterRequested,
+    ) }
     private val rootLayoutListener = View.OnLayoutChangeListener { view, left, top, right, bottom,
                                                                   oldLeft, oldTop, oldRight, oldBottom ->
         val bounds = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -65,6 +71,8 @@ class PipCoordinator(
                 "view=${view.width}x${view.height} metrics=${bounds.width()}x${bounds.height()} " +
                 "phase=${phase.name.lowercase()} inPip=${activity.isInPictureInPictureMode}",
         )
+        diagnostics.event("root.layout", mapOf("new" to "$left,$top,$right,$bottom", "old" to "$oldLeft,$oldTop,$oldRight,$oldBottom"))
+        diagnostics.snapshot("root.layout", true)
     }
 
     init {
@@ -73,7 +81,31 @@ class PipCoordinator(
         Log.i(TAG, "created api=${Build.VERSION.SDK_INT}")
     }
 
+    fun installRenderHost() {
+        if (renderHost != null) return
+        fun find(view: View): io.flutter.embedding.android.FlutterView? {
+            if (view is io.flutter.embedding.android.FlutterView) return view
+            if (view is android.view.ViewGroup) for (index in 0 until view.childCount) {
+                find(view.getChildAt(index))?.let { return it }
+            }
+            return null
+        }
+        val flutter = find(activity.window.decorView) ?: return
+        val parent = flutter.parent as? android.view.ViewGroup ?: return
+        val index = parent.indexOfChild(flutter)
+        val params = flutter.layoutParams
+        parent.removeView(flutter)
+        val host = PipRenderHost(activity, flutter,
+            { name, data -> diagnostics.event("renderHost.$name", data) },
+            { channel.invokeMethod("stateChanged", stateMap("render-host-restored")) },
+        )
+        renderHost = host
+        parent.addView(host, index, params)
+        diagnostics.event("renderHost.installed")
+    }
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        diagnostics.event("channel.receive", mapOf("method" to call.method, "arguments" to call.arguments.toString()))
         if (destroyed) {
             result.error("PIP_DESTROYED", "PiP coordinator is no longer attached", null)
             return
@@ -93,7 +125,7 @@ class PipCoordinator(
             "setSourceRect" -> {
                 // Layout callbacks from the shrinking window must not replace
                 // the rectangle Android uses to crop the entry animation.
-                if (phase == Phase.IDLE) {
+                if (phase == Phase.IDLE && renderHost?.locked != true) {
                     sourceRect = parseRect(call.arguments)
                     entrySourceRect = sourceRect?.let(::Rect)
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) applyParams()
@@ -137,8 +169,10 @@ class PipCoordinator(
         isLive = args?.bool("isLive") ?: false
         isPlaying = args?.bool("isPlaying") ?: false
         autoEnterRequested = args?.bool("autoEnter") ?: false
-        parseRect(args?.get("sourceRect"))?.let { sourceRect = it }
-        if (phase == Phase.IDLE) entrySourceRect = sourceRect?.let(::Rect)
+        if (phase == Phase.IDLE && renderHost?.locked != true) {
+            parseRect(args?.get("sourceRect"))?.let { sourceRect = it }
+            entrySourceRect = sourceRect?.let(::Rect)
+        }
         applyParams()
         Log.d(
             TAG,
@@ -176,6 +210,7 @@ class PipCoordinator(
     }
 
     private fun applyParams() {
+        diagnostics.event("params.apply")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         try {
             activity.setPictureInPictureParams(buildParams(autoEnterRequested && isPlaying))
@@ -226,6 +261,7 @@ class PipCoordinator(
     }
 
     fun onUserLeaveHint() {
+        diagnostics.arm("userLeaveHint")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
             !autoEnterRequested ||
             !isPlaying ||
@@ -248,6 +284,7 @@ class PipCoordinator(
     }
 
     fun onResume() {
+        diagnostics.arm("resume")
         setAutoEnterPending(false, "resume")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             phase == Phase.ENTERING &&
@@ -261,6 +298,8 @@ class PipCoordinator(
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {
+        diagnostics.arm("modeChanged:$isInPictureInPictureMode")
+        diagnostics.event("mode.callback", mapOf("active" to isInPictureInPictureMode, "config" to newConfig.toString()))
         if (isInPictureInPictureMode) {
             setAutoEnterPending(false, "mode-active")
             setPhase(Phase.ACTIVE, "mode-changed")
@@ -276,6 +315,8 @@ class PipCoordinator(
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)
     fun onPictureInPictureUiStateChanged(state: android.app.PictureInPictureUiState) {
+        diagnostics.arm("uiStateChanged")
+        diagnostics.event("ui.callback", mapOf("state" to state.toString(), "transitioning" to state.isTransitioningToPip))
         // Ui-state callbacks can arrive late or out of order around the
         // WindowManager resize. Once mode-changed has reported ACTIVE, a late
         // transition callback must not send Dart back through ENTERING and
@@ -288,7 +329,13 @@ class PipCoordinator(
     }
 
     private fun setPhase(next: Phase, reason: String) {
+        diagnostics.event("phase.request", mapOf("next" to next.name, "reason" to reason))
         if (phase == next && reason != "ui-transition") return
+        if (next != Phase.IDLE) {
+            renderHost?.enter(entrySourceRect ?: sourceRect)
+        } else {
+            renderHost?.exit()
+        }
         phase = next
         generation += 1
         val bounds = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -318,6 +365,7 @@ class PipCoordinator(
         "reason" to reason,
         "isInPip" to (phase == Phase.ACTIVE),
         "autoEnterPending" to autoEnterPending,
+        "renderHostLocked" to (renderHost?.locked ?: false),
     )
 
     private fun parseRect(value: Any?): Rect? {
@@ -343,10 +391,16 @@ class PipCoordinator(
     private fun Map<*, *>.bool(key: String): Boolean? = get(key) as? Boolean
 
     fun destroy() {
+        diagnostics.dispose()
         if (destroyed) return
         destroyed = true
         activity.window.decorView.removeOnLayoutChangeListener(rootLayoutListener)
         channel.setMethodCallHandler(null)
         Log.i(TAG, "destroyed")
+    }
+
+    fun traceLifecycle(name: String, config: Configuration? = null) {
+        diagnostics.arm(name)
+        diagnostics.event("activity.$name", mapOf("configuration" to config.toString()))
     }
 }

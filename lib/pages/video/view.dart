@@ -49,6 +49,7 @@ import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/pl_player/view/view.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/services/shutdown_timer_service.dart'
     show shutdownTimerService;
@@ -534,9 +535,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     return Obx(
       () {
         final isFullScreen = this.isFullScreen;
+        final pipWindow = PipWindowScope.of(context);
         return Scaffold(
           resizeToAvoidBottomInset: false,
-          appBar: removeAppBar(isFullScreen)
+          appBar: pipWindow || removeAppBar(isFullScreen)
               ? null
               : PreferredSize(
                   preferredSize: const Size.fromHeight(0),
@@ -575,7 +577,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
             controller: videoDetailController.scrollCtr,
             onlyOneScrollInBody: true,
             pinnedHeaderSliverHeightBuilder: () {
-              double pinnedHeight = this.isFullScreen || !isPortrait
+              double pinnedHeight = pipWindow
+                  ? maxHeight
+                  : this.isFullScreen || !isPortrait
                   ? maxHeight - (isWindowMode && !isPortrait ? 0 : padding.top)
                   : videoDetailController.isExpanding ||
                         videoDetailController.isCollapsing
@@ -601,7 +605,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
               return pinnedHeight;
             },
             headerSliverBuilder: (context, innerBoxIsScrolled) {
-              final height = isFullScreen || !isPortrait
+              final height = pipWindow
+                  ? maxHeight
+                  : isFullScreen || !isPortrait
                   ? maxHeight - (isWindowMode && !isPortrait ? 0 : padding.top)
                   : videoDetailController.isExpanding ||
                         videoDetailController.isCollapsing
@@ -616,10 +622,10 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                     children: [
                       SizedBox(
                         width: maxWidth,
-                        height: height,
+                        height: pipWindow ? maxHeight : height,
                         child: videoPlayer(
                           width: maxWidth,
-                          height: height,
+                          height: pipWindow ? maxHeight : height,
                         ),
                       ),
                       Obx(
@@ -737,7 +743,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                               ),
                             ),
                           );
-                          return videoDetailController.scrollRatio.value == 0 ||
+                          return pipWindow ||
+                                  videoDetailController.scrollRatio.value ==
+                                      0 ||
                                   videoDetailController.scrollCtr.offset == 0 ||
                                   !isPortrait
                               ? const SizedBox.shrink()
@@ -1558,6 +1566,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
   Widget videoPlayer({required double width, required double height}) {
     final isFullScreen = this.isFullScreen;
+    final pipWindow = PipWindowScope.of(context);
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -1566,7 +1575,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         plPlayer(width: width, height: height),
 
         Obx(() {
-          if (!videoDetailController.autoPlay) {
+          if (!pipWindow && !videoDetailController.autoPlay) {
             return Positioned.fill(
               bottom: -1,
               child: GestureDetector(
@@ -1592,8 +1601,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         }),
         manualPlayerWidget,
 
-        if (videoDetailController.plPlayerController.enableBlock ||
-            videoDetailController.continuePlayingPart)
+        if (!pipWindow &&
+            (videoDetailController.plPlayerController.enableBlock ||
+                videoDetailController.continuePlayingPart))
           Positioned(
             left: 16,
             bottom: isFullScreen ? max(75, maxHeight * 0.25) : 75,

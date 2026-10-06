@@ -82,13 +82,10 @@ class AndroidVideoController extends PlatformVideoController {
 
         if (_current != current) {
           _current = current;
-          // A new media item starts a new output-size epoch.  During one
-          // item mpv can briefly report a smaller transitional decoder size
-          // (for example 960x540) between two reports of the final size
-          // (1920x1080).  Clear the guard here so an actual source switch to
-          // a smaller video is still allowed, while transient shrink events
-          // in the same item cannot resize the native surface underneath a
-          // PiP window.
+          // Start a fresh geometry epoch for the new media item.  mpv may
+          // report a small RGBA decoder surface before the final hardware
+          // output; that transitional report must never become the Flutter
+          // rect or the native buffer size.
           _surfaceSizePublished = false;
           // The native platform view owns one SurfaceView for this player.
           // Reusing it across media items and PiP avoids a second output
@@ -122,7 +119,8 @@ class AndroidVideoController extends PlatformVideoController {
       });
     });
     player.onUnloadHooks.add(() {
-      return _lock.synchronizedSync(() {
+      return _lock.synchronized(() async {
+        _surfaceSizePublished = false;
         // Release any references to current android.view.Surface.
         //
         // It is important to set --vo=null here for 2 reasons:
@@ -132,6 +130,9 @@ class AndroidVideoController extends PlatformVideoController {
           // ----------------------------------------------
           player.setOption('vo', 'null');
           player.setOption('wid', '0');
+          await _channel.invokeMethod('VideoOutputManager.ResetSurfaceSize', {
+            'handle': player.handle.toString(),
+          });
           // ----------------------------------------------
         } catch (exception, stacktrace) {
           debugPrint(exception.toString());
@@ -142,6 +143,9 @@ class AndroidVideoController extends PlatformVideoController {
 
     _subscription = player.stream.videoParams.listen(
       (event) => _lock.synchronized(() async {
+        debugPrintSynchronously(
+          '[PLAYER_SURFACE] event=videoParams.raw handle=${player.handle} wid=$_wid published=$_surfaceSizePublished params=$event',
+        );
         if (const [0, null].contains(event.dw) ||
             const [0, null].contains(event.dh)) {
           return;
@@ -158,34 +162,57 @@ class AndroidVideoController extends PlatformVideoController {
           height = event.dw ?? 0;
         }
 
-        // Publish one fixed buffer geometry for each loaded media item. mpv
-        // can emit several decoder/intermediate sizes before settling; every
-        // native setFixedSize call creates a new BLAST SurfaceControl and can
-        // leave a stale frame visible during PiP entry/exit. The media-load
-        // hook resets this gate for a real source change.
-        if (_surfaceSizePublished) {
+        // mpv can publish a decoder/intermediate RGBA size before the final
+        // hardware output (for example 960x540 followed by 1920x1080
+        // yuv420p).  Do not expose that transient size to Flutter or to the
+        // native producer: changing either one after the first frame is what
+        // caused the startup scale flash and the stale-frame crop in PiP.
+        final pixelFormat = event.pixelformat;
+        if (pixelFormat == 'rgba') {
+          debugPrint(
+            '[PLAYER_SURFACE] event=videoParams.ignored '
+            'reason=transitionalRgba size=${width}x$height',
+          );
           return;
         }
-        _surfaceSizePublished = true;
 
-        // Keep one native SurfaceView and update only its fixed buffer size.
-        // The Activity can resize the view for PiP without replacing this
-        // output or applying a second Flutter transform.
+        // A real source change resets this gate above.  Within one media item
+        // keep the first non-RGBA geometry for both the producer and the
+        // Flutter rect; later decoder reports must not resize the visible
+        // widget while Android is entering or leaving PiP.
+        if (_surfaceSizePublished) {
+          debugPrintSynchronously(
+            '[PLAYER_SURFACE] event=videoParams.skipPublished size=${width}x$height format=$pixelFormat rect=${rect.value}',
+          );
+          return;
+        }
+        // Keep one engine texture and update only its final producer buffer
+        // size.  The Activity can resize the Flutter root for PiP without a
+        // second PlatformView/SurfaceView layout pass.
         try {
           if (vo == 'gpu') {
-            final surfaceData = await _channel.invokeMethod(
-              'VideoOutputManager.SetSurfaceSize', {
+            final surfaceData = await _channel
+                .invokeMethod('VideoOutputManager.SetSurfaceSize', {
                   'handle': player.handle.toString(),
                   'width': width.toString(),
                   'height': height.toString(),
-                },
-            );
+                });
 
+            var nativeSurfaceReady = false;
             if (surfaceData is Map) {
               final nativeWid = surfaceData['wid'];
               if (nativeWid is num && nativeWid != 0) {
                 _wid = nativeWid.toInt();
+                nativeSurfaceReady = true;
               }
+            }
+
+            if (!nativeSurfaceReady) {
+              debugPrint(
+                '[PLAYER_SURFACE] event=videoParams.retry '
+                'reason=nativeSurfaceUnavailable size=${width}x$height',
+              );
+              return;
             }
 
             // ----------------------------------------------
@@ -194,9 +221,11 @@ class AndroidVideoController extends PlatformVideoController {
               player.setOption('wid', _wid.toString());
               player.setOption('vo', 'gpu');
             }
+            _surfaceSizePublished = true;
           }
           // ----------------------------------------------
         } catch (exception, stacktrace) {
+          _surfaceSizePublished = false;
           debugPrint(exception.toString());
           debugPrint(stacktrace.toString());
         }
@@ -373,7 +402,13 @@ class AndroidVideoController extends PlatformVideoController {
     required Object? rect,
     required int retiredWid,
   }) async {
+    debugPrintSynchronously(
+      '[PLAYER_SURFACE] event=nativeSurface.queued handle=${player.handle} texture=$id wid=$wid retiredWid=$retiredWid rect=$rect',
+    );
     await _lock.synchronized(() async {
+      debugPrintSynchronously(
+        '[PLAYER_SURFACE] event=nativeSurface.begin handle=${player.handle} oldWid=$_wid newWid=$wid',
+      );
       this.id.value = id;
       _wid = wid == 0 ? null : wid;
       if (rect is Map) {
@@ -414,6 +449,9 @@ class AndroidVideoController extends PlatformVideoController {
         debugPrint(error.toString());
         debugPrint(stacktrace.toString());
       }
+      debugPrintSynchronously(
+        '[PLAYER_SURFACE] event=nativeSurface.end handle=${player.handle} wid=$_wid texture=${this.id.value} rect=${this.rect.value}',
+      );
     });
   }
 }

@@ -1,0 +1,30 @@
+unique_session_name: "piliplus_pip_frame_listener"
+buffers { size_kb: 32768 fill_policy: RING_BUFFER }
+duration_ms: 180000
+data_sources {
+  config {
+    name: "android.surfaceflinger.layers"
+    surfaceflinger_layers_config {
+      mode: MODE_ACTIVE
+      trace_flags: TRACE_FLAG_COMPOSITION
+      trace_flags: TRACE_FLAG_HWC
+      trace_flags: TRACE_FLAG_BUFFERS
+    }
+  }
+}
+data_sources { config { name: "android.surfaceflinger.frametimeline" } }
+data_sources { config { name: "com.android.wm.shell.transition" } }
+data_sources {
+  config {
+    name: "android.windowmanager"
+    windowmanager_config {
+      log_level: LOG_LEVEL_VERBOSE
+      log_frequency: LOG_FREQUENCY_FRAME
+    }
+  }
+}
+
+write_into_file: true
+flush_period_ms: 1000
+file_write_period_ms: 500
+max_file_size_bytes: 134217728

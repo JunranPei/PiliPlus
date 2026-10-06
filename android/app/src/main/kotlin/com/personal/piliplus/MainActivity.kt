@@ -17,6 +17,7 @@ class MainActivity : AudioServiceActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        pipCoordinator?.traceLifecycle("configurationChanged", newConfig)
         if (AndroidHelper.isFoldable) {
             AndroidHelper.ToDart.onConfigurationChanged?.run()
         }
@@ -24,6 +25,7 @@ class MainActivity : AudioServiceActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        pipCoordinator?.installRenderHost()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode =
                 LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
@@ -49,6 +51,21 @@ class MainActivity : AudioServiceActivity() {
     override fun onResume() {
         super.onResume()
         pipCoordinator?.onResume()
+    }
+
+    override fun onPause() {
+        pipCoordinator?.traceLifecycle("pause")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        pipCoordinator?.traceLifecycle("stop")
+        super.onStop()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        pipCoordinator?.traceLifecycle("focus:$hasFocus")
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration?) {

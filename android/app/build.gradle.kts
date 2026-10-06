@@ -90,3 +90,15 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.16.1") {
+        // These tests exercise View measurement/layout, not native raster.
+        exclude(group = "org.robolectric", module = "nativeruntime-dist-compat")
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2")
+}
