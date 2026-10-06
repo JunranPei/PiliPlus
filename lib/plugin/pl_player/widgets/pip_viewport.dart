@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/pip_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_frame_marker.dart';
 
 /// Marks the layout that is already inside Android's final PiP window.
 /// Pages use this scope to keep only the existing video surface mounted.
@@ -26,6 +27,57 @@ class PipWindowScope extends InheritedWidget {
       oldWidget.isPipWindow != isPipWindow;
 }
 
+/// Retains detail-panel state and its last normal constraints while PiP paints
+/// only the video. Offstage alone would still lay out wide rows at PiP width.
+class PipRetainedDetails extends StatefulWidget {
+  const PipRetainedDetails({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<PipRetainedDetails> createState() => _PipRetainedDetailsState();
+}
+
+class _PipRetainedDetailsState extends State<PipRetainedDetails> {
+  Size? _normalSize;
+  MediaQueryData? _normalMedia;
+
+  @override
+  Widget build(BuildContext context) {
+    final pip = PipWindowScope.of(context);
+    final media = MediaQuery.of(context);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (!pip && !constraints.biggest.isEmpty) {
+          _normalSize = Size(
+            constraints.hasBoundedWidth
+                ? constraints.maxWidth
+                : media.size.width,
+            constraints.hasBoundedHeight
+                ? constraints.maxHeight
+                : media.size.height,
+          );
+          _normalMedia = media;
+        }
+        final normal = _normalSize ?? media.size;
+        return Offstage(
+          offstage: pip,
+          child: OverflowBox(
+            alignment: Alignment.topLeft,
+            minWidth: pip ? normal.width : null,
+            maxWidth: pip ? normal.width : null,
+            minHeight: pip ? normal.height : null,
+            maxHeight: pip ? normal.height : null,
+            child: MediaQuery(
+              data: pip ? (_normalMedia ?? media) : media,
+              child: widget.child,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 /// Keeps the same page and media_kit Texture mounted while Android changes
 /// the Activity bounds. Flutter does not perform a second crop or transform;
 /// once the real PiP-sized constraints arrive, the page switches to its
@@ -45,6 +97,7 @@ class AndroidPipViewport extends StatelessWidget {
         phase: pip.phase,
         sourceRect: pip.sourceRect,
         nativeRootLocked: pip.renderHostLocked,
+        frameRequest: pip.frameRequest,
         child: child!,
       ),
       child: child,
@@ -61,12 +114,14 @@ class PipViewport extends StatefulWidget {
     required this.sourceRect,
     required this.child,
     this.nativeRootLocked = false,
+    this.frameRequest,
   });
 
   final AndroidPipPhase phase;
   final Rect? sourceRect;
   final Widget child;
   final bool nativeRootLocked;
+  final PipFrameRequest? frameRequest;
 
   @override
   State<PipViewport> createState() => _PipViewportState();
@@ -88,8 +143,11 @@ class _PipViewportState extends State<PipViewport> {
     final media = MediaQuery.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
+        final request = widget.frameRequest;
         final window = constraints.biggest;
-        if (widget.nativeRootLocked && _normalMedia != null) {
+        if (_normalMedia != null &&
+            ((widget.nativeRootLocked && request?.pip != true) ||
+                window.isEmpty)) {
           PipDiagnostics.event('viewport.nativeRootLocked', {
             'window': window.toString(),
             'media': _normalMedia!.size.toString(),
@@ -106,7 +164,11 @@ class _PipViewportState extends State<PipViewport> {
             ),
           );
         }
-        if (widget.phase == AndroidPipPhase.idle) _normalMedia = media;
+        if (widget.phase == AndroidPipPhase.idle &&
+            !widget.nativeRootLocked &&
+            request?.pip != true) {
+          _normalMedia = media;
+        }
         final normal = _normalWindow;
         final hasPipBounds =
             normal != null && _hasReducedBounds(window, normal);
@@ -135,8 +197,9 @@ class _PipViewportState extends State<PipViewport> {
         // are still full-screen; that intermediate rebuild can expose a black
         // frame before SystemUI has committed the small window.
         final isPipWindow =
-            (widget.phase == AndroidPipPhase.active && hasPipBounds) ||
-            (widget.phase == AndroidPipPhase.idle && _holdPipLayout);
+            request?.pip ??
+            ((widget.phase == AndroidPipPhase.active && hasPipBounds) ||
+                (widget.phase == AndroidPipPhase.idle && _holdPipLayout));
 
         // The Activity can update its constraints before the root
         // MediaQuery notification arrives. Propagate the actual bounds to

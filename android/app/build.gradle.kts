@@ -11,6 +11,12 @@ android {
     namespace = "com.personal.piliplus"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

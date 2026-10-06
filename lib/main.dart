@@ -2,6 +2,7 @@ import 'dart:async' show unawaited;
 import 'dart:io';
 
 import 'package:PiliPlus/build_config.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_frame_root.dart';
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/back_detector.dart';
 import 'package:PiliPlus/common/widgets/custom_toast.dart';
@@ -306,6 +307,15 @@ class MyApp extends StatelessWidget {
   }
 
   static Widget _builder(BuildContext context, Widget? child) {
+    if (Platform.isAndroid) {
+      return PipFrameRoot(
+        child: Builder(builder: (context) => _contentBuilder(context, child)),
+      );
+    }
+    return _contentBuilder(context, child);
+  }
+
+  static Widget _contentBuilder(BuildContext context, Widget? child) {
     final uiScale = Pref.uiScale;
     final mediaQuery = MediaQuery.of(context);
     final textScaler = TextScaler.linear(Pref.defaultTextScale);

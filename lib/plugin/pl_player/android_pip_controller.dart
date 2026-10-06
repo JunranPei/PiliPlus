@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:PiliPlus/plugin/pl_player/pip_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_frame_marker.dart';
 
 enum AndroidPipPhase { idle, entering, active }
 
@@ -29,6 +30,8 @@ final class AndroidPipController extends ChangeNotifier {
   String? _lastReason;
   bool _autoEnterPending = false;
   bool _renderHostLocked = false;
+  PipFrameRequest? _frameRequest;
+  PipFrameRequest? get frameRequest => _frameRequest;
   Future<void> _lastCommand = Future<void>.value();
   Rect? _sourceRect;
 
@@ -77,11 +80,15 @@ final class AndroidPipController extends ChangeNotifier {
     final reason = state['reason'] as String?;
     final autoEnterPending = state['autoEnterPending'] as bool? ?? false;
     final renderHostLocked = state['renderHostLocked'] as bool? ?? false;
+    final frameRequest = state['frameRequest'] is Map
+        ? PipFrameRequest.fromMap(state['frameRequest'] as Map)
+        : null;
     if (next == _phase &&
         generation == _generation &&
         reason == _lastReason &&
         autoEnterPending == _autoEnterPending &&
-        renderHostLocked == _renderHostLocked) {
+        renderHostLocked == _renderHostLocked &&
+        frameRequest?.epoch == _frameRequest?.epoch) {
       return;
     }
     _phase = next;
@@ -89,6 +96,7 @@ final class AndroidPipController extends ChangeNotifier {
     _lastReason = reason;
     _autoEnterPending = autoEnterPending;
     _renderHostLocked = renderHostLocked;
+    _frameRequest = frameRequest;
     debugPrint(
       '[PIP_V2] phase=${_phase.name} generation=$_generation reason=$reason',
     );
@@ -119,13 +127,16 @@ final class AndroidPipController extends ChangeNotifier {
     });
     // A failed command still reports its error to its own caller. Do not let
     // that error permanently poison the queue for all later PiP commands.
-    _lastCommand = command.then<void>((_) {}, onError: (Object error, StackTrace stack) {
-      PipDiagnostics.event('command.failure', {
-        'method': method,
-        'error': error.toString(),
-        'stack': stack.toString(),
-      });
-    });
+    _lastCommand = command.then<void>(
+      (_) {},
+      onError: (Object error, StackTrace stack) {
+        PipDiagnostics.event('command.failure', {
+          'method': method,
+          'error': error.toString(),
+          'stack': stack.toString(),
+        });
+      },
+    );
     return command;
   }
 
