@@ -16,15 +16,34 @@ class PipFrameRoot extends StatelessWidget {
     return ListenableBuilder(
       listenable: pip,
       child: child,
-      builder: (context, child) =>
-          _layout(context, request ?? pip.frameRequest, child!),
+      builder: (context, child) => LayoutBuilder(
+        builder: (context, constraints) =>
+            _layout(context, request ?? pip.frameRequest, child!, constraints),
+      ),
     );
   }
 
-  Widget _layout(BuildContext context, PipFrameRequest? target, Widget child) {
+  Widget _layout(
+    BuildContext context,
+    PipFrameRequest? target,
+    Widget child,
+    BoxConstraints constraints,
+  ) {
     final media = MediaQuery.of(context);
     final pixel = 1 / media.devicePixelRatio;
     final reserve = target == null ? 0.0 : pixel;
+    // A matching native buffer does not prove that Flutter laid out a matching
+    // scene. Window insets can temporarily restore full-window engine metrics.
+    // Emit no valid acknowledgement for such a scene, even at the same epoch.
+    final valid =
+        target != null &&
+        (media.size.width * media.devicePixelRatio).round() == target.width &&
+        (media.size.height * media.devicePixelRatio).round() ==
+            target.height + 1 &&
+        (constraints.maxWidth * media.devicePixelRatio).round() ==
+            target.width &&
+        (constraints.maxHeight * media.devicePixelRatio).round() ==
+            target.height + 1;
     final contentSize = Size(
       media.size.width,
       (media.size.height - reserve).clamp(0.0, double.infinity),
@@ -48,8 +67,16 @@ class PipFrameRoot extends StatelessWidget {
             right: 0,
             bottom: 0,
             height: pixel,
-            child: CustomPaint(
-              painter: PipFrameMarker(target.epoch, media.devicePixelRatio),
+            child: ColoredBox(
+              color: const Color(0xFF000000),
+              child: valid
+                  ? CustomPaint(
+                      painter: PipFrameMarker(
+                        target.epoch,
+                        media.devicePixelRatio,
+                      ),
+                    )
+                  : const SizedBox.expand(),
             ),
           ),
       ],

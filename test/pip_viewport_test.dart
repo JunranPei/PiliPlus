@@ -45,6 +45,52 @@ class _ProbeState extends State<_Probe> {
 }
 
 void main() {
+  testWidgets('root only acknowledges scenes with matching physical layout', (
+    tester,
+  ) async {
+    const target = PipFrameRequest(
+      epoch: 7,
+      width: 400,
+      height: 224,
+      pip: true,
+    );
+    await tester.binding.setSurfaceSize(const Size(800, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    Future<void> show(Size layout, Size media) => tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox.fromSize(
+            size: layout,
+            child: MediaQuery(
+              data: MediaQueryData(size: media, devicePixelRatio: 2),
+              child: const PipFrameRoot(
+                request: target,
+                child: SizedBox.expand(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    final marker = find.byWidgetPredicate(
+      (widget) => widget is CustomPaint && widget.painter is PipFrameMarker,
+    );
+    const small = Size(200, 112.5);
+    await show(small, small);
+    expect(marker, findsOneWidget);
+    // Buffer-sized constraints can coexist with wrong full-window MediaQuery.
+    await show(small, const Size(400, 900));
+    expect(marker, findsNothing);
+    // Conversely a correct MediaQuery cannot acknowledge a large root layout.
+    await show(const Size(400, 900), small);
+    expect(marker, findsNothing);
+    await show(small, small);
+    expect(marker, findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('hidden details keep normal bounds and state at PiP width', (
     tester,
   ) async {

@@ -78,7 +78,8 @@ class PipRenderHost(
         val expectedHeight = height
         // Require consecutive settled layout frames, rather than a fixed delay.
         postOnAnimation {
-            if (!active || exiting || width != expectedWidth || height != expectedHeight) return@postOnAnimation
+            if (!active || !locked || exiting || width != expectedWidth || height != expectedHeight ||
+                width >= normalWidth * .9 || height >= normalHeight * .9) return@postOnAnimation
             try {
                 if (handoff == null) {
                     fun surface(view: View): io.flutter.embedding.android.FlutterSurfaceView? {
@@ -229,8 +230,12 @@ class PipRenderHost(
         post {
             releaseIfRestored()
             if (Build.VERSION.SDK_INT >= 33 && handoff?.started == true) {
-                if (active && handoff?.hasFrame == true) handoff?.resize(width, height, true)
-                else if (active) handoff?.refreshMetrics()
+                if (active) {
+                    // Mode/insets callbacks can precede the window resize.
+                    // Never label a full-window scene as the small PiP scene.
+                    handoff?.refreshMetrics()
+                    prepareHandoff()
+                }
                 else if (!locked) handoff?.resize(width, height, false)
             }
         }

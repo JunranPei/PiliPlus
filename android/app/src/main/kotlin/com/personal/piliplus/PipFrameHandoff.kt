@@ -20,7 +20,7 @@ import java.util.concurrent.Executors
 
 /** Continuously fits each actual buffer through one producer/consumer queue.
  * A one-physical-pixel metadata row is outside the displayed crop. It is read
- * only during handoff, never saved, and is absent from the visible picture.
+ * on every frame, never saved, and is absent from the visible picture.
  * The compositor receives the original HardwareBuffer, without a bitmap copy.
  */
 @RequiresApi(33)
@@ -55,6 +55,12 @@ class PipFrameHandoff(
 
     fun resize(width: Int, height: Int, pip: Boolean) {
         if (disposed || width < 9 || height <= 0) return
+        if (pip && sourceCrop() == null) {
+            report("deferredSmall", mapOf("width" to width, "height" to height,
+                "reason" to "window-not-reduced", "epoch" to request?.epoch))
+            refreshMetrics()
+            return
+        }
         snapshotGeometry()
         val previous = request
         if (previous?.width == width && previous.height == height && previous.pip == pip) {
@@ -68,10 +74,12 @@ class PipFrameHandoff(
                 .setBufferSize(width, height + 1).setFormat(PixelFormat.RGBA_8888).build()
             val attach = root.buildReparentTransaction(candidate)
             if (attach == null) { candidate.release(); return }
-            // Under the Android window canvas, above the original SurfaceView.
-            // Keep SurfaceView's hole punched so native platform views remain
-            // able to draw above Flutter instead of being covered by this layer.
-            attach.setLayer(candidate, -1)
+            // Own the visible output above the window canvas. A paused
+            // SurfaceView must not provide a transparent hole for this layer:
+            // window movement can redraw the canvas independently of buffers.
+            // All Flutter content, including its texture video, is in this
+            // buffer; native platform-view overlays need separate integration.
+            attach.setLayer(candidate, 1)
             attach.addTransactionCommittedListener(host.context.mainExecutor) { attached = true }
             if (!root.applyTransactionOnDraw(attach)) { candidate.release(); attach.close(); return }
             layer = candidate
@@ -122,12 +130,9 @@ class PipFrameHandoff(
             val startedNs = System.nanoTime()
             val width = image.width
             val height = image.height
-            val previous = gate.lastAccepted
-            val pending = gate.current
-            val sameAcceptedShape = previous?.width == width && previous.bufferHeight == height
-            val samePendingShape = pending?.width == width && pending.bufferHeight == height
-            val needsMarker = !sameAcceptedShape || (samePendingShape && pending?.epoch != previous?.epoch)
-            val marker = if (needsMarker) readMarker(image) else null
+            // The producer can retain small buffers while Flutter receives
+            // full-window viewport metrics. Shape alone cannot verify content.
+            val marker = readMarker(image)
             val readUs = (System.nanoTime() - startedNs) / 1000
             consume(source, image, marker, width, height, readUs)
         } catch (error: Exception) {
@@ -178,10 +183,16 @@ class PipFrameHandoff(
             transaction.close()
             fence.close()
             hardware.close()
+            val timestamp = image.timestamp
+            val geometry = frameGeometry
+            main.post { if (!disposed) report("presented", target.state() + mapOf(
+                "timestampNs" to timestamp, "marker" to marker,
+                "bufferWidth" to width, "bufferHeight" to height, "readUs" to readUs,
+                "hostWidth" to geometry?.width, "hostHeight" to geometry?.height,
+                "layerZ" to 1)) }
             if (first) {
                 // The buffer and its crop/scale become visible in the SAME
                 // compositor transaction. View alpha is only a follow-up guard.
-                val timestamp = image.timestamp
                 main.post {
                     if (!disposed) {
                         original.alpha = 1f

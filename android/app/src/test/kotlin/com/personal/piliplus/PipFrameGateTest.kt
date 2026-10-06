@@ -9,7 +9,7 @@ class PipFrameGateTest {
         val full = gate.request(1080, 2400, false)
         assertEquals(full, gate.resolve(1080, 2401, full.epoch))
         val small = gate.request(598, 336, true)
-        assertEquals(full, gate.resolve(1080, 2401, null))
+        assertEquals(full, gate.resolve(1080, 2401, full.epoch))
         assertNull(gate.resolve(598, 337, full.epoch))
         assertEquals(small, gate.resolve(598, 337, small.epoch))
         assertNull(gate.resolve(1080, 2401, full.epoch))
@@ -36,7 +36,10 @@ class PipFrameGateTest {
         assertFalse(gate.accepts(request.epoch, 598, 337, request.epoch + 1))
         assertFalse(gate.accepted)
         assertTrue(gate.accepts(request.epoch, 598, 337, request.epoch))
-        assertTrue(gate.accepts(request.epoch, 598, 337, null))
+        assertFalse(gate.accepts(request.epoch, 598, 337, null))
+        assertNull(gate.resolve(598, 337, null))
+        assertNull(gate.resolve(598, 337, request.epoch + 1))
+        assertEquals(request, gate.resolve(598, 337, request.epoch))
     }
 
     @Test fun resizingAndReturningInvalidateQueuedOldFrames() {

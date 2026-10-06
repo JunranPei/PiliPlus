@@ -43,7 +43,7 @@ class PipFrameGate {
     @Synchronized fun accepts(epoch: Int, width: Int, height: Int, marker: Int?): Boolean {
         val target = current ?: return false
         if (target.epoch != epoch || target.width != width || target.bufferHeight != height) return false
-        if (!accepted && marker != epoch) return false
+        if (marker != epoch) return false
         accepted = true
         lastAccepted = target
         return true
@@ -52,7 +52,7 @@ class PipFrameGate {
     @Synchronized fun resolve(width: Int, height: Int, marker: Int?): Request? {
         val previous = lastAccepted
         if (previous != null && previous.width == width && previous.bufferHeight == height &&
-            (marker == null || marker == previous.epoch)) return previous
+            marker == previous.epoch) return previous
         val target = current ?: return null
         return if (accepts(target.epoch, width, height, marker)) target else null
     }
