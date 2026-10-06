@@ -1,6 +1,6 @@
 import 'dart:async' show StreamSubscription, Timer, unawaited;
 import 'dart:convert' show ascii;
-import 'dart:io' show Platform, Directory;
+import 'dart:io' show Platform;
 import 'dart:math' show max, min;
 import 'dart:ui' as ui;
 
@@ -21,7 +21,6 @@ import 'package:PiliPlus/pages/setting/models/play_settings.dart'
     show kMaxVolume;
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
-import 'package:PiliPlus/plugin/pl_player/pip_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -832,22 +831,9 @@ class PlPlayerController with BlockConfigMixin {
     if (autosync != '0') {
       opt['autosync'] = autosync;
     }
-    if (PipDiagnostics.enabled) {
-      final directory = Directory(path.join(appSupportDirPath, 'pip-diagnostics'));
-      await directory.create(recursive: true);
-      await PipDiagnostics.openFile(directory);
-      final logFile = path.join(directory.path,
-          'mpv-${DateTime.now().toUtc().microsecondsSinceEpoch}.log');
-      opt['log-file'] = logFile;
-      opt['msg-level'] = 'all=trace';
-      PipDiagnostics.event('mpv.file', {'path': logFile, 'level': 'trace'});
-    }
 
     final player = await Player.create(
       configuration: PlayerConfiguration(
-        // Keep the high-volume trace in mpv's own file sink. Sending all of it
-        // through the Dart event queue overflows mpv's message buffer and can
-        // distort the transition being measured.
         logLevel: kDebugMode ? .warn : .error,
         options: opt,
       ),
@@ -859,11 +845,7 @@ class PlPlayerController with BlockConfigMixin {
       player,
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
-        // Wait for the decoder's video parameters before attaching the
-        // Android Texture surface.  Attaching the default 1x1 surface first
-        // races PiP's window resize and can leave one frame scaled from the
-        // top-left corner.  This is also the media_kit default path.
-        androidAttachSurfaceAfterVideoParameters: true,
+        androidAttachSurfaceAfterVideoParameters: false,
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
@@ -1015,18 +997,6 @@ class PlPlayerController with BlockConfigMixin {
     assert(_subscriptions == null);
     final stream = player.stream;
     _subscriptions = [
-      if (PipDiagnostics.enabled) ...[
-        stream.log.listen((event) => PipDiagnostics.event('mpv.log', {
-          'handle': player.handle, 'prefix': event.prefix,
-          'level': event.level, 'text': event.text,
-        })),
-        stream.playing.listen((event) => PipDiagnostics.event('mpv.playing', {'handle': player.handle, 'playing': event})),
-        stream.buffering.listen((event) => PipDiagnostics.event('mpv.buffering', {'handle': player.handle, 'buffering': event})),
-        stream.position.listen((event) => PipDiagnostics.event('mpv.position', {'handle': player.handle, 'positionUs': event.inMicroseconds})),
-        stream.size.listen((event) => PipDiagnostics.event('mpv.size', {'handle': player.handle, 'size': event.toString()})),
-        stream.videoParams.listen((event) => PipDiagnostics.event('mpv.videoParams', {'handle': player.handle, 'params': event.toString()})),
-        stream.error.listen((event) => PipDiagnostics.event('mpv.error', {'handle': player.handle, 'error': event})),
-      ],
       stream.playing.listen((event) {
         WakelockPlus.toggle(enable: event);
         if (event) {

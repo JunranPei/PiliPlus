@@ -97,11 +97,10 @@ class PipCoordinator(
         parent.removeView(flutter)
         val host = PipRenderHost(activity, flutter,
             { name, data -> diagnostics.event("renderHost.$name", data) },
-            { channel.invokeMethod("stateChanged", stateMap("render-host-changed")) },
+            { channel.invokeMethod("stateChanged", stateMap("render-host-restored")) },
         )
         renderHost = host
         parent.addView(host, index, params)
-        host.warmUpWhenReady()
         diagnostics.event("renderHost.installed")
     }
 
@@ -338,7 +337,6 @@ class PipCoordinator(
             renderHost?.exit()
         }
         phase = next
-        renderHost?.active(next == Phase.ACTIVE)
         generation += 1
         val bounds = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             activity.windowManager.currentWindowMetrics.bounds
@@ -368,7 +366,6 @@ class PipCoordinator(
         "isInPip" to (phase == Phase.ACTIVE),
         "autoEnterPending" to autoEnterPending,
         "renderHostLocked" to (renderHost?.locked ?: false),
-        "frameRequest" to renderHost?.frameRequest,
     )
 
     private fun parseRect(value: Any?): Rect? {
@@ -397,7 +394,6 @@ class PipCoordinator(
         diagnostics.dispose()
         if (destroyed) return
         destroyed = true
-        renderHost?.dispose()
         activity.window.decorView.removeOnLayoutChangeListener(rootLayoutListener)
         channel.setMethodCallHandler(null)
         Log.i(TAG, "destroyed")

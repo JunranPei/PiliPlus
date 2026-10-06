@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/pip_frame_marker.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/pip_frame_root.dart';
 
 class _Probe extends StatefulWidget {
   const _Probe({required this.videoKey});
@@ -45,258 +43,42 @@ class _ProbeState extends State<_Probe> {
 }
 
 void main() {
-  testWidgets('root only acknowledges scenes with matching physical layout', (
-    tester,
-  ) async {
-    const target = PipFrameRequest(
-      epoch: 7,
-      width: 400,
-      height: 224,
-      pip: true,
-    );
-    await tester.binding.setSurfaceSize(const Size(800, 900));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    Future<void> show(Size layout, Size media) => tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox.fromSize(
-            size: layout,
-            child: MediaQuery(
-              data: MediaQueryData(size: media, devicePixelRatio: 2),
-              child: const PipFrameRoot(
-                request: target,
-                child: SizedBox.expand(),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    final marker = find.byWidgetPredicate(
-      (widget) => widget is CustomPaint && widget.painter is PipFrameMarker,
-    );
-    const small = Size(200, 112.5);
-    await show(small, small);
-    expect(marker, findsOneWidget);
-    // Buffer-sized constraints can coexist with wrong full-window MediaQuery.
-    await show(small, const Size(400, 900));
-    expect(marker, findsNothing);
-    // Conversely a correct MediaQuery cannot acknowledge a large root layout.
-    await show(const Size(400, 900), small);
-    expect(marker, findsNothing);
-    await show(small, small);
-    expect(marker, findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('hidden details keep normal bounds and state at PiP width', (
-    tester,
-  ) async {
-    const full = Size(400, 700);
-    await tester.binding.setSurfaceSize(full);
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    Future<void> show(bool pip) => tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox.fromSize(
-            size: pip ? const Size(200, 100) : full,
-            child: MediaQuery(
-              data: MediaQueryData(size: pip ? const Size(200, 100) : full),
-              child: PipWindowScope(
-                isPipWindow: pip,
-                child: const PipRetainedDetails(
-                  child: _Probe(videoKey: ValueKey('details')),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-    await show(false);
-    final state = tester.state<_ProbeState>(find.byType(_Probe));
-    await show(true);
-    expect(state.layoutSize, full);
-    expect(state.mediaSize, full);
-    expect(tester.widget<Offstage>(find.byType(Offstage)).offstage, true);
-    await show(false);
-    expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
-    expect(state.disposeCount, 0);
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets(
-    'zero-sized retained route cannot corrupt its viewport during handoff',
-    (tester) async {
-      const full = Size(400, 900);
-      await tester.binding.setSurfaceSize(full);
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-      Future<void> show(Size route, PipFrameRequest? request) =>
-          tester.pumpWidget(
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: SizedBox.fromSize(
-                  size: route,
-                  child: MediaQuery(
-                    data: const MediaQueryData(size: full, devicePixelRatio: 2),
-                    child: PipViewport(
-                      phase: request == null
-                          ? AndroidPipPhase.idle
-                          : AndroidPipPhase.active,
-                      nativeRootLocked: request != null,
-                      frameRequest: request,
-                      sourceRect: null,
-                      child: const _Probe(videoKey: ValueKey('retained-video')),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          );
-      await show(full, null);
-      final state = tester.state<_ProbeState>(find.byType(_Probe));
-      await show(
-        Size.zero,
-        const PipFrameRequest(epoch: 1, width: 800, height: 1800, pip: false),
-      );
-      expect(state.mediaSize, full);
-      expect(state.layoutSize, Size.zero);
-      await show(
-        Size.zero,
-        const PipFrameRequest(epoch: 2, width: 400, height: 224, pip: true),
-      );
-      expect(state.mediaSize, full);
-      expect(state.isPipWindow, false);
-      expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets(
-    'handoff excludes metadata row and retains the player across sizes',
-    (tester) async {
-      const full = Size(400, 900);
-      const videoKey = ValueKey('handoff-video');
-      await tester.binding.setSurfaceSize(full);
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-      Future<void> show(
-        Size size,
-        PipFrameRequest? request,
-        AndroidPipPhase phase,
-      ) => tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: Align(
-            alignment: Alignment.topLeft,
-            child: SizedBox.fromSize(
-              size: size,
-              child: MediaQuery(
-                data: MediaQueryData(size: size, devicePixelRatio: 2),
-                child: PipFrameRoot(
-                  request: request,
-                  child: PipViewport(
-                    phase: phase,
-                    nativeRootLocked: request != null,
-                    frameRequest: request,
-                    sourceRect: null,
-                    child: const _Probe(videoKey: videoKey),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-      await show(full, null, AndroidPipPhase.idle);
-      final state = tester.state<_ProbeState>(find.byType(_Probe));
-      await show(
-        const Size(200, 112.5),
-        const PipFrameRequest(epoch: 2, width: 400, height: 224, pip: true),
-        AndroidPipPhase.active,
-      );
-      expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
-      expect(state.layoutSize, const Size(200, 112));
-      expect(state.mediaSize, const Size(200, 112));
-      expect(state.isPipWindow, true);
-      // Native phase can already be idle while the accepted PiP frame is held.
-      await show(
-        const Size(200, 112.5),
-        const PipFrameRequest(epoch: 2, width: 400, height: 224, pip: true),
-        AndroidPipPhase.idle,
-      );
-      expect(state.isPipWindow, true);
-      await tester.binding.setSurfaceSize(const Size(400, 900.5));
-      await show(
-        const Size(400, 900.5),
-        const PipFrameRequest(epoch: 3, width: 800, height: 1800, pip: false),
-        AndroidPipPhase.idle,
-      );
-      expect(state.isPipWindow, false);
-      expect(state.layoutSize, full);
-      expect(state.mediaSize, full);
-      expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
-      expect(state.disposeCount, 0);
-      expect(tester.takeException(), isNull);
-    },
-  );
-
-  testWidgets('native root lock retains player state and original insets', (
-    tester,
-  ) async {
+  testWidgets('native root lock retains player state and original insets', (tester) async {
     const full = Size(400, 900);
     const videoKey = ValueKey('native-root-video');
     await tester.binding.setSurfaceSize(full);
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    Future<void> show(AndroidPipPhase phase, bool locked, double inset) =>
-        tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: MediaQuery(
-              data: MediaQueryData(
-                size: full,
-                devicePixelRatio: 2,
-                padding: EdgeInsets.only(top: inset),
-                viewPadding: EdgeInsets.only(top: inset),
-              ),
-              child: PipViewport(
-                phase: phase,
-                nativeRootLocked: locked,
-                sourceRect: const Rect.fromLTWH(0, 48, 800, 450),
-                child: const _Probe(videoKey: videoKey),
-              ),
-            ),
+    Future<void> show(AndroidPipPhase phase, bool locked, double inset) => tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: MediaQuery(
+          data: MediaQueryData(
+            size: full, devicePixelRatio: 2,
+            padding: EdgeInsets.only(top: inset),
+            viewPadding: EdgeInsets.only(top: inset),
           ),
-        );
+          child: PipViewport(
+            phase: phase, nativeRootLocked: locked,
+            sourceRect: const Rect.fromLTWH(0, 48, 800, 450),
+            child: const _Probe(videoKey: videoKey),
+          ),
+        ),
+      ),
+    );
     await show(AndroidPipPhase.idle, false, 24);
     final state = tester.state<_ProbeState>(find.byType(_Probe));
-    for (final phase in [
-      AndroidPipPhase.entering,
-      AndroidPipPhase.active,
-      AndroidPipPhase.idle,
-    ]) {
+    for (final phase in [AndroidPipPhase.entering, AndroidPipPhase.active, AndroidPipPhase.idle]) {
       await show(phase, true, 0);
       expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
       expect(state.disposeCount, 0);
       expect(state.layoutSize, full);
       expect(state.mediaData.padding.top, 24);
       expect(state.isPipWindow, false);
-      expect(
-        tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring,
-        true,
-      );
+      expect(tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring, true);
     }
     await show(AndroidPipPhase.idle, false, 24);
     expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
-    expect(
-      tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring,
-      false,
-    );
+    expect(tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring, false);
     expect(state.disposeCount, 0);
     expect(tester.takeException(), isNull);
   });

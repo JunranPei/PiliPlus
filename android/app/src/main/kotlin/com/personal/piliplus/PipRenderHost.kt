@@ -27,106 +27,6 @@ class PipRenderHost(
     private var normalBottomInset = 0
     private var normalBarsVisible = 0
     private var crop: Rect? = null
-    private var active = false
-    private var handoff: PipFrameHandoff? = null
-    private var heldSurface: io.flutter.embedding.android.FlutterSurfaceView? = null
-    val frameRequest: Map<String, Any>? get() =
-        if (Build.VERSION.SDK_INT >= 33) handoff?.request?.state() else null
-
-    fun warmUpWhenReady() {
-        if (Build.VERSION.SDK_INT < 33) return
-        fun find(view: View): io.flutter.embedding.android.FlutterSurfaceView? {
-            if (view is io.flutter.embedding.android.FlutterSurfaceView) return view
-            if (view is android.view.ViewGroup) for (index in 0 until view.childCount) {
-                find(view.getChildAt(index))?.let { return it }
-            }
-            return null
-        }
-        val original = find(flutter) ?: return
-        val renderer = original.attachedRenderer ?: return
-        fun warmUp() {
-            postOnAnimation {
-                if (!isAttachedToWindow || handoff != null || locked) return@postOnAnimation
-                try {
-                    heldSurface = original
-                    handoff = PipFrameHandoff(this, original, renderer,
-                        { name, data -> report("handoff.$name") { data } }, changed,
-                        { if (locked && width < normalWidth * .9 && height < normalHeight * .9) crop else null },
-                        { if (active) prepareHandoff() }, ::restoredVideoDestination)
-                    handoff?.resize(width, height, false)
-                } catch (error: Exception) {
-                    report("handoff.setupFailed") { mapOf("error" to error.toString()) }
-                }
-            }
-        }
-        if (renderer.isDisplayingFlutterUi) warmUp()
-        else renderer.addIsDisplayingFlutterUiListener(object : io.flutter.embedding.engine.renderer.FlutterUiDisplayListener {
-            override fun onFlutterUiDisplayed() { renderer.removeIsDisplayingFlutterUiListener(this); warmUp() }
-            override fun onFlutterUiNoLongerDisplayed() {}
-        })
-    }
-
-    fun active(value: Boolean) {
-        active = value
-        if (value) prepareHandoff()
-    }
-
-    private fun prepareHandoff() {
-        if (Build.VERSION.SDK_INT < 33 || !active || !locked || exiting ||
-            width >= normalWidth * .9 || height >= normalHeight * .9) return
-        val expectedWidth = width
-        val expectedHeight = height
-        // Require consecutive settled layout frames, rather than a fixed delay.
-        postOnAnimation {
-            if (!active || !locked || exiting || width != expectedWidth || height != expectedHeight ||
-                width >= normalWidth * .9 || height >= normalHeight * .9) return@postOnAnimation
-            try {
-                if (handoff == null) {
-                    fun surface(view: View): io.flutter.embedding.android.FlutterSurfaceView? {
-                        if (view is io.flutter.embedding.android.FlutterSurfaceView) return view
-                        if (view is android.view.ViewGroup) for (index in 0 until view.childCount) {
-                            surface(view.getChildAt(index))?.let { return it }
-                        }
-                        return null
-                    }
-                    val original = surface(flutter) ?: return@postOnAnimation
-                    heldSurface = original
-                    val renderer = original.attachedRenderer ?: return@postOnAnimation
-                    handoff = PipFrameHandoff(this, original, renderer,
-                        { name, data -> report("handoff.$name") { data } }, changed,
-                        { if (locked && width < normalWidth * .9 && height < normalHeight * .9) crop else null },
-                        {
-                            if (active) prepareHandoff()
-                        }, ::restoredVideoDestination)
-                }
-                val bridge = handoff ?: return@postOnAnimation
-                if (!bridge.started) {
-                    // Freeze only the old SurfaceView's geometry. This lets us
-                    // go directly to the small buffer, without rendering an
-                    // extra full-page ImageReader buffer first.
-                    bridge.resize(width, height, true)
-                } else if (bridge.hasFrame) {
-                    bridge.resize(width, height, true)
-                }
-            } catch (error: Exception) {
-                report("handoff.setupFailed") { mapOf("error" to error.toString()) }
-            }
-        }
-    }
-
-    fun dispose() {
-        if (Build.VERSION.SDK_INT >= 33) handoff?.dispose()
-    }
-
-    private fun restoredVideoDestination(): Rect? {
-        val source = crop ?: return null
-        if (active || normalWidth <= 0 || normalHeight <= 0 ||
-            min(width, height) < min(normalWidth, normalHeight) * .9 ||
-            maxOf(width, height) < maxOf(normalWidth, normalHeight) * .9) return null
-        return Rect(
-            source.left * width / normalWidth, source.top * height / normalHeight,
-            source.right * width / normalWidth, source.bottom * height / normalHeight)
-    }
 
     init {
         clipChildren = true
@@ -162,21 +62,11 @@ class PipRenderHost(
 
     fun exit() {
         if (!locked) return
-        active = false
         exiting = true
         requestLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (Build.VERSION.SDK_INT >= 33 && handoff?.started == true) {
-            // Flutter's content-size listener mutates SurfaceView LayoutParams.
-            // Override those while its OLD buffer remains visible, BEFORE the
-            // child is measured. Once the new buffer is visible, release it.
-            heldSurface?.layoutParams?.apply {
-                width = if (locked) normalWidth else View.MeasureSpec.getSize(widthMeasureSpec)
-                height = if (locked) normalHeight else View.MeasureSpec.getSize(heightMeasureSpec)
-            }
-        }
         if (!locked) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             return
@@ -191,9 +81,6 @@ class PipRenderHost(
     override fun onLayout(changedBounds: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         if (!locked) {
             super.onLayout(changedBounds, left, top, right, bottom)
-            if (Build.VERSION.SDK_INT >= 33 && handoff?.started == true) {
-                handoff?.resize(width, height, false)
-            }
             return
         }
         flutter.layout(0, 0, normalWidth, normalHeight)
@@ -218,27 +105,11 @@ class PipRenderHost(
             "scale" to flutter.scaleX, "x" to flutter.translationX, "y" to flutter.translationY,
             "clip" to flutter.clipBounds?.toString(),
         ) }
-        if (Build.VERSION.SDK_INT >= 33) {
-            handoff?.geometry()
-            if (!reduced && handoff?.started == true && !locked) handoff?.resize(width, height, false)
-        }
-        prepareHandoff()
     }
 
     override fun onApplyWindowInsets(insets: WindowInsets): WindowInsets {
         val result = super.onApplyWindowInsets(insets)
-        post {
-            releaseIfRestored()
-            if (Build.VERSION.SDK_INT >= 33 && handoff?.started == true) {
-                if (active) {
-                    // Mode/insets callbacks can precede the window resize.
-                    // Never label a full-window scene as the small PiP scene.
-                    handoff?.refreshMetrics()
-                    prepareHandoff()
-                }
-                else if (!locked) handoff?.resize(width, height, false)
-            }
-        }
+        post { releaseIfRestored() }
         return result
     }
 

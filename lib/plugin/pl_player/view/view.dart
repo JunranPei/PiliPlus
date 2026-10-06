@@ -37,7 +37,7 @@ import 'package:PiliPlus/pages/video/post_panel/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
-import 'package:PiliPlus/plugin/pl_player/pip_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/pip_source_rect.dart';
 import 'package:PiliPlus/plugin/pl_player/models/bottom_control_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -52,9 +52,6 @@ import 'package:PiliPlus/plugin/pl_player/widgets/common_btn.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/forward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/mpv_convert_webp.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/play_pause_btn.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/pip_simple_video.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/pip_source_rect.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
 import 'package:PiliPlus/utils/cache_manager.dart';
 import 'package:PiliPlus/utils/connectivity_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
@@ -101,7 +98,6 @@ class PLVideoPlayer extends StatefulWidget {
     this.danmuWidget,
     this.showEpisodes,
     this.showViewPoints,
-    this.videoOnly = false,
     this.fill = Colors.black,
     this.alignment = Alignment.center,
     super.key,
@@ -125,13 +121,6 @@ class PLVideoPlayer extends StatefulWidget {
   ])?
   showEpisodes;
   final VoidCallback? showViewPoints;
-
-  /// Keeps only the existing video surface mounted for Android PiP.
-  ///
-  /// Android owns the PiP window transform. The Flutter controls, danmaku,
-  /// subtitles, and gesture layers must not be part of that surface while the
-  /// system is resizing it.
-  final bool videoOnly;
   final Color fill;
   final Alignment alignment;
 
@@ -151,7 +140,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   final _videoKey = GlobalKey();
   final _pipContentKey = GlobalKey();
   ui.Rect? _lastPipSourceRect;
-  String? _lastPipGeometry;
+  Size? _lastNormalPipWindowSize;
 
   final RxDouble _brightnessValue = 0.0.obs;
   final RxBool _brightnessIndicator = false.obs;
@@ -272,124 +261,18 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     );
   }
 
-  Size? _lastNormalPipWindowSize;
-  String get _pipProbeName => 'player.${identityHashCode(this)}';
-  String? _lastPipLayoutChain;
-
-  Map<String, Object?> _pipEngineView() {
-    final view = View.of(context);
-    return {
-      'viewId': view.viewId,
-      'physicalSize': view.physicalSize.toString(),
-      'dpr': view.devicePixelRatio,
-      'padding': view.padding.toString(),
-      'viewPadding': view.viewPadding.toString(),
-      'viewInsets': view.viewInsets.toString(),
-      'systemGestureInsets': view.systemGestureInsets.toString(),
-    };
-  }
-
-  void _tracePipLayoutChain() {
-    if (!PipDiagnostics.enabled) return;
-    final chain = <Map<String, Object?>>[];
-    RenderObject? node = _pipContentKey.currentContext?.findRenderObject();
-    while (node != null && chain.length < 40) {
-      final current = node;
-      chain.add({
-        'id': identityHashCode(current),
-        'type': current.runtimeType.toString(),
-        'attached': current.attached,
-        'parentData': current.parentData.toString(),
-        if (current.attached) 'paintBounds': current.paintBounds.toString(),
-        if (current is RenderBox && current.hasSize) ...{
-          'size': current.size.toString(),
-          'constraints': current.constraints.toString(),
-          'matrixToRoot': current.getTransformTo(null).storage.toList(),
-        },
-      });
-      node = current.parent;
-    }
-    final signature = chain.toString();
-    if (_lastPipLayoutChain == signature) return;
-    _lastPipLayoutChain = signature;
-    PipDiagnostics.event('layout.ancestorChain', {
-      'probe': _pipProbeName,
-      'phase': AndroidPipController.instance.phase.name,
-      'nodes': chain,
-    });
-  }
-
-  Map<String, Object?> _pipBox(GlobalKey key) {
-    final render = key.currentContext?.findRenderObject();
-    if (render is! RenderBox || !render.attached || !render.hasSize) {
-      return {'id': identityHashCode(render), 'ready': false};
-    }
-    return {
-      'id': identityHashCode(render), 'type': render.runtimeType.toString(),
-      'size': render.size.toString(), 'constraints': render.constraints.toString(),
-      'paintBounds': render.paintBounds.toString(),
-      'matrixToRoot': render.getTransformTo(null).storage.toList(),
-    };
-  }
-
-  Map<String, Object?> _pipGeometry() {
-    _tracePipLayoutChain();
-    final pip = AndroidPipController.instance;
-    final media = MediaQuery.of(context);
-    final player = videoController.player.state;
-    return {
-      'phase': pip.phase.name, 'generation': pip.generation,
-      'scope': PipWindowScope.of(context), 'videoOnly': widget.videoOnly,
-      'widgetSize': '${widget.maxWidth}x${widget.maxHeight}',
-      'mediaSize': media.size.toString(), 'dpr': media.devicePixelRatio,
-      'engineView': _pipEngineView(),
-      'padding': media.padding.toString(), 'viewPadding': media.viewPadding.toString(),
-      'viewInsets': media.viewInsets.toString(),
-      'viewport': _pipBox(_videoKey), 'content': _pipBox(_pipContentKey),
-      'visiblePhysical': getVideoPhysicalRect()?.toString(),
-      'zoomMatrix': _transformationController.value.storage.toList(),
-      'texture': videoController.id.value, 'rect': videoController.rect.value?.toString(),
-      'controller': identityHashCode(videoController),
-      'playing': player.playing, 'buffering': player.buffering,
-      'positionMs': player.position.inMilliseconds,
-      'videoSize': '${player.width}x${player.height}',
-      'videoFit': plPlayerController.videoFit.value.toString(),
-    };
-  }
-
   void _reportPipSourceRect() {
-    if (!mounted || !Platform.isAndroid) {
+    if (!mounted ||
+        !Platform.isAndroid ||
+        AndroidPipController.instance.protectsPlayback) {
       return;
     }
     final rect = getVideoPhysicalRect();
-    if (kDebugMode) {
-      final pip = AndroidPipController.instance;
-      final viewport = _videoKey.currentContext?.findRenderObject() as RenderBox?;
-      final content = _pipContentKey.currentContext?.findRenderObject() as RenderBox?;
-      final geometry =
-          'state=${identityHashCode(this)} phase=${pip.phase.name} '
-          'generation=${pip.generation} texture=${videoController.id.value} '
-          'window=${MediaQuery.sizeOf(context)} '
-          'viewport=${viewport?.hasSize == true ? viewport!.size : null} '
-          'content=${content?.hasSize == true ? content!.size : null} '
-          'visiblePhysical=$rect '
-          'zoom=${_transformationController.value.getMaxScaleOnAxis()}';
-      if (geometry != _lastPipGeometry) {
-        _lastPipGeometry = geometry;
-        debugPrint('[PIP_GEOMETRY] $geometry');
-      }
-    }
-    if (AndroidPipController.instance.protectsPlayback) return;
     if (rect == null || rect.isEmpty || rect == _lastPipSourceRect) return;
-
-    // onPictureInPictureModeChanged(false) arrives before Flutter has laid
-    // the activity back out at full size. Do not publish that transient
-    // PiP-sized rectangle as the next sourceRectHint.
     final window = MediaQuery.sizeOf(context);
-    final normalWindow = _lastNormalPipWindowSize;
-    if (normalWindow != null &&
-        window.width * window.height <
-            normalWindow.width * normalWindow.height * 0.45) {
+    final normal = _lastNormalPipWindowSize;
+    if (normal != null &&
+        window.width * window.height < normal.width * normal.height * .45) {
       return;
     }
     _lastNormalPipWindowSize = window;
@@ -398,11 +281,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   void _onPipPhaseChanged() {
-    PipDiagnostics.arm('player.phase');
-    PipDiagnostics.event('player.phase', {'probe': _pipProbeName});
-    // Native clears the old entry hint on exit. Re-publish even if this page
-    // returns to exactly the same rectangle as before entry.
     _lastPipSourceRect = null;
+    if (AndroidPipController.instance.protectsPlayback) {
+      plPlayerController.controls = false;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _reportPipSourceRect());
   }
 
@@ -424,8 +306,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       duration: const Duration(milliseconds: 100),
     );
     videoController = plPlayerController.videoController!;
-    PipDiagnostics.register(_pipProbeName, _pipGeometry);
-    PipDiagnostics.arm('player.mount');
 
     if (PlatformUtils.isMobile) {
       Future.microtask(() {
@@ -489,19 +369,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   }
 
   @override
-  void didChangeMetrics() {
-    if (!mounted || !PipDiagnostics.enabled) return;
-    PipDiagnostics.arm('player.metrics');
-    PipDiagnostics.event('player.metrics', {
-      'probe': _pipProbeName,
-      'engineView': _pipEngineView(),
-      'mediaSizeBeforeLayout': MediaQuery.sizeOf(context).toString(),
-    });
-  }
-
-  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    PipDiagnostics.event('player.lifecycle', {'probe': _pipProbeName, 'state': state.name});
     if (state == .resumed) {
       plPlayerController.onAppForegrounded();
     } else if (const <AppLifecycleState>[
@@ -567,7 +435,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void dispose() {
-    PipDiagnostics.unregister(_pipProbeName);
     AndroidPipController.instance.removeListener(_onPipPhaseChanged);
     plPlayerController.getVideoRectCallback = null;
     removeObserverMobile(this);
@@ -1144,21 +1011,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    PipDiagnostics.event('player.dependencies', {'probe': _pipProbeName});
     colorScheme = ColorScheme.of(context);
   }
 
   @override
   void didUpdateWidget(covariant PLVideoPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    PipDiagnostics.event('player.widgetUpdate', {
-      'probe': _pipProbeName,
-      'oldSize': '${oldWidget.maxWidth}x${oldWidget.maxHeight}',
-      'size': '${widget.maxWidth}x${widget.maxHeight}',
-      'oldController': identityHashCode(oldWidget.plPlayerController),
-      'controller': identityHashCode(widget.plPlayerController),
-      'videoOnly': widget.videoOnly,
-    });
     if (Platform.isAndroid && AndroidPipController.instance.protectsPlayback) {
       plPlayerController.controls = false;
     }
@@ -1576,7 +1434,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   Widget build(BuildContext context) {
     maxWidth = widget.maxWidth;
     maxHeight = widget.maxHeight;
-    final pipWindow = widget.videoOnly || PipWindowScope.of(context);
     final isFullScreen = this.isFullScreen;
     final primary = isFullScreen && colorScheme.isLight
         ? colorScheme.inversePrimary
@@ -1594,8 +1451,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       key: _playerKey,
       children: <Widget>[
         _videoWidget,
-        // Keep the Texture's parent Stack mounted while native PiP resizes.
-        if (!pipWindow) ...[
 
         if (widget.danmuWidget case final danmaku?)
           Positioned.fill(top: 4, child: danmaku),
@@ -2241,7 +2096,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   )
                 : const SizedBox.shrink();
           }),
-        ],
       ],
     );
     if (PlatformUtils.isDesktop) {
@@ -2302,30 +2156,22 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         ? (plPlayerController.width! /
                               plPlayerController.height!)
                         : null);
-                final videoContent = PipSourceRectObserver(
-                  key: _pipContentKey,
-                  onPaint: _reportPipSourceRect,
-                  child: PipSimpleVideo(
-                    controller: plPlayerController.videoController!,
-                    fill: widget.fill,
-                    aspectRatio: aspect,
-                  ),
-                );
-                // The Android path is a Flutter Texture backed by one native
-                // SurfaceProducer. It participates in Flutter layout, so it
-                // must be fitted to the current window just like the other
-                // platforms. The old SizedBox-only branch was required for
-                // PlatformView/SurfaceView hybrid composition and left the
-                // intrinsic video rect exposed during PiP resize.
-                final fittedVideo = FittedBox(
-                  fit: videoFit.boxFit,
-                  alignment: widget.alignment,
-                  child: videoContent,
-                );
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,
                   flipY: plPlayerController.flipY.value,
-                  child: fittedVideo,
+                  child: FittedBox(
+                    fit: videoFit.boxFit,
+                    alignment: widget.alignment,
+                    child: PipSourceRectObserver(
+                      key: _pipContentKey,
+                      onPaint: _reportPipSourceRect,
+                      child: SimpleVideo(
+                        controller: plPlayerController.videoController!,
+                        fill: widget.fill,
+                        aspectRatio: aspect,
+                      ),
+                    ),
+                  ),
                 );
               },
             ),

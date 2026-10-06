@@ -35,7 +35,6 @@ import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/danmaku_options.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/plugin/pl_player/view/view.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/pip_viewport.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/size_ext.dart';
@@ -117,7 +116,12 @@ class _LiveRoomPageState extends State<LiveRoomPage>
       width: maxWidth * plPlayerController.uiScale,
       height: maxHeight * plPlayerController.uiScale,
     );
-    isPortrait = size.isPortrait;
+    // Preserve the pre-PiP orientation while Android resizes the activity;
+    // changing the root layout during the transition reparents the player
+    // Surface and causes the app-icon placeholder.
+    if (!AndroidPipController.instance.protectsPlayback) {
+      isPortrait = size.isPortrait;
+    }
     plPlayerController.screenRatio = maxHeight / maxWidth;
   }
 
@@ -223,6 +227,9 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   Widget build(BuildContext context) {
+    // Do not replace the mounted video subtree during the native PiP
+    // transition. Reparenting the player detaches its Surface and produces an
+    // app-icon placeholder until a new video frame arrives.
     Widget child = childWhenDisabled;
     if (plPlayerController.keyboardControl) {
       child = PlayerFocus(
@@ -278,19 +285,15 @@ class _LiveRoomPageState extends State<LiveRoomPage>
               liveRoomCtr: _liveRoomController,
               onRefresh: _liveRoomController.queryLiveUrl,
             ),
-            danmuWidget:
-                !needDm ||
-                    (plPlayerController.isPipMode &&
-                        plPlayerController.pipNoDanmaku)
+            danmuWidget: !needDm
                 ? null
                 : LiveDanmaku(
                     liveRoomController: _liveRoomController,
                     plPlayerController: plPlayerController,
                     isFullScreen: isFullScreen,
-                    isPipMode: plPlayerController.isPipMode || isPipMode,
+                    isPipMode: plPlayerController.isDesktopPip || isPipMode,
                     size: Size(width, height),
                   ),
-            videoOnly: isPipMode,
           );
         }
         return const SizedBox.shrink();
@@ -379,12 +382,11 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   Widget get childWhenDisabled {
     return Obx(() {
       final isFullScreen = this.isFullScreen || plPlayerController.isDesktopPip;
-      final pipWindow = PipWindowScope.of(context);
       return Stack(
         clipBehavior: Clip.none,
         children: [
           const SizedBox.expand(child: ColoredBox(color: Colors.black)),
-          if (!isFullScreen && !pipWindow)
+          if (!isFullScreen)
             Obx(
               () {
                 final appBackground = _liveRoomController
@@ -469,18 +471,15 @@ class _LiveRoomPageState extends State<LiveRoomPage>
   }
 
   Widget _buildPP(bool isFullScreen) {
-    final pipWindow = PipWindowScope.of(context);
     final bottomHeight = 70 + padding.bottom;
-    final videoHeight = pipWindow
-        ? maxHeight
-        : isFullScreen
+    final videoHeight = isFullScreen
         ? maxHeight - (isWindowMode && !isPortrait ? 0 : padding.top)
         : maxHeight - bottomHeight;
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Positioned.fill(
-          bottom: pipWindow || isFullScreen ? 0 : bottomHeight,
+          bottom: isFullScreen ? 0 : bottomHeight,
           child: videoPlayerPanel(
             width: maxWidth,
             height: videoHeight,
@@ -495,7 +494,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           bottom: 55 + bottomHeight,
           height: maxHeight * 0.32,
           child: Offstage(
-            offstage: pipWindow || isFullScreen,
+            offstage: isFullScreen,
             child: _buildChatWidget(true),
           ),
         ),
@@ -505,7 +504,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           bottom: 0,
           height: bottomHeight,
           child: Offstage(
-            offstage: pipWindow || isFullScreen,
+            offstage: isFullScreen,
             child: _buildInputWidget,
           ),
         ),
