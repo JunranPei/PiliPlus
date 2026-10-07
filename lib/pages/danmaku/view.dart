@@ -161,6 +161,9 @@ class _PlDanmakuState extends State<PlDanmaku> {
       ..removePositionListener(videoPositionListen)
       ..removeStatusLister(playerListener);
     _plDanmakuController.dispose();
+    if (identical(playerController.danmakuController, _controller)) {
+      playerController.danmakuController = null;
+    }
     _controller = null;
     super.dispose();
   }

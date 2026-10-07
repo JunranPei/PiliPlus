@@ -1,4 +1,4 @@
-import 'dart:async' show StreamSubscription, Timer, unawaited;
+import 'dart:async' show Completer, StreamSubscription, Timer, unawaited;
 import 'dart:convert' show ascii;
 import 'dart:io' show Platform;
 import 'dart:math' show max, min;
@@ -21,6 +21,8 @@ import 'package:PiliPlus/pages/setting/models/play_settings.dart'
     show kMaxVolume;
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -68,6 +70,19 @@ typedef PlayCallback = Future<void>? Function();
 class PlPlayerController with BlockConfigMixin {
   Player? _videoPlayerController;
   VideoController? _videoController;
+  final _sourceQueue = PlaybackSourceQueue();
+  Object? _readySourceOwner;
+  Object? _sourceOwner;
+  int _sourceRevision = 0;
+  Future<void> Function()? _reloadSource;
+
+  bool hasSourceFor(Object owner, int? cid) =>
+      _readySourceOwner == owner && this.cid == cid && _videoController != null;
+
+  void cancelSource(Object owner) {
+    _sourceQueue.cancel(owner);
+    if (_sourceOwner == owner) _sourceRevision++;
+  }
 
   // 添加一个私有静态变量来保存实例
   static PlPlayerController? _instance;
@@ -146,8 +161,6 @@ class PlPlayerController with BlockConfigMixin {
 
   ///
   final RxBool isSliderMoving = false.obs;
-
-  bool _autoPlay = false;
 
   // 记录历史记录
   int? _aid;
@@ -636,8 +649,7 @@ class PlPlayerController with BlockConfigMixin {
       .._playerCount += 1;
   }
 
-  bool _processing = false;
-  bool get processing => _processing;
+  bool get processing => _sourceQueue.busy;
 
   // offline
   bool get isFileSource => dataSource is FileSource;
@@ -671,77 +683,115 @@ class PlPlayerController with BlockConfigMixin {
     int? pgcType,
     VideoType? videoType,
     VoidCallback? onInit,
+    Object? owner,
+    Future<void> Function()? onPrepared,
+    Future<void> Function()? onFrameReady,
+    Future<void> Function()? onReload,
     Volume? volume,
     bool autoFullScreenFlag = false,
   }) async {
-    try {
-      _processing = true;
-      this.isLive = isLive;
-      _videoType = videoType ?? VideoType.ugc;
-      this.width = width;
-      this.height = height;
-      this.dataSource = dataSource;
-      _autoPlay = autoplay;
-      // 初始化视频倍速
-      // _playbackSpeed.value = speed;
-      // 初始化数据加载状态
-      dataStatus.value = DataStatus.loading;
-      // 初始化全屏方向
-      _isVertical = isVertical ?? false;
-      _aid = aid;
-      _bvid = bvid;
-      this.cid = cid;
-      _epid = epid;
-      _seasonId = seasonId;
-      _pgcType = pgcType;
+    await _sourceQueue.run(owner ?? this, (request) async {
+      try {
+        _readySourceOwner = null;
+        _sourceOwner = owner ?? this;
+        _sourceRevision++;
+        _reloadSource = onReload;
+        if (kDebugMode) {
+          debugPrint('[PLAYBACK] prepare request=${request.id} cid=$cid');
+        }
+        this.isLive = isLive;
+        _videoType = videoType ?? VideoType.ugc;
+        this.width = width;
+        this.height = height;
+        this.dataSource = dataSource;
+        // 初始化视频倍速
+        // _playbackSpeed.value = speed;
+        // 初始化数据加载状态
+        dataStatus.value = DataStatus.loading;
+        // 初始化全屏方向
+        _isVertical = isVertical ?? false;
+        _aid = aid;
+        _bvid = bvid;
+        this.cid = cid;
+        _epid = epid;
+        _seasonId = seasonId;
+        _pgcType = pgcType;
 
-      if (showSeekPreview) {
-        _clearPreview();
-      }
-      cancelLongPressTimer();
-      if (_videoPlayerController != null &&
-          _videoPlayerController!.state.playing) {
-        await pause(notify: false);
-      }
+        if (showSeekPreview) {
+          _clearPreview();
+        }
+        cancelLongPressTimer();
+        if (_videoPlayerController != null &&
+            _videoPlayerController!.state.playing) {
+          await pause(notify: false);
+        }
 
-      if (_playerCount == 0) {
-        return;
-      }
-      // 配置Player 音轨、字幕等等
-      await _createVideoController(dataSource, seekTo, volume);
+        request.checkCurrent();
+        if (_playerCount == 0) return false;
+        // 配置Player 音轨、字幕等等
+        await _createVideoController(
+          dataSource,
+          seekTo,
+          volume,
+          request: request,
+          onPrepared: onPrepared,
+          waitForFrame: owner != null && !isLive && !onlyPlayAudio.value,
+        );
+        request.checkCurrent();
 
-      if (_playerCount == 0) {
-        _removeListeners();
-        _videoPlayerController?.dispose();
-        _videoPlayerController = null;
-        _videoController = null;
-        return;
-      }
+        if (_playerCount == 0) {
+          _removeListeners();
+          _videoPlayerController?.dispose();
+          _videoPlayerController = null;
+          _videoController = null;
+          return false;
+        }
 
-      // 获取视频时长 00:00
-      this.duration.value = duration ?? _videoPlayerController!.state.duration;
-      position = buffered.value = sliderPosition = seekTo ?? Duration.zero;
-      updatePositionSecond();
-      updateSliderPositionSecond();
-      updateBufferedSecond();
-      // 数据加载完成
-      dataStatus.value = DataStatus.loaded;
+        // 获取视频时长 00:00
+        this.duration.value =
+            duration ?? _videoPlayerController!.state.duration;
+        position = buffered.value = sliderPosition = seekTo ?? Duration.zero;
+        updatePositionSecond();
+        updateSliderPositionSecond();
+        updateBufferedSecond();
 
-      if (autoFullScreenFlag && autoEnterFullScreen) {
-        triggerFullScreen(status: true);
-      }
+        if (autoFullScreenFlag && autoEnterFullScreen) {
+          triggerFullScreen(status: true);
+        }
 
-      await _initializePlayer();
-      onInit?.call();
-    } catch (err, stackTrace) {
-      dataStatus.value = DataStatus.error;
-      if (kDebugMode) {
-        debugPrint(stackTrace.toString());
-        debugPrint('plPlayer err:  $err');
+        await _initializePlayer();
+        request.checkCurrent();
+        _readySourceOwner = owner ?? this;
+        dataStatus.value = DataStatus.loaded;
+        onInit?.call();
+        if (onFrameReady != null) {
+          await Future.any<void>([
+            onFrameReady(),
+            request.cancelled.then<void>(
+              (_) => throw const PlaybackSourceCancelled(),
+            ),
+          ]);
+        }
+        request.checkCurrent();
+        if (autoplay) await play();
+        if (kDebugMode) {
+          debugPrint(
+            '[PLAYBACK] ready request=${request.id} cid=$cid autoplay=$autoplay',
+          );
+        }
+        return true;
+      } on PlaybackSourceCancelled {
+        rethrow;
+      } catch (err, stackTrace) {
+        if (!request.isCurrent) return false;
+        dataStatus.value = DataStatus.error;
+        if (kDebugMode) {
+          debugPrint(stackTrace.toString());
+          debugPrint('plPlayer err:  $err');
+        }
+        return false;
       }
-    } finally {
-      _processing = false;
-    }
+    });
   }
 
   String? shadersDirPath;
@@ -837,7 +887,7 @@ class PlPlayerController with BlockConfigMixin {
       player,
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
-        androidAttachSurfaceAfterVideoParameters: false,
+        androidAttachSurfaceAfterVideoParameters: true,
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
@@ -859,8 +909,11 @@ class PlPlayerController with BlockConfigMixin {
   Future<void> _createVideoController(
     DataSource dataSource,
     Duration? seekTo,
-    Volume? volume,
-  ) async {
+    Volume? volume, {
+    required PlaybackSourceRequest request,
+    Future<void> Function()? onPrepared,
+    required bool waitForFrame,
+  }) async {
     isBuffering.value = false;
     buffered.value = Duration.zero;
     _heartDuration = 0;
@@ -884,6 +937,17 @@ class PlPlayerController with BlockConfigMixin {
         await setShader();
       }
     }
+
+    request.checkCurrent();
+    if (onPrepared != null) {
+      await Future.any<void>([
+        onPrepared(),
+        request.cancelled.then<void>(
+          (_) => throw const PlaybackSourceCancelled(),
+        ),
+      ]);
+    }
+    request.checkCurrent();
 
     final Map<String, String> extras = {};
 
@@ -932,22 +996,86 @@ class PlPlayerController with BlockConfigMixin {
       }
     }
 
-    await player.open(
-      Media(
-        video,
-        start: seekTo,
-        extras: extras.isEmpty ? null : extras,
-      ),
-      play: false,
-    );
+    final gate = waitForFrame ? MpvFrameGate(player, source: video) : null;
+    try {
+      await player.open(
+        Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
+        play: false,
+      );
+      request.checkCurrent();
+      if (gate != null) {
+        await Future.any<void>([
+          gate.ready,
+          request.cancelled.then<void>(
+            (_) => throw const PlaybackSourceCancelled(),
+          ),
+        ]);
+        request.checkCurrent();
+        await _waitForVideoOutput(request);
+      }
+    } finally {
+      gate?.dispose();
+    }
+  }
+
+  Future<void> _waitForVideoOutput(PlaybackSourceRequest request) async {
+    final controller = _videoController!;
+    final ready = Completer<void>();
+    void check() {
+      final rect = controller.rect.value;
+      final state = controller.player.state;
+      if (!ready.isCompleted &&
+          controller.id.value != null &&
+          rect != null &&
+          rect.width > 1 &&
+          rect.height > 1 &&
+          state.width > 0 &&
+          state.height > 0 &&
+          (!Platform.isAndroid ||
+              (rect.width == state.width && rect.height == state.height))) {
+        if (kDebugMode) {
+          debugPrint(
+            '[PLAYBACK] output request=${request.id} texture=${controller.id.value} size=${state.width}x${state.height} rect=$rect',
+          );
+        }
+        ready.complete();
+      }
+    }
+
+    controller.rect.addListener(check);
+    controller.id.addListener(check);
+    final subscription = controller.player.stream.size.listen((_) => check());
+    try {
+      check();
+      await Future.any<void>([
+        ready.future.timeout(const Duration(seconds: 10)),
+        request.cancelled.then<void>(
+          (_) => throw const PlaybackSourceCancelled(),
+        ),
+      ]);
+    } finally {
+      controller.rect.removeListener(check);
+      controller.id.removeListener(check);
+      await subscription.cancel();
+    }
   }
 
   Future<void>? refreshPlayer() {
-    if (dataSource is FileSource) {
+    if (dataSource is FileSource || processing) {
       return null;
     }
+    if (_reloadSource case final reload?) return reload();
+    if (!isLive) return null;
     if (_videoPlayerController case final ctr? when (ctr.current.isNotEmpty)) {
-      return ctr.open(ctr.current.last.copyWith(start: position), play: true);
+      final media = ctr.current.last.copyWith(start: position);
+      return _sourceQueue
+          .run(_sourceOwner ?? this, (request) async {
+            await ctr.open(media, play: false);
+            request.checkCurrent();
+            await play();
+            return true;
+          })
+          .then<void>((_) {});
     }
     return null;
   }
@@ -972,12 +1100,6 @@ class PlPlayerController with BlockConfigMixin {
     // if (seekTo != Duration.zero) {
     //   await this.seekTo(seekTo);
     // }
-
-    // 自动播放
-    if (_autoPlay) {
-      playIfExists();
-      // await play(duration: duration);
-    }
   }
 
   List<StreamSubscription>? _subscriptions;
@@ -1014,7 +1136,8 @@ class PlPlayerController with BlockConfigMixin {
         for (final element in _statusListeners) {
           element(event ? PlayerStatus.playing : PlayerStatus.paused);
         }
-        if (videoPlayerController!.state.position.inSeconds != 0) {
+        if (_readySourceOwner != null &&
+            videoPlayerController!.state.position.inSeconds != 0) {
           makeHeartBeat(positionSeconds.value, type: HeartBeatType.status);
         }
       }),
@@ -1029,7 +1152,9 @@ class PlPlayerController with BlockConfigMixin {
         } else {
           // playerStatus.value = PlayerStatus.playing;
         }
-        makeHeartBeat(positionSeconds.value, type: HeartBeatType.completed);
+        if (_readySourceOwner != null) {
+          makeHeartBeat(positionSeconds.value, type: HeartBeatType.completed);
+        }
       }),
       stream.position.listen((event) {
         position = event;
@@ -1043,7 +1168,7 @@ class PlPlayerController with BlockConfigMixin {
         for (final element in _positionListeners) {
           element(event);
         }
-        makeHeartBeat(event.inSeconds);
+        if (_readySourceOwner != null) makeHeartBeat(event.inSeconds);
       }),
       stream.duration.listen((Duration event) {
         duration.value = event;
@@ -1069,6 +1194,7 @@ class PlPlayerController with BlockConfigMixin {
           }
         })),
       stream.error.listen((String event) {
+        final failedRevision = _sourceRevision;
         if (dataSource is FileSource &&
             event.startsWith("Failed to open file")) {
           return;
@@ -1077,7 +1203,9 @@ class PlPlayerController with BlockConfigMixin {
           if (event.startsWith('tcp: ffurl_read returned ') ||
               event.startsWith("Failed to open https://") ||
               event.startsWith("Can not open external file https://")) {
-            Future.delayed(const Duration(milliseconds: 3000), refreshPlayer);
+            Future.delayed(const Duration(milliseconds: 3000), () {
+              if (failedRevision == _sourceRevision) refreshPlayer();
+            });
           }
           return;
         }
@@ -1091,6 +1219,7 @@ class PlPlayerController with BlockConfigMixin {
             const Duration(milliseconds: 10000),
             () {
               Future.delayed(const Duration(milliseconds: 3000), () {
+                if (failedRevision != _sourceRevision) return;
                 // if (kDebugMode) {
                 //   debugPrint("isBuffering.value: ${isBuffering.value}");
                 // }
@@ -1663,6 +1792,10 @@ class PlPlayerController with BlockConfigMixin {
     }
 
     _playerCount = 0;
+    _sourceQueue.cancelAll();
+    _readySourceOwner = null;
+    _sourceOwner = null;
+    _reloadSource = null;
     if (removeSafeArea) {
       showSystemBar();
     }

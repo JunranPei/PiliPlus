@@ -22,6 +22,7 @@ class PlayerFocus extends StatelessWidget {
     this.introController,
     required this.onSendDanmaku,
     this.canPlay,
+    this.isReady,
     this.onSkipSegment,
     this.onRefresh,
   });
@@ -31,6 +32,7 @@ class PlayerFocus extends StatelessWidget {
   final CommonIntroController? introController;
   final VoidCallback onSendDanmaku;
   final ValueGetter<bool>? canPlay;
+  final ValueGetter<bool>? isReady;
   final ValueGetter<bool>? onSkipSegment;
   final VoidCallback? onRefresh;
 
@@ -58,7 +60,9 @@ class PlayerFocus extends StatelessWidget {
   }
 
   bool get isFullScreen => plPlayerController.isFullScreen.value;
-  bool get hasPlayer => plPlayerController.videoPlayerController != null;
+  bool get hasPlayer =>
+      plPlayerController.videoPlayerController != null &&
+      (isReady?.call() ?? true);
 
   void _setVolume({required bool isIncrease}) {
     final volume = isIncrease

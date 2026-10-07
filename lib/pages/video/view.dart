@@ -3,8 +3,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
-
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/custom_icon.dart';
@@ -44,6 +42,7 @@ import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/pages/video/widgets/player_focus.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/video_presentation.dart';
 import 'package:PiliPlus/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
@@ -83,7 +82,9 @@ class VideoDetailPageV extends StatefulWidget {
 class _VideoDetailPageVState extends State<VideoDetailPageV>
     with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
   final heroTag = Get.arguments['heroTag'];
-  StreamSubscription? _dataStatusSubscription;
+  final Set<VoidCallback> _cancelRouteWaits = {};
+  Animation<double>? _coverAnimation;
+  final Completer<bool> _initialPlaybackLayout = Completer<bool>();
 
   late final VideoDetailController videoDetailController;
   late final VideoReplyController _videoReplyController;
@@ -165,6 +166,12 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       pgcIntroController = Get.put(PgcIntroController(), tag: heroTag);
     }
 
+    videoDetailController.waitForPlaybackRoute = _waitForPlaybackRoute;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_initialPlaybackLayout.isCompleted) {
+        _initialPlaybackLayout.complete(mounted);
+      }
+    });
     videoSourceInit();
 
     addObserverMobile(this);
@@ -186,8 +193,17 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   }
 
   void positionListener(Duration position) {
+    if (!_ownsReadyPlayback) return;
     videoDetailController.playedTime = position;
   }
+
+  bool get _ownsReadyPlayback =>
+      isShowing &&
+      videoDetailController.frameReady.value &&
+      videoDetailController.plPlayerController.hasSourceFor(
+        videoDetailController,
+        videoDetailController.cid.value,
+      );
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -210,11 +226,12 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         ?..addStatusLister(playerListener)
         ..addPositionListener(positionListener);
     }
-    return plPlayerController?.play();
+    return videoDetailController.requestPlayback();
   }
 
   // 播放器状态监听
   Future<void> playerListener(PlayerStatus status) async {
+    if (!_ownsReadyPlayback) return;
     final isPlaying = status.isPlaying;
     try {
       if (videoDetailController.scrollCtr.hasClients) {
@@ -295,43 +312,81 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     plPlayerController!.play();
   }
 
-  /// 未开启自动播放时触发播放
-  Future<void>? handlePlay() {
-    if (!videoDetailController.isFileSource) {
-      if (videoDetailController.isQuerying) {
-        if (kDebugMode) debugPrint('handlePlay: querying');
-        return null;
-      }
-      if (videoDetailController.videoUrl == null ||
-          videoDetailController.audioUrl == null) {
-        if (kDebugMode) {
-          debugPrint('handlePlay: videoUrl/audioUrl not initialized');
-        }
-        videoDetailController.queryVideoUrl();
-        return null;
-      }
-    }
-    final plPlayerController = this.plPlayerController =
-        videoDetailController.plPlayerController;
-    videoDetailController.autoPlay = true;
-    plPlayerController
+  /// Every play entry uses this page's source and preparation state.
+  Future<void> handlePlay() {
+    plPlayerController = videoDetailController.plPlayerController;
+    plPlayerController!
       ..addStatusLister(playerListener)
       ..addPositionListener(positionListener);
-    if (plPlayerController.preInitPlayer) {
-      if (plPlayerController.autoEnterFullScreen) {
-        plPlayerController.triggerFullScreen();
-      }
-      return plPlayerController.play();
-    } else {
-      return videoDetailController.playerInit(
-        autoplay: true,
-        autoFullScreenFlag: true,
-      );
+    return videoDetailController.requestPlayback(autoFullScreenFlag: true);
+  }
+
+  Future<bool> _waitForPlaybackRoute() async {
+    if (!_initialPlaybackLayout.isCompleted &&
+        !await _initialPlaybackLayout.future) {
+      return false;
     }
+    if (!mounted || !isShowing) return false;
+    final route = ModalRoute.of(context);
+    if (route == null) return true;
+    if (!route.isCurrent) return false;
+    final entry = route.animation;
+    final covering = route.secondaryAnimation;
+    bool settled() =>
+        (entry == null || entry.status == AnimationStatus.completed) &&
+        (covering == null || covering.status == AnimationStatus.dismissed);
+    if (settled()) return true;
+    final result = Completer<bool>();
+    void finish(bool value) {
+      if (!result.isCompleted) result.complete(value);
+    }
+
+    void cancel() => finish(false);
+    void changed(AnimationStatus _) {
+      if (!mounted || !isShowing || !route.isCurrent) {
+        finish(false);
+      } else if (settled()) {
+        finish(true);
+      }
+    }
+
+    _cancelRouteWaits.add(cancel);
+    entry?.addStatusListener(changed);
+    covering?.addStatusListener(changed);
+    try {
+      changed(AnimationStatus.forward);
+      return await result.future;
+    } finally {
+      _cancelRouteWaits.remove(cancel);
+      entry?.removeStatusListener(changed);
+      covering?.removeStatusListener(changed);
+    }
+  }
+
+  void _cancelPlaybackRouteWaits() {
+    for (final cancel in _cancelRouteWaits.toList()) {
+      cancel();
+    }
+  }
+
+  void _onCovered(AnimationStatus status) {
+    if (status != AnimationStatus.completed) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          isShowing ||
+          _coverAnimation?.status != AnimationStatus.completed) {
+        return;
+      }
+      videoDetailController.videoState.value = false;
+      videoDetailController.frameReady.value = false;
+    });
   }
 
   @override
   void dispose() {
+    if (!_initialPlaybackLayout.isCompleted) {
+      _initialPlaybackLayout.complete(false);
+    }
     AndroidPipController.instance.removeListener(_onPipStateChanged);
     plPlayerController
       ?..removeStatusLister(playerListener)
@@ -355,7 +410,11 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       showSystemBar();
     }
 
-    _dataStatusSubscription?.cancel();
+    _cancelPlaybackRouteWaits();
+    _coverAnimation?.removeStatusListener(_onCovered);
+    videoDetailController
+      ..leavePlaybackRoute()
+      ..waitForPlaybackRoute = null;
 
     if (!videoDetailController.plPlayerController.isCloseAll) {
       videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
@@ -395,18 +454,29 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       return; // 已在画中画，保留播放器状态，不进行注销与暂停
     }
 
-    videoDetailController
-      ..videoState.value = false
-      ..cancelBlockListener()
-      ..playedTime = plPlayerController?.position
-      ..playerStatus = plPlayerController?.playerStatus.value
-      ..brightness = plPlayerController?.brightness.value;
+    videoDetailController.leavePlaybackRoute();
+    _cancelPlaybackRouteWaits();
+    videoDetailController.cancelBlockListener();
+    final ownsSource =
+        plPlayerController?.hasSourceFor(
+          videoDetailController,
+          videoDetailController.cid.value,
+        ) ==
+        true;
+    if (ownsSource) {
+      videoDetailController
+        ..playedTime = plPlayerController?.position
+        ..playerStatus = plPlayerController?.playerStatus.value
+        ..brightness = plPlayerController?.brightness.value;
+    }
     if (plPlayerController != null) {
-      videoDetailController.makeHeartBeat();
       plPlayerController!
         ..removeStatusLister(playerListener)
-        ..removePositionListener(positionListener)
-        ..pause();
+        ..removePositionListener(positionListener);
+      if (ownsSource) {
+        videoDetailController.makeHeartBeat();
+        unawaited(plPlayerController!.pause());
+      }
     }
   }
 
@@ -451,50 +521,55 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       }
     }
 
-    if (plPlayerController?.cid == videoDetailController.cid.value &&
-        plPlayerController?.videoController != null) {
-      // 视频源没有改变，说明离开期间未播放过其他视频，直接恢复状态
-      videoDetailController.videoState.value = true;
-      plPlayerController
-        ?..addStatusLister(playerListener)
-        ..addPositionListener(positionListener);
+    final sameSource = videoDetailController.plPlayerController.hasSourceFor(
+      videoDetailController,
+      videoDetailController.cid.value,
+    );
+    videoDetailController.returnToPlaybackRoute(
+      restoreCurrentSource: sameSource,
+    );
+    plPlayerController
+      ?..addStatusLister(playerListener)
+      ..addPositionListener(positionListener);
+    if (sameSource &&
+        videoDetailController.playerStatus == PlayerStatus.playing) {
+      unawaited(videoDetailController.requestPlayback());
+    } else if (!sameSource &&
+        videoDetailController.plPlayerController.preInitPlayer &&
+        !videoDetailController.isQuerying &&
+        (videoDetailController.isFileSource ||
+            videoDetailController.videoUrl != null)) {
+      unawaited(videoDetailController.playerInit(autoplay: false));
+    }
+  }
 
-      if (videoDetailController.playerStatus == PlayerStatus.playing) {
-        plPlayerController?.play();
-      } else {
-        plPlayerController?.pause();
-      }
-    } else {
-      // 视频源改变了，重新初始化并加载新源
-      plPlayerController
-        ?..addStatusLister(playerListener)
-        ..addPositionListener(positionListener);
-
-      // 监听 dataStatus，加载完成后清除监听
-      _dataStatusSubscription?.cancel();
-      _dataStatusSubscription = plPlayerController?.dataStatus.listen((status) {
-        if ((status == DataStatus.loaded || status == DataStatus.error) &&
-            plPlayerController?.cid == videoDetailController.cid.value) {
-          _dataStatusSubscription?.cancel();
-          _dataStatusSubscription = null;
-        }
-      });
-
-      if (videoDetailController.autoPlay) {
-        videoDetailController.playerInit(
-          autoplay: videoDetailController.playerStatus?.isPlaying ?? false,
-        );
-      } else if (videoDetailController.plPlayerController.preInitPlayer &&
-          !videoDetailController.isQuerying &&
-          videoDetailController.videoUrl != null) {
-        videoDetailController.playerInit();
-      }
+  @override
+  void didPop() {
+    super.didPop();
+    isShowing = false;
+    videoDetailController.leavePlaybackRoute();
+    _cancelPlaybackRouteWaits();
+    plPlayerController
+      ?..removeStatusLister(playerListener)
+      ..removePositionListener(positionListener);
+    if (plPlayerController?.hasSourceFor(
+          videoDetailController,
+          videoDetailController.cid.value,
+        ) ==
+        true) {
+      unawaited(plPlayerController!.pause());
     }
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final covering = ModalRoute.of(context)?.secondaryAnimation;
+    if (_coverAnimation != covering) {
+      _coverAnimation?.removeStatusListener(_onCovered);
+      _coverAnimation = covering;
+      covering?.addStatusListener(_onCovered);
+    }
     if (videoDetailController.removeSafeArea) {
       padding = .zero;
     } else {
@@ -751,51 +826,19 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                               : Positioned.fill(
                                   bottom: -2,
                                   child: GestureDetector(
-                                    onTap: () async {
-                                      if (!videoDetailController.isFileSource) {
-                                        if (videoDetailController.isQuerying) {
-                                          if (kDebugMode) {
-                                            debugPrint(
-                                              'handlePlay: querying',
-                                            );
-                                          }
-                                          return;
-                                        }
-                                        if (videoDetailController.videoUrl ==
-                                                null ||
-                                            videoDetailController.audioUrl ==
-                                                null) {
-                                          if (kDebugMode) {
-                                            debugPrint(
-                                              'handlePlay: videoUrl/audioUrl not initialized',
-                                            );
-                                          }
-                                          videoDetailController.queryVideoUrl();
-                                          return;
-                                        }
-                                      }
+                                    onTap: () {
                                       videoDetailController.scrollRatio.value =
                                           0;
-                                      if (plPlayerController == null ||
-                                          videoDetailController.playedTime ==
-                                              null) {
+                                      if (!videoDetailController
+                                              .frameReady
+                                              .value ||
+                                          !plPlayerController!.hasSourceFor(
+                                            videoDetailController,
+                                            videoDetailController.cid.value,
+                                          )) {
                                         handlePlay();
                                       } else {
-                                        if (plPlayerController!
-                                            .videoPlayerController!
-                                            .state
-                                            .completed) {
-                                          await plPlayerController!
-                                              .videoPlayerController!
-                                              .seek(Duration.zero);
-                                          plPlayerController!
-                                              .videoPlayerController!
-                                              .play();
-                                        } else {
-                                          plPlayerController!
-                                              .videoPlayerController!
-                                              .playOrPause();
-                                        }
+                                        plPlayerController!.onDoubleTapCenter();
                                       }
                                     },
                                     behavior: HitTestBehavior.opaque,
@@ -1321,48 +1364,60 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         videoDetailController.plPlayerController.onPopInvokedWithResult,
     child: Obx(
       () {
-        final bool showLoadingOrPlaceholder =
-            !videoDetailController.videoState.value ||
-            !videoDetailController.autoPlay ||
-            plPlayerController?.videoController == null;
-
-        if (showLoadingOrPlaceholder) {
-          return NetworkImgLayer(
+        final canAttach =
+            videoDetailController.videoState.value &&
+            plPlayerController?.videoController != null;
+        final player = canAttach
+            ? PLVideoPlayer(
+                maxWidth: width,
+                maxHeight: height,
+                plPlayerController: plPlayerController!,
+                videoDetailController: videoDetailController,
+                introController: introController,
+                headerControl: HeaderControl(
+                  key: videoDetailController.headerCtrKey,
+                  isPortrait: isPortrait,
+                  controller: videoDetailController.plPlayerController,
+                  videoDetailCtr: videoDetailController,
+                  heroTag: heroTag,
+                ),
+                danmuWidget: isPipMode && pipNoDanmaku
+                    ? null
+                    : Obx(
+                        () => PlDanmaku(
+                          key: ValueKey(videoDetailController.cid.value),
+                          isPipMode: isPipMode,
+                          cid: videoDetailController.cid.value,
+                          playerController: plPlayerController!,
+                          isFullScreen: plPlayerController!.isFullScreen.value,
+                          isFileSource: videoDetailController.isFileSource,
+                          size: Size(width, height),
+                        ),
+                      ),
+                showEpisodes: showEpisodes,
+                showViewPoints: showViewPoints,
+              )
+            : null;
+        return VideoPresentation(
+          width: width,
+          height: height,
+          player: player,
+          showPoster:
+              !videoDetailController.autoPlay ||
+              !videoDetailController.frameReady.value,
+          loading: videoDetailController.preparingPlayback.value,
+          onPlay: handlePlay,
+          poster: NetworkImgLayer(
+            type: .emote,
+            quality: 60,
             src: videoDetailController.cover.value,
-            fit: plPlayerController?.videoFit.value.boxFit ?? BoxFit.contain,
+            fit: BoxFit.contain,
             width: width,
             height: height,
-          );
-        }
-
-        return PLVideoPlayer(
-          maxWidth: width,
-          maxHeight: height,
-          plPlayerController: plPlayerController!,
-          videoDetailController: videoDetailController,
-          introController: introController,
-          headerControl: HeaderControl(
-            key: videoDetailController.headerCtrKey,
-            isPortrait: isPortrait,
-            controller: videoDetailController.plPlayerController,
-            videoDetailCtr: videoDetailController,
-            heroTag: heroTag,
+            cacheWidth: true,
+            fadeInDuration: Duration.zero,
+            fadeOutDuration: Duration.zero,
           ),
-          danmuWidget: isPipMode && pipNoDanmaku
-              ? null
-              : Obx(
-                  () => PlDanmaku(
-                    key: ValueKey(videoDetailController.cid.value),
-                    isPipMode: isPipMode,
-                    cid: videoDetailController.cid.value,
-                    playerController: plPlayerController!,
-                    isFullScreen: plPlayerController!.isFullScreen.value,
-                    isFileSource: videoDetailController.isFileSource,
-                    size: Size(width, height),
-                  ),
-                ),
-          showEpisodes: showEpisodes,
-          showViewPoints: showViewPoints,
         );
       },
     ),
@@ -1402,8 +1457,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         plPlayerController: videoDetailController.plPlayerController,
         introController: introController,
         onSendDanmaku: videoDetailController.showShootDanmakuSheet,
+        isReady: () =>
+            _ownsReadyPlayback &&
+            !videoDetailController.preparingPlayback.value,
         canPlay: () {
-          if (videoDetailController.autoPlay) {
+          if (_ownsReadyPlayback &&
+              !videoDetailController.preparingPlayback.value &&
+              videoDetailController.autoPlay) {
             return true;
           }
           handlePlay();
@@ -1581,31 +1641,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
         plPlayer(width: width, height: height),
 
-        Obx(() {
-          if (!videoDetailController.autoPlay) {
-            return Positioned.fill(
-              bottom: -1,
-              child: GestureDetector(
-                onTap: handlePlay,
-                behavior: .opaque,
-                child: Obx(
-                  () => NetworkImgLayer(
-                    type: .emote,
-                    quality: 60,
-                    src: videoDetailController.cover.value,
-                    width: width,
-                    height: height,
-                    cacheWidth: true,
-                    getPlaceHolder: () => Center(
-                      child: Image.asset(Assets.loading),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        }),
         manualPlayerWidget,
 
         if (videoDetailController.plPlayerController.enableBlock ||

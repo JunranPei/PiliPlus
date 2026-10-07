@@ -91,7 +91,7 @@ class _LiveRoomPageState extends State<LiveRoomPage>
     plPlayerController = _liveRoomController.plPlayerController
       ..addStatusLister(playerListener);
     AndroidPipController.instance.addListener(_onPipStateChanged);
-    PlPlayerController.setPlayCallBack(plPlayerController.play);
+    PlPlayerController.setPlayCallBack(_liveRoomController.playCurrentSource);
     if (plPlayerController.removeSafeArea) {
       hideSystemBar();
     }
@@ -127,17 +127,17 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   Future<void> didPopNext() async {
+    _liveRoomController.returnToPlaybackRoute();
     addObserverMobile(this);
-    if (!plPlayerController.isLive) {
-      plPlayerController.isLive = true;
-      _liveRoomController.isLoaded.refresh();
-    }
     plPlayerController.danmakuController =
         _liveRoomController.danmakuController;
-    PlPlayerController.setPlayCallBack(plPlayerController.play);
+    PlPlayerController.setPlayCallBack(_liveRoomController.playCurrentSource);
+    if (_liveRoomController.roomInfoH5.value == null) {
+      _liveRoomController.queryLiveInfoH5();
+    }
     _liveRoomController.startLiveTimer();
     if (plPlayerController.playerStatus.isPlaying &&
-        plPlayerController.cid == null) {
+        _liveRoomController.ownsPlayback) {
       _liveRoomController
         ..danmakuController?.resume()
         ..startLiveMsg();
@@ -148,27 +148,45 @@ class _LiveRoomPageState extends State<LiveRoomPage>
           ..danmakuController?.resume()
           ..startLiveMsg();
       }
-      await _liveRoomController.playerInit(autoplay: shouldPlay);
+      if (_liveRoomController.videoUrl == null) {
+        await _liveRoomController.queryLiveUrl(autoplay: shouldPlay);
+      } else {
+        await _liveRoomController.playerInit(autoplay: shouldPlay);
+      }
     }
-    if (!mounted) return;
+    if (!mounted || !_liveRoomController.playbackRouteActive) return;
     plPlayerController.addStatusLister(playerListener);
     super.didPopNext();
   }
 
   @override
   void didPushNext() {
+    if (_liveRoomController.ownsPlayback) {
+      _liveRoomController.isPlaying = plPlayerController.playerStatus.isPlaying;
+    }
+    _liveRoomController.leavePlaybackRoute();
     removeObserverMobile(this);
     plPlayerController.removeStatusLister(playerListener);
     _liveRoomController
       ..danmakuController?.clear()
       ..danmakuController?.pause()
       ..cancelLiveTimer()
-      ..closeLiveMsg()
-      ..isPlaying = plPlayerController.playerStatus.isPlaying;
+      ..closeLiveMsg();
     super.didPushNext();
   }
 
+  @override
+  void didPop() {
+    _liveRoomController.leavePlaybackRoute();
+    plPlayerController.removeStatusLister(playerListener);
+    super.didPop();
+  }
+
   void playerListener(PlayerStatus status) {
+    if (!_liveRoomController.playbackRouteActive ||
+        !_liveRoomController.ownsPlayback) {
+      return;
+    }
     if (status.isPlaying) {
       _liveRoomController
         ..danmakuController?.resume()
@@ -184,13 +202,15 @@ class _LiveRoomPageState extends State<LiveRoomPage>
 
   @override
   void dispose() {
+    _liveRoomController.leavePlaybackRoute();
     AndroidPipController.instance.removeListener(_onPipStateChanged);
     removeObserverMobile(this);
     videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
     if (Platform.isAndroid && !plPlayerController.setSystemBrightness) {
       ScreenBrightnessPlatform.instance.resetApplicationScreenBrightness();
     }
-    PlPlayerController.setPlayCallBack(null);
+    // The shared controller clears its callback when the last page disposes.
+    // A departing live page must not clear the new foreground page's callback.
     plPlayerController
       ..removeStatusLister(playerListener)
       ..dispose();

@@ -156,6 +156,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   bool _pauseDueToPauseUponEnteringBackgroundMode = false;
 
   StreamSubscription? _brightnessListener;
+  StreamSubscription<double>? _volumeListener;
   void _onBrightnessChanged(double value) {
     if (mounted && _gestureType != .left) {
       _brightnessValue.value = value;
@@ -309,10 +310,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
     if (PlatformUtils.isMobile) {
       Future.microtask(() {
+        if (!mounted) return;
         try {
           FlutterVolumeController.updateShowSystemUI(true);
           _getCurrVolume();
-          FlutterVolumeController.addListener(
+          _volumeListener = FlutterVolumeController.addListener(
             _onVolumeChanged,
             emitOnStart: false,
           );
@@ -427,7 +429,9 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
   @override
   void dispose() {
     AndroidPipController.instance.removeListener(_onPipPhaseChanged);
-    plPlayerController.getVideoRectCallback = null;
+    if (plPlayerController.getVideoRectCallback == getVideoPhysicalRect) {
+      plPlayerController.getVideoRectCallback = null;
+    }
     removeObserverMobile(this);
     _danmakuListener?.cancel();
     _tapGestureRecognizer.dispose();
@@ -435,13 +439,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
     _doubleTapGestureRecognizer.dispose();
     _scaleGestureRecognizer.dispose();
     _brightnessListener?.cancel();
+    _volumeListener?.cancel();
     _controlsListener?.cancel();
     _animationController.dispose();
     _transformationController.dispose();
     _removeDmAction();
-    if (PlatformUtils.isMobile) {
-      FlutterVolumeController.removeListener();
-    }
     super.dispose();
   }
 

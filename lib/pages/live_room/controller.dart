@@ -125,6 +125,37 @@ class LiveRoomController extends GetxController {
   String? videoUrl;
   bool? isPlaying;
   late bool isFullScreen = false;
+  bool _playbackRouteActive = true;
+  int _routeRevision = 0;
+  int _queryRevision = 0;
+  int _prepareRevision = 0;
+
+  bool get playbackRouteActive => _playbackRouteActive && !isClosed;
+  bool get ownsPlayback => plPlayerController.hasSourceFor(this, null);
+
+  void leavePlaybackRoute() {
+    _playbackRouteActive = false;
+    _routeRevision++;
+    _queryRevision++;
+    _prepareRevision++;
+    plPlayerController.cancelSource(this);
+  }
+
+  void returnToPlaybackRoute() {
+    _playbackRouteActive = true;
+    _routeRevision++;
+  }
+
+  Future<void> playCurrentSource() async {
+    if (!playbackRouteActive) return;
+    if (ownsPlayback) {
+      await plPlayerController.play();
+    } else if (videoUrl != null) {
+      await playerInit();
+    } else {
+      await queryLiveUrl();
+    }
+  }
 
   final superChatType = Pref.superChatType;
   late final showSuperChat = superChatType != SuperChatType.disable;
@@ -166,31 +197,62 @@ class LiveRoomController extends GetxController {
     }
   }
 
-  Future<void>? playerInit({
+  Future<void> playerInit({
     bool autoplay = true,
     bool autoFullScreenFlag = false,
-  }) {
-    if (videoUrl == null) {
-      return null;
+  }) async {
+    if (!playbackRouteActive || videoUrl == null) {
+      return;
     }
-    return plPlayerController.setDataSource(
+    final routeRevision = _routeRevision;
+    final prepareRevision = ++_prepareRevision;
+    await plPlayerController.setDataSource(
       NetworkSource(videoSource: videoUrl!, audioSource: null),
       isLive: true,
       autoplay: autoplay,
       isVertical: isPortrait.value,
       autoFullScreenFlag: autoFullScreenFlag,
+      owner: this,
+      onReload: playerInit,
     );
+    if (!playbackRouteActive ||
+        routeRevision != _routeRevision ||
+        prepareRevision != _prepareRevision ||
+        !ownsPlayback) {
+      return;
+    }
+    // The shared player's isLive flag is not reactive. Refresh an already
+    // loaded page as well when returning from a different playback owner.
+    if (isLoaded.value) {
+      isLoaded.refresh();
+    } else {
+      isLoaded.value = true;
+    }
   }
 
-  Future<void> queryLiveUrl({bool autoFullScreenFlag = false}) async {
-    currentQn ??= await ConnectivityUtils.isWiFi
-        ? Pref.liveQuality
-        : Pref.liveQualityCellular;
+  Future<void> queryLiveUrl({
+    bool autoFullScreenFlag = false,
+    bool autoplay = true,
+  }) async {
+    if (!playbackRouteActive) return;
+    final routeRevision = _routeRevision;
+    final queryRevision = ++_queryRevision;
+    bool isCurrent() =>
+        playbackRouteActive &&
+        routeRevision == _routeRevision &&
+        queryRevision == _queryRevision;
+    if (currentQn == null) {
+      final isWiFi = await ConnectivityUtils.isWiFi;
+      if (!isCurrent()) return;
+      currentQn ??= isWiFi ? Pref.liveQuality : Pref.liveQualityCellular;
+    }
+    if (!isCurrent()) return;
     final res = await LiveHttp.liveRoomInfo(
       roomId: roomId,
       qn: currentQn,
       onlyAudio: plPlayerController.onlyPlayAudio.value,
     );
+    if (!isCurrent()) return;
     if (res case Success(:final response)) {
       if (response.liveStatus != 1) {
         _showDialog('当前直播间未开播');
@@ -214,8 +276,8 @@ class LiveRoomController extends GetxController {
         formatIndex: formatIndex,
         codecIndex: codecIndex,
         liveUrlIndex: liveUrlIndex,
+        autoplay: autoplay,
       );
-      isLoaded.value = true;
     } else {
       _showDialog(res.toString());
     }
@@ -232,7 +294,9 @@ class LiveRoomController extends GetxController {
     int formatIndex = 0,
     int codecIndex = 0,
     int liveUrlIndex = 0,
+    bool autoplay = true,
   }) {
+    if (!playbackRouteActive) return null;
     this.streamIndex = streamIndex;
     this.formatIndex = formatIndex;
     this.codecIndex = codecIndex;
@@ -255,11 +319,14 @@ class LiveRoomController extends GetxController {
     currentQnDesc.value =
         LiveQuality.fromCode(currentQn)?.desc ?? currentQn.toString();
     videoUrl = VideoUtils.getLiveCdnUrl(item, index: liveUrlIndex);
-    return playerInit();
+    return playerInit(autoplay: autoplay);
   }
 
   Future<void> queryLiveInfoH5() async {
+    if (!playbackRouteActive) return;
+    final routeRevision = _routeRevision;
     final res = await LiveHttp.liveRoomInfoH5(roomId: roomId);
+    if (!playbackRouteActive || routeRevision != _routeRevision) return;
     if (res case Success(:final response)) {
       roomInfoH5.value = response;
       title.value = response.roomInfo?.title ?? '';
@@ -410,6 +477,7 @@ class LiveRoomController extends GetxController {
 
   @override
   void onClose() {
+    leavePlaybackRoute();
     closeLiveMsg();
     cancelLikeTimer();
     cancelLiveTimer();
