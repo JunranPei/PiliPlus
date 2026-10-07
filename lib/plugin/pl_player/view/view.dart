@@ -370,15 +370,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == .resumed) {
-      plPlayerController.onAppForegrounded();
-    } else if (const <AppLifecycleState>[
-      .paused,
-      .detached,
-    ].contains(state)) {
-      plPlayerController.onAppBackgrounded();
-    }
-
     if (!plPlayerController.continuePlayInBackground.value) {
       late final player = plPlayerController.videoPlayerController;
       if (const <AppLifecycleState>[.paused, .detached].contains(state)) {
@@ -401,10 +392,10 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             player.pause();
           }
         }
-      } else if (state == .resumed) {
+      } else {
         if (_pauseDueToPauseUponEnteringBackgroundMode) {
           _pauseDueToPauseUponEnteringBackgroundMode = false;
-          plPlayerController.play();
+          player?.play();
         }
       }
     }

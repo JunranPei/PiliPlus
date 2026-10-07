@@ -141,7 +141,16 @@ class _PipViewportState extends State<PipViewport> {
         // MediaQuery notification arrives. Propagate the actual bounds to
         // the retained page so its existing player receives the PiP size,
         // instead of laying out a full-window child at the top-left.
-        final windowMedia = media.copyWith(size: window);
+        // Outside a PiP transition, preserve the route's original MediaQuery.
+        // Route constraints can exclude insets or other surrounding layout;
+        // they must not become a new screen size for ordinary playback.
+        final normalPlayback =
+            widget.phase == AndroidPipPhase.idle &&
+            !_holdPipLayout &&
+            hasNormalBounds;
+        final windowMedia = normalPlayback
+            ? media
+            : media.copyWith(size: window);
         PipDiagnostics.event('viewport.layout', {
           'state': identityHashCode(this),
           'phase': widget.phase.name,

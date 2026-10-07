@@ -43,42 +43,102 @@ class _ProbeState extends State<_Probe> {
 }
 
 void main() {
-  testWidgets('native root lock retains player state and original insets', (tester) async {
-    const full = Size(400, 900);
-    const videoKey = ValueKey('native-root-video');
-    await tester.binding.setSurfaceSize(full);
+  testWidgets('ordinary playback retains inherited screen metrics', (
+    tester,
+  ) async {
+    const screen = Size(400, 900);
+    const content = Size(400, 852);
+    const videoKey = ValueKey('ordinary-video');
+    const media = MediaQueryData(
+      size: screen,
+      devicePixelRatio: 2,
+      padding: EdgeInsets.only(top: 24, bottom: 24),
+    );
+    await tester.binding.setSurfaceSize(screen);
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    Future<void> show(AndroidPipPhase phase, bool locked, double inset) => tester.pumpWidget(
+
+    await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: MediaQuery(
-          data: MediaQueryData(
-            size: full, devicePixelRatio: 2,
-            padding: EdgeInsets.only(top: inset),
-            viewPadding: EdgeInsets.only(top: inset),
-          ),
-          child: PipViewport(
-            phase: phase, nativeRootLocked: locked,
-            sourceRect: const Rect.fromLTWH(0, 48, 800, 450),
-            child: const _Probe(videoKey: videoKey),
+          data: media,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: SizedBox.fromSize(
+              size: content,
+              child: const PipViewport(
+                phase: AndroidPipPhase.idle,
+                sourceRect: null,
+                child: _Probe(videoKey: videoKey),
+              ),
+            ),
           ),
         ),
       ),
     );
+
+    final state = tester.state<_ProbeState>(find.byType(_Probe));
+    expect(state.mediaData, media);
+    expect(state.layoutSize, content);
+    expect(state.isPipWindow, false);
+    expect(
+      tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring,
+      false,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('native root lock retains player state and original insets', (
+    tester,
+  ) async {
+    const full = Size(400, 900);
+    const videoKey = ValueKey('native-root-video');
+    await tester.binding.setSurfaceSize(full);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    Future<void> show(AndroidPipPhase phase, bool locked, double inset) =>
+        tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: MediaQuery(
+              data: MediaQueryData(
+                size: full,
+                devicePixelRatio: 2,
+                padding: EdgeInsets.only(top: inset),
+                viewPadding: EdgeInsets.only(top: inset),
+              ),
+              child: PipViewport(
+                phase: phase,
+                nativeRootLocked: locked,
+                sourceRect: const Rect.fromLTWH(0, 48, 800, 450),
+                child: const _Probe(videoKey: videoKey),
+              ),
+            ),
+          ),
+        );
     await show(AndroidPipPhase.idle, false, 24);
     final state = tester.state<_ProbeState>(find.byType(_Probe));
-    for (final phase in [AndroidPipPhase.entering, AndroidPipPhase.active, AndroidPipPhase.idle]) {
+    for (final phase in [
+      AndroidPipPhase.entering,
+      AndroidPipPhase.active,
+      AndroidPipPhase.idle,
+    ]) {
       await show(phase, true, 0);
       expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
       expect(state.disposeCount, 0);
       expect(state.layoutSize, full);
       expect(state.mediaData.padding.top, 24);
       expect(state.isPipWindow, false);
-      expect(tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring, true);
+      expect(
+        tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring,
+        true,
+      );
     }
     await show(AndroidPipPhase.idle, false, 24);
     expect(tester.state<_ProbeState>(find.byType(_Probe)), same(state));
-    expect(tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring, false);
+    expect(
+      tester.widget<IgnorePointer>(find.byType(IgnorePointer)).ignoring,
+      false,
+    );
     expect(state.disposeCount, 0);
     expect(tester.takeException(), isNull);
   });

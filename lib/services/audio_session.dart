@@ -3,20 +3,20 @@ import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:audio_session/audio_session.dart';
 
 class AudioSessionHandler {
-  late final Future<AudioSession> _session;
+  late AudioSession session;
   bool _playInterrupted = false;
 
-  Future<bool> setActive(bool active) async {
-    return (await _session).setActive(active);
+  Future<bool> setActive(bool active) {
+    return session.setActive(active);
   }
 
   AudioSessionHandler() {
-    _session = _initSession();
+    initSession();
   }
 
-  Future<AudioSession> _initSession() async {
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration.music());
+  Future<void> initSession() async {
+    session = await AudioSession.instance;
+    session.configure(const AudioSessionConfiguration.music());
 
     session.interruptionEventStream.listen((event) {
       final playerStatus = PlPlayerController.getPlayerStatusIfExists();
@@ -71,6 +71,5 @@ class AudioSessionHandler {
       //   player.pause();
       // }
     });
-    return session;
   }
 }

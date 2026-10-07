@@ -69,11 +69,6 @@ class PlPlayerController with BlockConfigMixin {
   Player? _videoPlayerController;
   VideoController? _videoController;
 
-  static const _androidPausedRecoveryDelay = Duration(seconds: 30);
-  DateTime? _androidBackgroundedAt;
-  int? _androidBackgroundedPlayerHandle;
-  bool _recoverAndroidVideoOnNextPlay = false;
-
   // 添加一个私有静态变量来保存实例
   static PlPlayerController? _instance;
 
@@ -686,9 +681,6 @@ class PlPlayerController with BlockConfigMixin {
       this.width = width;
       this.height = height;
       this.dataSource = dataSource;
-      _androidBackgroundedAt = null;
-      _androidBackgroundedPlayerHandle = null;
-      _recoverAndroidVideoOnNextPlay = false;
       _autoPlay = autoplay;
       // 初始化视频倍速
       // _playbackSpeed.value = speed;
@@ -1238,72 +1230,12 @@ class PlPlayerController with BlockConfigMixin {
       await seekTo(Duration.zero, isSeek: false);
     }
 
-    await _recoverAndroidVideoIfNeeded();
     await _videoPlayerController?.play();
 
     audioSessionHandler?.setActive(true);
 
     playerStatus.value = PlayerStatus.playing;
     // screenManager.setOverlays(false);
-  }
-
-  /// Records a paused Android decoder before the Activity loses its surface.
-  /// Some OEM MediaCodec implementations do not recover that decoder after a
-  /// long suspension even though audio and the mpv clock continue normally.
-  void onAppBackgrounded() {
-    if (!Platform.isAndroid || isLive || onlyPlayAudio.value) return;
-    final player = _videoPlayerController;
-    if (player == null || player.state.playing) {
-      _androidBackgroundedAt = null;
-      _androidBackgroundedPlayerHandle = null;
-      return;
-    }
-    _androidBackgroundedAt ??= DateTime.now();
-    _androidBackgroundedPlayerHandle = player.handle;
-  }
-
-  void onAppForegrounded() {
-    final backgroundedAt = _androidBackgroundedAt;
-    final player = _videoPlayerController;
-    _androidBackgroundedAt = null;
-    if (!Platform.isAndroid ||
-        backgroundedAt == null ||
-        player == null ||
-        player.handle != _androidBackgroundedPlayerHandle) {
-      _androidBackgroundedPlayerHandle = null;
-      return;
-    }
-    _androidBackgroundedPlayerHandle = null;
-    if (!player.state.playing &&
-        DateTime.now().difference(backgroundedAt) >=
-            _androidPausedRecoveryDelay) {
-      _recoverAndroidVideoOnNextPlay = true;
-    }
-  }
-
-  Future<void> _recoverAndroidVideoIfNeeded() async {
-    if (!_recoverAndroidVideoOnNextPlay) return;
-    _recoverAndroidVideoOnNextPlay = false;
-    final player = _videoPlayerController;
-    if (player == null ||
-        player.state.playing ||
-        isLive ||
-        onlyPlayAudio.value) {
-      return;
-    }
-
-    final resumePosition = player.state.position;
-    try {
-      // Recreate only the video decoder. This preserves the media source,
-      // audio track, quality selection and controller/widget identities.
-      await player.command(const ['video-reload']);
-      if (resumePosition > Duration.zero && !player.state.completed) {
-        await player.seek(resumePosition);
-      }
-    } catch (error) {
-      // Playback must remain usable even on mpv builds without video-reload.
-      if (kDebugMode) debugPrint('Android video recovery failed: $error');
-    }
   }
 
   /// 暂停播放
@@ -1466,11 +1398,10 @@ class PlPlayerController with BlockConfigMixin {
   // 双击播放、暂停
   Future<void> onDoubleTapCenter() async {
     if (!isLive && _isCompleted) {
-      await play(repeat: true);
-    } else if (videoPlayerController!.state.playing) {
-      await pause();
+      await videoPlayerController!.seek(Duration.zero);
+      videoPlayerController!.play();
     } else {
-      await play();
+      videoPlayerController!.playOrPause();
     }
   }
 

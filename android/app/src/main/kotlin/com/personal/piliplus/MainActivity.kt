@@ -1,5 +1,6 @@
 package com.personal.piliplus
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -35,11 +36,7 @@ class MainActivity : AudioServiceActivity() {
     override fun onDestroy() {
         pipCoordinator?.destroy()
         pipCoordinator = null
-        // AudioService owns the FlutterEngine used by this Activity. Stopping
-        // it here can race FlutterActivity's detach on devices which reclaim
-        // background activities aggressively, leaving a destroyed cached
-        // engine behind for the next launcher tap. The plugin will unbind and
-        // stop the service itself when playback is inactive.
+        stopService(Intent(this, com.ryanheise.audioservice.AudioService::class.java))
         super.onDestroy()
     }
 

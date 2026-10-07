@@ -391,7 +391,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     // 只在确实处于画中画模式时跳过暂停，不再依赖 isEnteringPip
     // 因为 didPushNext 是应用内页面切换触发的，不可能是"正在进入PiP"
-    if (AndroidPipController.instance.protectsPlayback) {
+    if (AndroidPipController.instance.isActive) {
       return; // 已在画中画，保留播放器状态，不进行注销与暂停
     }
 
@@ -785,16 +785,16 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                                             .videoPlayerController!
                                             .state
                                             .completed) {
-                                          await plPlayerController!.play(
-                                            repeat: true,
-                                          );
-                                        } else if (plPlayerController!
-                                            .videoPlayerController!
-                                            .state
-                                            .playing) {
-                                          await plPlayerController!.pause();
+                                          await plPlayerController!
+                                              .videoPlayerController!
+                                              .seek(Duration.zero);
+                                          plPlayerController!
+                                              .videoPlayerController!
+                                              .play();
                                         } else {
-                                          await plPlayerController!.play();
+                                          plPlayerController!
+                                              .videoPlayerController!
+                                              .playOrPause();
                                         }
                                       }
                                     },
