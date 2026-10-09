@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import org.jetbrains.kotlin.konan.properties.Properties
+import java.util.Base64
 
 plugins {
     id("com.android.application")
@@ -55,6 +56,14 @@ android {
             signingConfig = config ?: signingConfigs["debug"]
         }
         release {
+            val playbackTrace = project.findProperty("dart-defines")?.toString()?.split(",")?.any {
+                runCatching {
+                    String(Base64.getDecoder().decode(it), Charsets.UTF_8) == "PLAYBACK_TRACE=true"
+                }.getOrDefault(false)
+            } == true
+            if (playbackTrace) {
+                proguardFiles("playback-diagnostics-rules.pro")
+            }
             if (project.hasProperty("dev")) {
                 applicationIdSuffix = ".dev"
                 resValue(

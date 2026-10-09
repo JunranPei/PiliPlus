@@ -66,6 +66,7 @@ import 'package:PiliPlus/utils/theme_utils.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -178,6 +179,21 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   }
 
   void _onPipStateChanged() {
+    // If PiP starts while the ordinary-page output handshake is still
+    // settling, do not let the native transition capture the cover/placeholder
+    // layer.  Android scales the already-playing texture itself during this
+    // window; the normal page will still finish its geometry handshake after
+    // the transition.
+    if (AndroidPipController.instance.isEntering &&
+        videoDetailController.videoState.value &&
+        videoDetailController
+                .plPlayerController
+                .videoPlayerController
+                ?.state
+                .playing ==
+            true) {
+      videoDetailController.frameReady.value = true;
+    }
     if (mounted) setState(() {});
   }
 
@@ -1399,6 +1415,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
               )
             : null;
         return VideoPresentation(
+          traceData: PlaybackDiagnostics.enabled
+              ? videoDetailController.playbackTraceState
+              : null,
           width: width,
           height: height,
           player: player,

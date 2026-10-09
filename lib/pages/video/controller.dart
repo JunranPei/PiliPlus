@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math' show min;
 import 'dart:ui';
 
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/pair.dart';
 import 'package:PiliPlus/common/widgets/progress_bar/segment_progress_bar.dart';
@@ -115,7 +117,24 @@ class VideoDetailController extends GetxController
   bool _playWhenPrepared = false;
   Future<bool> Function()? waitForPlaybackRoute;
 
+  Map<String, Object?> playbackTraceState() => {
+    'owner': identityHashCode(this),
+    'cid': cid.value,
+    'revision': _playbackRevision,
+    'routeActive': playbackRouteActive,
+    'videoState': videoState.value,
+    'frameReady': frameReady.value,
+    'preparing': preparingPlayback.value,
+    'autoPlay': _autoPlay.value,
+    'coverSourceId': PlaybackDiagnostics.sourceId(cover.value),
+    'mediaSourceId': PlaybackDiagnostics.sourceId(videoUrl),
+    'player': plPlayerController.playbackTraceState(),
+  };
+
   void leavePlaybackRoute() {
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('route.leave', playbackTraceState());
+    }
     playbackRouteActive = false;
     _playbackRevision++;
     plPlayerController.cancelSource(this);
@@ -123,6 +142,9 @@ class VideoDetailController extends GetxController
   }
 
   void returnToPlaybackRoute({bool restoreCurrentSource = false}) {
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.arm('route.return', playbackTraceState());
+    }
     playbackRouteActive = true;
     _playbackRevision++;
     plPlayerController.cancelSource(this);
@@ -165,8 +187,8 @@ class VideoDetailController extends GetxController
     }
     if (sameSource && plPlayerController.hasSourceFor(this, cid.value)) {
       videoState.value = true;
-      frameReady.value = true;
-      await WidgetsBinding.instance.endOfFrame;
+      final revealAfterPlay = !frameReady.value;
+      if (revealAfterPlay) frameReady.value = false;
       if (!playbackRouteActive || isClosed || revision != _playbackRevision) {
         return;
       }
@@ -176,6 +198,14 @@ class VideoDetailController extends GetxController
       await plPlayerController.play(
         repeat: plPlayerController.playerStatus.isCompleted,
       );
+      if (revealAfterPlay) {
+        await plPlayerController.waitForStableVideoOutput();
+        if (!playbackRouteActive || isClosed || revision != _playbackRevision) {
+          return;
+        }
+        frameReady.value = true;
+        await WidgetsBinding.instance.endOfFrame;
+      }
     } else {
       await playerInit(autoplay: true, autoFullScreenFlag: autoFullScreenFlag);
     }
@@ -817,6 +847,9 @@ class VideoDetailController extends GetxController
     bool autoFullScreenFlag = false,
   }) async {
     final revision = ++_playbackRevision;
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.arm('source.prepare', playbackTraceState());
+    }
     plPlayerController.cancelSource(this);
     final requestedCid = cid.value;
     bool isCurrent() =>
@@ -870,6 +903,9 @@ class VideoDetailController extends GetxController
         owner: this,
         onPrepared: () async {
           if (!isCurrent()) return;
+          if (PlaybackDiagnostics.enabled) {
+            PlaybackDiagnostics.event('ui.mount.request', playbackTraceState());
+          }
           videoState.value = true;
           if (plPlayerController.visible) {
             await WidgetsBinding.instance.endOfFrame;
@@ -882,7 +918,19 @@ class VideoDetailController extends GetxController
         },
         onFrameReady: () async {
           if (!isCurrent()) return;
+          if (PlaybackDiagnostics.enabled) {
+            PlaybackDiagnostics.event(
+              'ui.frameReady.before',
+              playbackTraceState(),
+            );
+          }
           frameReady.value = true;
+          if (PlaybackDiagnostics.enabled) {
+            PlaybackDiagnostics.event(
+              'ui.frameReady.after',
+              playbackTraceState(),
+            );
+          }
           if (plPlayerController.visible) {
             await WidgetsBinding.instance.endOfFrame;
           }
@@ -972,6 +1020,9 @@ class VideoDetailController extends GetxController
     }
     if (isQuerying) {
       return;
+    }
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.arm('source.query', playbackTraceState());
     }
     isQuerying = true;
     final queryRevision = ++_queryRevision;

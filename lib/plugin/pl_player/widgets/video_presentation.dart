@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 
 /// Keeps the playback surface mounted while a cover conceals an unready video.
 ///
@@ -15,6 +16,7 @@ class VideoPresentation extends StatelessWidget {
     required this.showPoster,
     this.loading = false,
     this.onPlay,
+    this.traceData,
   });
 
   final double width;
@@ -24,52 +26,80 @@ class VideoPresentation extends StatelessWidget {
   final bool showPoster;
   final bool loading;
   final VoidCallback? onPlay;
+  final Map<String, Object?> Function()? traceData;
+
+  Map<String, Object?> _trace() => {
+    ...?traceData?.call(),
+    'showPoster': showPoster,
+    'loading': loading,
+    'hasPlayer': player != null,
+    'requestedWidth': width,
+    'requestedHeight': height,
+  };
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    width: width,
-    height: height,
-    child: Stack(
-      fit: StackFit.expand,
-      children: [
-        Positioned.fill(
-          key: const ValueKey('video-presentation-player'),
-          child: player ?? const SizedBox.shrink(),
-        ),
-        Positioned.fill(
-          key: const ValueKey('video-presentation-poster'),
-          child: IgnorePointer(
-            ignoring: !showPoster,
-            child: ExcludeSemantics(
-              excluding: !showPoster,
-              child: Opacity(
-                opacity: showPoster ? 1 : 0,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  // Preparation may have started paused. Preserve the user's
-                  // play intent and let the controller coalesce requests.
-                  onTap: showPoster ? onPlay : null,
-                  child: ColoredBox(
-                    color: Colors.black,
-                    child: poster,
+  Widget build(BuildContext context) {
+    if (PlaybackDiagnostics.active) {
+      try {
+        PlaybackDiagnostics.event('presentation.build', _trace());
+      } catch (_) {
+        // Metadata collection must not interrupt playback widget construction.
+      }
+    }
+    final result = SizedBox(
+      width: width,
+      height: height,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned.fill(
+            key: const ValueKey('video-presentation-player'),
+            child: player ?? const SizedBox.shrink(),
+          ),
+          Positioned.fill(
+            key: const ValueKey('video-presentation-poster'),
+            child: IgnorePointer(
+              ignoring: !showPoster,
+              child: ExcludeSemantics(
+                excluding: !showPoster,
+                child: Opacity(
+                  opacity: showPoster ? 1 : 0,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    // Preparation may have started paused. Preserve the user's
+                    // play intent and let the controller coalesce requests.
+                    onTap: showPoster ? onPlay : null,
+                    child: ColoredBox(
+                      color: Colors.black,
+                      child: PlaybackDiagnostics.enabled
+                          ? PlaybackTraceRegion(
+                              name: 'poster',
+                              data: _trace,
+                              child: poster,
+                            )
+                          : poster,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-        if (showPoster && loading)
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: Center(
-                child: SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+          if (showPoster && loading)
+            const Positioned.fill(
+              child: IgnorePointer(
+                child: Center(
+                  child: SizedBox.square(
+                    dimension: 24,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
                 ),
               ),
             ),
-          ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+    return PlaybackDiagnostics.enabled
+        ? PlaybackTraceRegion(name: 'presentation', data: _trace, child: result)
+        : result;
+  }
 }

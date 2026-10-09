@@ -36,6 +36,7 @@ import 'package:PiliPlus/pages/video/post_panel/popup_menu_text.dart';
 import 'package:PiliPlus/pages/video/post_panel/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/pip_source_rect.dart';
 import 'package:PiliPlus/plugin/pl_player/models/bottom_control_type.dart';
@@ -2149,6 +2150,11 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         ? (plPlayerController.width! /
                               plPlayerController.height!)
                         : null);
+                final video = SimpleVideo(
+                  controller: plPlayerController.videoController!,
+                  fill: widget.fill,
+                  aspectRatio: aspect,
+                );
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,
                   flipY: plPlayerController.flipY.value,
@@ -2158,11 +2164,23 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                     child: PipSourceRectObserver(
                       key: _pipContentKey,
                       onPaint: _reportPipSourceRect,
-                      child: SimpleVideo(
-                        controller: plPlayerController.videoController!,
-                        fill: widget.fill,
-                        aspectRatio: aspect,
-                      ),
+                      child: PlaybackDiagnostics.enabled
+                          ? PlaybackTraceRegion(
+                              name: 'video-content',
+                              data: () => {
+                                ...plPlayerController.playbackTraceState(),
+                                'page': widget.videoDetailController
+                                    ?.playbackTraceState(),
+                                'aspectOverride': aspect,
+                                'alignment': widget.alignment.toString(),
+                                'gestureMatrix': _transformationController
+                                    .value
+                                    .storage
+                                    .toList(),
+                              },
+                              child: video,
+                            )
+                          : video,
                     ),
                   ),
                 );

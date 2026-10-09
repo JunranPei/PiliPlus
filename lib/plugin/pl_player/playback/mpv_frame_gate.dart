@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:ffi';
 
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/generated/libmpv/bindings.dart' as mpv;
 import 'package:media_kit/media_kit.dart';
@@ -187,6 +189,7 @@ class MpvFrameGate {
   }
 
   void _trace(String event) {
+    PlaybackDiagnostics.event('mpv.gate', {'gateId': _id, 'detail': event});
     if (kDebugMode) debugPrint('[PLAYBACK_FRAME] gate=$_id $event');
   }
 

@@ -22,6 +22,7 @@ import 'package:PiliPlus/pages/setting/models/play_settings.dart'
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
@@ -74,6 +75,66 @@ class PlPlayerController with BlockConfigMixin {
   Object? _readySourceOwner;
   Object? _sourceOwner;
   int _sourceRevision = 0;
+  int? _diagnosticRequest;
+  String? _diagnosticSource;
+  Future<void> Function()? _pendingFrameReady;
+  int _pendingFrameReadyRevision = 0;
+  VoidCallback? _traceRectChanged;
+  VoidCallback? _traceIdChanged;
+  VideoController? _traceVideoController;
+
+  Map<String, Object?> playbackTraceState() {
+    final state = _videoPlayerController?.state;
+    final rect = _videoController?.rect.value;
+    return {
+      'requestId': _diagnosticRequest,
+      'sourceRevision': _sourceRevision,
+      'owner': _sourceOwner == null ? null : identityHashCode(_sourceOwner!),
+      'readyOwner': _readySourceOwner == null
+          ? null
+          : identityHashCode(_readySourceOwner!),
+      'cid': cid,
+      'mediaSourceId': _diagnosticSource,
+      'playerId': _videoPlayerController == null
+          ? null
+          : identityHashCode(_videoPlayerController!),
+      'videoControllerId': _videoController == null
+          ? null
+          : identityHashCode(_videoController!),
+      'textureId': _videoController?.id.value,
+      'textureRect': rect == null
+          ? null
+          : [rect.left, rect.top, rect.right, rect.bottom],
+      'decodedDisplaySize': state == null ? null : [state.width, state.height],
+      'positionMs': state?.position.inMilliseconds,
+      'playing': state?.playing,
+      'buffering': state?.buffering,
+      'requestedSize': [width, height],
+      'fit': videoFit.value.name,
+      'flipX': flipX.value,
+      'flipY': flipY.value,
+      'onlyAudio': onlyPlayAudio.value,
+      'isLive': isLive,
+    };
+  }
+
+  void _installPlaybackTrace() {
+    if (!PlaybackDiagnostics.enabled) return;
+    final controller = _videoController!;
+    _traceVideoController = controller;
+    _traceRectChanged = () =>
+        PlaybackDiagnostics.event('media.textureRect', playbackTraceState());
+    _traceIdChanged = () =>
+        PlaybackDiagnostics.event('media.textureId', playbackTraceState());
+    controller.rect.addListener(_traceRectChanged!);
+    controller.id.addListener(_traceIdChanged!);
+    PlaybackDiagnostics.register(
+      'player#${identityHashCode(this)}',
+      playbackTraceState,
+    );
+    PlaybackDiagnostics.event('media.controller.created', playbackTraceState());
+  }
+
   Future<void> Function()? _reloadSource;
 
   bool hasSourceFor(Object owner, int? cid) =>
@@ -81,7 +142,10 @@ class PlPlayerController with BlockConfigMixin {
 
   void cancelSource(Object owner) {
     _sourceQueue.cancel(owner);
-    if (_sourceOwner == owner) _sourceRevision++;
+    if (_sourceOwner == owner) {
+      _sourceRevision++;
+      _pendingFrameReady = null;
+    }
   }
 
   // 添加一个私有静态变量来保存实例
@@ -692,9 +756,25 @@ class PlPlayerController with BlockConfigMixin {
   }) async {
     await _sourceQueue.run(owner ?? this, (request) async {
       try {
+        _diagnosticRequest = request.id;
+        if (PlaybackDiagnostics.enabled) {
+          PlaybackDiagnostics.event('source.prepare.begin', {
+            'requestId': request.id,
+            'owner': identityHashCode(owner ?? this),
+            'cid': cid,
+            'previous': playbackTraceState(),
+          });
+        }
         _readySourceOwner = null;
         _sourceOwner = owner ?? this;
         _sourceRevision++;
+        // The first mpv output only proves that the source can render.  The
+        // Android surface may still receive its final video parameters when
+        // play() starts.  Keep the presentation callback pending until that
+        // second handoff has settled, otherwise the poster exposes the
+        // intermediate texture geometry for one or more frames.
+        _pendingFrameReady = null;
+        _pendingFrameReadyRevision = _sourceRevision;
         _reloadSource = onReload;
         if (kDebugMode) {
           debugPrint('[PLAYBACK] prepare request=${request.id} cid=$cid');
@@ -762,15 +842,14 @@ class PlPlayerController with BlockConfigMixin {
         await _initializePlayer();
         request.checkCurrent();
         _readySourceOwner = owner ?? this;
+        if (PlaybackDiagnostics.enabled) {
+          PlaybackDiagnostics.event('source.gate.ready', playbackTraceState());
+        }
         dataStatus.value = DataStatus.loaded;
         onInit?.call();
         if (onFrameReady != null) {
-          await Future.any<void>([
-            onFrameReady(),
-            request.cancelled.then<void>(
-              (_) => throw const PlaybackSourceCancelled(),
-            ),
-          ]);
+          _pendingFrameReady = onFrameReady;
+          _pendingFrameReadyRevision = _sourceRevision;
         }
         request.checkCurrent();
         if (autoplay) await play();
@@ -781,10 +860,19 @@ class PlPlayerController with BlockConfigMixin {
         }
         return true;
       } on PlaybackSourceCancelled {
+        PlaybackDiagnostics.event('source.cancelled', {
+          'requestId': request.id,
+          'cid': cid,
+        });
         rethrow;
       } catch (err, stackTrace) {
         if (!request.isCurrent) return false;
         dataStatus.value = DataStatus.error;
+        PlaybackDiagnostics.event('source.error', {
+          'requestId': request.id,
+          'cid': cid,
+          'errorType': err.runtimeType.toString(),
+        });
         if (kDebugMode) {
           debugPrint(stackTrace.toString());
           debugPrint('plPlayer err:  $err');
@@ -894,6 +982,8 @@ class PlPlayerController with BlockConfigMixin {
 
     player.setMediaHeader(userAgent: BrowserUa.pc, referer: HttpString.baseUrl);
 
+    _installPlaybackTrace();
+
     _startListeners(player);
 
     return player;
@@ -997,11 +1087,18 @@ class PlPlayerController with BlockConfigMixin {
     }
 
     final gate = waitForFrame ? MpvFrameGate(player, source: video) : null;
+    _diagnosticSource = PlaybackDiagnostics.sourceId(video);
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('source.open.begin', playbackTraceState());
+    }
     try {
       await player.open(
         Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
         play: false,
       );
+      if (PlaybackDiagnostics.enabled) {
+        PlaybackDiagnostics.event('source.open.return', playbackTraceState());
+      }
       request.checkCurrent();
       if (gate != null) {
         await Future.any<void>([
@@ -1060,6 +1157,119 @@ class PlPlayerController with BlockConfigMixin {
     }
   }
 
+  /// Wait until the output exposed by media_kit has stopped changing after a
+  /// play command.  mpv can report a usable frame before the Android surface
+  /// is resized to the final decoded stream; revealing Flutter in that gap
+  /// causes the old texture geometry to flash before the final one replaces
+  /// it.  Three equal samples across frame boundaries make the handoff atomic
+  /// from the UI's point of view while retaining the same texture.
+  Future<void> _waitForStableVideoOutput({
+    required int sourceRevision,
+    Duration timeout = const Duration(milliseconds: 1500),
+  }) async {
+    final controller = _videoController;
+    if (controller == null) return;
+    final started = Stopwatch()..start();
+    String? previous;
+    var stableSamples = 0;
+    while (started.elapsed < timeout) {
+      // PiP owns the transition surface once Android marks the entry as
+      // pending.  Waiting for the normal-page geometry here leaves Flutter
+      // covered while SystemUI captures the transition, which can produce an
+      // app-icon frame for sources whose final output arrives a little later.
+      // The already-playing texture is the correct source for PiP's native
+      // scaling, so hand it over immediately in this case.
+      if (Platform.isAndroid &&
+          AndroidPipController.instance.protectsPlayback) {
+        if (PlaybackDiagnostics.enabled) {
+          PlaybackDiagnostics.event('output.stable.pip-bypass', {
+            ...playbackTraceState(),
+            'sourceRevision': sourceRevision,
+            'elapsedMs': started.elapsedMilliseconds,
+          });
+        }
+        return;
+      }
+      if (sourceRevision != _sourceRevision || _videoController != controller) {
+        return;
+      }
+      final rect = controller.rect.value;
+      final state = controller.player.state;
+      final id = controller.id.value;
+      final valid =
+          id != null &&
+          rect != null &&
+          rect.width > 1 &&
+          rect.height > 1 &&
+          state.width > 0 &&
+          state.height > 0;
+      if (valid) {
+        final signature =
+            '$id|${rect.left.toStringAsFixed(3)},'
+            '${rect.top.toStringAsFixed(3)},'
+            '${rect.width.toStringAsFixed(3)},'
+            '${rect.height.toStringAsFixed(3)}|'
+            '${state.width}x${state.height}';
+        if (signature == previous) {
+          stableSamples++;
+        } else {
+          previous = signature;
+          stableSamples = 1;
+        }
+        // Give the post-play surface resize at least one display interval to
+        // arrive before accepting the first repeated sample.
+        if (started.elapsed >= const Duration(milliseconds: 120) &&
+            stableSamples >= 3) {
+          if (PlaybackDiagnostics.enabled) {
+            PlaybackDiagnostics.event('output.stable', {
+              ...playbackTraceState(),
+              'sourceRevision': sourceRevision,
+              'samples': stableSamples,
+              'elapsedMs': started.elapsedMilliseconds,
+              'signature': signature,
+            });
+          }
+          return;
+        }
+      } else {
+        previous = null;
+        stableSamples = 0;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 16));
+    }
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('output.stable.timeout', {
+        ...playbackTraceState(),
+        'sourceRevision': sourceRevision,
+        'elapsedMs': started.elapsedMilliseconds,
+        'lastSignature': previous,
+      });
+    }
+  }
+
+  Future<void> _presentPendingFrameIfNeeded() async {
+    final callback = _pendingFrameReady;
+    if (callback == null) return;
+    final revision = _pendingFrameReadyRevision;
+    _pendingFrameReady = null;
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('output.stable.wait', {
+        ...playbackTraceState(),
+        'sourceRevision': revision,
+      });
+    }
+    await _waitForStableVideoOutput(sourceRevision: revision);
+    if (revision != _sourceRevision) return;
+    await callback();
+  }
+
+  /// Public counterpart used when a source is already loaded but its Flutter
+  /// presentation is still covered (for example, after returning to a video
+  /// route).  It intentionally does not reveal anything by itself; the owner
+  /// changes its frame-ready flag only after this future completes.
+  Future<void> waitForStableVideoOutput() =>
+      _waitForStableVideoOutput(sourceRevision: _sourceRevision);
+
   Future<void>? refreshPlayer() {
     if (dataSource is FileSource || processing) {
       return null;
@@ -1111,7 +1321,34 @@ class PlPlayerController with BlockConfigMixin {
     assert(_subscriptions == null);
     final stream = player.stream;
     _subscriptions = [
+      if (PlaybackDiagnostics.enabled) ...[
+        stream.videoParams.listen(
+          (event) => PlaybackDiagnostics.event('media.videoParams', {
+            ...playbackTraceState(),
+            'params': {
+              'w': event.w,
+              'h': event.h,
+              'dw': event.dw,
+              'dh': event.dh,
+              'rotate': event.rotate,
+              'aspect': event.aspect,
+              'pixelformat': event.pixelformat,
+              'hwPixelformat': event.hwPixelformat,
+            },
+          }),
+        ),
+        stream.size.listen(
+          (event) =>
+              PlaybackDiagnostics.event('media.size', playbackTraceState()),
+        ),
+      ],
       stream.playing.listen((event) {
+        if (PlaybackDiagnostics.enabled) {
+          PlaybackDiagnostics.event('media.playing', {
+            'value': event,
+            ...playbackTraceState(),
+          });
+        }
         WakelockPlus.toggle(enable: event);
         if (event) {
           if (_isAutoEnterPip) {
@@ -1264,6 +1501,19 @@ class PlPlayerController with BlockConfigMixin {
 
   /// 移除事件监听
   void _removeListeners() {
+    if (PlaybackDiagnostics.enabled) {
+      final controller = _traceVideoController;
+      if (controller != null) {
+        if (_traceRectChanged != null) {
+          controller.rect.removeListener(_traceRectChanged!);
+        }
+        if (_traceIdChanged != null) {
+          controller.id.removeListener(_traceIdChanged!);
+        }
+      }
+      _traceVideoController = null;
+      PlaybackDiagnostics.unregister('player#${identityHashCode(this)}');
+    }
     _subscriptions?.forEach((e) => e.cancel());
     _subscriptions?.clear();
     _subscriptions = null;
@@ -1350,6 +1600,9 @@ class PlPlayerController with BlockConfigMixin {
 
   /// 播放视频
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('command.play', playbackTraceState());
+    }
     if (_playerCount == 0) return;
     // 播放时自动隐藏控制条
     controls = !hideControls;
@@ -1361,6 +1614,11 @@ class PlPlayerController with BlockConfigMixin {
 
     await _videoPlayerController?.play();
 
+    // Do not reveal the Flutter presentation until the post-play surface
+    // handoff has converged.  This is a no-op for ordinary play commands
+    // without a pending source callback.
+    await _presentPendingFrameIfNeeded();
+
     audioSessionHandler?.setActive(true);
 
     playerStatus.value = PlayerStatus.playing;
@@ -1369,6 +1627,9 @@ class PlPlayerController with BlockConfigMixin {
 
   /// 暂停播放
   Future<void> pause({bool notify = true, bool isInterrupt = false}) async {
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('command.pause', playbackTraceState());
+    }
     await _videoPlayerController?.pause();
     playerStatus.value = PlayerStatus.paused;
 
