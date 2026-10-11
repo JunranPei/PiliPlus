@@ -1,0 +1,1387 @@
+{
+  "status": "SOURCE_INTEGRATION_VERIFIED_RUNTIME_PARTIAL",
+  "date": "2026-10-11",
+  "local_ref": "513626c1924b7444a56d71f9feae5810d6d00639",
+  "comparison_base": "7e3c5c6d793b17fdd1587d9a96b64be7ab3e9df9",
+  "upstream_repository": "https://github.com/bggRGjQaUbCoE/PiliPlus",
+  "upstream_tag": "2.1.6",
+  "upstream_release": "https://github.com/bggRGjQaUbCoE/PiliPlus/releases/tag/2.1.6",
+  "source_archive_sha256": "10743e6340819341080bdb70c186759fbb30dafde7266ec69b0d4741d2595d71",
+  "provenance_note": "All 1621 archived upstream file contents match the fetched 2.1.6 Git commit. Final integration uses two parents: the untouched local tip and this exact upstream tag.",
+  "corrections": [
+    "54 initial full-file conflicts were inflated by CRLF/LF differences: normalized results are 21 conflicting, 22 automatic, 8 local-only, 3 identical shared paths.",
+    "98 rename-aware paths expand to 100 paths: 97 present files and 3 deletions.",
+    "The two Java package renames require mapping old paths to new paths. Keeping both packages is incorrect.",
+    "True merge-base audit showed DynamicStat count > 0 was already common ancestry, not a fork customization. Adopt upstream count >= 0 fix. JNI generator package remapping is an intentional integration adaptation."
+  ],
+  "archive_filename_repairs": [],
+  "counts": {
+    "local-content-unchanged": 52,
+    "combined-source-reviewed": 41,
+    "local-deletion-preserved": 3,
+    "core-adapted-source-reviewed": 4
+  },
+  "static_preservation_checks": {
+    "custom_package": true,
+    "build_label": true,
+    "pip_route_wrappers": true,
+    "local_audio_order": true,
+    "video_card_pause": true,
+    "legacy_media_signature": true,
+    "jni_package": true,
+    "provider_package": true,
+    "hevc_default": true,
+    "avc_fallback": true,
+    "legacy_codec_migration": true,
+    "mediacodec_default": true,
+    "audio_sync": true,
+    "buffer_32_mb": true,
+    "source_queue": true,
+    "frame_gate": true,
+    "post_play_frame_handoff": true,
+    "stale_retry_guard": true,
+    "video_route_barrier": true,
+    "video_owner_guard": true,
+    "query_revision_guard": true,
+    "cover_handoff": true,
+    "keep_pip_tree": true,
+    "live_query_guard": true,
+    "live_size_owner_guard": true,
+    "upstream_progress_api": true,
+    "upstream_ios_pip": true,
+    "upstream_quality_supplement": true,
+    "upstream_live_stream_preference": true
+  },
+  "checks": {
+    "syntax": "58 locally changed Dart files parsed with exit 0.",
+    "internal_imports": "No missing package:PiliPlus import targets or conflict markers detected.",
+    "dependencies": "Flutter 3.47.6 / Dart 3.13.5 installed from official checksum-verified archive; pub get passed and pubspec.lock remained byte-identical to upstream. Upstream SDK and Material patches applied in isolated copies.",
+    "runtime": {
+      "device": "emulator-5554 / sdk_gphone64_x86_64 / Android API 36",
+      "package": "com.personal.piliplus.upstreamreview",
+      "production_package_modified": false,
+      "tested_source_commit": "1297477194bb3f5d5b37561c8dda5ee088d72ec1",
+      "final_source_delta_after_device_test": "Adopt unchanged upstream DynamicStat zero-count fix; no subsequent playback or PiP source changes.",
+      "observations": [
+        {
+          "case": "ordinary playback",
+          "result": "video visibly played; media session PLAYING(3); frame-gate readiness and presentation logged",
+          "evidence": [
+            "playing.png",
+            "playing-logcat.txt",
+            "playing-media-session.txt"
+          ]
+        },
+        {
+          "case": "back out of video page",
+          "result": "media session changed to NONE(0)",
+          "evidence": [
+            "after-video-back-media.txt"
+          ]
+        },
+        {
+          "case": "direct Home PiP",
+          "result": "pinned task and continued PLAYING(3), visible video in PiP",
+          "evidence": [
+            "direct-home.mp4",
+            "direct-home-frames.png",
+            "home-pip.png",
+            "home-after-activity.txt",
+            "home-after-media.txt"
+          ]
+        },
+        {
+          "case": "recents then Home PiP",
+          "result": "recents UI observed, followed by pinned task and continued PLAYING(3), visible video in PiP",
+          "evidence": [
+            "recents-home.mp4",
+            "recents-visible.png",
+            "recents-home-frames.png",
+            "recents-home-pip.png",
+            "recents-home-activity.txt",
+            "recents-home-media.txt"
+          ]
+        }
+      ],
+      "not_accepted": [
+        "video-switch-back.mp4",
+        "switch-*.png",
+        "route-retry.png"
+      ],
+      "limitations": [
+        "Video A -> related video B -> back to A was attempted but not accepted: another test app (com.pixel.gallery.multitask.test) took the foreground, and a Google Play services ANR dialog appeared. These captures are excluded from passing evidence.",
+        "Live playback, authenticated account actions, physical OnePlus power consumption, long-duration playback and non-Android platforms were not runtime-tested.",
+        "Both Android PiP paths were observed separately with videos, screenshots and system state. Contact sheets sample at 4 fps; this does not establish absence of every transient frame glitch or resolve the previously documented settled-jump issue."
+      ],
+      "evidence_directory": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\worktree-upstream-2.1.6-preserve\\diagnostics\\upstream-2.1.6-review\\device"
+    },
+    "original_tracked_worktree": "unchanged",
+    "analysis": {
+      "sdk": "Dart 3.13.5 with upstream SDK patches",
+      "errors": 0,
+      "warnings": 0,
+      "info_count": 37
+    },
+    "flutter_tests": {
+      "passed": 41,
+      "failed": 0,
+      "files": 6,
+      "log": "flutter-test-final-direct.log"
+    },
+    "dependency_lock": "unchanged from upstream 2.1.6",
+    "android_build": {
+      "exit_code": 0,
+      "result": "final debug APK built",
+      "log": "android-build-final-retry.log"
+    },
+    "android_unit_tests": {
+      "passed": 5,
+      "failed": 0,
+      "suites": [
+        {
+          "name": "com.personal.piliplus.PipDiagnosticsTest",
+          "tests": "1",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        },
+        {
+          "name": "com.personal.piliplus.PipRenderHostTest",
+          "tests": "4",
+          "failures": "0",
+          "errors": "0",
+          "skipped": "0"
+        }
+      ]
+    },
+    "strict_dependency_lock": {
+      "exit_code": 0,
+      "result": "enforced lockfile resolution succeeded; lock unchanged from upstream"
+    }
+  },
+  "core_adaptations": [
+    {
+      "file": "lib/plugin/pl_player/controller.dart",
+      "result": "Preserved serialized source queue, owner/revision cancellation, native mpv frame gate, stable-output handoff, heartbeats gated by ready owner, power options and Android PiP; adapted upstream integer progress state, PlayerStatus, iOS PiP and live reload without seeking."
+    },
+    {
+      "file": "lib/pages/video/controller.dart",
+      "result": "Preserved route/cid/revision barriers, explicit playback intent and frame-ready callbacks; combined upstream codec preferences, quality supplementation and offline SponsorBlock initialization."
+    },
+    {
+      "file": "lib/pages/video/view.dart",
+      "result": "Preserved cover presentation, animation barrier, previous-source restoration, pause on pop, fixed PiP subtree; combined upstream intro initialization and new header layout."
+    },
+    {
+      "file": "lib/pages/live_room/controller.dart",
+      "result": "Preserved source ownership, route/query cancellation and autoplay intent; added upstream stream preferences and block rules; guarded new size listener by owner and cancelled it on route leave."
+    }
+  ],
+  "blockers": [],
+  "files": [
+    {
+      "path": ".agents/AGENTS.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "55527b17615cebf465cebd2f838776408f85eff64ee99cf3e06b8bbc2c6b0920",
+      "candidate_sha256": "55527b17615cebf465cebd2f838776408f85eff64ee99cf3e06b8bbc2c6b0920",
+      "local_commits": [
+        "929ce5e62 feat: 截图占位与 ModalRoute 声音残留修复"
+      ]
+    },
+    {
+      "path": "android/app/build.gradle.kts",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "c701f7dc25d6922b40f25d8ada2306ea587b64734d42ec386913499f61cf74a4",
+      "candidate_sha256": "23c6169c69ba4a054bda153c83d024529dc4ea24134e71607c4865351ff965f4",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/playback-diagnostics-rules.pro",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "5e03b674cff689aeb4c3edf09841e32e4976aa53a3bf2216259fe692de6a73a4",
+      "candidate_sha256": "5e03b674cff689aeb4c3edf09841e32e4976aa53a3bf2216259fe692de6a73a4",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff"
+      ]
+    },
+    {
+      "path": "android/app/src/main/AndroidManifest.xml",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "b0d28b05631597bd575205696f9f3a6821b8eb63823a1ab0e208c35048c0d55b",
+      "candidate_sha256": "87e09d61a4be68775b023b7977f80bc9cb797fbf9e3eb9a06bfc0f8fd68177c7",
+      "local_commits": [
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/java/com/example/piliplus/AndroidHelper.java",
+      "local_change": "D",
+      "status": "local-deletion-preserved",
+      "local_sha256": null,
+      "candidate_sha256": null,
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/java/com/example/piliplus/MediaHelper.java",
+      "local_change": "D",
+      "status": "local-deletion-preserved",
+      "local_sha256": null,
+      "candidate_sha256": null,
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/java/com/personal/piliplus/AndroidHelper.java",
+      "local_change": "A",
+      "status": "combined-source-reviewed",
+      "local_sha256": "a7b99a2dea7a16cc9ab7b90389f96c3901b633090a755eda90b6c8a7f1ae5aa5",
+      "candidate_sha256": "6386ff230ab69619204100fd38ca96a0c56d78a4ce7cec830f456c4d0c33f759",
+      "local_commits": [
+        "cf70a5793 fix: 开启无缝小窗调整大小并修复大小切换卡顿闪烁",
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/java/com/personal/piliplus/MediaHelper.java",
+      "local_change": "A",
+      "status": "combined-source-reviewed",
+      "local_sha256": "1a5170a2c1bd5916e82ee33d7490181c4945438ff9bc5e13c085b9ede2a1ff87",
+      "candidate_sha256": "a91a517e2abcc1816f682613b5f9b78dc4addb14223e0bb206d8c202e698631e",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/example/piliplus/MainActivity.kt",
+      "local_change": "D",
+      "status": "local-deletion-preserved",
+      "local_sha256": null,
+      "candidate_sha256": null,
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/MainActivity.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "ca852178c8133e614e1d448484cd08696c138f464fd3f2ebc7fb39849be79702",
+      "candidate_sha256": "ca852178c8133e614e1d448484cd08696c138f464fd3f2ebc7fb39849be79702",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "809a090de fix(pip): keep playback tree stable during Android PiP",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation",
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PipCoordinator.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "2fa59e9c432bcfcfd3ebd8f135bf7a2368c6a79ad7097f2ae66b19ddb135f0b8",
+      "candidate_sha256": "2fa59e9c432bcfcfd3ebd8f135bf7a2368c6a79ad7097f2ae66b19ddb135f0b8",
+      "local_commits": [
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "1e8bf9cd3 fix(pip): synchronize native surface with PiP window",
+        "5450455a0 feat(pip): route playback through native SurfaceView",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "809a090de fix(pip): keep playback tree stable during Android PiP",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PipDiagnostics.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "52ed8a0fb04988b8d40bf881716475180d688b04f898192eb1ecfdcdf94649ed",
+      "candidate_sha256": "52ed8a0fb04988b8d40bf881716475180d688b04f898192eb1ecfdcdf94649ed",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PipRenderHost.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "c6923fbea33cdf095d0529c8bc6b6acf17cc44e16e99629ba949a4d1a5e9c004",
+      "candidate_sha256": "c6923fbea33cdf095d0529c8bc6b6acf17cc44e16e99629ba949a4d1a5e9c004",
+      "local_commits": [
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "5d19a266f wip(android): archive failed PiP layer and entry experiments",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PlaybackDiagnostics.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "b5bd48f2e95f8b743d579620055077fb4d6bb08f602ae274e1757a56490f2c5c",
+      "candidate_sha256": "b5bd48f2e95f8b743d579620055077fb4d6bb08f602ae274e1757a56490f2c5c",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff"
+      ]
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PlaybackTextureProbe.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "c14e77340f2435c7ccab0c5eadb97f6f65bc63362704eaa882e242fd50e52fb2",
+      "candidate_sha256": "c14e77340f2435c7ccab0c5eadb97f6f65bc63362704eaa882e242fd50e52fb2",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff"
+      ]
+    },
+    {
+      "path": "android/app/src/main/res/values-night-v31/styles.xml",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "9554a4d36355ecc0cffdd964c5ad8df3c8df71c7dda977361cbee457d9415248",
+      "candidate_sha256": "9554a4d36355ecc0cffdd964c5ad8df3c8df71c7dda977361cbee457d9415248",
+      "local_commits": [
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/res/values-night/styles.xml",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "9d1978b88752b51f11c7fafeed9d4582ce068e9e362e0ab17bc4f2d5d5f3e8d2",
+      "candidate_sha256": "9d1978b88752b51f11c7fafeed9d4582ce068e9e362e0ab17bc4f2d5d5f3e8d2",
+      "local_commits": [
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/res/values-v31/styles.xml",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "1ee90e72d785d8948034cfe3ca549980fa610eb583e984704f187627698b6dff",
+      "candidate_sha256": "1ee90e72d785d8948034cfe3ca549980fa610eb583e984704f187627698b6dff",
+      "local_commits": [
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题"
+      ]
+    },
+    {
+      "path": "android/app/src/main/res/xml-v25/shortcuts.xml",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "f4d7ab42c60a6d1733bd8265ca9354a73df78e8e7410030cff3d3d3306b9b07e",
+      "candidate_sha256": "f4d7ab42c60a6d1733bd8265ca9354a73df78e8e7410030cff3d3d3306b9b07e",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/profile/AndroidManifest.xml",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "1ff21caf00c3bd2acc3460a455d2b1204fb63f5f90a1a473ec90cce7411e4f36",
+      "candidate_sha256": "1ff21caf00c3bd2acc3460a455d2b1204fb63f5f90a1a473ec90cce7411e4f36",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "android/app/src/test/kotlin/com/personal/piliplus/PipDiagnosticsTest.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "31ddb6142030a54441c2e2fbae48fa121290095e1b689938ba13afa96f942fbb",
+      "candidate_sha256": "31ddb6142030a54441c2e2fbae48fa121290095e1b689938ba13afa96f942fbb",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "android/app/src/test/kotlin/com/personal/piliplus/PipRenderHostTest.kt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "deade7b1d099535483aa93720e92066e246a39b2333c55e652658c0916400a5f",
+      "candidate_sha256": "deade7b1d099535483aa93720e92066e246a39b2333c55e652658c0916400a5f",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "android/gradle.properties",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "2835221e25cac9a6fe8bb1033ae19ef336838deec0f03ea5800b1881d740b49f",
+      "candidate_sha256": "2835221e25cac9a6fe8bb1033ae19ef336838deec0f03ea5800b1881d740b49f",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261002/pip-settled-jump-glitch-crop.png",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "7aca9f0c0e37407236f1aac49065d3dac2a8089eee148a8a639fe16fadd6773f",
+      "candidate_sha256": "7aca9f0c0e37407236f1aac49065d3dac2a8089eee148a8a639fe16fadd6773f",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261002/pip-settled-jump-glitch-full.png",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "6b420ff8e2fdb70bce0a79e9ce816af19394a41c720366a5f2e071138a4eb2c5",
+      "candidate_sha256": "6b420ff8e2fdb70bce0a79e9ce816af19394a41c720366a5f2e071138a4eb2c5",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261002/pip-settled-jump.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "c2c1e5772f224901d77c1d06c41189273abf974c13a9ff1c82b108c165676664",
+      "candidate_sha256": "c2c1e5772f224901d77c1d06c41189273abf974c13a9ff1c82b108c165676664",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "309e15100 docs(pip): record surface resize black-frame evidence"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261002/user-case2-persistent-top-left-crop.png",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "861614f679dd4f3b255ed7b9c68570fbda79c367a70f94f079379a5bad7a4643",
+      "candidate_sha256": "861614f679dd4f3b255ed7b9c68570fbda79c367a70f94f079379a5bad7a4643",
+      "local_commits": [
+        "309e15100 docs(pip): record surface resize black-frame evidence"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261006/README.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "af3f7dfd834696e8c9f5b095b8d88af07ee1e7d50c21eb321d069afc925ff65f",
+      "candidate_sha256": "af3f7dfd834696e8c9f5b095b8d88af07ee1e7d50c21eb321d069afc925ff65f",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261006/entry-buffer-handoff-analysis.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "b6f2b3f427da1dc7c585ff74c42c8a20daaaa40b3781314b95c29680af0ceede",
+      "candidate_sha256": "b6f2b3f427da1dc7c585ff74c42c8a20daaaa40b3781314b95c29680af0ceede",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261006/handoff-parent-evidence.json",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "a5e125d9c556d43582ba2f749a171cadb26f65e8f3dc62cd2c54d5deb8a8a21b",
+      "candidate_sha256": "a5e125d9c556d43582ba2f749a171cadb26f65e8f3dc62cd2c54d5deb8a8a21b",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261006/pip-frame-listener-live.pbtxt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "630074832df242e5677c373ec670d562d306d7cf938c9f066b2bc886d129d72b",
+      "candidate_sha256": "630074832df242e5677c373ec670d562d306d7cf938c9f066b2bc886d129d72b",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261006/pip-frame-listener.pbtxt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "8cb3d56350cb4f794f94fa122064f4ab7609fa951a5a58557e30b65cbf509851",
+      "candidate_sha256": "8cb3d56350cb4f794f94fa122064f4ab7609fa951a5a58557e30b65cbf509851",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "diagnostics/pip-20261007/FIXED-ROOT-ONLY.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "290b5e9aaa080da664337cd816463c51eb90043bff9fdb06da812c1c45d1d643",
+      "candidate_sha256": "290b5e9aaa080da664337cd816463c51eb90043bff9fdb06da812c1c45d1d643",
+      "local_commits": [
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only"
+      ]
+    },
+    {
+      "path": "lib/common/style.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "5fec2533ba0a14a48c75971d85a213cb85590daa51e159515c7ba652750fc687",
+      "candidate_sha256": "7b640cf1ef37c615598d561621409fd1b16483cf6c79bddaf0461d6693c7f90a",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/common/widgets/flutter/text_field/editable_text.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "24ace7c86ab0432313d6b482d1e82559df161bdd02ad8949fc415e854e3ee918",
+      "candidate_sha256": "feef61103abf02a664b14d92f4cdf74385957fa290dc5af3e2b8a98113ce8135",
+      "local_commits": [
+        "1c19925b5 fix RichTextField text replace"
+      ]
+    },
+    {
+      "path": "lib/common/widgets/image_grid/image_grid_builder.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "9792cfda8394c4a1254828d80d3d2520f33143f4b091cf0f1f1cd29423b783b1",
+      "candidate_sha256": "642db9d424309ba0f2ef62dae61fe637d518f28be16c0447f1a5737001108e39",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/common/widgets/image_grid/image_grid_view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "05f014c9ea089c42465ddcf71a2795a319b0c92f88bcee729dce1e070c2f671e",
+      "candidate_sha256": "193931e791b2ce461cc2a333f83f03dec2bb9d8ed12342aa312d6f0a426bce00",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/common/widgets/route_aware_mixin.dart",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "6527458c76495ff5797be4e2c889b74db86f5bbda3547e6c6f06775dfea08cdb",
+      "candidate_sha256": "6527458c76495ff5797be4e2c889b74db86f5bbda3547e6c6f06775dfea08cdb",
+      "local_commits": [
+        "260cc9b9f fix: 彻底修复页面切换和销毁时的视频声音残留泄漏问题",
+        "929ce5e62 feat: 截图占位与 ModalRoute 声音残留修复"
+      ]
+    },
+    {
+      "path": "lib/common/widgets/video_card/video_card_h.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "20661158f88a2802640670f6ff1dcbf5779abefc7ef758757ef8c50c58473f09",
+      "candidate_sha256": "a49ea5df69a7c2c6f84dfc7650d3c8240e6bb3b3087dcc48add20358a3ebd0a6",
+      "local_commits": [
+        "b4b0f1fae Optimize video transition: replace screenshot with cover image placeholder and restore play position"
+      ]
+    },
+    {
+      "path": "lib/common/widgets/video_card/video_card_v.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "2e8825e9f5d7b8beb4b2c62f445182d3caa42e29c6d895275b4a54992ee1794d",
+      "candidate_sha256": "e9a717ee4b1300649391774ac4e169dbcfe2296d4df2ba86003cf64c8ae18d71",
+      "local_commits": [
+        "b4b0f1fae Optimize video transition: replace screenshot with cover image placeholder and restore play position"
+      ]
+    },
+    {
+      "path": "lib/grpc/audio.dart",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "8e3b65b4df7dbca1511c9b6c7a20d996c2ea8b10ed057f272812d9bf961bebce",
+      "candidate_sha256": "8e3b65b4df7dbca1511c9b6c7a20d996c2ea8b10ed057f272812d9bf961bebce",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/grpc/space.dart",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "e68f8526e8507b77dfa8f1912ab52a360a81f50f45b1684fa18fac0d8224cb57",
+      "candidate_sha256": "e68f8526e8507b77dfa8f1912ab52a360a81f50f45b1684fa18fac0d8224cb57",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/grpc/view.dart",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "5fc6cbfcb8c675417f325618b7f0b739365a2ca742b971f380b0c24cf380d06b",
+      "candidate_sha256": "5fc6cbfcb8c675417f325618b7f0b739365a2ca742b971f380b0c24cf380d06b",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/http/video.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "14e4c6cb908cf789af9f2ca7da4148d66879037520c059d4c19fc47941e95c08",
+      "candidate_sha256": "b47ce8f4e511742432d9bbb9db1e48ac5216593df76ec6e2e0eeb56576476f83",
+      "local_commits": [
+        "b02e4253f fix video progress"
+      ]
+    },
+    {
+      "path": "lib/models/dynamics/result.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "0229e6199542f6fb3bf1488a55a8c4094823ca0bf01b7cb2491abf619ed8567e",
+      "candidate_sha256": "e87cedece25c9d6463a5bb76dc5fe98b0c0a26e21f9918f05787a35db6c9d98e",
+      "local_commits": [
+        "2536350cc fix parse dyn"
+      ]
+    },
+    {
+      "path": "lib/models/video/play/url.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "c0372bc27a9dd84696e016c12f9412a3ad1fb6439956028896756288b998276d",
+      "candidate_sha256": "e401d58bb691955395734e1c6d688e5c3c594857a3e610c7fb4a99e185193905",
+      "local_commits": [
+        "b02e4253f fix video progress"
+      ]
+    },
+    {
+      "path": "lib/pages/about/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "2d7da21d97bd11c1758356e031345c3716a1666fe224866dba638aed7da23549",
+      "candidate_sha256": "8bbcd8ac02d190cb3747e588e3e11cd7538851aecc047ea592977a6232ab3ac3",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/common/publish/common_rich_text_pub_page.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "cbd8216623906e62d71d8ad3eaa087b2c7e05299c03a75b7a892743dba338686",
+      "candidate_sha256": "24f786047c28762018835664172d3b0d6e8883118e95566416cb1dd50bb28845",
+      "local_commits": [
+        "199ad274b tweaks (#2404)",
+        "1c19925b5 fix RichTextField text replace"
+      ]
+    },
+    {
+      "path": "lib/pages/danmaku/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "852df3ce7248f910b8f995974a0b8b7a60a582ce0ca331eae7771213c1e9901f",
+      "candidate_sha256": "bfe06e4c965b59e66e949bad6cb3f06d775c20e26d49fe9d2a6468ea53bf0a8b",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "lib/pages/dynamics_create_vote/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "f404d64788a05ce5815c54eb281424dc1cc8bb53f5fcfc0c90a834835b864271",
+      "candidate_sha256": "cece7eb24697dad71d44aad9d0f563cabea9b737dce1e034d4d4e1e4d4324458",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/fav_create/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "1fe767d66c15cc96b50b772073e1874c2e23bb533fa28ca6e815c17ad7de10b2",
+      "candidate_sha256": "2bc0be0109384450b31a70c1bd817ac57cf2dd8d2998081ffbf9eed0d6bd00dc",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/live_room/controller.dart",
+      "local_change": "M",
+      "status": "core-adapted-source-reviewed",
+      "local_sha256": "926821bddb00631bdfd868bf104a4cf8afca425d0f916e50661c45c939e90dfc",
+      "candidate_sha256": "c0abae0d778d13f6d82f818db80a8c2319961e2c058dfe187cdcae6f0a54bbaf",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation",
+        "3fae4ef63 opt ui"
+      ]
+    },
+    {
+      "path": "lib/pages/live_room/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "fdd55c05972ca1b5cc3bd053a0c64d184f8d5ab3086786271e4c4eba5183e65a",
+      "candidate_sha256": "5ba4e27591cc6146ecefae4f71f6421d6a823accd2b8b8efea62fbf8621fc88a",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "b3a254d3e fix(pip): avoid remounting video surface",
+        "3922fce3e refactor(pip): keep native video surface in PiP",
+        "809a090de fix(pip): keep playback tree stable during Android PiP",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation",
+        "3fae4ef63 opt ui"
+      ]
+    },
+    {
+      "path": "lib/pages/live_room/widgets/bottom_control.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "c8a08b50bbcccadbb15a53768eab57f1c627da784cbde6256964dafa6c4ed566",
+      "candidate_sha256": "e3e43b45ed7bc3c83611d9abdd24f13bf458e31583fe26b6cb9726d70dd6c06f",
+      "local_commits": [
+        "3fae4ef63 opt ui"
+      ]
+    },
+    {
+      "path": "lib/pages/live_room/widgets/header_control.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "585d99abe5460b3953b696dad80d388a6e4252776bd5c546eebe74a1898fff2a",
+      "candidate_sha256": "cd6b8c5df5633150f591971c7e25ed4ba2e0f9a3ca939ee0aeed3b173e1a49c8",
+      "local_commits": [
+        "3fae4ef63 opt ui"
+      ]
+    },
+    {
+      "path": "lib/pages/login/geetest/geetest_webview_dialog.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "0a7cdd7c0d08f5ef10b3030953bff873e36bc0c0853c7e67ddb7311d96a77f0d",
+      "candidate_sha256": "97a63fb2dcfdfb67c2ee2e1baaf88584a12f56758d1631a38cb9e330da014a26",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/login/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "ef28296bea35b8863126cd09e22b344f488c46eddd843475ef7aee7aa17b5549",
+      "candidate_sha256": "61547fd29a30f437224774e2a5541e5e1ba2a41d70d9d314734ee6bcf0b19692",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/member_profile/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "05ff89525f7fa528c1e9aed08e92a75d451aeed681dd125b17d6bdfafef83850",
+      "candidate_sha256": "234b7e1fb800cb929f2bebb7a2af536d7f2dff679e10cdc55051914dc565cd65",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/setting/widgets/ordered_multi_select_dialog.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "b7e5f25bdeada5ef860738a6084615ffc3ac3970d3af7400f10c476b6152c533",
+      "candidate_sha256": "b143548a68c7039e5cfb4484e525642da872066c79f134d7a3aa52459532ff9c",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/video/controller.dart",
+      "local_change": "M",
+      "status": "core-adapted-source-reviewed",
+      "local_sha256": "a649189ecb1f97de46ad310bdb620e858144847cf89928e8bde8f96348167f8f",
+      "candidate_sha256": "c56893e80f2ecff7fcecb0088616cc2d996322004dffd0842181d9c005524935",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation",
+        "3fae4ef63 opt ui",
+        "b02e4253f fix video progress"
+      ]
+    },
+    {
+      "path": "lib/pages/video/introduction/ugc/widgets/action_item.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "ac41e4e02fc228033e8baa34148e8e7700999f2af917f2a1bf1597c4885cdf26",
+      "candidate_sha256": "c550941140cd9378baf816fe97c51d35e69da05a0846cc65aabfbc5bfb162c8b",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/video/reply_reply/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "0c59ba70a6ec1a719c894e038668ab459fce2e3110cbefb9a1eb375bdbbb21d1",
+      "candidate_sha256": "bf2e8126e7ba71417b9fedb5f3419a03e5df1453eab8744fe6d6a4f2b237332a",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/video/send_danmaku/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "658e3afb462e5a8a56f750d6fbd3de2d943a8725c1f5b3317aaa75c59d90f1cf",
+      "candidate_sha256": "82d85526e8aef432840f6c630f4df6cb4f2b901ca63ff83208f60bfb4e625181",
+      "local_commits": [
+        "3fae4ef63 opt ui"
+      ]
+    },
+    {
+      "path": "lib/pages/video/view.dart",
+      "local_change": "M",
+      "status": "core-adapted-source-reviewed",
+      "local_sha256": "cd30b49fe98ad711da0cb92ef2bdcf804f80bbb5f60a17b5a1a22c8074665d44",
+      "candidate_sha256": "05394d8dbb36a44387928d291b63ea50f9d6e801e3361102d72be4d49aec341e",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation",
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "b3a254d3e fix(pip): avoid remounting video surface",
+        "3922fce3e refactor(pip): keep native video surface in PiP",
+        "809a090de fix(pip): keep playback tree stable during Android PiP",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation",
+        "b4b0f1fae Optimize video transition: replace screenshot with cover image placeholder and restore play position",
+        "97abbfb9b fix: optimize screenshot lag using RawImage and resolve race condition pause on pop",
+        "e3f0a8980 fix: resolve 3-stage flicker, unplayable video, and screenshot zoom issue",
+        "52eabd37d backup: before fixing screenshot flicker issue",
+        "260cc9b9f fix: 彻底修复页面切换和销毁时的视频声音残留泄漏问题",
+        "69a9b9265 feat: 页面销毁时强制 pause 解决声音残留",
+        "929ce5e62 feat: 截图占位与 ModalRoute 声音残留修复",
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题",
+        "3fae4ef63 opt ui",
+        "b02e4253f fix video progress",
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/video/widgets/header_control.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "5426dc26e6ba282bc699f12f848516a40a4536604b11c566fe2c519e24c15985",
+      "candidate_sha256": "ec8d72130e02f32e93b8118727903076f1ffdcbee57140a4c58e9268d8c1e7da",
+      "local_commits": [
+        "b02e4253f fix video progress",
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/pages/video/widgets/header_mixin.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "66d04910a22b9c28e0214191fd944c47d793e2f05298fe15f490e38c0a842ad0",
+      "candidate_sha256": "3b46b5cd925388b675e7fa552c356910e827b889bd709d4bd906a7d0c2599cc9",
+      "local_commits": [
+        "3fae4ef63 opt ui"
+      ]
+    },
+    {
+      "path": "lib/pages/video/widgets/player_focus.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "1711c68f69e637f196220cae370971e6bd432c17fddf86df09c93d1b5771efbd",
+      "candidate_sha256": "0a193543e9e72d8af18abfb07184abd213f049bdc8f93480bd8c3fdba2412d1e",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "lib/pages/whisper_detail/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "c4090391ea83aa06e469105d429286299c3fe24cfa42e458003896ffc7fd617e",
+      "candidate_sha256": "29cbcba022a39d53532dac5bcb8cff0560a62061d296b30a279e39cb9caec996",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/android_pip_controller.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "2e70292c4aa2d14ef2975d8ec910732a7fdd69fed962feed19da2dd2fa624828",
+      "candidate_sha256": "2e70292c4aa2d14ef2975d8ec910732a7fdd69fed962feed19da2dd2fa624828",
+      "local_commits": [
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "1e8bf9cd3 fix(pip): synchronize native surface with PiP window",
+        "5450455a0 feat(pip): route playback through native SurfaceView",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "809a090de fix(pip): keep playback tree stable during Android PiP",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/controller.dart",
+      "local_change": "M",
+      "status": "core-adapted-source-reviewed",
+      "local_sha256": "791b9d3b83791bd831bc6de3be198b7bd64d1318abb534f9e37003274d6ebfe3",
+      "candidate_sha256": "6b173c0609e8e9f301a8e19ee7acf95402a19dd01bd751e800ab50f9e01fc8fb",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation",
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "1e8bf9cd3 fix(pip): synchronize native surface with PiP window",
+        "5450455a0 feat(pip): route playback through native SurfaceView",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation",
+        "97abbfb9b fix: optimize screenshot lag using RawImage and resolve race condition pause on pop",
+        "37fb49083 fix: 严格等待小窗改变尺寸时的异步窗口时序",
+        "50ae1c52e feat: 释放画中画手势拦截以恢复原生双击缩放",
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题",
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/models/audio_output_type.dart",
+      "local_change": "M",
+      "status": "local-content-unchanged",
+      "local_sha256": "5c3d885f74b45bc3e0ff4c8c5ddb8bccec69e30cb74adfbfd2d6e0f1fd4ef144",
+      "candidate_sha256": "5c3d885f74b45bc3e0ff4c8c5ddb8bccec69e30cb74adfbfd2d6e0f1fd4ef144",
+      "local_commits": [
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/pip_diagnostics.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "18a272c6928dd3d7b80fbb98d98eecb0183b7cd8ce22fd4edafe04e9c70bd7cf",
+      "candidate_sha256": "18a272c6928dd3d7b80fbb98d98eecb0183b7cd8ce22fd4edafe04e9c70bd7cf",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/mpv_frame_gate.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "2d2b9cead63271f427b60812f2de65a6e13848cb927ca58a3c8103cf50dd05ac",
+      "candidate_sha256": "2d2b9cead63271f427b60812f2de65a6e13848cb927ca58a3c8103cf50dd05ac",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/playback_diagnostics.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "862cc7815862d1e235b894947635507be259c99b0f538379b6da739abeba2965",
+      "candidate_sha256": "862cc7815862d1e235b894947635507be259c99b0f538379b6da739abeba2965",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/playback_source_queue.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "9663ac42c796588c56e98c13238b83d4d45e910493c558dc92a8a1068c8320ad",
+      "candidate_sha256": "9663ac42c796588c56e98c13238b83d4d45e910493c558dc92a8a1068c8320ad",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/view/view.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "40479cffd09b5e90afec02dd8ee0b4494e19208ab7f7f164e2d26ce95cff1a80",
+      "candidate_sha256": "72712bca63d0208fc76f0a5e4741451b1ccc028f6d87bd05cc408ef5d01911fd",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation",
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "1e8bf9cd3 fix(pip): synchronize native surface with PiP window",
+        "9f09c3b08 fix(pip): retain video texture during surface resize",
+        "615e76c0c fix(pip): keep video texture parent mounted",
+        "b3a254d3e fix(pip): avoid remounting video surface",
+        "3922fce3e refactor(pip): keep native video surface in PiP",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "809a090de fix(pip): keep playback tree stable during Android PiP",
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation",
+        "929ce5e62 feat: 截图占位与 ModalRoute 声音残留修复",
+        "50ae1c52e feat: 释放画中画手势拦截以恢复原生双击缩放",
+        "d1124699d feat: 修复画中画无缝转场卡顿与闪白并还原白天亮色主题",
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/widgets/pip_source_rect.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "ff1db0b6c6a2886d07d171a2df539f0bf2876dd741ff0bad80a069762e9f3fe3",
+      "candidate_sha256": "ff1db0b6c6a2886d07d171a2df539f0bf2876dd741ff0bad80a069762e9f3fe3",
+      "local_commits": [
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/widgets/pip_viewport.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "cb847243dc28a93ca34c509083ad93dba335818ce8a8b2bd93c5166a63869771",
+      "candidate_sha256": "cb847243dc28a93ca34c509083ad93dba335818ce8a8b2bd93c5166a63869771",
+      "local_commits": [
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "3922fce3e refactor(pip): keep native video surface in PiP",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    },
+    {
+      "path": "lib/plugin/pl_player/widgets/video_presentation.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "69f3eff3d00fc907fde4b7e42c1103d45eed1aa0349f56636915191ab3ec89c1",
+      "candidate_sha256": "69f3eff3d00fc907fde4b7e42c1103d45eed1aa0349f56636915191ab3ec89c1",
+      "local_commits": [
+        "35ce8f8bf fix(player): synchronize video presentation handoff",
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "lib/router/app_pages.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "e15f5c46a20f6ad680e2395642740a89d967bda38b2e70ce7dd7261e95aa3c1a",
+      "candidate_sha256": "d3480917683d19458f3df3fee52abeb751ebac98093d41671721e9508ace18ed",
+      "local_commits": [
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    },
+    {
+      "path": "lib/services/audio_handler.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "ba0b2783eec991fe24f2b974968f2ed9559b422e0d58805c54c2633c5184b972",
+      "candidate_sha256": "2d5ba3f4f71156b52474c0379eb5ac32a6d1d438cacbc013cfb4b91a3d525920",
+      "local_commits": [
+        "0299be56f chore(pip): checkpoint existing playback experiments before investigation",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "lib/services/shutdown_timer_service.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "76467920bd4e3a084f5f7e01f6bcb77d0c015de53cc32236a997faee434fb071",
+      "candidate_sha256": "087d7c15196ff374c766d29d9152835252326607820d6cfd44747389b53a47ed",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/utils/android/bindings.g.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "b85b095c2a0157c93576197b416689454fe6809e0bad106d3e4946bd2da624e2",
+      "candidate_sha256": "73a82b24179649f495bf0b1725752130c0e456347c8a9e68c0d86e9fa2c47d41",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "lib/utils/image_utils.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "5675d041bd6bcab1133cb53a65946643c273d37fcdbd7c3d327700c2bcdebfdf",
+      "candidate_sha256": "61abd6a77b9748074f8c9bba8b339567ed46e7ce9b738c9fb70cc0aa518991d4",
+      "local_commits": [
+        "199ad274b tweaks (#2404)"
+      ]
+    },
+    {
+      "path": "lib/utils/page_utils.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "ad6c41557f7dc56ad7a5754d8349e97367025a59164e9f0076c8fd47ba02bdc5",
+      "candidate_sha256": "ca26018e8cd9a2efa504e0487084714e33cf1b665288f04def2bd48a97adbac2",
+      "local_commits": [
+        "b4b0f1fae Optimize video transition: replace screenshot with cover image placeholder and restore play position"
+      ]
+    },
+    {
+      "path": "lib/utils/storage_pref.dart",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "c9432700ebc3fd2667229a79ecbc3706be47434ca8cdeb1ffe8c359df9c3577b",
+      "candidate_sha256": "5443a3e9ee351023a46288de120b03171dfb274a33cbbd6a68924bfc17097e4f",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "power_consumption_fix.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "be864e10023e9208139d128dc47001955222728051f2914012de46c814954b79",
+      "candidate_sha256": "be864e10023e9208139d128dc47001955222728051f2914012de46c814954b79",
+      "local_commits": [
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "pubspec.yaml",
+      "local_change": "M",
+      "status": "combined-source-reviewed",
+      "local_sha256": "c628797fc56c709be687377482182082d14967305202f9af253e10fa031cf0e6",
+      "candidate_sha256": "bbd12afd3bf85a0303c4c025e241d6e4de7589f3874fae494efb1cd379fb4023",
+      "local_commits": [
+        "513626c19 bump: release version to 2.0.10+4",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "af1720a9d fix(pip): keep media texture rect during Android resize",
+        "5d15aa6b2 bump: release version to 2.0.9+3",
+        "a84a6a75a fix: 修复Android端4K播放功耗过高和包名重构后的黑屏闪退问题"
+      ]
+    },
+    {
+      "path": "test/mpv_frame_gate_test.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "b1eb17bd8ae0ea57187ff94cca1cc445408d623b3ccf095e05e8405f67b2b4ea",
+      "candidate_sha256": "b1eb17bd8ae0ea57187ff94cca1cc445408d623b3ccf095e05e8405f67b2b4ea",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "test/pip_source_rect_test.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "5b6151f226ad9ffef1674eaead4629e7e4d2e377b8eccee9781bb8560adec409",
+      "candidate_sha256": "5b6151f226ad9ffef1674eaead4629e7e4d2e377b8eccee9781bb8560adec409",
+      "local_commits": [
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    },
+    {
+      "path": "test/pip_viewport_test.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "5164b661fb563510162abbed071a2fa522ad9afe9f1cb20fcfc0a2d73790f7d7",
+      "candidate_sha256": "5164b661fb563510162abbed071a2fa522ad9afe9f1cb20fcfc0a2d73790f7d7",
+      "local_commits": [
+        "bacab3022 fix(player): restore cover-placeholder baseline with fixed-size PiP",
+        "c32532a24 fix(pip): restore pre-investigation player with fixed-size PiP canvas only",
+        "5d19a266f wip(android): archive failed PiP layer and entry experiments",
+        "570f69f29 wip(android): preserve continuous PiP buffer handoff experiment",
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions",
+        "3922fce3e refactor(pip): keep native video surface in PiP",
+        "5091b9353 fix(pip): stabilize auto-enter and texture surface timing",
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    },
+    {
+      "path": "test/playback_source_queue_test.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "6f30100e045980246ee3eb3e7adf137a045f4ce12bbd68773a520bb6f4a632da",
+      "candidate_sha256": "6f30100e045980246ee3eb3e7adf137a045f4ce12bbd68773a520bb6f4a632da",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "test/video_presentation_test.dart",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "0b84c12c635f2653e7399f1db4f6af725e09c8d2957f25099924848b8e16e62b",
+      "candidate_sha256": "0b84c12c635f2653e7399f1db4f6af725e09c8d2957f25099924848b8e16e62b",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "tmp_original_view.txt",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "b3afb8f8207556554f6757168289cb8dcb7e359112784e8f4e3b72bb67588979",
+      "candidate_sha256": "b3afb8f8207556554f6757168289cb8dcb7e359112784e8f4e3b72bb67588979",
+      "local_commits": [
+        "52eabd37d backup: before fixing screenshot flicker issue"
+      ]
+    },
+    {
+      "path": "tool/ordinary-playback-refactor.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "8fc40c1283aab2d466531c583e946556b3cb06bbb41c4e9d56d1b3361e766a17",
+      "candidate_sha256": "8fc40c1283aab2d466531c583e946556b3cb06bbb41c4e9d56d1b3361e766a17",
+      "local_commits": [
+        "5e8dae7b3 refactor(player): serialize source changes and gate video presentation"
+      ]
+    },
+    {
+      "path": "tool/pip-investigation.md",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "0d4cddacd51a5297aeccb9952ad8f62f44208c2eb1bba5020332bf5b24760820",
+      "candidate_sha256": "0d4cddacd51a5297aeccb9952ad8f62f44208c2eb1bba5020332bf5b24760820",
+      "local_commits": [
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    },
+    {
+      "path": "tool/pip_layer_trace.py",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "3fb04da110d18b55519b858937423d184c05f772a0dbc98af4580a7836d6f210",
+      "candidate_sha256": "3fb04da110d18b55519b858937423d184c05f772a0dbc98af4580a7836d6f210",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "tool/pip_pull_logs.py",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "995b252e339528fa5eeef5f4eb5fd8a770fe68ade0f356d227e48e99ccd1d7d4",
+      "candidate_sha256": "995b252e339528fa5eeef5f4eb5fd8a770fe68ade0f356d227e48e99ccd1d7d4",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "tool/pip_trace.py",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "db4c17eb39df661ab45b4ae7aa10fdabf7e27ba9b97bc64c3c19faf8d09d185b",
+      "candidate_sha256": "db4c17eb39df661ab45b4ae7aa10fdabf7e27ba9b97bc64c3c19faf8d09d185b",
+      "local_commits": [
+        "d0b40bfce fix(android): keep PiP video geometry stable across transitions"
+      ]
+    },
+    {
+      "path": "tool/record_pip_transition.ps1",
+      "local_change": "A",
+      "status": "local-content-unchanged",
+      "local_sha256": "af540a5731ad9ff8aae133dbd5b63ee70d6e73023de8b2b9d9909511e10d056b",
+      "candidate_sha256": "af540a5731ad9ff8aae133dbd5b63ee70d6e73023de8b2b9d9909511e10d056b",
+      "local_commits": [
+        "809a090de fix(pip): keep playback tree stable during Android PiP"
+      ]
+    }
+  ],
+  "actual_merge_base": "2536350ccfc87b9d5d23c564e3d4c8adbd175820",
+  "actual_local_change_path_count": 72,
+  "actual_local_change_paths": [
+    ".agents/AGENTS.md",
+    "android/app/build.gradle.kts",
+    "android/app/playback-diagnostics-rules.pro",
+    "android/app/src/main/AndroidManifest.xml",
+    "android/app/src/main/java/com/example/piliplus/AndroidHelper.java",
+    "android/app/src/main/java/com/example/piliplus/MediaHelper.java",
+    "android/app/src/main/java/com/personal/piliplus/AndroidHelper.java",
+    "android/app/src/main/java/com/personal/piliplus/MediaHelper.java",
+    "android/app/src/main/kotlin/com/example/piliplus/MainActivity.kt",
+    "android/app/src/main/kotlin/com/personal/piliplus/MainActivity.kt",
+    "android/app/src/main/kotlin/com/personal/piliplus/PipCoordinator.kt",
+    "android/app/src/main/kotlin/com/personal/piliplus/PipDiagnostics.kt",
+    "android/app/src/main/kotlin/com/personal/piliplus/PipRenderHost.kt",
+    "android/app/src/main/kotlin/com/personal/piliplus/PlaybackDiagnostics.kt",
+    "android/app/src/main/kotlin/com/personal/piliplus/PlaybackTextureProbe.kt",
+    "android/app/src/main/res/values-night-v31/styles.xml",
+    "android/app/src/main/res/values-night/styles.xml",
+    "android/app/src/main/res/values-v31/styles.xml",
+    "android/app/src/main/res/xml-v25/shortcuts.xml",
+    "android/app/src/profile/AndroidManifest.xml",
+    "android/app/src/test/kotlin/com/personal/piliplus/PipDiagnosticsTest.kt",
+    "android/app/src/test/kotlin/com/personal/piliplus/PipRenderHostTest.kt",
+    "android/gradle.properties",
+    "diagnostics/pip-20261002/pip-settled-jump-glitch-crop.png",
+    "diagnostics/pip-20261002/pip-settled-jump-glitch-full.png",
+    "diagnostics/pip-20261002/pip-settled-jump.md",
+    "diagnostics/pip-20261002/user-case2-persistent-top-left-crop.png",
+    "diagnostics/pip-20261006/README.md",
+    "diagnostics/pip-20261006/entry-buffer-handoff-analysis.md",
+    "diagnostics/pip-20261006/handoff-parent-evidence.json",
+    "diagnostics/pip-20261006/pip-frame-listener-live.pbtxt",
+    "diagnostics/pip-20261006/pip-frame-listener.pbtxt",
+    "diagnostics/pip-20261007/FIXED-ROOT-ONLY.md",
+    "lib/common/widgets/route_aware_mixin.dart",
+    "lib/common/widgets/video_card/video_card_h.dart",
+    "lib/common/widgets/video_card/video_card_v.dart",
+    "lib/pages/danmaku/view.dart",
+    "lib/pages/live_room/controller.dart",
+    "lib/pages/live_room/view.dart",
+    "lib/pages/video/controller.dart",
+    "lib/pages/video/view.dart",
+    "lib/pages/video/widgets/player_focus.dart",
+    "lib/plugin/pl_player/android_pip_controller.dart",
+    "lib/plugin/pl_player/controller.dart",
+    "lib/plugin/pl_player/models/audio_output_type.dart",
+    "lib/plugin/pl_player/pip_diagnostics.dart",
+    "lib/plugin/pl_player/playback/mpv_frame_gate.dart",
+    "lib/plugin/pl_player/playback/playback_diagnostics.dart",
+    "lib/plugin/pl_player/playback/playback_source_queue.dart",
+    "lib/plugin/pl_player/view/view.dart",
+    "lib/plugin/pl_player/widgets/pip_source_rect.dart",
+    "lib/plugin/pl_player/widgets/pip_viewport.dart",
+    "lib/plugin/pl_player/widgets/video_presentation.dart",
+    "lib/router/app_pages.dart",
+    "lib/services/audio_handler.dart",
+    "lib/utils/android/bindings.g.dart",
+    "lib/utils/page_utils.dart",
+    "lib/utils/storage_pref.dart",
+    "power_consumption_fix.md",
+    "pubspec.yaml",
+    "test/mpv_frame_gate_test.dart",
+    "test/pip_source_rect_test.dart",
+    "test/pip_viewport_test.dart",
+    "test/playback_source_queue_test.dart",
+    "test/video_presentation_test.dart",
+    "tmp_original_view.txt",
+    "tool/ordinary-playback-refactor.md",
+    "tool/pip-investigation.md",
+    "tool/pip_layer_trace.py",
+    "tool/pip_pull_logs.py",
+    "tool/pip_trace.py",
+    "tool/record_pip_transition.ps1"
+  ],
+  "merge_parents": [
+    "513626c1924b7444a56d71f9feae5810d6d00639",
+    "4ed5968f37af8b4aa7e0f13178cb8d8c2f86defc"
+  ],
+  "scope": "Preserve every effective local modification at the local tip. Earlier superseded experiments remain in parent history and are not reintroduced into current source.",
+  "runtime_acceptance_pending": [
+    "Video A -> related video B -> back to A was attempted but not accepted: another test app (com.pixel.gallery.multitask.test) took the foreground, and a Google Play services ANR dialog appeared. These captures are excluded from passing evidence.",
+    "Live playback, authenticated account actions, physical OnePlus power consumption, long-duration playback and non-Android platforms were not runtime-tested.",
+    "Both Android PiP paths were observed separately with videos, screenshots and system state. Contact sheets sample at 4 fps; this does not establish absence of every transient frame glitch or resolve the previously documented settled-jump issue."
+  ],
+  "review_method": "The conservative 100-path inventory includes all 72 actual local changes. Unchanged files and deletions are verified by content hashes; crossed changes were reviewed against local diffs; four player files were adapted to upstream APIs, with owner/revision barriers and local defaults retained. Unit tests and build results do not imply exhaustive behavioral proof."
+}

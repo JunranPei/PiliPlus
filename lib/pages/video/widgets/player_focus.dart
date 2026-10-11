@@ -8,11 +8,10 @@ import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'
     show KeyDownEvent, KeyUpEvent, LogicalKeyboardKey, HardwareKeyboard;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart';
 
 class PlayerFocus extends StatelessWidget {
   const PlayerFocus({
@@ -49,7 +48,7 @@ class PlayerFocus extends StatelessWidget {
     return Focus(
       autofocus: true,
       onKeyEvent: (node, event) {
-        final handled = _handleKey(event);
+        final handled = _handleKey(context, event);
         if (handled || _shouldHandle(event.logicalKey)) {
           return KeyEventResult.handled;
         }
@@ -90,7 +89,7 @@ class PlayerFocus extends StatelessWidget {
     }
   }
 
-  bool _handleKey(KeyEvent event) {
+  bool _handleKey(BuildContext context, KeyEvent event) {
     final key = event.logicalKey;
 
     final isKeyQ = key == LogicalKeyboardKey.keyQ;
@@ -111,6 +110,10 @@ class PlayerFocus extends StatelessWidget {
         introController!.onCancelTriple(isKeyQ);
       }
       return true;
+    } else if (event is KeyDownEvent) {
+      if (introController?.isTripling ?? false) {
+        introController!.onCancelTriple();
+      }
     }
 
     final isArrowUp = key == LogicalKeyboardKey.arrowUp;
@@ -149,18 +152,6 @@ class PlayerFocus extends StatelessWidget {
     }
 
     if (event is KeyDownEvent) {
-      final isDigit1 = key == LogicalKeyboardKey.digit1;
-      if (isDigit1 || key == LogicalKeyboardKey.digit2) {
-        if (HardwareKeyboard.instance.isShiftPressed && hasPlayer) {
-          final speed = isDigit1 ? 1.0 : 2.0;
-          if (speed != plPlayerController.playbackSpeed) {
-            plPlayerController.setPlaybackSpeed(speed);
-          }
-          SmartDialog.showToast('${speed}x播放');
-        }
-        return true;
-      }
-
       switch (key) {
         case LogicalKeyboardKey.space:
           if (plPlayerController.isLive || canPlay!()) {
@@ -184,8 +175,8 @@ class PlayerFocus extends StatelessWidget {
           return true;
 
         case LogicalKeyboardKey.keyD:
-          final newVal = !plPlayerController.enableShowDanmaku.value;
-          plPlayerController.enableShowDanmaku.value = newVal;
+          final newVal = !plPlayerController.enableShowDanmakuAdaptive.value;
+          plPlayerController.enableShowDanmakuAdaptive.value = newVal;
           if (!plPlayerController.tempPlayerConf) {
             GStorage.setting.put(
               plPlayerController.isLive
@@ -239,6 +230,18 @@ class PlayerFocus extends StatelessWidget {
       }
 
       if (!plPlayerController.isLive) {
+        final isDigit1 = key == LogicalKeyboardKey.digit1;
+        if (isDigit1 || key == LogicalKeyboardKey.digit2) {
+          if (HardwareKeyboard.instance.isShiftPressed && hasPlayer) {
+            final speed = isDigit1 ? 1.0 : 2.0;
+            if (speed != plPlayerController.playbackSpeed) {
+              plPlayerController.setPlaybackSpeed(speed);
+            }
+            SmartDialog.showToast('${speed}x播放');
+          }
+          return true;
+        }
+
         switch (key) {
           case LogicalKeyboardKey.arrowLeft:
             if (hasPlayer) {
@@ -265,7 +268,7 @@ class PlayerFocus extends StatelessWidget {
 
           case LogicalKeyboardKey.keyG:
             if (introController case final UgcIntroController ugcCtr) {
-              ugcCtr.actionRelationMod(Get.context!);
+              ugcCtr.actionRelationMod(context);
             }
             return true;
 

@@ -1,0 +1,59 @@
+{
+  "device": "emulator-5554 / sdk_gphone64_x86_64 / Android API 36",
+  "package": "com.personal.piliplus.upstreamreview",
+  "production_package_modified": false,
+  "tested_source_commit": "1297477194bb3f5d5b37561c8dda5ee088d72ec1",
+  "final_source_delta_after_device_test": "Adopt unchanged upstream DynamicStat zero-count fix; no subsequent playback or PiP source changes.",
+  "observations": [
+    {
+      "case": "ordinary playback",
+      "result": "video visibly played; media session PLAYING(3); frame-gate readiness and presentation logged",
+      "evidence": [
+        "playing.png",
+        "playing-logcat.txt",
+        "playing-media-session.txt"
+      ]
+    },
+    {
+      "case": "back out of video page",
+      "result": "media session changed to NONE(0)",
+      "evidence": [
+        "after-video-back-media.txt"
+      ]
+    },
+    {
+      "case": "direct Home PiP",
+      "result": "pinned task and continued PLAYING(3), visible video in PiP",
+      "evidence": [
+        "direct-home.mp4",
+        "direct-home-frames.png",
+        "home-pip.png",
+        "home-after-activity.txt",
+        "home-after-media.txt"
+      ]
+    },
+    {
+      "case": "recents then Home PiP",
+      "result": "recents UI observed, followed by pinned task and continued PLAYING(3), visible video in PiP",
+      "evidence": [
+        "recents-home.mp4",
+        "recents-visible.png",
+        "recents-home-frames.png",
+        "recents-home-pip.png",
+        "recents-home-activity.txt",
+        "recents-home-media.txt"
+      ]
+    }
+  ],
+  "not_accepted": [
+    "video-switch-back.mp4",
+    "switch-*.png",
+    "route-retry.png"
+  ],
+  "limitations": [
+    "Video A -> related video B -> back to A was attempted but not accepted: another test app (com.pixel.gallery.multitask.test) took the foreground, and a Google Play services ANR dialog appeared. These captures are excluded from passing evidence.",
+    "Live playback, authenticated account actions, physical OnePlus power consumption, long-duration playback and non-Android platforms were not runtime-tested.",
+    "Both Android PiP paths were observed separately with videos, screenshots and system state. Contact sheets sample at 4 fps; this does not establish absence of every transient frame glitch or resolve the previously documented settled-jump issue."
+  ],
+  "evidence_directory": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\worktree-upstream-2.1.6-preserve\\diagnostics\\upstream-2.1.6-review\\device"
+}

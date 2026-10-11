@@ -1,0 +1,214 @@
+{
+  "source": "lib/scripts/patch.ps1 Android patch sequence",
+  "sdk": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+  "material_ui_source": "C:\\Users\\10540\\AppData\\Local\\Pub\\Cache\\hosted\\pub.dev\\material_ui-1.5.0",
+  "material_ui_patched_copy": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+  "global_git_config_changed": false,
+  "shared_pub_cache_changed": false,
+  "patches": [
+    {
+      "patch": "lib\\scripts\\modal_barrier.patch",
+      "sha256": "acd81d8f627e51e2cfb25a2f0ca941aa7b8d9657cddb51c5e5d04c067734ae7c",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\text_selection.patch",
+      "sha256": "b313cde06733c2c533f5859796168a99ee97fa145cda4d0565cd6c372d2ae6d8",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\mouse_cursor.patch",
+      "sha256": "0b919f513047ab0f26d02a5a88cd8ea20ccabba839faf5eebcb50f033b5e08b2",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\image_anim.patch",
+      "sha256": "4bcfff476a8b39d19601f01a2914b989cf29037500ee78c1a7c93b8ccf4831ef",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\layout_builder.patch",
+      "sha256": "0768fe076da2445f469beb35ca5c9515a9baec8efac3eee2220752b09b8f3af0",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\navigation_drawer.patch",
+      "sha256": "1d666a7f79b4234747ffd3ab7a67c4616750a9694a98a421a7dc05794338ce67",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\popup_menu.patch",
+      "sha256": "5447ebc2e196d56a7a6e1734a862fce5ae0d9684171c047816718ef3e635e964",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\fab.patch",
+      "sha256": "753eeff0b0815470e589a9c3a94e567f15bb3581bf2d29c126aa01ce0438c0c8",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\null_safety_for_selectable_region.patch",
+      "sha256": "e065cf974a9a74ddfbb8447cf42061f011ca690c2272d2c82e7f9e8c12c672c1",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\selectable_region.patch",
+      "sha256": "72c9b63b76d03de8198c99c5acac56d3c4ebb8bbef90f836ff1d50895faacfc4",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\editable_text.patch",
+      "sha256": "1fc9c52fd9e3ddcbc23fcc80520d7065940c5f3f01f9cafab0d4ad4585d9a3d0",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\text_field.patch",
+      "sha256": "d48d3ee5c6337b08d63ec2b97d52cde697e698da64ac2fda7e2b65e3c0ffc118",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\scroll_position.patch",
+      "sha256": "fca507e39a4dab6145e0fc1d3489d5427e6f872e0e744b3681788b3df3a1d76d",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\scrollable.patch",
+      "sha256": "69f58082a1bc9a686d59fe84608f5ede93204c94e7c0d5b915332691281d1013",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\scrollable_gesture.patch",
+      "sha256": "8121b487b35062239ffaca37b4be4fb829d938b7894cece9db5378c729cf6a73",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\draggable_scrollable_sheet.patch",
+      "sha256": "57ce130ec30e9ae077273bf19f83a79d5699182c88942d804e3e0578feb19114",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\scaffold.patch",
+      "sha256": "ffd7b6214779ec6fa62a28680214cf99593e099e8b5b819282de38e44c877061",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\text.patch",
+      "sha256": "d6cbc31578bf5c32a0b33a09360ea8196d09eb1571e8cb3ccd3f050684344993",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\text_painter.patch",
+      "sha256": "4f4f8df0d63abc476ab427e7c236a8d193e618de5269b0f419d59fb1693b739e",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\sliver.patch",
+      "sha256": "481c5868ac42b0fce5059111b1ed3aa25fcc04a6072ed28f42bb38dfba9bc30e",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\refresh_indicator.patch",
+      "sha256": "34d98cd7fc1ae7fe1ad9ff99dbb36502c7877b99cb3f3a52c791d33e608cd38d",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\double_tap_gesture.patch",
+      "sha256": "85cf0e1f8205383d005eb8097be9fdff560a3b58878e6d0ae73763909f1ca638",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\bottom_sheet_android.patch",
+      "sha256": "bb3e278132b0d800987ae54852f470933370e992bafc45da89d6dea6476472c5",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\scroll_view.patch",
+      "sha256": "2d28351a290d762ce8d093da6c9d6ff6cc7e34053d487dd074bd826613b1c5ba",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\navigator.patch",
+      "sha256": "13f0d4e6da6a04848fba182846a2fa0d512d4380a5121d668dc44f629db7276c",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\flutter-sdk-3.47.6\\flutter",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\modal_barrier_material.patch",
+      "sha256": "ebf5290a6cb8b90f869a39c5fd81b77ebf640490cf29bbb39dbfc0d9466393b9",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\navigation_drawer.patch",
+      "sha256": "d9b3958366a5414ed685c739ac341ffaf6bb7f52aa5a81fc22d8609915d51833",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\popup_menu.patch",
+      "sha256": "8954cfbeac6bd8ccb97b4f5a757dc07c92aaa393e1dd97d7fa1070ed8ef1e583",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\fab.patch",
+      "sha256": "1524373a7675ae5ec86a9a2560414d980dfeec2c979a8894a2f64ca332575326",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\text_field.patch",
+      "sha256": "e4464b031e635651e7a376fa7bf26d5d22d311a68dd50c06be97bb3fd0e5f298",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\scaffold.patch",
+      "sha256": "f0031979fa6b97793675ac4dfbff3773d497a2914e02fda28e015d5fc41642de",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\refresh_indicator.patch",
+      "sha256": "8d3f461a7897cfbd43079254607875eae2d31c40323829791b498809ab61251f",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\tabs.patch",
+      "sha256": "3b8dda173bfc0d2d9ae7cc682ead6f35e9dafa5fb5f482a4b5f4a47fae1c8b43",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    },
+    {
+      "patch": "lib\\scripts\\material\\bottom_sheet_android.patch",
+      "sha256": "9aa342d0330b2b436e7c6e8b3ea760f01250258d11f36b43a96f8fe1e072d5fd",
+      "target": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+      "status": "applied"
+    }
+  ]
+}

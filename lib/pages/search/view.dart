@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:PiliPlus/common/widgets/dialog/export_import.dart';
 import 'package:PiliPlus/common/widgets/disabled_icon.dart';
 import 'package:PiliPlus/common/widgets/loading_widget/http_error.dart';
+import 'package:PiliPlus/common/widgets/scaffold/simple_scaffold.dart';
 import 'package:PiliPlus/common/widgets/sliver_wrap.dart';
+import 'package:PiliPlus/common/widgets/view_insets_safe_area.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/models_new/search/search_rcmd/data.dart';
 import 'package:PiliPlus/pages/search/controller.dart';
@@ -14,8 +16,8 @@ import 'package:PiliPlus/utils/extension/size_ext.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:PiliPlus/utils/utils.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -34,10 +36,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    _searchController = Get.put(
-      SSearchController(_tag),
-      tag: _tag,
-    );
+    _searchController = Get.put(SSearchController(_tag), tag: _tag);
   }
 
   @override
@@ -57,29 +56,30 @@ class _SearchPageState extends State<SearchPage> {
         ? _buildHotSearch(isTrending: false)
         : null;
 
-    return Scaffold(
+    return SimpleScaffold(
       appBar: _buildAppBar,
       body: Padding(
         padding: .only(left: padding.left, right: padding.right),
-        child: CustomScrollView(
-          slivers: [
-            if (_searchController.searchSuggestion) _buildSearchSuggest(),
-            if (isPortrait) ...[
-              ?trending,
-              _buildHistory,
-              ?rcmd,
-            ] else if (_searchController.enableTrending ||
-                _searchController.enableSearchRcmd)
-              SliverCrossAxisGroup(
-                slivers: [
-                  SliverMainAxisGroup(slivers: [?trending, ?rcmd]),
-                  _buildHistory,
-                ],
-              )
-            else
-              _buildHistory,
-            SliverPadding(padding: .only(bottom: padding.bottom)),
-          ],
+        child: ViewInsetsSafeArea(
+          child: CustomScrollView(
+            slivers: [
+              if (_searchController.searchSuggestion) _buildSearchSuggest(),
+              if (isPortrait) ...[
+                ?trending,
+                _buildHistory,
+                ?rcmd,
+              ] else if (trending != null || rcmd != null)
+                SliverCrossAxisGroup(
+                  slivers: [
+                    SliverMainAxisGroup(slivers: [?trending, ?rcmd]),
+                    _buildHistory,
+                  ],
+                )
+              else
+                _buildHistory,
+              SliverPadding(padding: .only(bottom: padding.bottom)),
+            ],
+          ),
         ),
       ),
     );
@@ -142,7 +142,10 @@ class _SearchPageState extends State<SearchPage> {
                   .map(
                     (item) => InkWell(
                       borderRadius: const .all(.circular(4)),
-                      onTap: () => _searchController.onClickKeyword(item.term!),
+                      onTap: () => _searchController.onClickKeyword(
+                        item.term!,
+                        clearSuggest: false,
+                      ),
                       child: Padding(
                         padding: const .only(left: 20, top: 9, bottom: 9),
                         child: Text.rich(
@@ -153,10 +156,8 @@ class _SearchPageState extends State<SearchPage> {
                                     text: e.text,
                                     style: e.isEm
                                         ? TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.primary,
+                                            fontWeight: .bold,
+                                            color: theme.colorScheme.primary,
                                           )
                                         : null,
                                   ),
@@ -181,7 +182,7 @@ class _SearchPageState extends State<SearchPage> {
       strutStyle: const StrutStyle(leading: 0, height: 1),
       style: theme.textTheme.titleMedium!.copyWith(
         height: 1,
-        fontWeight: FontWeight.bold,
+        fontWeight: .bold,
       ),
     );
     final outline = theme.colorScheme.outline;
@@ -192,7 +193,7 @@ class _SearchPageState extends State<SearchPage> {
       color: outline,
     );
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(
+      padding: .fromLTRB(
         10,
         !isTrending && (isPortrait || _searchController.enableTrending)
             ? 4
@@ -203,10 +204,10 @@ class _SearchPageState extends State<SearchPage> {
       sliver: SliverMainAxisGroup(
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+            padding: const .fromLTRB(6, 0, 6, 6),
             sliver: SliverToBoxAdapter(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: .spaceBetween,
                 children: [
                   isTrending
                       ? Row(
@@ -263,10 +264,7 @@ class _SearchPageState extends State<SearchPage> {
                     label: Text(
                       '刷新',
                       strutStyle: const StrutStyle(leading: 0, height: 1),
-                      style: TextStyle(
-                        height: 1,
-                        color: secondary,
-                      ),
+                      style: TextStyle(height: 1, color: secondary),
                     ),
                   ),
                 ],
@@ -296,7 +294,7 @@ class _SearchPageState extends State<SearchPage> {
         }
         final secondary = theme.colorScheme.secondary;
         return SliverPadding(
-          padding: EdgeInsets.fromLTRB(
+          padding: .fromLTRB(
             10,
             !isPortrait
                 ? 25
@@ -309,7 +307,7 @@ class _SearchPageState extends State<SearchPage> {
           sliver: SliverMainAxisGroup(
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(6, 0, 6, 6),
+                padding: const .fromLTRB(6, 0, 6, 6),
                 sliver: SliverToBoxAdapter(
                   child: Row(
                     children: [
@@ -318,7 +316,7 @@ class _SearchPageState extends State<SearchPage> {
                         strutStyle: const StrutStyle(leading: 0, height: 1),
                         style: theme.textTheme.titleMedium!.copyWith(
                           height: 1,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: .bold,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -341,10 +339,7 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                         label: Text(
                           '清空',
-                          style: TextStyle(
-                            height: 1,
-                            color: secondary,
-                          ),
+                          style: TextStyle(height: 1, color: secondary),
                         ),
                       ),
                     ],
@@ -363,12 +358,11 @@ class _SearchPageState extends State<SearchPage> {
                     text: list[index],
                     onTap: _searchController.onClickKeyword,
                     onLongPress: _searchController.onLongSelect,
-                    fontSize: 14,
                     height: 1,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 11,
-                      vertical: 8,
-                    ),
+                    maxLines: 1,
+                    fontSize: 14,
+                    overflow: .ellipsis,
+                    padding: const .fromLTRB(11, 8, 11, 0),
                   ),
                 ),
               ),

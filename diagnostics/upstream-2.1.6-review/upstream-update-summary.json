@@ -1,0 +1,118 @@
+{
+  "upstream": "bggRGjQaUbCoE/PiliPlus",
+  "fork": "JunranPei/PiliPlus",
+  "target": "2.1.6",
+  "upstream_commit": "4ed5968f37af8b4aa7e0f13178cb8d8c2f86defc",
+  "commits_since_actual_common_ancestor": 402,
+  "version_in_merged_project": "2.1.6+5",
+  "groups": {
+    "offline playback and download": [
+      {
+        "commit": "7a4f442f450ff0698d0fbe5cecb9666cd1c12e3f",
+        "subject": "feat: offline ugc season"
+      },
+      {
+        "commit": "35e70c30b873004b4cb4c5fa68fbb50b2aeafdfa",
+        "subject": "feat: offline skip"
+      },
+      {
+        "commit": "691d0307a396679d69b0a13dda1c9141b17618a4",
+        "subject": "fix cache pgc"
+      },
+      {
+        "commit": "3e8a79446eade6b6a85ad324545ebaefe6d12f09",
+        "subject": "feat: android doc provider"
+      }
+    ],
+    "player and platform": [
+      {
+        "commit": "8f2af3c0959c1a32614e969a2863ebfeb444978c",
+        "subject": "add picture-in-picture on iOS (#3162)"
+      },
+      {
+        "commit": "dd922b0c1bcc5ba89568b483a9bbd0829228688d",
+        "subject": "skip to next/prev from audio session (#2964)"
+      },
+      {
+        "commit": "ee148aa640e2da807c3048fde40eff9094ff897a",
+        "subject": "Partial Revert \"feat: upgrade media-kit (#2961)\""
+      },
+      {
+        "commit": "00cb572ccf2815bae3c47617f0130edd0e09b248",
+        "subject": "feat: upgrade media-kit (#2961)"
+      },
+      {
+        "commit": "a3f9c90d3c1cda97559a98f03604acd9d543ac83",
+        "subject": "feat(windows): support video URL activation (#2673)"
+      },
+      {
+        "commit": "53269d9f997fa25ba9427d334defec7a77187e2b",
+        "subject": "Separate Default Codecs for Wi-Fi and Cellular (#2571)"
+      }
+    ],
+    "live": [
+      {
+        "commit": "858dba22deb09033db944eb12482df2459239286",
+        "subject": "add default live area entrance"
+      },
+      {
+        "commit": "3a5636ecee85a1109a689433f9cae12b584a2852",
+        "subject": "feat: live feedback (#2456)"
+      },
+      {
+        "commit": "3510b6c74db4ff0988ea09f4f4632d5697922d2c",
+        "subject": "cache live stream pref"
+      }
+    ],
+    "interface and search": [
+      {
+        "commit": "66a1225d34108cb08b3527194bd9f77838b715a0",
+        "subject": "filter search all users"
+      },
+      {
+        "commit": "92c455be74f1b4df4a3e83b3f32136d66ccaf3ac",
+        "subject": "support custom color seed"
+      },
+      {
+        "commit": "1a4bb7ba978eb6846adc35f5f93a4455feb431e1",
+        "subject": "feat: search all"
+      },
+      {
+        "commit": "5aa7b02e3dc8d298079a126887ee3dce02bf35a1",
+        "subject": "feat: page order"
+      },
+      {
+        "commit": "797f15453561df696ea73d812b8a5ee4288ef457",
+        "subject": "feat: custom font"
+      },
+      {
+        "commit": "4ca0373455e91668a734ceb6ed9e079a98049be0",
+        "subject": "feat: font setting page (#2611)"
+      }
+    ],
+    "comments and dynamics": [
+      {
+        "commit": "11930f1280f874fba628cc4d4a07109d9812d5d1",
+        "subject": "feat: reply when repost"
+      },
+      {
+        "commit": "9c9076a4c9c1a55f35b10d4f0080a12c66ff9be5",
+        "subject": "refa dyn reaction (#2894)"
+      },
+      {
+        "commit": "5a6f3feaea37db997eae0671ef86490022b0d7df",
+        "subject": "feat(comment): add latex to unicode converter (#2792)"
+      },
+      {
+        "commit": "0b7a58d9c5f4e649ca6307907c20b64537e55583",
+        "subject": "feat: add independent sort setting for reply2 comments (#2655)"
+      },
+      {
+        "commit": "c4dd07ab0ff2c8a202924f75f814063e0fc861b9",
+        "subject": "feat: dyn reaction"
+      }
+    ]
+  },
+  "source_decisions": "integration-decisions.json",
+  "adoption": "Upstream release source integrated, with effective local customizations retained and crossed player APIs adapted. Explicit local-precedence decisions are listed separately."
+}

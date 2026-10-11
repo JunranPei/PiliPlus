@@ -1,0 +1,13 @@
+{
+  "old_sdk": "D:\\Program Files\\Flutter\\flutter_windows_3.44.2-stable\\flutter",
+  "modified_tracked_files": [],
+  "paths_not_covered_by_existing_project_sdk_patches": [],
+  "media_kit_git_cache": "clean",
+  "media_kit_video_git_cache": "clean",
+  "audio_service_git_cache": "clean",
+  "canvas_danmaku_git_cache": "clean",
+  "hosted_cache_note": "Hosted package cache has no Git baseline; not claimed as audited by git status.",
+  "actual_old_sdk_tag": "3.44.4",
+  "directory_name_is_not_version": true,
+  "old_sdk_and_shared_pub_cache_modified_by_this_integration": false
+}

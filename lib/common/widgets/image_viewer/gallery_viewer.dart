@@ -15,15 +15,19 @@
  * along with PiliPlus.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import 'dart:async';
 import 'dart:io' show File, Platform;
 
 import 'package:PiliPlus/common/widgets/colored_box_transition.dart';
-import 'package:PiliPlus/common/widgets/flutter/page/page_view.dart';
+import 'package:PiliPlus/common/widgets/dialog/simple_dialog_option.dart';
+import 'package:PiliPlus/common/widgets/gesture/image_double_tap_gesture_recognizer.dart';
 import 'package:PiliPlus/common/widgets/gesture/image_horizontal_drag_gesture_recognizer.dart';
+import 'package:PiliPlus/common/widgets/gesture/image_tap_gesture_recognizer.dart';
 import 'package:PiliPlus/common/widgets/image_viewer/image.dart';
 import 'package:PiliPlus/common/widgets/image_viewer/loading_indicator.dart';
 import 'package:PiliPlus/common/widgets/image_viewer/viewer.dart';
-import 'package:PiliPlus/common/widgets/scroll_physics.dart';
+import 'package:PiliPlus/common/widgets/scroll_physics.dart'
+    show tabBarScrollPhysics;
 import 'package:PiliPlus/main.dart' show tmpPadding;
 import 'package:PiliPlus/models/common/image_preview_type.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
@@ -37,11 +41,10 @@ import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:cached_network_image_ce/cached_network_image.dart';
-import 'package:easy_debounce/easy_throttle.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' hide Image, PageView;
+import 'package:flutter/gestures.dart' show LongPressGestureRecognizer;
 import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart' hide Image;
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
@@ -87,10 +90,14 @@ class _GalleryViewerState extends State<GalleryViewer>
 
   late final PageController _pageController;
 
-  late final TapGestureRecognizer _tapGestureRecognizer;
-  late final DoubleTapGestureRecognizer _doubleTapGestureRecognizer;
+  late final ImageTapGestureRecognizer _tapGestureRecognizer;
+  late final ImageDoubleTapGestureRecognizer _doubleTapGestureRecognizer;
   late final ImageHorizontalDragGestureRecognizer
   _horizontalDragGestureRecognizer;
+  ImageHorizontalDragGestureRecognizer horizontalDragGestureRecognizer() {
+    return _horizontalDragGestureRecognizer;
+  }
+
   late final LongPressGestureRecognizer _longPressGestureRecognizer;
 
   late final AnimationController _animateController;
@@ -139,13 +146,13 @@ class _GalleryViewerState extends State<GalleryViewer>
     _pageController = PageController(initialPage: widget.initIndex);
 
     final gestureSettings = MediaQuery.maybeGestureSettingsOf(Get.context!);
-    _tapGestureRecognizer = TapGestureRecognizer()
+    _tapGestureRecognizer = ImageTapGestureRecognizer()
       // ..onTap = _onTap
       ..gestureSettings = gestureSettings;
     if (PlatformUtils.isDesktop) {
       _tapGestureRecognizer.onSecondaryTapUp = _showDesktopMenu;
     }
-    _doubleTapGestureRecognizer = DoubleTapGestureRecognizer()
+    _doubleTapGestureRecognizer = ImageDoubleTapGestureRecognizer()
       ..onDoubleTap = () {}
       ..gestureSettings = gestureSettings;
     _horizontalDragGestureRecognizer = ImageHorizontalDragGestureRecognizer();
@@ -153,7 +160,7 @@ class _GalleryViewerState extends State<GalleryViewer>
       ..onLongPress = _onLongPress
       ..gestureSettings = gestureSettings;
 
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
         _tapGestureRecognizer.onTap = _onTap;
       }
@@ -299,7 +306,7 @@ class _GalleryViewerState extends State<GalleryViewer>
         }
       }
     }
-    Future.delayed(const Duration(milliseconds: 200), _currIndex.close);
+    Timer(const Duration(milliseconds: 200), _currIndex.close);
     super.dispose();
     if (_hideSystemBar) {
       showSystemBar();
@@ -330,16 +337,16 @@ class _GalleryViewerState extends State<GalleryViewer>
                 alignment: .topLeft,
                 animation: _animateController,
                 onTransform: _onTransform,
-                child: PageView<ImageHorizontalDragGestureRecognizer>.builder(
+                child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: _onPageChanged,
-                  physics: const CustomTabBarViewScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: tabBarScrollPhysics,
                   ),
                   itemCount: widget.sources.length,
                   itemBuilder: _itemBuilder,
-                  horizontalDragGestureRecognizer: () =>
-                      _horizontalDragGestureRecognizer,
+                  horizontalDragGestureRecognizer:
+                      horizontalDragGestureRecognizer,
                 ),
               );
             },
@@ -520,12 +527,15 @@ class _GalleryViewerState extends State<GalleryViewer>
     return Hero(tag: '${item.url}${widget.tag}', child: child);
   }
 
+  static const Duration _kTapDiff = Duration(milliseconds: 300);
+
   void _onTap() {
-    EasyThrottle.throttle(
-      'VIEWER_TAP',
-      const Duration(milliseconds: 555),
-      Get.back,
-    );
+    if (_tapGestureRecognizer.timeStamp -
+            _doubleTapGestureRecognizer.timeStamp <
+        _kTapDiff) {
+      return;
+    }
+    Get.back();
   }
 
   void _onLongPress() {
@@ -534,76 +544,67 @@ class _GalleryViewerState extends State<GalleryViewer>
     HapticFeedback.mediumImpact();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => SimpleDialog(
         clipBehavior: Clip.hardEdge,
         contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (PlatformUtils.isMobile)
-              ListTile(
-                onTap: () {
-                  Get.back();
-                  ImageUtils.onShareImg(item.url);
-                },
-                dense: true,
-                title: const Text('分享', style: TextStyle(fontSize: 14)),
-              ),
-            ListTile(
-              onTap: () {
+        children: [
+          if (PlatformUtils.isMobile)
+            DialogOption(
+              onPressed: () {
                 Get.back();
-                Utils.copyText(item.url);
+                ImageUtils.onShareImg(item.url);
               },
-              dense: true,
-              title: const Text('复制链接', style: TextStyle(fontSize: 14)),
+              child: const Text('分享', style: TextStyle(fontSize: 14)),
             ),
-            ListTile(
-              onTap: () {
+          DialogOption(
+            onPressed: () {
+              Get.back();
+              Utils.copyText(item.url);
+            },
+            child: const Text('复制链接', style: TextStyle(fontSize: 14)),
+          ),
+          DialogOption(
+            onPressed: () {
+              Get.back();
+              ImageUtils.downloadImg([item.url]);
+            },
+            child: const Text('保存图片', style: TextStyle(fontSize: 14)),
+          ),
+          if (PlatformUtils.isDesktop)
+            DialogOption(
+              onPressed: () {
                 Get.back();
-                ImageUtils.downloadImg([item.url]);
+                PageUtils.launchURL(item.url);
               },
-              dense: true,
-              title: const Text('保存图片', style: TextStyle(fontSize: 14)),
+              child: const Text('网页打开', style: TextStyle(fontSize: 14)),
             ),
-            if (PlatformUtils.isDesktop)
-              ListTile(
-                onTap: () {
-                  Get.back();
-                  PageUtils.launchURL(item.url);
-                },
-                dense: true,
-                title: const Text('网页打开', style: TextStyle(fontSize: 14)),
-              )
-            else if (widget.sources.length > 1)
-              ListTile(
-                onTap: () {
-                  Get.back();
-                  ImageUtils.downloadImg(
-                    widget.sources.map((item) => item.url).toList(),
-                  );
-                },
-                dense: true,
-                title: const Text('保存全部图片', style: TextStyle(fontSize: 14)),
+          if (widget.sources.length > 1)
+            DialogOption(
+              onPressed: () {
+                Get.back();
+                ImageUtils.downloadImg(
+                  widget.sources.map((item) => item.url).toList(),
+                );
+              },
+              child: const Text('保存全部图片', style: TextStyle(fontSize: 14)),
+            ),
+          if (item.sourceType == SourceType.livePhoto)
+            DialogOption(
+              onPressed: () {
+                Get.back();
+                ImageUtils.downloadLivePhoto(
+                  url: item.url,
+                  liveUrl: item.liveUrl!,
+                  width: item.width!,
+                  height: item.height!,
+                );
+              },
+              child: Text(
+                '保存${Platform.isIOS ? ' Live Photo' : '视频'}',
+                style: const TextStyle(fontSize: 14),
               ),
-            if (item.sourceType == SourceType.livePhoto)
-              ListTile(
-                onTap: () {
-                  Get.back();
-                  ImageUtils.downloadLivePhoto(
-                    url: item.url,
-                    liveUrl: item.liveUrl!,
-                    width: item.width!,
-                    height: item.height!,
-                  );
-                },
-                dense: true,
-                title: Text(
-                  '保存${Platform.isIOS ? ' Live Photo' : '视频'}',
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -617,19 +618,27 @@ class _GalleryViewerState extends State<GalleryViewer>
       items: [
         PopupMenuItem(
           height: 42,
-          onTap: () => Utils.copyText(item.url),
-          child: const Text('复制链接', style: TextStyle(fontSize: 14)),
+          onTap: () => ImageUtils.downloadImg([item.url]),
+          child: const Text('保存图片', style: TextStyle(fontSize: 14)),
         ),
         PopupMenuItem(
           height: 42,
-          onTap: () => ImageUtils.downloadImg([item.url]),
-          child: const Text('保存图片', style: TextStyle(fontSize: 14)),
+          onTap: () => Utils.copyText(item.url),
+          child: const Text('复制链接', style: TextStyle(fontSize: 14)),
         ),
         PopupMenuItem(
           height: 42,
           onTap: () => PageUtils.launchURL(item.url),
           child: const Text('网页打开', style: TextStyle(fontSize: 14)),
         ),
+        if (widget.sources.length > 1)
+          PopupMenuItem(
+            height: 42,
+            onTap: () => ImageUtils.downloadImg(
+              widget.sources.map((item) => item.url).toList(),
+            ),
+            child: const Text('保存全部图片', style: TextStyle(fontSize: 14)),
+          ),
         if (item.sourceType == SourceType.livePhoto)
           PopupMenuItem(
             height: 42,

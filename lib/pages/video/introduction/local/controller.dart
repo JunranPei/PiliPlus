@@ -1,7 +1,7 @@
 import 'package:PiliPlus/models_new/download/bili_download_entry_info.dart';
 import 'package:PiliPlus/models_new/video/video_detail/stat_detail.dart';
 import 'package:PiliPlus/pages/common/common_intro_controller.dart';
-import 'package:PiliPlus/pages/download/controller.dart';
+import 'package:PiliPlus/pages/download/download/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_repeat.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
@@ -43,7 +43,6 @@ class LocalIntroController extends CommonIntroController {
   @override
   void onClose() {
     aidSet.clear();
-    videoPlayerServiceHandler?.onVideoDetailDispose(heroTag);
     super.onClose();
   }
 
@@ -51,14 +50,16 @@ class LocalIntroController extends CommonIntroController {
   void onInit() {
     super.onInit();
     videoDetail.value.title = videoDetailCtr.args['title'];
-    final controller = Get.find<DownloadPageController>();
+    final controller = Get.find<DownloadController>();
     final list = <BiliDownloadEntryInfo>[];
-    for (final e in controller.pages) {
-      final items = e.entries..sort((a, b) => a.sortKey.compareTo(b.sortKey));
-      final completed = items.where((e) => e.isCompleted);
-      list.addAllIf(completed.isNotEmpty, completed);
-      if (completed.length == 1) {
-        aidSet.add(e.pageId);
+    for (final seaon in controller.seasons) {
+      for (final page in seaon.pages) {
+        final items = page.entries..sort(downloadEntrySort);
+        final completed = items.where((e) => e.isCompleted);
+        list.addAllIf(completed.isNotEmpty, completed);
+        if (completed.length == 1) {
+          aidSet.add(page.pageId);
+        }
       }
     }
     this.list.value = list;
@@ -71,9 +72,9 @@ class LocalIntroController extends CommonIntroController {
     if (index != 0) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         try {
-          if (videoDetailCtr.scrollKey.currentState?.mounted ?? false) {
-            (videoDetailCtr.scrollKey.currentState!.innerController
-                    as ExtendedNestedScrollController)
+          final state = videoDetailCtr.scrollKey.currentState;
+          if (state != null && state.mounted) {
+            (state.innerController as ExtendedNestedScrollController)
                 .nestedPositions
                 .first
                 .localJumpTo(_offset);
@@ -88,7 +89,7 @@ class LocalIntroController extends CommonIntroController {
   }
 
   final index = (-1).obs;
-  double get _offset => index * 100 + 7 - 35;
+  double get _offset => index * 112 + 7 - 35;
   final list = RxList<BiliDownloadEntryInfo>();
 
   @override
@@ -135,8 +136,8 @@ class LocalIntroController extends CommonIntroController {
       ..bvid = entry.bvid
       ..cid.value = entry.cid
       ..args['dirPath'] = entry.entryDirPath
-      ..initFileSource(entry, isInit: false)
-      ..playerInit();
+      ..initFileSource(entry)
+      ..initPlayerIfNeeded(false);
     videoDetail
       ..value.title = entry.showTitle
       ..refresh();

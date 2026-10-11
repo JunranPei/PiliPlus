@@ -1,0 +1,43 @@
+{
+  "review_boundary": "Current effective local changes are preserved; superseded experiments are retained in Git history, not reintroduced into current source.",
+  "comparison_base": "7e3c5c6d793b17fdd1587d9a96b64be7ab3e9df9",
+  "actual_merge_base": "2536350ccfc87b9d5d23c564e3d4c8adbd175820",
+  "integration_decisions": [
+    {
+      "item": "Android package and renamed source files",
+      "choice": "Keep com.personal.piliplus and local PipCoordinator; map upstream Java helpers, DocumentsProvider, Utils and generated JNI references to this package."
+    },
+    {
+      "item": "Activity destruction",
+      "choice": "Keep current explicit audio-service stop plus local PiP/diagnostic disposal. Upstream removal of stopService is not adopted because it changes the current shutdown behavior."
+    },
+    {
+      "item": "Default decoder, renderer and buffers",
+      "choice": "Keep HEVC then AVC defaults, saved old codec preferences, mediacodec, audio sync, 32 MB buffer, audio-track ordering and low-power mpv options."
+    },
+    {
+      "item": "Source lifecycle and presentation",
+      "choice": "Keep serialized ownership, cancellation, ready-owner heartbeat guard, native first-frame observer, stable output wait, cover handoff, route barrier and paused source restoration while adapting upstream interfaces."
+    },
+    {
+      "item": "Android PiP",
+      "choice": "Keep fixed viewport/canvas and mounted player subtree; local native coordinator remains responsible for both Android entry paths. Upstream iOS PiP is added."
+    },
+    {
+      "item": "Live stream size subscription",
+      "choice": "Combine upstream stream preference and size detection with local ownership. Cancel listener on route leave and ignore frames belonging to another owner."
+    },
+    {
+      "item": "Upstream test ignored by gitignore",
+      "choice": "Force track upstream test/utils/accounts/deleted_account_test.dart; source content matches upstream."
+    },
+    {
+      "item": "Dependency lock",
+      "choice": "Normal resolution and a subsequent isolated enforced-lockfile resolution both succeeded. pubspec.lock remains identical to upstream 2.1.6; no dependency version was changed."
+    },
+    {
+      "item": "Merge history and rollback",
+      "choice": "Use a two-parent merge with original local tip as first parent and upstream 2.1.6 as second parent. Preserve a safety branch at the original local tip; do not rewrite local commits or include temporary WIP snapshot commits."
+    }
+  ]
+}

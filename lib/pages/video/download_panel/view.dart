@@ -12,7 +12,7 @@ import 'package:PiliPlus/models_new/pgc/pgc_info_model/result.dart';
 import 'package:PiliPlus/models_new/video/video_detail/data.dart';
 import 'package:PiliPlus/models_new/video/video_detail/episode.dart' as ugc;
 import 'package:PiliPlus/models_new/video/video_detail/page.dart';
-import 'package:PiliPlus/pages/download/view.dart';
+import 'package:PiliPlus/pages/download/download/view.dart';
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/page.dart';
@@ -27,10 +27,10 @@ import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kReleaseMode;
-import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:super_sliver_list/super_sliver_list.dart';
 
 class DownloadPanel extends StatefulWidget {
@@ -149,7 +149,7 @@ class _DownloadPanelState extends State<DownloadPanel> {
               ),
             ),
           ),
-          if (kDebugMode || PlatformUtils.isMobile) ...[
+          if (PlatformUtils.isMobile) ...[
             const Spacer(),
             StreamBuilder(
               stream: Connectivity().onConnectivityChanged,
@@ -288,26 +288,30 @@ class _DownloadPanelState extends State<DownloadPanel> {
       switch (episode) {
         case Part part:
           _downloadService.downloadVideo(
-            part,
-            parent == null ? widget.videoDetail : null,
-            parent,
-            _quality,
+            index: index,
+            page: part,
+            videoDetail: parent == null ? widget.videoDetail : null,
+            videoArc: parent,
+            videoQuality: _quality,
+            seasonInfo: widget.videoDetail?.seasonInfo(index),
           );
           break;
         case ugc.EpisodeItem episode:
           _downloadService.downloadVideo(
-            episode.pages!.first,
-            null,
-            episode,
-            _quality,
+            index: index,
+            page: episode.pages!.first,
+            videoDetail: null,
+            videoArc: episode,
+            videoQuality: _quality,
+            seasonInfo: widget.videoDetail?.seasonInfo(index),
           );
           break;
         case pgc.EpisodeItem episode:
           _downloadService.downloadBangumi(
-            index,
-            widget.pgcItem!,
-            episode,
-            _quality,
+            index: index,
+            pgcItem: widget.pgcItem!,
+            episode: episode,
+            quality: _quality,
           );
           break;
       }
@@ -383,7 +387,7 @@ class _DownloadPanelState extends State<DownloadPanel> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: SizedBox(
-        height: 98,
+        height: 110,
         child: Builder(
           builder: (context) {
             return Material(
@@ -412,8 +416,8 @@ class _DownloadPanelState extends State<DownloadPanel> {
                           children: [
                             NetworkImgLayer(
                               src: cover,
-                              width: 140.8,
-                              height: 88,
+                              width: 160,
+                              height: 100,
                               cacheWidth: cacheWidth,
                             ),
                             if (duration != null && duration > 0)

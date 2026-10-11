@@ -5,16 +5,16 @@ import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/floating_navigation_bar.dart';
 import 'package:PiliPlus/common/widgets/flutter/pop_scope.dart';
-import 'package:PiliPlus/common/widgets/flutter/tabs.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
+import 'package:PiliPlus/common/widgets/main_layout.dart';
 import 'package:PiliPlus/common/widgets/route_aware_mixin.dart';
 import 'package:PiliPlus/models/common/nav_bar_config.dart';
 import 'package:PiliPlus/pages/home/view.dart';
 import 'package:PiliPlus/pages/main/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
-import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/utils/android/android_helper.dart';
 import 'package:PiliPlus/utils/app_scheme.dart';
+import 'package:PiliPlus/utils/device_utils.dart';
 import 'package:PiliPlus/utils/extension/context_ext.dart';
 import 'package:PiliPlus/utils/extension/size_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
@@ -22,11 +22,10 @@ import 'package:PiliPlus/utils/mobile_observer.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tray_manager/tray_manager.dart';
-import 'package:win32/win32.dart' as kernel32;
 import 'package:window_manager/window_manager.dart';
 
 class MainApp extends StatefulWidget {
@@ -46,7 +45,8 @@ class _MainAppState extends PopScopeState<MainApp>
   final _mainController = Get.put(MainController());
   late final _setting = GStorage.setting;
   late EdgeInsets _padding;
-  late ThemeData theme;
+  late ColorScheme _colorScheme;
+  Brightness? _brightness;
 
   @override
   bool get initCanPop => false;
@@ -55,6 +55,9 @@ class _MainAppState extends PopScopeState<MainApp>
   void initState() {
     super.initState();
     addObserverMobile(this);
+    if (Platform.isMacOS) {
+      HardwareKeyboard.instance.addHandler(_handleKeyEvent);
+    }
     if (PlatformUtils.isDesktop) {
       windowManager
         ..addListener(this)
@@ -63,8 +66,8 @@ class _MainAppState extends PopScopeState<MainApp>
         trayManager.addListener(this);
         _handleTray();
       }
-    } else {
-      // FlutterSmartDialog throws
+    }
+    if (!Platform.isMacOS) {
       PiliScheme.init();
     }
   }
@@ -73,12 +76,15 @@ class _MainAppState extends PopScopeState<MainApp>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _padding = MediaQuery.viewPaddingOf(context);
-    theme = Theme.of(context);
-    final brightness = theme.brightness;
+    _colorScheme = ColorScheme.of(context);
+    final brightness = _colorScheme.brightness;
     NetworkImgLayer.reduce =
         NetworkImgLayer.reduceLuxColor != null && brightness.isDark;
     if (PlatformUtils.isDesktop) {
-      windowManager.setBrightness(brightness);
+      if (_brightness != brightness) {
+        _brightness = brightness;
+        windowManager.setBrightness(brightness);
+      }
     }
     if (!_mainController.useSideBar) {
       _mainController.useBottomNav = MediaQuery.sizeOf(context).isPortrait;
@@ -113,6 +119,9 @@ class _MainAppState extends PopScopeState<MainApp>
 
   @override
   void dispose() {
+    if (Platform.isMacOS) {
+      HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    }
     if (PlatformUtils.isDesktop) {
       trayManager.removeListener(this);
       windowManager.removeListener(this);
@@ -121,6 +130,13 @@ class _MainAppState extends PopScopeState<MainApp>
     PiliScheme.listener?.cancel();
     GStorage.close();
     super.dispose();
+  }
+
+  bool _handleKeyEvent(KeyEvent event) {
+    return event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.keyR &&
+        HardwareKeyboard.instance.isMetaPressed &&
+        _mainController.refreshRecommendations();
   }
 
   @override
@@ -135,7 +151,7 @@ class _MainAppState extends PopScopeState<MainApp>
 
   @override
   Future<void> onWindowMoved() async {
-    if (PlPlayerController.instance?.isDesktopPip ?? false) {
+    if (PlPlayerController.instance?.updatePipBounds() ?? false) {
       return;
     }
     final Offset offset = await windowManager.getPosition();
@@ -144,7 +160,7 @@ class _MainAppState extends PopScopeState<MainApp>
 
   @override
   Future<void> onWindowResized() async {
-    if (PlPlayerController.instance?.isDesktopPip ?? false) {
+    if (PlPlayerController.instance?.updatePipBounds() ?? false) {
       return;
     }
     final Rect bounds = await windowManager.getBounds();
@@ -157,7 +173,7 @@ class _MainAppState extends PopScopeState<MainApp>
   @override
   void onWindowClose() {
     if (_mainController.showTrayIcon && _mainController.minimizeOnExit) {
-      windowManager.hide();
+      _hide();
       _onHideWindow();
     } else {
       _onClose();
@@ -168,15 +184,7 @@ class _MainAppState extends PopScopeState<MainApp>
     await GStorage.compact();
     await GStorage.close();
     await trayManager.destroy();
-    if (Platform.isWindows) {
-      // flutter_inappwebview
-      // 6.2.0-beta.2+ https://github.com/pichillilorenzo/flutter_inappwebview/issues/2482
-      // 6.1.5 https://github.com/pichillilorenzo/flutter_inappwebview/issues/2512#issuecomment-3031039587
-      final hProcess = kernel32.GetCurrentProcess();
-      kernel32.TerminateProcess(hProcess, 0);
-    } else {
-      exit(0);
-    }
+    DeviceUtils.exitApp();
   }
 
   @override
@@ -207,14 +215,39 @@ class _MainAppState extends PopScopeState<MainApp>
     }
   }
 
+  double? _opacity;
+
+  Future<void>? _setOpacity(double opacity) {
+    if (Platform.isWindows && _opacity != opacity) {
+      _opacity = opacity;
+      return windowManager.setOpacity(opacity);
+    }
+    return null;
+  }
+
+  @override
+  Future<void>? onWindowFocus() {
+    return _setOpacity(1.0);
+  }
+
+  /// https://github.com/leanflutter/window_manager/issues/571
+  Future<void> _hide() async {
+    await _setOpacity(0.0);
+    await windowManager.hide();
+  }
+
+  Future<void> _show() {
+    return windowManager.show();
+  }
+
   @override
   Future<void> onTrayIconMouseDown() async {
     if (await windowManager.isVisible()) {
       _onHideWindow();
-      windowManager.hide();
+      _hide();
     } else {
       _onShowWindow();
-      windowManager.show();
+      _show();
     }
   }
 
@@ -228,7 +261,7 @@ class _MainAppState extends PopScopeState<MainApp>
   void onTrayMenuItemClick(MenuItem menuItem) {
     switch (menuItem.key) {
       case 'show':
-        windowManager.show();
+        _show();
       case 'exit':
         _onClose();
     }
@@ -364,128 +397,135 @@ class _MainAppState extends PopScopeState<MainApp>
     return bottomNav;
   }
 
-  Widget _sideBar(ThemeData theme) {
-    return _mainController.navigationBars.length > 1
-        ? context.isTablet && _mainController.optTabletNav
-              ? Column(
-                  children: [
-                    const SizedBox(height: 25),
-                    userAndSearchVertical(theme),
-                    const Spacer(flex: 2),
-                    Expanded(
-                      flex: 5,
-                      child: SizedBox(
-                        width: 130,
-                        child: Obx(
-                          () => NavigationDrawer(
-                            backgroundColor: Colors.transparent,
-                            tilePadding: const .symmetric(
-                              vertical: 5,
-                              horizontal: 12,
-                            ),
-                            indicatorShape: const RoundedRectangleBorder(
-                              borderRadius: .all(.circular(16)),
-                            ),
-                            onDestinationSelected: _mainController.setIndex,
-                            selectedIndex: _mainController.selectedIndex.value,
-                            children: _mainController.navigationBars
-                                .map(
-                                  (e) => NavigationDrawerDestination(
-                                    label: Text(e.label),
-                                    icon: _buildIcon(type: e),
-                                    selectedIcon: _buildIcon(
-                                      type: e,
-                                      selected: true,
-                                    ),
-                                  ),
-                                )
-                                .toList(),
+  Widget _sideBar() {
+    if (_mainController.navigationBars.length > 1) {
+      if (context.isTablet && _mainController.optTabletNav) {
+        return Padding(
+          padding: const .only(top: 25),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeRight: true,
+            child: DrawerTheme(
+              data: DrawerThemeData(width: 130 + _padding.left),
+              child: Obx(
+                () => NavigationDrawer(
+                  /// apply `lib/scripts/navigation_drawer.patch`
+                  flex: 5,
+                  backgroundColor: Colors.transparent,
+                  onDestinationSelected: _mainController.setIndex,
+                  selectedIndex: _mainController.selectedIndex.value,
+                  header: Expanded(flex: 4, child: userAndSearchVertical()),
+                  tilePadding: const .symmetric(vertical: 5, horizontal: 12),
+                  indicatorShape: const RoundedRectangleBorder(
+                    borderRadius: .all(.circular(16)),
+                  ),
+                  children: _mainController.navigationBars
+                      .map(
+                        (e) => NavigationDrawerDestination(
+                          label: Text(e.label),
+                          icon: _buildIcon(type: e),
+                          selectedIcon: _buildIcon(
+                            type: e,
+                            selected: true,
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                )
-              : Obx(
-                  () => NavigationRail(
-                    groupAlignment: 0.5,
-                    selectedIndex: _mainController.selectedIndex.value,
-                    onDestinationSelected: _mainController.setIndex,
-                    labelType: .selected,
-                    leading: userAndSearchVertical(theme),
-                    destinations: _mainController.navigationBars
-                        .map(
-                          (e) => NavigationRailDestination(
-                            label: Text(e.label),
-                            icon: _buildIcon(type: e),
-                            selectedIcon: _buildIcon(type: e, selected: true),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                )
-        : Container(
-            width: 80,
-            padding: const .only(top: 10),
-            child: userAndSearchVertical(theme),
-          );
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      return Obx(
+        () => NavigationRail(
+          groupAlignment: 0.5,
+          labelType: .selected,
+          leading: userAndSearchVertical(),
+          backgroundColor: Colors.transparent,
+          onDestinationSelected: _mainController.setIndex,
+          selectedIndex: _mainController.selectedIndex.value,
+          destinations: _mainController.navigationBars
+              .map(
+                (e) => NavigationRailDestination(
+                  label: Text(e.label),
+                  icon: _buildIcon(type: e),
+                  selectedIcon: _buildIcon(type: e, selected: true),
+                ),
+              )
+              .toList(),
+        ),
+      );
+    }
+    return Container(
+      width: 80,
+      margin: .only(top: 12 + _padding.top, left: _padding.left),
+      child: userAndSearchVertical(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     Widget child;
     if (_mainController.mainTabBarView) {
-      child = CustomTabBarView(
-        scrollDirection: _mainController.useBottomNav ? .horizontal : .vertical,
-        physics: const NeverScrollableScrollPhysics(),
+      child = TabBarView(
         controller: _mainController.controller,
+        physics: const NeverScrollableScrollPhysics(),
+        scrollDirection: _mainController.useBottomNav ? .horizontal : .vertical,
         children: _mainController.navigationBars.map((i) => i.page).toList(),
       );
     } else {
       child = PageView(
-        physics: const NeverScrollableScrollPhysics(),
         controller: _mainController.controller,
+        physics: const NeverScrollableScrollPhysics(),
         children: _mainController.navigationBars.map((i) => i.page).toList(),
       );
     }
 
+    Widget? sideBar;
     Widget? bottomNav;
+    final EdgeInsets padding;
     if (_mainController.useBottomNav) {
       bottomNav = _bottomNav;
-      child = Row(children: [Expanded(child: child)]);
+      if (bottomNav != null) {
+        bottomNav = MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: bottomNav,
+        );
+      }
+      padding = _padding.copyWith(bottom: 0);
     } else {
-      child = Row(
-        children: [
-          _sideBar(theme),
-          VerticalDivider(
-            width: 1,
-            endIndent: _padding.bottom,
-            color: theme.colorScheme.outline.withValues(alpha: 0.06),
+      sideBar = DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            right: BorderSide(
+              color: _colorScheme.outline.withValues(alpha: 0.06),
+            ),
           ),
-          Expanded(child: child),
-        ],
+        ),
+        child: _sideBar(),
       );
+      padding = .only(top: _padding.top, right: _padding.right);
     }
 
-    child = Scaffold(
-      extendBody: true,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(toolbarHeight: 0),
-      body: Padding(
-        padding: EdgeInsets.only(
-          left: _mainController.useBottomNav ? _padding.left : 0.0,
-          right: _padding.right,
-        ),
-        child: child,
+    child = Material(
+      child: MainLayout(
+        sideBar: sideBar,
+        bottomNav: bottomNav,
+        body: Padding(padding: padding, child: child),
       ),
-      bottomNavigationBar: bottomNav,
     );
 
     if (PlatformUtils.isMobile) {
-      child = AnnotatedRegion<SystemUiOverlayStyle>(
+      return AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarBrightness: _colorScheme.brightness,
+          statusBarIconBrightness: _colorScheme.brightness.reverse,
+          systemStatusBarContrastEnforced: false,
           systemNavigationBarColor: Colors.transparent,
-          systemNavigationBarIconBrightness: theme.brightness.reverse,
+          systemNavigationBarIconBrightness: _colorScheme.brightness.reverse,
         ),
         child: child,
       );
@@ -513,10 +553,10 @@ class _MainAppState extends PopScopeState<MainApp>
         : icon;
   }
 
-  Widget userAndSearchVertical(ThemeData theme) {
+  Widget userAndSearchVertical() {
     return Column(
       children: [
-        userAvatar(theme: theme, mainController: _mainController),
+        userAvatar(colorScheme: _colorScheme, mainController: _mainController),
         const SizedBox(height: 8),
         msgBadge(_mainController),
         IconButton(

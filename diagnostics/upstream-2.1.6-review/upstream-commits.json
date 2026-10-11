@@ -1,0 +1,1614 @@
+{
+  "comparison_base": "2536350ccfc87b9d5d23c564e3d4c8adbd175820",
+  "count": 402,
+  "commits": [
+    {
+      "commit": "4ed5968f37af8b4aa7e0f13178cb8d8c2f86defc",
+      "subject": "Release 2.1.6"
+    },
+    {
+      "commit": "2c93d7ca326e210d9deb4985081f161556ef9c88",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "ca6e6bf7fea0ae9e7555fc4e0cfc3b61246b32e7",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "2395e2fad956cad5fb26b00834fe3c67e754f0f0",
+      "subject": "align app exit"
+    },
+    {
+      "commit": "d012afcc8af9065343bfa3a3122324631f47f1f1",
+      "subject": "handle esc event on all platforms"
+    },
+    {
+      "commit": "7a4f442f450ff0698d0fbe5cecb9666cd1c12e3f",
+      "subject": "feat: offline ugc season"
+    },
+    {
+      "commit": "e5ede1a8f7227d35dd24454c9c206dcb175e754a",
+      "subject": "fix build"
+    },
+    {
+      "commit": "35e70c30b873004b4cb4c5fa68fbb50b2aeafdfa",
+      "subject": "feat: offline skip"
+    },
+    {
+      "commit": "691d0307a396679d69b0a13dda1c9141b17618a4",
+      "subject": "fix cache pgc"
+    },
+    {
+      "commit": "2515ecfc8743e06c137f852399cdec1df036f3c2",
+      "subject": "opt image viewer gesture"
+    },
+    {
+      "commit": "781bf88808d8d7c1ddf8da4bc65773f10709ea09",
+      "subject": "fix image pan zoom from trackpad"
+    },
+    {
+      "commit": "affb0bdd1e14eb34fc688241ce2cd128094294c8",
+      "subject": "fix reply ctr onClose"
+    },
+    {
+      "commit": "919bc310a25e1fb91891f7e965727fbb21c91edb",
+      "subject": "add filter scope detail"
+    },
+    {
+      "commit": "d2544b312b70d3caab3b7077e0db252dd98f0fc7",
+      "subject": "press enter to save screenshot (#3101)"
+    },
+    {
+      "commit": "8f2af3c0959c1a32614e969a2863ebfeb444978c",
+      "subject": "add picture-in-picture on iOS (#3162)"
+    },
+    {
+      "commit": "baec58c4ee4d52959269f994b82b8156b3fdf53f",
+      "subject": "disable search video tab"
+    },
+    {
+      "commit": "14ea2914c1b8a7d068df9419dbd34c2256b9159e",
+      "subject": "constraint cache input length"
+    },
+    {
+      "commit": "b1d3302a377a5cced3b4eb112f3c480db2878aaa",
+      "subject": "improve user block"
+    },
+    {
+      "commit": "334d758127c8126e7f3bb3df7470b3229bc9b0ee",
+      "subject": "fix #3160"
+    },
+    {
+      "commit": "a6e7cc120d0b4e7fc5682d1203c64023ab4ead23",
+      "subject": "fix ugc season panel"
+    },
+    {
+      "commit": "901dc2b9c2f2f38021f2d5cc85061a1f7e789ecc",
+      "subject": "adjust desktop pip aspectRatio"
+    },
+    {
+      "commit": "dd922b0c1bcc5ba89568b483a9bbd0829228688d",
+      "subject": "skip to next/prev from audio session (#2964)"
+    },
+    {
+      "commit": "8a8db36ea386d868a239975d90cbf42fd9dc6138",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "9a9ce8d1849aa827e1d8a9167ab257018eb00403",
+      "subject": "only show light mendal in live chat"
+    },
+    {
+      "commit": "27bf5e94354afd413d1b8efb5541d2fa464a6b0a",
+      "subject": "show up label for chat msg"
+    },
+    {
+      "commit": "858dba22deb09033db944eb12482df2459239286",
+      "subject": "add default live area entrance"
+    },
+    {
+      "commit": "951a91b53af7ebc166296ecf1c8c781b377065dc",
+      "subject": "fix #3136"
+    },
+    {
+      "commit": "3125cbe21bac0b5db290d4c5114ec7251ec5ce4f",
+      "subject": "show pgc episodes on side pane"
+    },
+    {
+      "commit": "6c63774175f404051097747edc30c000f90ac052",
+      "subject": "switch pgc season support"
+    },
+    {
+      "commit": "bdca06f2bf1bc57e1dc4c8bc0e7d3d197ca72372",
+      "subject": "cache desktop pip bounds"
+    },
+    {
+      "commit": "bf1208f57f1114f290c860c813c475251337e689",
+      "subject": "add top mention item"
+    },
+    {
+      "commit": "dbb92ef2c8c434808ed186b60930778816a49268",
+      "subject": "fix #3137"
+    },
+    {
+      "commit": "11930f1280f874fba628cc4d4a07109d9812d5d1",
+      "subject": "feat: reply when repost"
+    },
+    {
+      "commit": "f4292ac96a310219b480147a6b6d89ba92d66bbd",
+      "subject": "opt member cheese cover radius"
+    },
+    {
+      "commit": "ecb5c8974ac9d04e6e1255507a95e022be22e8ec",
+      "subject": "constraint season title lines"
+    },
+    {
+      "commit": "96a36fb8a7e1af558c62d4061316cd8008b0db35",
+      "subject": "fix #2901"
+    },
+    {
+      "commit": "80b1db31be64030725d13dbd46b43222362fcb43",
+      "subject": "opt set playback speed"
+    },
+    {
+      "commit": "55d89f55a21ff2012444961600a1f0a5e96c51eb",
+      "subject": "disable selection if fav folder is full"
+    },
+    {
+      "commit": "ef895e989c513b33417cd7e7bb5fa33647b395c1",
+      "subject": "refa mid black list"
+    },
+    {
+      "commit": "713972df9a62adf9d899f59857ea44bcb003debc",
+      "subject": "refa player bar"
+    },
+    {
+      "commit": "2607441a2f041022836f6dfd5f80380e476751a5",
+      "subject": "show live entrance in member home page"
+    },
+    {
+      "commit": "366d6de18d3ca9ef04b901c7b921f1bb4aa3a91f",
+      "subject": "flutter 3.47.6"
+    },
+    {
+      "commit": "c102a6115c7ac040f6a0c6a1653944b81b82dcb4",
+      "subject": "docs: English README, direct link to Releases page (#3131)"
+    },
+    {
+      "commit": "a30fcc31043e10cd38c198f47ddd7b23fd6e6163",
+      "subject": "Release 2.1.5"
+    },
+    {
+      "commit": "6a884d60429e12e83558e302ce7848dbbc810ea4",
+      "subject": "Android legacy webview (#3063)"
+    },
+    {
+      "commit": "47ea33adf8875c3a21ca86c3d0533269ccacfd0c",
+      "subject": "opt member page tab"
+    },
+    {
+      "commit": "e49209f82405063421a9df4d53f5b1465361175a",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "df86852f3ad7c200fd5f2dccca917dd213c9827f",
+      "subject": "opt update PlaybackState"
+    },
+    {
+      "commit": "f4e598ab09b0866dcca8e7cbf01e16aa0c82b600",
+      "subject": "fix #3066"
+    },
+    {
+      "commit": "4735071874bba12f12cc7800fd6b6252fa2f9a7c",
+      "subject": "fix update pip params"
+    },
+    {
+      "commit": "9d84da7153e48258b547a61802e8c0807e69cf2e",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "f5118f4aca7ce3b590183861661e91943a28c44a",
+      "subject": "opt pip actions"
+    },
+    {
+      "commit": "acff988f18adce44fb0ff870ad50e4da1c78db19",
+      "subject": "fix: open devtools (#3059)"
+    },
+    {
+      "commit": "2f4a50200fdb96e1bca161d7d1f1182fa95001fa",
+      "subject": "opt webview (#3050)"
+    },
+    {
+      "commit": "483a423becf4c28bfdfec45e5f4ed26cf321a60f",
+      "subject": "fix contextMenuBuilder"
+    },
+    {
+      "commit": "a0e6148e928bf2d7f6e14599cab01bde2a0630f7",
+      "subject": "fix(ios): preserve playback category when registering volume listener (#3039)"
+    },
+    {
+      "commit": "3d8711cb3e34d5a0b0c504c073b36b979befdc4c",
+      "subject": "flutter 3.47.5"
+    },
+    {
+      "commit": "5f68384c40e90fedb104fd828935580717e1c7a7",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "66a1225d34108cb08b3527194bd9f77838b715a0",
+      "subject": "filter search all users"
+    },
+    {
+      "commit": "38f851e038cbd59e7dc669dd4665fef563987fa5",
+      "subject": "opt msg feed like item"
+    },
+    {
+      "commit": "6ef5111c28cd93851a5e62eb799520ceab381901",
+      "subject": "opt update PlaybackState"
+    },
+    {
+      "commit": "5c46936000c982be51799345b6ed39d0453662a4",
+      "subject": "fix #3017"
+    },
+    {
+      "commit": "7abf4e7becf5d980ce299834ef43c1dd033f401c",
+      "subject": "fix init playback speed"
+    },
+    {
+      "commit": "e4185e5b1d0eebfefb9cb6f32933401a4aa23c29",
+      "subject": "refa update PlaybackState"
+    },
+    {
+      "commit": "682ada6c4d2592ff876ffec7bc2019935514c6b7",
+      "subject": "fix geetest patch"
+    },
+    {
+      "commit": "48f07575834f91550f3da0308b028ed09cbabfaa",
+      "subject": "refa emote tooltip"
+    },
+    {
+      "commit": "92f53a9971632bb90748f3a6d40d0496c59cadb4",
+      "subject": "opt sc item"
+    },
+    {
+      "commit": "ee148aa640e2da807c3048fde40eff9094ff897a",
+      "subject": "Partial Revert \"feat: upgrade media-kit (#2961)\""
+    },
+    {
+      "commit": "6755d0942fe629a12d989463955b49b71f529708",
+      "subject": "show js error (#3027)"
+    },
+    {
+      "commit": "d1d5c323cf6af119ad10a8dbee9bf123d290f4e4",
+      "subject": "tweaks (#3025)"
+    },
+    {
+      "commit": "a85ae21c005da23ad53d93f2b76e25c1ecc32dfb",
+      "subject": "opt linux webview (#3016)"
+    },
+    {
+      "commit": "5d02a625d5c91a758db6d7ec1c506b5321f16d9f",
+      "subject": "fix close image save dialog"
+    },
+    {
+      "commit": "c6177733320f86543ef74400778e0df7f6ec85dc",
+      "subject": "add search btn by default for SelectionText"
+    },
+    {
+      "commit": "89fe1755fa2e81deb3ed3ffc72553316c0ca5deb",
+      "subject": "opt search esports title"
+    },
+    {
+      "commit": "fbc22f530ab0df0634c886ee30372a60010fc5df",
+      "subject": "fix geetest patch"
+    },
+    {
+      "commit": "2eeb745b7233c596d1744b6c0cd64508d58def9f",
+      "subject": "embedded linux webview (#3014)"
+    },
+    {
+      "commit": "7afc32cf817d8709c36b9a098bd06e1c62ff1b1e",
+      "subject": "feat: sc to image"
+    },
+    {
+      "commit": "2408a7f4dcaa4eda1de51d825a0683516484250a",
+      "subject": "opt search history item"
+    },
+    {
+      "commit": "c876e5d8b8bd4b944ea1a746386835efbed8689f",
+      "subject": "update popular api headers"
+    },
+    {
+      "commit": "92c455be74f1b4df4a3e83b3f32136d66ccaf3ac",
+      "subject": "support custom color seed"
+    },
+    {
+      "commit": "1cf440ed9ae3af842d45eb69a3b84e215f16d766",
+      "subject": "fix update PlaybackState"
+    },
+    {
+      "commit": "c8cee1bc3f96487822511fd396d5218213da33a5",
+      "subject": "opt default hwdec"
+    },
+    {
+      "commit": "41fe78223ed66bd06f7f69d763a6e9127868e1ed",
+      "subject": "do not pass part title"
+    },
+    {
+      "commit": "94e413ac01a429dc0d1d993706048ff5eda36c6f",
+      "subject": "opt update PlaybackState"
+    },
+    {
+      "commit": "df86de3ec7facc580526103e49bbb066fca21260",
+      "subject": "fix #3005"
+    },
+    {
+      "commit": "20b1cb5c0f34fcfa1e23009bfb1855ceef9cac7b",
+      "subject": "refresh search suggest if needed"
+    },
+    {
+      "commit": "41ccd5801a496a13595f9ab4748e2ec6a064ccbc",
+      "subject": "fix #2761"
+    },
+    {
+      "commit": "0a6fe28a1b9dbdd74ea6a966f01603bd49eb16b9",
+      "subject": "Revert \"fix #2761\""
+    },
+    {
+      "commit": "9d3e8b6264675a00388edbc712ef5ed5f3aa01a8",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "47230b61c7f1e32987678335a5e2b0fba7f65fda",
+      "subject": "fix #2761"
+    },
+    {
+      "commit": "faf49b3550713f31ebae9cf069170939874cd65e",
+      "subject": "fix #2971"
+    },
+    {
+      "commit": "08a9f55099b56b23166e683cb79e2730e04615be",
+      "subject": "opt parse app rcmd"
+    },
+    {
+      "commit": "2b0ffa12ffb21fa73f79cecbdbaf0ea239607ace",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "b0e7e4eb16d501bac0688738b0ba18d0fce87640",
+      "subject": "opt: save all images (#2983)"
+    },
+    {
+      "commit": "6fd7987cf2da502e96c5c58d7ad844cbae6aa35d",
+      "subject": "fix(desktop): lower the minimum size of pip window (#2982)"
+    },
+    {
+      "commit": "00cb572ccf2815bae3c47617f0130edd0e09b248",
+      "subject": "feat: upgrade media-kit (#2961)"
+    },
+    {
+      "commit": "455254ee6bfbdd5172d0c7e38cf24d57cf034fd2",
+      "subject": "fix: mouse input stuck after middle-click fullscreen (#2917) (#2976)"
+    },
+    {
+      "commit": "b6908e5156ce6eb7d66448c2d3fcb4adb3a3cd15",
+      "subject": "save all images support on desktop"
+    },
+    {
+      "commit": "7399f3507196247695ec250087675ef040de36f7",
+      "subject": "update app rcmd params"
+    },
+    {
+      "commit": "a3f9c90d3c1cda97559a98f03604acd9d543ac83",
+      "subject": "feat(windows): support video URL activation (#2673)"
+    },
+    {
+      "commit": "9adad75dd1870d10f66365eca5abe34a0589918b",
+      "subject": "linux deeplink (#2931)"
+    },
+    {
+      "commit": "f1a41ed0f1c95d783b06373867e9e3f356daad08",
+      "subject": "fix #2963"
+    },
+    {
+      "commit": "e9008c8eb24cf2ec2d258bb7172d901b0d36eb04",
+      "subject": "fix #2966"
+    },
+    {
+      "commit": "8b6abc07d6ccb6fb8deace9a171dddb46eb0e5c5",
+      "subject": "fix search esports team score"
+    },
+    {
+      "commit": "11e02b866b19d6cbb41975422cc8c184e3c44971",
+      "subject": "tweaks (#2962)"
+    },
+    {
+      "commit": "ce17223a8d71338d0c452a05f8fc55e86a3bba64",
+      "subject": "Release 2.1.4"
+    },
+    {
+      "commit": "d07da9861f16483d6e541acb68310bdb44f4857e",
+      "subject": "flutter 3.47.4"
+    },
+    {
+      "commit": "84a3b5ff2e035ad44495ae43f7ac2f206e375128",
+      "subject": "upgrade dep"
+    },
+    {
+      "commit": "51a041a5ba2837fe70d38eba7753b53352db1c7e",
+      "subject": "opt search esports"
+    },
+    {
+      "commit": "7c717237e2c6aaf51a5011436d1577601be44502",
+      "subject": "fix #2949"
+    },
+    {
+      "commit": "2b9fc8bf15fcc313939472776178dbe76ca45ed3",
+      "subject": "fix #2950"
+    },
+    {
+      "commit": "2ddf574aa91a6e78e7ca51dfc47d562f68f7af5a",
+      "subject": "fix #2956"
+    },
+    {
+      "commit": "04fe7be29b929c5d4e460d9f9f6d00a889376457",
+      "subject": "only inner scroll if is locating video"
+    },
+    {
+      "commit": "7f1792f64968722e9989350c8a4c99acbdaefa52",
+      "subject": "show search esports"
+    },
+    {
+      "commit": "21a0fc06962ea22ed880d64db594c45f40a67240",
+      "subject": "show search trending showName instead"
+    },
+    {
+      "commit": "152547941a50fd5e6d820db8a21fd56a2d9fd248",
+      "subject": "refa load previous video"
+    },
+    {
+      "commit": "861ab3f9168d8542d85553dbb61109c43c0b2b59",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "47e94b33b9a3d4a7538b3e252e26056af3fe4f5a",
+      "subject": "update proto"
+    },
+    {
+      "commit": "827ee5d66249172b976dcc85c538f36bae067c0e",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "1a4bb7ba978eb6846adc35f5f93a4455feb431e1",
+      "subject": "feat: search all"
+    },
+    {
+      "commit": "3e030b202bcc1c2e0152fa73e916044c59afb643",
+      "subject": "keep fav resources order on copy/cut"
+    },
+    {
+      "commit": "b8eeeb78c441ff5aef4471d2c2c37643f72252d1",
+      "subject": "improve emote tooltip"
+    },
+    {
+      "commit": "cd096d3377f3a80d17c910d732b0762f6d8588d5",
+      "subject": "flutter 3.47.3"
+    },
+    {
+      "commit": "1f1ac0fbedfacb9e52b2cff3bf3631809a657150",
+      "subject": "fix #2909"
+    },
+    {
+      "commit": "8795d0628a7292e87e580610a607c48b5cdfcc37",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "32538c4d705c9f5c74747cd00bacdd061d4aed99",
+      "subject": "opt block segment edit panel"
+    },
+    {
+      "commit": "7a86daba8a809ec23edf330f8edf00ec5cab0787",
+      "subject": "migrate reply main list api"
+    },
+    {
+      "commit": "74203a89fb98c81477313a6e175d02cfc8f1c000",
+      "subject": "pass uidOffset to dyn like list"
+    },
+    {
+      "commit": "68fb0e3960a109f38256379ad5c7279d8fb20dd6",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "5b1e909d6ed04fa7fb70904f43e9031c55b6b951",
+      "subject": "opt dyn repost item"
+    },
+    {
+      "commit": "9730d29a8a34e0d07fec0afb06155711961a0509",
+      "subject": "fix #2892"
+    },
+    {
+      "commit": "d7c6263c8958c7a0eb70ea0fce80434b250f3491",
+      "subject": "update position on seek"
+    },
+    {
+      "commit": "9c9076a4c9c1a55f35b10d4f0080a12c66ff9be5",
+      "subject": "refa dyn reaction (#2894)"
+    },
+    {
+      "commit": "444898e4f3c228bca4daaa617cec53c6f563451e",
+      "subject": "tweaks (#2889)"
+    },
+    {
+      "commit": "78d266ae7b6a8b87e13a02ab9125bdedff14eadc",
+      "subject": "fix(linux): single instance (#2884)"
+    },
+    {
+      "commit": "879679fc6324391fe969c8e927e274e73bb1ffa7",
+      "subject": "add seek position"
+    },
+    {
+      "commit": "5aa7b02e3dc8d298079a126887ee3dce02bf35a1",
+      "subject": "feat: page order"
+    },
+    {
+      "commit": "d7fb17b91338950d626d53b635c1a009540a53ba",
+      "subject": "opt: mpv args & native event loop (#2873)"
+    },
+    {
+      "commit": "4d66b7b638c9cb9d533ffe95f23a56b822af90e2",
+      "subject": "fix find missing video qa"
+    },
+    {
+      "commit": "edf8c55e2e20096f2e551e6286ec35af84ad30df",
+      "subject": "Release 2.1.3"
+    },
+    {
+      "commit": "3c07a28d02e50666e45c64f6ab63b190d65654c3",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "edf0bf20389f8501031e019bf0aa1777aecc7922",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "75c83af892e8d9af05f0869cc699fe9753ee56f4",
+      "subject": "feat(linux): webview (#2843)"
+    },
+    {
+      "commit": "3e6ac82e060e36d6b75d6610f16c19f590cdfb90",
+      "subject": "fix #2837"
+    },
+    {
+      "commit": "4cc337b479f56fb580001191472defe68b66601c",
+      "subject": "Implement live danmaku blocking (#2821)"
+    },
+    {
+      "commit": "837ef862fe7e21eabad126466fcb5edac23aea5f",
+      "subject": "fix #2836"
+    },
+    {
+      "commit": "9cc3bb2c80d2e6dc0fb2a647ea5658e7d95ff762",
+      "subject": "fix cupertino patch"
+    },
+    {
+      "commit": "8a282c85e2459d69140966e5eed011fc47d98d14",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "b181b6fe10331283fcbb451e795fe081e99e502a",
+      "subject": "Revert \"fix: resolve Linux window close handler to prevent app hang (#1795)\""
+    },
+    {
+      "commit": "25ec0faa7fadf094597a5ad302876cb7b557498f",
+      "subject": "add initialIndex support for live chat"
+    },
+    {
+      "commit": "77dcc826cc40072d8475ca806359eae5cb69885a",
+      "subject": "opt init `hasLater`"
+    },
+    {
+      "commit": "294aa7161193af0f6914c4a0294d9ccf120a5a2e",
+      "subject": "fix(video): fix video quality availability (#2828)"
+    },
+    {
+      "commit": "5c7cb99b68526d0096f09060577d46ff5926db85",
+      "subject": "feat(shutdown_timer_service): show remaining time (#2461)"
+    },
+    {
+      "commit": "05cfb595dd0a8dba06eaaf3e58d517b0075e6584",
+      "subject": "opt trim live chat message"
+    },
+    {
+      "commit": "5a6f3feaea37db997eae0671ef86490022b0d7df",
+      "subject": "feat(comment): add latex to unicode converter (#2792)"
+    },
+    {
+      "commit": "99bf57b6402c3e638e59e26e1079a9f0094be633",
+      "subject": "bound live chat messages"
+    },
+    {
+      "commit": "ea10b4559d2510588be47560c31e0051350cc3c7",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "42b6d59335859d8afbcc607cdf7aec7ac318967f",
+      "subject": "fix #2709"
+    },
+    {
+      "commit": "adc9a4b94a66cd18535bc68112ef53276427381b",
+      "subject": "opt: account (#2817)"
+    },
+    {
+      "commit": "66d1f7d627a74860ce428480d75a6e9f4fdb2d98",
+      "subject": "opt publish panel"
+    },
+    {
+      "commit": "c7458b1f3b7236bdb82df838ecfed2efd5f007a0",
+      "subject": "apply `orderType` to follow tag api (#2772)"
+    },
+    {
+      "commit": "315068bbeab5f3c746047edf7f33c1ab458462e2",
+      "subject": "bound danmaku download concurrency (#2800)"
+    },
+    {
+      "commit": "95d299d30260dc5325043a2e857161fc3b72ccdc",
+      "subject": "fix account change"
+    },
+    {
+      "commit": "f3f59775f12f6e236d8c747ba09609b54404ec96",
+      "subject": "fix #2816"
+    },
+    {
+      "commit": "adbf6f3f578e097450c821da6154a3e8b04ef917",
+      "subject": "opt provider authorities"
+    },
+    {
+      "commit": "628031d4dacaa10126627332ffa9e6e1ee30dbb5",
+      "subject": "fix: bind response cookies to request account (#2794)"
+    },
+    {
+      "commit": "6d3541dcdc174ffe04cfd18b9845d931c4af3547",
+      "subject": "fix: prevent deleted accounts from being persisted (#2797)"
+    },
+    {
+      "commit": "4b91b40012e9d7247a58b14ed6666c8188578666",
+      "subject": "fix loudnormRegExp"
+    },
+    {
+      "commit": "f0e92f2ba6f267f5b637760709ce1c85d5c44f44",
+      "subject": "Update build.yml"
+    },
+    {
+      "commit": "03dcaa746bf4954fb95796acfe809b13649a790e",
+      "subject": "configure audio normalization in audio page (#2598)"
+    },
+    {
+      "commit": "5f9aa9ecf8bc77c9616d7f8f919542583319111f",
+      "subject": "Declear ITSAppUsesNonExemptEncryption (#2789)"
+    },
+    {
+      "commit": "828de30e9efe7a7cebddd4f0380db462de67b55a",
+      "subject": "opt: appFontWeight (#2787)"
+    },
+    {
+      "commit": "44680b8a486a0518f366a2c9bff6242506cf8783",
+      "subject": "fix parse dyn uri"
+    },
+    {
+      "commit": "932b95ccb05b6dc683bf57fab698400d4b259cdd",
+      "subject": "fix default font weight in font page"
+    },
+    {
+      "commit": "adb65993886c47229e597d10ed64a0d817bc3000",
+      "subject": "fix show reply bottom sheet"
+    },
+    {
+      "commit": "06b88943ca5fa787ff797dfa51af0147bee76ca9",
+      "subject": "fix: report info (#2771)"
+    },
+    {
+      "commit": "9624c37255837412e8677a6b9d69fdfac720b68a",
+      "subject": "tweaks (#2767)"
+    },
+    {
+      "commit": "4667f5f53d950441bfb167fdc1dcc67964e450d3",
+      "subject": "fix update font settings"
+    },
+    {
+      "commit": "32a39e466ae634a5dabd6cd0a52fdd581b89323e",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "db77169b4d4581138ab70ecfb216151614421c75",
+      "subject": "refa: font setting (#2760)"
+    },
+    {
+      "commit": "85803c19637153ff68e5f2424816145b455af13e",
+      "subject": "fix selectable region patch"
+    },
+    {
+      "commit": "1f43c60d8ea95d47f4e6cf262cf16473386970a3",
+      "subject": "opt fallback to default fontFamily"
+    },
+    {
+      "commit": "6ee11d392a1aa054a317081a829344bc5e74a78f",
+      "subject": "refa font page"
+    },
+    {
+      "commit": "9058ac1443926aaf68f43ef860d6a69b41e4be5f",
+      "subject": "correct get font toast"
+    },
+    {
+      "commit": "4da811080571335bcf97c4d46b07bf79be59a5dd",
+      "subject": "copy video cached uri on mobile support"
+    },
+    {
+      "commit": "37ae9cf2db5b4d9bed44be3f4328c9cb5c441aa3",
+      "subject": "remove DropdownButton underline border"
+    },
+    {
+      "commit": "797f15453561df696ea73d812b8a5ee4288ef457",
+      "subject": "feat: custom font"
+    },
+    {
+      "commit": "76feace3491b363ed4eaa030c5fe741435a9c127",
+      "subject": "opt init theme style"
+    },
+    {
+      "commit": "44354d7fa091737c5899a1071ae966c8c31845bf",
+      "subject": "flutter 3.47.2"
+    },
+    {
+      "commit": "d7552cad89dfa778c31f1208ab8aa2f501ae3e33",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "ea67b9313f5513bd0752f9d144e78036c40e5104",
+      "subject": "fix #2731"
+    },
+    {
+      "commit": "d529e0a2d90a2a3a04ef9847e6c14187852ea6ee",
+      "subject": "style: directives_ordering (#2734)"
+    },
+    {
+      "commit": "ed78bee1f920a01bfbfab8a554dd253cbcbfdc2e",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "2c3cc3b88f8bf9d7b9a0b0bc19260c7be24bb7e8",
+      "subject": "Revert \"fix: auto-recover from stream corruption errors (#2446)\""
+    },
+    {
+      "commit": "dde09d91a5a7ce581da4daf857c90bbc08740e99",
+      "subject": "show index in part item"
+    },
+    {
+      "commit": "198261f519cafa78337775af110ea8b5ec9176df",
+      "subject": "show copy btn in save dialog on desktop"
+    },
+    {
+      "commit": "ddd46dfd4a42d728edcb1bf42fa411e666c23045",
+      "subject": "opt: webview (#2713)"
+    },
+    {
+      "commit": "49356bf73e25f07c3aae0f08aa0c6d862d95ce12",
+      "subject": "unify settings text style"
+    },
+    {
+      "commit": "35e5454a47246c187106b869cd02b9bdbe90c015",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "f40cab0a573a37f3b37844f140557b62d1d81769",
+      "subject": "allow `bcc` subtitle ext"
+    },
+    {
+      "commit": "b71474d09145033ac9d4cbfe0f56591daf583caf",
+      "subject": "fix: auto-recover from stream corruption errors (#2446)"
+    },
+    {
+      "commit": "226bd3bb76bca80cc196a9c2f34ee0986940fb03",
+      "subject": "refa content check in report dialog"
+    },
+    {
+      "commit": "9b9791cf3007242556b538e2d300e0da9a96c0ae",
+      "subject": "opt: unused activity context (#2698)"
+    },
+    {
+      "commit": "66c9c339d9d6ec30553ecbaabc50cba33e185a4e",
+      "subject": "fix: search apiType (#2697)"
+    },
+    {
+      "commit": "3e8a79446eade6b6a85ad324545ebaefe6d12f09",
+      "subject": "feat: android doc provider"
+    },
+    {
+      "commit": "b819ad89826781d5aa871c463e1e7206f88105fa",
+      "subject": "update publish transition duration"
+    },
+    {
+      "commit": "6c6b8dd7edbdb9e545eb3a54e85cc13c887392b3",
+      "subject": "fix #2638"
+    },
+    {
+      "commit": "6413631c0f36c792a5e54501bfd89a69330b29b2",
+      "subject": "update reply sort type"
+    },
+    {
+      "commit": "299905f474a71b9c25611ad8efd8e97272b91afb",
+      "subject": "opt: replace dialog with popup (#2683)"
+    },
+    {
+      "commit": "d2b2f5c9d70cddc68b5bebcb234160970534344d",
+      "subject": "fix clear vote card"
+    },
+    {
+      "commit": "62bdcafa1a5cdb7d834df445fad0e56b3161f424",
+      "subject": "fix cdn test"
+    },
+    {
+      "commit": "61c65a65cef0aa9993b16859d1e1f922e4557b3f",
+      "subject": "feat: show copy deviceInfo card (#2688)"
+    },
+    {
+      "commit": "17e92c4702796aeb77ed5f17578ca5260a02024d",
+      "subject": "Release 2.1.2"
+    },
+    {
+      "commit": "aa8f650b899aa88b58b62537b65193635ff15e41",
+      "subject": "fix #2664"
+    },
+    {
+      "commit": "1b9130eeb9d25564da03e249bf48a67621a8db11",
+      "subject": "fix: logout selected accounts (#2666)"
+    },
+    {
+      "commit": "4ca0373455e91668a734ceb6ed9e079a98049be0",
+      "subject": "feat: font setting page (#2611)"
+    },
+    {
+      "commit": "efe03c6472a04fe4b2973927dfbf4ce326c5818c",
+      "subject": "feat(macos): refresh recommendations with Command+R (#2537)"
+    },
+    {
+      "commit": "53269d9f997fa25ba9427d334defec7a77187e2b",
+      "subject": "Separate Default Codecs for Wi-Fi and Cellular (#2571)"
+    },
+    {
+      "commit": "867bf6bd4630c5ea2762d2f9429ddc190577f794",
+      "subject": "fix: bind WebDAV client to current settings (#2667)"
+    },
+    {
+      "commit": "0b7a58d9c5f4e649ca6307907c20b64537e55583",
+      "subject": "feat: add independent sort setting for reply2 comments (#2655)"
+    },
+    {
+      "commit": "5fc31388946daa828acd921727f425eb6784b30f",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "a33284dec0dec52a40b9ad01d1b3ee6e3109d613",
+      "subject": "fix #2621"
+    },
+    {
+      "commit": "edd60d635035f556eefaeb6fa61819e6dab6fb4b",
+      "subject": "fix custom shutdown wheel"
+    },
+    {
+      "commit": "2c87a32b47fce8c91b1cc97ab0169bb4a89aabc0",
+      "subject": "fix describe semantics label"
+    },
+    {
+      "commit": "cd31a2d75e91866dc7d7db917fda7d887ed42889",
+      "subject": "fix #2636"
+    },
+    {
+      "commit": "81dc927aee95a1a0cf7095e4511424aa7c33ef46",
+      "subject": "refa custom shutdown panel"
+    },
+    {
+      "commit": "763b8514f036b7e89376def9978fb6801eedb789",
+      "subject": "fix: remove no_clip (#2634)"
+    },
+    {
+      "commit": "6a7ce57708c3cc240d8fe0cae3800f708188986d",
+      "subject": "fix: copy videoParams (#2633)"
+    },
+    {
+      "commit": "58c73b53fa55e599e354666d83f47ea8da43cfcf",
+      "subject": "Release 2.1.1"
+    },
+    {
+      "commit": "c71f1488325e983dd9e81097baa9aaf21bfde8c2",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "e998fc22444b2e6c13ecdc41ec0f7294d5e267ef",
+      "subject": "build"
+    },
+    {
+      "commit": "372c0c3ce8f1bd695c9787bb20c2dc05c3e5f8a4",
+      "subject": "remove EmoteSpan"
+    },
+    {
+      "commit": "5cc996c48509c9fd84b45dedf44e319a9cf5e52c",
+      "subject": "tweaks (#2612)"
+    },
+    {
+      "commit": "7126895b6fb43026a5471e129f0b0873e5df8494",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "0bef5b84f18a19556043c19a7d5cdcad347e6407",
+      "subject": "cupertino patch"
+    },
+    {
+      "commit": "870cb030be51e0971d8ee9696a0f9db59a4880f7",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "1762898e5829e0e91b8c77b9a7165f1f99db02ce",
+      "subject": "show sc face_frame"
+    },
+    {
+      "commit": "ef01529f32eb2ee87a9f82366653458c5eacec23",
+      "subject": "fix #2595"
+    },
+    {
+      "commit": "d5d3dde2dece38bc53569aa40f3111ad2238c13a",
+      "subject": "fix #2581"
+    },
+    {
+      "commit": "e09754991e1d2395d1011421227772b6ba185ff0",
+      "subject": "fix ios bottom sheet patch"
+    },
+    {
+      "commit": "5fd1645a8f354bba389403d9faeffcafa93f29d2",
+      "subject": "Reformat"
+    },
+    {
+      "commit": "a939207d2c7b4c97cfa88e9f2f1622c941b762e3",
+      "subject": "flutter 3.47.1"
+    },
+    {
+      "commit": "9a4e5874b9777315b992145b50d30ce9ce0e3b6f",
+      "subject": "optimize imports"
+    },
+    {
+      "commit": "b6e9da163f9be45a323e711f8131681d60538ca8",
+      "subject": "fix #2575"
+    },
+    {
+      "commit": "8bf39dd5ebd286df52e59f06a54d12975d1a761b",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "9d99693d2c48a838e5626328ac8ddcd29a2a4eb8",
+      "subject": "fix build"
+    },
+    {
+      "commit": "1226ef00e6370c6744f381c1eaae986587597070",
+      "subject": "optimize imports"
+    },
+    {
+      "commit": "08456a1786d51c163b084bb8447281fd1f8acbe7",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "97652a15616c0051c94095829a4710e5edb8fbca",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "b11815c85c6a3a34a9419e5a0d0ec26687595c0c",
+      "subject": "disable linux Impeller (#2569)"
+    },
+    {
+      "commit": "f8b9ef3e6eca50dafb187cfbcdd67cab78ee4d61",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "f73b9c9510f54a131211060b3f013378e934c48d",
+      "subject": "fix star history chart (#2557)"
+    },
+    {
+      "commit": "810c26a6e451320fa4d79d63051012188eef7963",
+      "subject": "migrate to material_ui (#2565)"
+    },
+    {
+      "commit": "3a7d4614743cb7289293d6c47e13d96aec544f18",
+      "subject": "migrate file_picker to new api"
+    },
+    {
+      "commit": "71ed689a259cd0e2ff5b482873b63230978fcd71",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "c92476e671a5d1a3a44d0e59a42c7cfca568a388",
+      "subject": "disable windows impeller"
+    },
+    {
+      "commit": "bf2cde270d39cd844ce2b63e88279136490949b2",
+      "subject": "fix video progress bar"
+    },
+    {
+      "commit": "3a8c0b97e300ebce7622e6bde01280673ca0e42e",
+      "subject": "opt desktop back detector"
+    },
+    {
+      "commit": "1affd11f12b24ededf6c36a0f5ed4901245cb692",
+      "subject": "refresh indicator patch"
+    },
+    {
+      "commit": "c9871e9a876cb609f294550ffa1248b38be4c681",
+      "subject": "flutter 3.47.0"
+    },
+    {
+      "commit": "f6632944c36434ac1b648d81495f0e4fbade3d3a",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "411f05b9d45d19bfc6622b30892c2ffac897bac1",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "efefaf06eb70b82d95950ead4cd75757ee097c57",
+      "subject": "fix(macos): restore opaque window title bar (#2534)"
+    },
+    {
+      "commit": "e5dfc6394135c79776f23a3e8e51d2ff35399203",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "5416d0acef78d45b97581275b5895f95e94d99e0",
+      "subject": "improve theme style"
+    },
+    {
+      "commit": "42d44f33a9489bf8ec2883dde8b6a677143c4f6b",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "1260c37a4c6c5dfccdb810c30a967cad9ec795b8",
+      "subject": "filter charged rcmd"
+    },
+    {
+      "commit": "ade700d629614000274c9aa3e502f16c2ff57828",
+      "subject": "opt reply/dyn check result dialog"
+    },
+    {
+      "commit": "36dec609315cd34f8895cf15607f1cc582a66f01",
+      "subject": "feat: centered sliver constrained cross axis"
+    },
+    {
+      "commit": "5b0ff38dfce9100987048bdf955d938eb4dd2944",
+      "subject": "opt settings slider"
+    },
+    {
+      "commit": "8fa622eb861ff8cf7ef6e2ae406f8fbecd1916fb",
+      "subject": "fix #2485"
+    },
+    {
+      "commit": "d5f4cea5e7e8d5cab346a7c9a04f8801e7d2bd3a",
+      "subject": "fix #2491"
+    },
+    {
+      "commit": "97ad78c8a40f97a63fd4bfe2f862b4cb14c2d165",
+      "subject": "fix #2494"
+    },
+    {
+      "commit": "ece7795d51e73a031c792772b9f8c9ff0e885698",
+      "subject": "pass video title"
+    },
+    {
+      "commit": "8676a2984bfd9a409649a5a2ec9b527d2db5296e",
+      "subject": "fix(ipados): keep navigation clear of window controls (#2482)"
+    },
+    {
+      "commit": "e2647ea3547b8e0b4da8cf68dac5f1804e46a605",
+      "subject": "refa refresh drag extent"
+    },
+    {
+      "commit": "60b9938047e793b854e7d9d32ff7fa2025c340aa",
+      "subject": "refa refresh indicator"
+    },
+    {
+      "commit": "1cfff520c52dd8085e6cbce285295039c6f81c44",
+      "subject": "opt text ellipsis"
+    },
+    {
+      "commit": "f8b466f09033a684a9edf7f4623f27da22c74b7e",
+      "subject": "fix reply up label"
+    },
+    {
+      "commit": "f7314f928e70b8c0c91e0bf42569d5fd92f13b9c",
+      "subject": "fix image save radius"
+    },
+    {
+      "commit": "94d6501c8bce37cbc35e94aeab0727ce147646f8",
+      "subject": "fix search from menu"
+    },
+    {
+      "commit": "3ee6c38b5aa571e0f602bf4e79790f8c22cb9899",
+      "subject": "feat: show ellipsis in line break"
+    },
+    {
+      "commit": "d06d1bb2cf2b9fc3a0f5bcb7aad5f6f134acc6dd",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "2bc52541b7eaf7ed42e4e45dacb68fd5889d5816",
+      "subject": "perf(cache): reuse HTTP client across downloads (#2473)"
+    },
+    {
+      "commit": "67cc3caa45ad8646666381a9e1069b30db61d998",
+      "subject": "fix: unknown scheme & always show open menu (#2474)"
+    },
+    {
+      "commit": "0e9a372b825fa8bd14189395d9f38b7269486a22",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "8077573c50305e6494241b0ab7ec0dff30e139d7",
+      "subject": "fix marquee"
+    },
+    {
+      "commit": "6cb8a8e060d711e254040187f188441001f49f36",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "2a99d967fdcb4b8172fe59fcdfed5c474fbb28c3",
+      "subject": "add patch desc"
+    },
+    {
+      "commit": "f9a9e221b08159f08a8a007fb82bd82c6170e5ea",
+      "subject": "fix statusbar brightness"
+    },
+    {
+      "commit": "90d8e8b2f202eb3bcd7188b5601e55389584d489",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "5c0c6b3cfdf0ea68946c43c9ba2e181f8864aa91",
+      "subject": "opt dyn text"
+    },
+    {
+      "commit": "946c7a82f40f1f8c486620b5669850079eae798f",
+      "subject": "target 37"
+    },
+    {
+      "commit": "55b4fa6fe7416b05f55b28af5917e32241c4b838",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "97769b94501420cd8d154cc3146303fae5f8ce8f",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "f90d1789cc9e37a51622d7ba1b53b6ef5ec4e7b4",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "c4c0852dea5056852d335bf9b36f7cd7ed5e16c1",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "b5b15dbed63567379535dc540ec4513910c0cb3a",
+      "subject": "opt dyn/top sheet"
+    },
+    {
+      "commit": "1ded09f246d707f42ebb70db7130897f2be7dc7d",
+      "subject": "opt scrollable gesture"
+    },
+    {
+      "commit": "32fd0e4a766ee0c0f17f1e6339a1e849dfddbea5",
+      "subject": "opt image viewer"
+    },
+    {
+      "commit": "e892411092772951e8aa63b7d0e235080648a70a",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "133f45945c89fe422d5ee8323f5b11af7ab94396",
+      "subject": "opt paint text selection rect"
+    },
+    {
+      "commit": "557585334ab39ef2df7ced244f4639c558de1caa",
+      "subject": "opt vote option"
+    },
+    {
+      "commit": "5296a8f7f07a22f347ad53bc8c7651e6787bf3ec",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "91e78998584019452b2dc201d7846749f84220bb",
+      "subject": "opt text selection"
+    },
+    {
+      "commit": "e4e70370d1ea16e37f887a4bc18db95b6358afd1",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "10b723fa6408a4f7d00072412c0e7f86b43fdbfb",
+      "subject": "opt text selection"
+    },
+    {
+      "commit": "56ca0cade48d20aada40a08b1dd36aa82d75d8ce",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "f1b79eeafc586b4dab5b4c067f3936b90fef133c",
+      "subject": "flutter 3.44.8"
+    },
+    {
+      "commit": "1e6f9d0d584baa03273bf09c405ca85b3be89a77",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "b8321c1ef22a8cdaa09458480341301674824416",
+      "subject": "opt placeholder selection"
+    },
+    {
+      "commit": "87c7b84e5c038a52e3e0fa0e3e282b24708b8533",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "47aaa28898eb6d6897ae2d2c209d1de414967ee5",
+      "subject": "opt ScrollBehavior"
+    },
+    {
+      "commit": "fa75f5c54238fbab84dce40eb8b61186e267edd2",
+      "subject": "fix: resume history from the recording account progress (#2458)"
+    },
+    {
+      "commit": "0ca091ac48661b7fd2dc445e14d66e9042cfc06e",
+      "subject": "feat: emote selection"
+    },
+    {
+      "commit": "565a2f8754478b8d9926e1277be4cb433631c54f",
+      "subject": "opt selectable selection"
+    },
+    {
+      "commit": "d97bfe3f152374304db1b2f6ac0ae6147610ae28",
+      "subject": "fix selection separator"
+    },
+    {
+      "commit": "ad85bc432cbd055f9fd63e85a6fcfca96f2933c3",
+      "subject": "fix theme switch"
+    },
+    {
+      "commit": "39240598b04adcc6ed07807937fe94b53cd45dcd",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "c39daf023e9e86dfd623629c3f66ecf6a6bfc564",
+      "subject": "opt ios fab anim"
+    },
+    {
+      "commit": "0164e32b70625ca42f9e53f090a83c10bd8d25fc",
+      "subject": "opt context menu"
+    },
+    {
+      "commit": "8f48ddb42a874e1af3845392ad0c600b5b100b01",
+      "subject": "flutter 3.44.7"
+    },
+    {
+      "commit": "9bc4c34db79e13a6c6224bcbe34b99d2becc20b8",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "7d4afc15d3a3996cc0ccccc170535ec635bccd3c",
+      "subject": "opt fab anim"
+    },
+    {
+      "commit": "be07cafb54aba757e10bd61028f3cbcb9ea63505",
+      "subject": "opt iOS ScrollPhysics"
+    },
+    {
+      "commit": "43843ca721702b1133403cacbdde51c93fe0d2ab",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "dae8df840a2b8c31f4ff2b7e24fea53c8be24788",
+      "subject": "opt: edl file (#2455)"
+    },
+    {
+      "commit": "3a5636ecee85a1109a689433f9cae12b584a2852",
+      "subject": "feat: live feedback (#2456)"
+    },
+    {
+      "commit": "2d389424aff9a06a8df76d595e2fc362be3f4df3",
+      "subject": "fix(macos): 🐛 restore opaque window background for title bar (#2448)"
+    },
+    {
+      "commit": "0afeb9a55f40ce93a565ca6514bc2cba82efcb51",
+      "subject": "feat: increase danmaku opacity/fontsize divisions (#2452)"
+    },
+    {
+      "commit": "1dead21c5440babb92ea95611ea9cea49805d82b",
+      "subject": "fix player pointer scroll"
+    },
+    {
+      "commit": "7617bb692af109aa9b90d811e9abe72fa018e74c",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "db65e7df76084b7840bb9f0c1f52f24776ece6c1",
+      "subject": "fix in-app webview (#2454)"
+    },
+    {
+      "commit": "f6035628d3f8db26b7b3ecd317b74becc748db68",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "0c73e01013ffd0bc9798248e07c2a992e41f5a06",
+      "subject": "replace SelectableText with SelectionArea"
+    },
+    {
+      "commit": "4ce32b869844b20983b74b7e89d9c1285180b16f",
+      "subject": "fix RichTextField desktop menu"
+    },
+    {
+      "commit": "cf27cf8b5fb49c500fd312c989f7531a27c67797",
+      "subject": "apply TextSelectionMenuFix"
+    },
+    {
+      "commit": "3d4aa7d5a956709da7df8c6224f98a54b5bd4c89",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "8e4824ab6fd5bfeedc59f59172aa8a4b1f8e2aa0",
+      "subject": "show sc start time"
+    },
+    {
+      "commit": "01eca30575fc208128ed5907c48d2b5bb39c9480",
+      "subject": "text field patch"
+    },
+    {
+      "commit": "177493fe38cc4f484d29622ca17af86b1f8a1c32",
+      "subject": "opt dyn/reply text menu"
+    },
+    {
+      "commit": "f7cd1aa502df0490c350a6098885f51a48554c1d",
+      "subject": "update im ack"
+    },
+    {
+      "commit": "a12223b42b73ba5edf80e66b040a96672e208d45",
+      "subject": "opt opus"
+    },
+    {
+      "commit": "1548624920c7d5529c13a99d9c367df5de33b84b",
+      "subject": "opt member relation"
+    },
+    {
+      "commit": "c1aeaca09e24f67e75685c7744fd1aa0a94b439a",
+      "subject": "Release 2.1.0"
+    },
+    {
+      "commit": "dc306a011512d934bd0016aa9ae6572b1e682480",
+      "subject": "opt intro panel"
+    },
+    {
+      "commit": "77153c153a11174c01c3e9417ca3ebab302503aa",
+      "subject": "refa intro panel gesture"
+    },
+    {
+      "commit": "bcd8bc7366087e15eb7f138c5be48d5776615add",
+      "subject": "opt export subtitle"
+    },
+    {
+      "commit": "82116480cb267258f7fad46aef71146dec4985fc",
+      "subject": "refa expandable"
+    },
+    {
+      "commit": "24e17c5cdd669edc9e87530f368b14475677af6b",
+      "subject": "flutter 3.44.6"
+    },
+    {
+      "commit": "5aa49a1ae1f6e8f70440ec17b6473851041dece4",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "1946218df3faa94251f3d6d837060acf260b8360",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "cae5befa634a085b00c9f335996b92a97779f7e3",
+      "subject": "fix(player): preserve default codec preferences after upgrade (#2444)"
+    },
+    {
+      "commit": "90eee40f92262762cbbd811186c7b2a49f184fd5",
+      "subject": "flutter 3.44.5"
+    },
+    {
+      "commit": "89d56ec6a1f525c6f8ff02cda4248f6fe17d5c02",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "6bedd9d25ff755927c54327afbef9eb6e5972108",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "aa03eed92d12dd987d1bf0ba395abfd8e99fe959",
+      "subject": "dyn topic fold"
+    },
+    {
+      "commit": "5e1c73abc10ac5c80391cd0be703eab821f11ce5",
+      "subject": "perf(ci): remove unnecessary packages from linux x64 install deps (#2441)"
+    },
+    {
+      "commit": "15b6f91ad7e249fe04532814ae61f8a6f4ef68ba",
+      "subject": "Revert \"opt: webview ua\""
+    },
+    {
+      "commit": "2179e56b136c07968fbec9c33f81e6350e027953",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "e3d405677c8be276f963d6ef964450883b216cd1",
+      "subject": "opt show live cover"
+    },
+    {
+      "commit": "8cf21954358c7d63469af8c31377425749837d8d",
+      "subject": "opt vote item"
+    },
+    {
+      "commit": "0036b58aabca4981e60c7cd89a23e0ce49e14774",
+      "subject": "feat: reply vote"
+    },
+    {
+      "commit": "fd017e0581a32b90cdd0207c0ce10b8b3c42c599",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "46ce01d76f2590ec1b9f75550af6832e64816093",
+      "subject": "opt opus"
+    },
+    {
+      "commit": "8c8eb18aedbfb66f829c46865610c96dd9df1f65",
+      "subject": "selectable region selection patch"
+    },
+    {
+      "commit": "b540647222ca07ea8cc622b715b2bc90dff0720d",
+      "subject": "feat: cross row select (#2437)"
+    },
+    {
+      "commit": "204715266fe59fb51dd44f09c47856f3c102e907",
+      "subject": "remove FAB hero"
+    },
+    {
+      "commit": "f73fb0904a535940bb9bded8198f45ab4a19e150",
+      "subject": "stop triple on interrupted"
+    },
+    {
+      "commit": "2a7112662f6ae1eea21d65201ed77dc203d86f10",
+      "subject": "update video header param"
+    },
+    {
+      "commit": "a63cc4603c7f1872590847ff5154d70b0c6400a6",
+      "subject": "opt icons"
+    },
+    {
+      "commit": "600677c244cdb3b5c12e9e7c8f975540c10aeb75",
+      "subject": "opt icons"
+    },
+    {
+      "commit": "8dd86b856f28302ab885a163cc2b5e646ab65711",
+      "subject": "parse em html"
+    },
+    {
+      "commit": "ee770f4e2e284698fb341f5025e8a79bdaaf4c69",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "f615a43259b8d9f962a95d30ae88c4e0d0907856",
+      "subject": "opt trending header"
+    },
+    {
+      "commit": "ed6353e6d5e38b386360c37985c3ba70465ff8f4",
+      "subject": "opt video header"
+    },
+    {
+      "commit": "0df637fb733fcb248231b1dc2637e076e1a8f19b",
+      "subject": "popup menu patch"
+    },
+    {
+      "commit": "ace9404f5ad4dc079df1101a2dc8c76313310a97",
+      "subject": "opt nested scroll"
+    },
+    {
+      "commit": "add6dfc3895c54886c538b61dc85285bf9e4dc47",
+      "subject": "lazy init dyn refreshctrl"
+    },
+    {
+      "commit": "aac4524e81f06e32c254190cb8f1a702f1f28ef1",
+      "subject": "opt dyn desktop ctr"
+    },
+    {
+      "commit": "37c7d1f3cd9188280f155dad3e285d33b524e92b",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "d33d2a1c867ac25d719a28c6223ce0e13f0000c9",
+      "subject": "tweaks"
+    },
+    {
+      "commit": "5d15bf5e59b5790c12631640e5e914d456035657",
+      "subject": "refactor dyn uplist"
+    },
+    {
+      "commit": "840f8d5a2589f6fa6c494713cbf03eac6ee7bea5",
+      "subject": "opt HeartBeat"
+    },
+    {
+      "commit": "7049e5c63ab686ccc2f67b520127ee297bd4749b",
+      "subject": "opt ui"
+    },
+    {
+      "commit": "a623ceee47b11639564b77495bc0d64f05a1c69f",
+      "subject": "refactor progress bar"
+    },
+    {
+      "commit": "2ba6f0d063d1b73ccdc7947947dc2285cf2c9e9a",
+      "subject": "flutter 3.44.4"
+    },
+    {
+      "commit": "c23518d354ac38c59929788ce26762590e7efc04",
+      "subject": "upgrade deps"
+    },
+    {
+      "commit": "735bb0ac235fd2699ee716868c5bd964eb0f29ee",
+      "subject": "opt set dyn react count"
+    },
+    {
+      "commit": "9d94c72e950f9b3315465a462c3c077fa3d4095e",
+      "subject": "tweaks (#2426)"
+    },
+    {
+      "commit": "3dee6a85e5fbfff9f2fd3207a0b9c1a8ef492d25",
+      "subject": "build"
+    },
+    {
+      "commit": "e4cbb4cf30133f3c8bf3afc400c172c9020e8050",
+      "subject": "update default spring description"
+    },
+    {
+      "commit": "3b92e4f84788dd2c715e314aaed1ff30b44f1449",
+      "subject": "set desktop brightness if needed"
+    },
+    {
+      "commit": "267de61e9573ea1bf19ac653227e78f231c6076c",
+      "subject": "update android default hwdec"
+    },
+    {
+      "commit": "c4dd07ab0ff2c8a202924f75f814063e0fc861b9",
+      "subject": "feat: dyn reaction"
+    },
+    {
+      "commit": "16b38d1d3b1712c88214ec02fd9872e531ab034f",
+      "subject": "opt like btn"
+    },
+    {
+      "commit": "1ce299919bc66d92d3987cffb0a39a25ff948255",
+      "subject": "remove delete range on focus changed"
+    },
+    {
+      "commit": "c3c8876bb4a9b72d75ddf6d60d51bc2b7483dee1",
+      "subject": "fix RichTextField text replace on desktop"
+    },
+    {
+      "commit": "fe2ebebfdd14b8db5eae9f46a5e00670d9cc3b25",
+      "subject": "fix RichTextField text delete"
+    },
+    {
+      "commit": "3510b6c74db4ff0988ea09f4f4632d5697922d2c",
+      "subject": "cache live stream pref"
+    },
+    {
+      "commit": "3e2e78a2b84e7839e8ccf47f9670e22126507710",
+      "subject": "flutter 3.44.3"
+    },
+    {
+      "commit": "7c7ae11bb87f62c285dea292f68bb013e2a3f6b4",
+      "subject": "upgrade deps"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "upstream_commit": "4ed5968f37af8b4aa7e0f13178cb8d8c2f86defc",
+  "actual_common_ancestor": "2536350ccfc87b9d5d23c564e3d4c8adbd175820",
+  "archive_files_verified": 1621,
+  "archive_blob_mismatches": [],
+  "upstream_test_restored_to_index": "test/utils/accounts/deleted_account_test.dart",
+  "archive_note": "All 1621 file contents in the source tar match actual upstream Git blobs. Two extracted Chinese template filenames had already been repaired in the candidate."
+}

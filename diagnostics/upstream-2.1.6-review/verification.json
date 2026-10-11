@@ -1,0 +1,140 @@
+{
+  "status": "BUILD_AND_AUTOMATED_CHECKS_PASSED_RUNTIME_PARTIAL",
+  "sdk": "Flutter 3.47.6 / Dart 3.13.5 with upstream Android SDK patches",
+  "analysis": {
+    "exit_code": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "flutter_tests": {
+    "exit_code": 0,
+    "passed": 41,
+    "failed": 0
+  },
+  "log_sha256": {
+    "analyze-final.log": "4ec9bc632eea531a4fefa281967d0d0da37caf63f0a7e5f45b8abc1252087820",
+    "flutter-test-final.log": "68a9614783dd8283cf0f4db9495dec24b37cfbe53dfacf902f4f21c6dc266ebd",
+    "pub-get-resolved.log": "b4608b0e99fc23537da26406b41468cb5a221cff626dcfeffd0929c77adcdc21",
+    "android-build.log": "68453cdc2682c529d1516753ae218cfcabd3fdd6b5ccc2447a651c9c230d95e7",
+    "android-isolated-test-build.log": "45f709dbd25c4b63de76d3f29a4b24cc6cbd55b517b68776d631de87000e6713",
+    "lock-check-final.log": "4e7cb31c2e0770dfe04b20930cdedf3bbe368ee614016ba1a03472f6e87be2a0",
+    "android-build-final-retry.log": "d91f2d43517e2f8324cea5c740796581481e93df40b7e6c800dbd1ec7f400dcb",
+    "flutter-test-final-direct.log": "26c2b8e9b315a481cf06547cc9a5a62c0767685a6b96cc4debed39968f236423",
+    "analyze-final-model.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "original_branch": "pip",
+  "original_head": "513626c1924b7444a56d71f9feae5810d6d00639",
+  "original_tracked_worktree": "unchanged at verification; ready for fast-forward to reviewed merge commit",
+  "android_build": {
+    "exit_code": 0,
+    "log": "android-build-final-retry.log"
+  },
+  "android_tests": {
+    "exit_code": 0,
+    "passed": 5,
+    "failed": 0,
+    "suites": [
+      {
+        "name": "com.personal.piliplus.PipDiagnosticsTest",
+        "tests": "1",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "com.personal.piliplus.PipRenderHostTest",
+        "tests": "4",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ]
+  },
+  "strict_dependency_lock": {
+    "exit_code": 0,
+    "unchanged_from_upstream": true,
+    "log": "lock-check-final.log"
+  },
+  "runtime": {
+    "device": "emulator-5554 / sdk_gphone64_x86_64 / Android API 36",
+    "package": "com.personal.piliplus.upstreamreview",
+    "production_package_modified": false,
+    "tested_source_commit": "1297477194bb3f5d5b37561c8dda5ee088d72ec1",
+    "final_source_delta_after_device_test": "Adopt unchanged upstream DynamicStat zero-count fix; no subsequent playback or PiP source changes.",
+    "observations": [
+      {
+        "case": "ordinary playback",
+        "result": "video visibly played; media session PLAYING(3); frame-gate readiness and presentation logged",
+        "evidence": [
+          "playing.png",
+          "playing-logcat.txt",
+          "playing-media-session.txt"
+        ]
+      },
+      {
+        "case": "back out of video page",
+        "result": "media session changed to NONE(0)",
+        "evidence": [
+          "after-video-back-media.txt"
+        ]
+      },
+      {
+        "case": "direct Home PiP",
+        "result": "pinned task and continued PLAYING(3), visible video in PiP",
+        "evidence": [
+          "direct-home.mp4",
+          "direct-home-frames.png",
+          "home-pip.png",
+          "home-after-activity.txt",
+          "home-after-media.txt"
+        ]
+      },
+      {
+        "case": "recents then Home PiP",
+        "result": "recents UI observed, followed by pinned task and continued PLAYING(3), visible video in PiP",
+        "evidence": [
+          "recents-home.mp4",
+          "recents-visible.png",
+          "recents-home-frames.png",
+          "recents-home-pip.png",
+          "recents-home-activity.txt",
+          "recents-home-media.txt"
+        ]
+      }
+    ],
+    "not_accepted": [
+      "video-switch-back.mp4",
+      "switch-*.png",
+      "route-retry.png"
+    ],
+    "limitations": [
+      "Video A -> related video B -> back to A was attempted but not accepted: another test app (com.pixel.gallery.multitask.test) took the foreground, and a Google Play services ANR dialog appeared. These captures are excluded from passing evidence.",
+      "Live playback, authenticated account actions, physical OnePlus power consumption, long-duration playback and non-Android platforms were not runtime-tested.",
+      "Both Android PiP paths were observed separately with videos, screenshots and system state. Contact sheets sample at 4 fps; this does not establish absence of every transient frame glitch or resolve the previously documented settled-jump issue."
+    ],
+    "evidence_directory": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\worktree-upstream-2.1.6-preserve\\diagnostics\\upstream-2.1.6-review\\device"
+  },
+  "source_preservation": {
+    "conservative_paths": 100,
+    "actual_local_paths": 72,
+    "checks": 29,
+    "result": "all source checks passed"
+  },
+  "runtime_evidence_sha256": {
+    "after-video-back-media.txt": "2a3b41af3bde644192263107f930c6f92f8b4ec24a4050a4ec4472966eb50783",
+    "direct-home-frames.png": "a2582f4cdb90310a37e07d71178fa2071817498ad14d72e58f959929f4940b14",
+    "direct-home.mp4": "d1eba92bf6adfc1916dd0a903ae36ebee6cfb13b77a3670bc2dd9983f451ae18",
+    "home-after-activity.txt": "429b18ac38c427aae4de96133144595953903be659513ae3f0306f29754ce034",
+    "home-after-media.txt": "fcd1c082137139689a592741148a1d4c88850fc141f46eb9f0bf26b8da7190c4",
+    "home-pip.png": "f9ee8db7db221aa5356bf273bda74abc0287e33b8977f1c1a012ee9cd25eadab",
+    "playing-logcat.txt": "1faef863332c5e2a15834bdf1862e2bb9b1d2ff62a9eda0e7851ac359b18a5e3",
+    "playing-media-session.txt": "88a2e69832486637236a8605916153e2e7a5ef4f41b2c522e71e2699c9b33353",
+    "playing.png": "093018b3ced85ac1f1528cc1691f7d64f09daf0a8eed58e105154195c89e3af6",
+    "recents-home-activity.txt": "37fae2ed314fd799cbe3f7e2d216126c3699135c1010103376c6c870006f254d",
+    "recents-home-frames.png": "626634b67608340daf5b253abc5c9a37e2c6342fe37ddf983fc263036de02f4d",
+    "recents-home-media.txt": "fcd1c082137139689a592741148a1d4c88850fc141f46eb9f0bf26b8da7190c4",
+    "recents-home-pip.png": "fe19c2cb044822bd5e80889224441fe1f331b88904c5860df86bf67b983d4080",
+    "recents-home.mp4": "7ce47af1c3a72a7aaa5a7b008775b8a66409addc261ddf5b3554efdac67bd27a",
+    "recents-visible.png": "5b40a53d1b14a6f8255f991dd20b54e100bea59e4a690b80107c541b4fa9ba2a"
+  }
+}
