@@ -6,16 +6,37 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
 import com.ryanheise.audioservice.AudioServiceActivity
+import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : AudioServiceActivity() {
     private var pipCoordinator: PipCoordinator? = null
     private var playbackDiagnostics: PlaybackDiagnostics? = null
+    private var media3Channel: MethodChannel? = null
 
 
     override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         pipCoordinator = PipCoordinator(this, flutterEngine.dartExecutor.binaryMessenger)
         playbackDiagnostics = PlaybackDiagnostics(this, flutterEngine.dartExecutor.binaryMessenger, flutterEngine)
+        media3Channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, MEDIA3_CHANNEL).also { channel ->
+            channel.setMethodCallHandler { call, result ->
+                if (call.method != "launch") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                val bvid = call.argument<String>("bvid")
+                val cid = call.argument<Number>("cid")?.toLong()
+                if (bvid.isNullOrBlank() || cid == null || cid <= 0L) {
+                    result.error("INVALID_ARGUMENT", "bvid and cid are required", null)
+                    return@setMethodCallHandler
+                }
+                startActivity(Intent(this, Media3ProbeActivity::class.java).apply {
+                    putExtra("bvid", bvid)
+                    putExtra("cid", cid)
+                })
+                result.success(null)
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -39,6 +60,8 @@ class MainActivity : AudioServiceActivity() {
     override fun onDestroy() {
         playbackDiagnostics?.dispose()
         playbackDiagnostics = null
+        media3Channel?.setMethodCallHandler(null)
+        media3Channel = null
         pipCoordinator?.destroy()
         pipCoordinator = null
         stopService(Intent(this, com.ryanheise.audioservice.AudioService::class.java))
@@ -84,5 +107,9 @@ class MainActivity : AudioServiceActivity() {
     override fun onPictureInPictureUiStateChanged(state: android.app.PictureInPictureUiState) {
         super.onPictureInPictureUiStateChanged(state)
         pipCoordinator?.onPictureInPictureUiStateChanged(state)
+    }
+
+    companion object {
+        private const val MEDIA3_CHANNEL = "com.personal.piliplus/media3"
     }
 }

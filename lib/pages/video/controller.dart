@@ -72,12 +72,19 @@ import 'package:dio/dio.dart' show Options;
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     show ExtendedNestedScrollViewState;
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:media_kit/media_kit.dart' hide Subtitle;
+
+const _media3NativePlayer = bool.fromEnvironment(
+  'MEDIA3_NATIVE_PLAYER',
+  defaultValue: false,
+);
+const _media3Channel = MethodChannel('com.personal.piliplus/media3');
 
 class VideoDetailController extends GetxController
     with GetTickerProviderStateMixin, BlockMixin {
@@ -861,6 +868,22 @@ class VideoDetailController extends GetxController
       seek = getFirstSegment();
     }
     try {
+      if (_media3NativePlayer && !isFileSource) {
+        try {
+          await _media3Channel.invokeMethod<void>('launch', {
+            'bvid': bvid,
+            'cid': cid.value,
+          });
+          preparingPlayback.value = false;
+          videoState.value = false;
+          return;
+        } catch (error, stackTrace) {
+          if (kDebugMode) {
+            debugPrint('Media3 launch failed, falling back to mpv: $error');
+            debugPrintStack(stackTrace: stackTrace);
+          }
+        }
+      }
       await plPlayerController.setDataSource(
         isFileSource
             ? FileSource(
