@@ -881,7 +881,10 @@ class VideoDetailController extends GetxController
         aid: aid,
         bvid: bvid,
         cid: cid.value,
-        autoplay: false,
+        // Let the player start underneath the cover for autoplay. The
+        // controller reveals the frame only after the post-play surface handoff
+        // settles, while paused/preloaded sources keep the old-frame gate.
+        autoplay: startWhenReady,
         epid: isUgc ? null : epId,
         seasonId: isUgc ? null : seasonId,
         pgcType: isUgc ? null : pgcType,
@@ -949,7 +952,8 @@ class VideoDetailController extends GetxController
           !plPlayerController.hasSourceFor(this, requestedCid)) {
         return;
       }
-      if (startWhenReady || _playWhenPrepared) {
+      if (!startWhenReady && _playWhenPrepared) {
+        _playWhenPrepared = false;
         await plPlayerController.play();
         if (kDebugMode) {
           debugPrint(

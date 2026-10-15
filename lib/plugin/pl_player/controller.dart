@@ -24,6 +24,7 @@ import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_probe.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -887,7 +888,12 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           volume,
           request: request,
           onPrepared: onPrepared,
-          waitForFrame: owner != null && !isLive && !onlyPlayAudio.value,
+          // Autoplay must start as soon as mpv accepts the source.  The
+          // presentation callback below keeps the poster in front until the
+          // post-play surface handoff is stable.  Only paused/preloaded media
+          // needs the old-frame gate before returning to the caller.
+          waitForFrame:
+              owner != null && !isLive && !onlyPlayAudio.value && !autoplay,
         );
         request.checkCurrent();
 
@@ -1004,6 +1010,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
   Future<Player> _initPlayer() async {
     assert(_videoPlayerController == null);
+    PlaybackDiagnostics.event('startup.player.create.begin');
     String ao = Pref.audioOutput;
     if (ao == 'opensles,aaudio,audiotrack') {
       ao = 'audiotrack,aaudio,opensles';
@@ -1030,23 +1037,33 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
     final player = await Player.create(
       configuration: PlayerConfiguration(
-        logLevel: kDebugMode ? .warn : .error,
+        logLevel: StartupProbe.verbose
+            ? .debug
+            : kDebugMode
+            ? .warn
+            : .error,
         options: opt,
       ),
     );
 
     assert(_videoController == null);
+    PlaybackDiagnostics.event('startup.player.create.end');
+    PlaybackDiagnostics.event('startup.videoController.create.begin');
 
     _videoController = await VideoController.create(
       player,
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
-        androidAttachSurfaceAfterVideoParameters: true,
+        // Attach the Android surface immediately. Waiting for video parameters
+        // makes the loading cover disappear before the first picture on slow
+        // streams and regresses startup against the original player.
+        androidAttachSurfaceAfterVideoParameters: false,
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
 
     player.setMediaHeader(userAgent: BrowserUa.pc, referer: HttpString.baseUrl);
+    PlaybackDiagnostics.event('startup.videoController.create.end');
 
     _installPlaybackTrace();
 
@@ -1111,8 +1128,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       }
     }
 
-    String video = dataSource.videoSource;
-    if (dataSource.audioSource case final audio? when (audio.isNotEmpty)) {
+    final source = StartupProbe.enabled
+        ? await StartupProbe.resolve(dataSource, cid)
+        : (video: dataSource.videoSource, audio: dataSource.audioSource);
+    String video = source.video;
+    if (source.audio case final audio? when (audio.isNotEmpty)) {
       if (onlyPlayAudio.value) {
         video = audio;
       } else {
@@ -1209,7 +1229,10 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   /// from the UI's point of view while retaining the same texture.
   Future<void> _waitForStableVideoOutput({
     required int sourceRevision,
-    Duration timeout = const Duration(milliseconds: 1500),
+    // Autoplay starts before Android has attached the decoded surface. On the
+    // emulator that handoff can take a few seconds; a short fallback reveals
+    // the cover onto an empty texture and makes startup look slower.
+    Duration timeout = const Duration(seconds: 5),
   }) async {
     final controller = _videoController;
     if (controller == null) return;
@@ -1388,6 +1411,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     assert(_subscriptions == null);
     final stream = player.stream;
     _subscriptions = [
+      if (StartupProbe.verbose) stream.log.listen(StartupProbe.onLog),
       if (PlaybackDiagnostics.enabled) ...[
         stream.videoParams.listen(
           (event) => PlaybackDiagnostics.event('media.videoParams', {

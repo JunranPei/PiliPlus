@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/grpc/bilibili/main/community/reply/v1.pb.dart'
     show ReplyInfo;
@@ -225,6 +227,7 @@ abstract final class VideoHttp {
     String? language,
     bool voiceBalance = false,
   }) async {
+    PlaybackDiagnostics.event('source.url.begin', {'cid': cid, 'quality': qn});
     final dmImgStr = Utils.base64EncodeRandomString(16, 64);
     final dmCoverImgStr = Utils.base64EncodeRandomString(32, 128);
     final params = await WbiSign.makSign({
@@ -252,7 +255,17 @@ abstract final class VideoHttp {
     });
 
     try {
+      PlaybackDiagnostics.event('source.url.signed', {
+        'cid': cid,
+        'quality': qn,
+      });
       final res = await Request().get(videoType.api, queryParameters: params);
+      PlaybackDiagnostics.event('source.url.response', {
+        'cid': cid,
+        'quality': qn,
+        'httpStatus': res.statusCode,
+        'apiCode': res.data['code'],
+      });
 
       if (res.data['code'] == 0) {
         late PlayUrlModel data;
