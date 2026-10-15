@@ -26,6 +26,15 @@ class MainActivity : AudioServiceActivity() {
                 }
                 val bvid = call.argument<String>("bvid")
                 val cid = call.argument<Number>("cid")?.toLong()
+                val videoUrl = call.argument<String>("videoUrl")
+                val audioUrl = call.argument<String>("audioUrl")
+                val videoSegmentBase = call.argument<String>("videoSegmentBase")
+                val audioSegmentBase = call.argument<String>("audioSegmentBase")
+                val videoCodecs = call.argument<String>("videoCodecs")
+                val videoWidth = call.argument<Number>("videoWidth")?.toInt()
+                val videoHeight = call.argument<Number>("videoHeight")?.toInt()
+                val audioCodecs = call.argument<String>("audioCodecs")
+                val durationMs = call.argument<Number>("durationMs")?.toLong()
                 if (bvid.isNullOrBlank() || cid == null || cid <= 0L) {
                     result.error("INVALID_ARGUMENT", "bvid and cid are required", null)
                     return@setMethodCallHandler
@@ -33,6 +42,15 @@ class MainActivity : AudioServiceActivity() {
                 startActivity(Intent(this, Media3ProbeActivity::class.java).apply {
                     putExtra("bvid", bvid)
                     putExtra("cid", cid)
+                    putExtra("video_url", videoUrl)
+                    putExtra("audio_url", audioUrl)
+                    putExtra("video_segment_base", videoSegmentBase)
+                    putExtra("audio_segment_base", audioSegmentBase)
+                    putExtra("video_codecs", videoCodecs)
+                    putExtra("video_width", videoWidth ?: 0)
+                    putExtra("video_height", videoHeight ?: 0)
+                    putExtra("audio_codecs", audioCodecs)
+                    putExtra("duration_ms", durationMs ?: 0L)
                 })
                 result.success(null)
             }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert' show jsonEncode;
 import 'dart:math' show min;
 import 'dart:ui';
 
@@ -82,7 +83,7 @@ import 'package:media_kit/media_kit.dart' hide Subtitle;
 
 const _media3NativePlayer = bool.fromEnvironment(
   'MEDIA3_NATIVE_PLAYER',
-  defaultValue: false,
+  defaultValue: true,
 );
 const _media3Channel = MethodChannel('com.personal.piliplus/media3');
 
@@ -870,9 +871,31 @@ class VideoDetailController extends GetxController
     try {
       if (_media3NativePlayer && !isFileSource) {
         try {
+          AudioItem? selectedAudio;
+          final audioItems = data.dash?.audio;
+          if (audioItems != null &&
+              audioItems.isNotEmpty &&
+              currentAudioQa != null) {
+            selectedAudio = audioItems.firstWhereOrNull(
+              (item) => item.id == currentAudioQa!.code,
+            );
+          }
           await _media3Channel.invokeMethod<void>('launch', {
             'bvid': bvid,
             'cid': cid.value,
+            'videoUrl': videoUrl,
+            'audioUrl': audioUrl,
+            'videoSegmentBase': firstVideo.segmentBase == null
+                ? null
+                : jsonEncode(firstVideo.segmentBase),
+            'audioSegmentBase': selectedAudio?.segmentBase == null
+                ? null
+                : jsonEncode(selectedAudio!.segmentBase),
+            'videoCodecs': firstVideo.codecs,
+            'videoWidth': firstVideo.width,
+            'videoHeight': firstVideo.height,
+            'audioCodecs': selectedAudio?.codecs,
+            'durationMs': data.timeLength,
           });
           preparingPlayback.value = false;
           videoState.value = false;

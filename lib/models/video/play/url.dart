@@ -299,7 +299,10 @@ abstract class BaseItem {
     frameRate = json['frameRate'] ?? json['frame_rate'];
     sar = json['sar'];
     startWithSap = json['startWithSap'] ?? json['start_with_sap'];
-    segmentBase = json['segmentBase'] ?? json['segment_base'];
+    // Bilibili's web playurl response uses the historical `SegmentBase`
+    // spelling, while other endpoints return camelCase or snake_case.
+    segmentBase =
+        json['SegmentBase'] ?? json['segmentBase'] ?? json['segment_base'];
     codecid = json['codecid'];
   }
 

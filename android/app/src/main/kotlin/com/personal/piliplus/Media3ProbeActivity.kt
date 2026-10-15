@@ -12,6 +12,9 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.common.PlaybackException
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.dash.DashMediaSource
+import androidx.media3.exoplayer.source.MediaSource
+import androidx.media3.exoplayer.source.MergingMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.ui.PlayerView
@@ -41,8 +44,40 @@ class Media3ProbeActivity : Activity() {
         val cid = intent.getLongExtra(EXTRA_CID, -1L).takeIf { it > 0L }
             ?: intent.data?.getQueryParameter(EXTRA_CID)?.toLongOrNull()
             ?: DEFAULT_CID
+        val directVideo = intent.getStringExtra(EXTRA_VIDEO_URL)
+        val directAudio = intent.getStringExtra(EXTRA_AUDIO_URL)
+        val directVideoSegmentBase = intent.getStringExtra(EXTRA_VIDEO_SEGMENT_BASE)
+        val directAudioSegmentBase = intent.getStringExtra(EXTRA_AUDIO_SEGMENT_BASE)
+        val directVideoCodecs = intent.getStringExtra(EXTRA_VIDEO_CODECS)
+        val directVideoWidth = intent.getIntExtra(EXTRA_VIDEO_WIDTH, 0)
+        val directVideoHeight = intent.getIntExtra(EXTRA_VIDEO_HEIGHT, 0)
+        val directAudioCodecs = intent.getStringExtra(EXTRA_AUDIO_CODECS)
+        val directDurationMs = intent.getLongExtra(EXTRA_DURATION_MS, 0L)
         executor.execute {
-            runCatching { prepareMedia(bvid, cid) }
+            runCatching {
+                if (!directVideo.isNullOrBlank()) {
+                    Log.i(TAG, "source.direct.begin")
+                    runOnUiThread {
+                        if (!directVideoSegmentBase.isNullOrBlank()) {
+                            attachDirectDash(
+                                directVideo,
+                                directAudio,
+                                directVideoSegmentBase,
+                                directAudioSegmentBase,
+                                directVideoCodecs,
+                                directVideoWidth,
+                                directVideoHeight,
+                                directAudioCodecs,
+                                directDurationMs,
+                            )
+                        } else {
+                            attachProgressive(directVideo, directAudio)
+                        }
+                    }
+                } else {
+                    prepareMedia(bvid, cid)
+                }
+            }
                 .onFailure { error -> runOnUiThread { showMessage("Media3 播放失败：${error.message}") } }
         }
     }
@@ -86,6 +121,64 @@ class Media3ProbeActivity : Activity() {
                     .setMimeType(MimeTypes.APPLICATION_MPD)
                     .build(),
             )
+        attachSource(source)
+    }
+
+    private fun attachProgressive(videoUrl: String, audioUrl: String?) {
+        val httpFactory = DefaultHttpDataSource.Factory()
+            .setConnectTimeoutMs(10_000)
+            .setReadTimeoutMs(15_000)
+            .setDefaultRequestProperties(
+                mapOf("User-Agent" to USER_AGENT, "Referer" to "https://www.bilibili.com")
+            )
+        val factory = ProgressiveMediaSource.Factory(DefaultDataSource.Factory(this, httpFactory))
+        val video = factory.createMediaSource(MediaItem.fromUri(videoUrl))
+        val source: MediaSource = if (!audioUrl.isNullOrBlank()) {
+            MergingMediaSource(video, factory.createMediaSource(MediaItem.fromUri(audioUrl)))
+        } else {
+            video
+        }
+        Log.i(TAG, "source.direct.ready elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
+        attachSource(source)
+    }
+
+    private fun attachDirectDash(
+        videoUrl: String,
+        audioUrl: String?,
+        videoSegmentBase: String,
+        audioSegmentBase: String?,
+        videoCodecs: String?,
+        videoWidth: Int,
+        videoHeight: Int,
+        audioCodecs: String?,
+        durationMs: Long,
+    ) {
+        val video = JSONObject().apply {
+            put("baseUrl", videoUrl)
+            put("codecs", videoCodecs.orEmpty())
+            put("width", videoWidth)
+            put("height", videoHeight)
+            put("SegmentBase", JSONObject(videoSegmentBase))
+        }
+        val audio = if (!audioUrl.isNullOrBlank() && !audioSegmentBase.isNullOrBlank()) {
+            JSONObject().apply {
+                put("baseUrl", audioUrl)
+                put("codecs", audioCodecs.orEmpty())
+                put("SegmentBase", JSONObject(audioSegmentBase))
+            }
+        } else {
+            null
+        }
+        val dash = JSONObject().put("duration", durationMs / 1000.0)
+        val manifest = buildManifest(dash, video, audio ?: video)
+        val file = File(cacheDir, "media3-direct-${SystemClock.elapsedRealtime()}.mpd")
+        file.writeText(manifest)
+        Log.i(TAG, "source.direct.dash.ready elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
+        attachPlayer(file)
+    }
+
+    private fun attachSource(source: MediaSource) {
+        Log.i(TAG, "player.attach elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
         val exo = ExoPlayer.Builder(this).build().also { candidate ->
             candidate.setMediaSource(source)
             candidate.addListener(object : androidx.media3.common.Player.Listener {
@@ -126,12 +219,21 @@ class Media3ProbeActivity : Activity() {
         private const val TAG = "Media3Probe"
         private const val EXTRA_BVID = "bvid"
         private const val EXTRA_CID = "cid"
+        private const val EXTRA_VIDEO_URL = "video_url"
+        private const val EXTRA_AUDIO_URL = "audio_url"
+        private const val EXTRA_VIDEO_SEGMENT_BASE = "video_segment_base"
+        private const val EXTRA_AUDIO_SEGMENT_BASE = "audio_segment_base"
+        private const val EXTRA_VIDEO_CODECS = "video_codecs"
+        private const val EXTRA_VIDEO_WIDTH = "video_width"
+        private const val EXTRA_VIDEO_HEIGHT = "video_height"
+        private const val EXTRA_AUDIO_CODECS = "audio_codecs"
+        private const val EXTRA_DURATION_MS = "duration_ms"
         private const val DEFAULT_BVID = "BV1GJ411x7h7"
         private const val DEFAULT_CID = 137649199L
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
         private fun buildManifest(dash: JSONObject, video: JSONObject, audio: JSONObject): String {
-            val duration = dash.optInt("duration", 0)
+            val duration = dash.optDouble("duration", 0.0)
             return """
                 <?xml version="1.0" encoding="UTF-8"?>
                 <MPD xmlns="urn:mpeg:dash:schema:mpd:2011" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011" type="static" minBufferTime="PT1.5S" mediaPresentationDuration="PT${duration}S">
