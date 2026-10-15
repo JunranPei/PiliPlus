@@ -1054,6 +1054,12 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       player,
       configuration: VideoControllerConfiguration(
         enableHardwareAcceleration: hwdec != null,
+        // The Android fork of media_kit provides a MediaCodec-backed output
+        // which attaches the decoder surface without the GPU output's second
+        // SurfaceTexture resize/reconfigure pass.  The startup probe showed
+        // that this is the first visible-output bottleneck after play(); keep
+        // desktop and iOS on their existing platform defaults.
+        vo: Platform.isAndroid ? 'mediacodec_embed' : null,
         // Attach the Android surface immediately. Waiting for video parameters
         // makes the loading cover disappear before the first picture on slow
         // streams and regresses startup against the original player.
@@ -1061,6 +1067,14 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
+
+    if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('startup.output.config', {
+        'requestedVo': Platform.isAndroid ? 'mediacodec_embed' : 'default',
+        'attachSurfaceAfterVideoParameters': false,
+        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec,
+      });
+    }
 
     player.setMediaHeader(userAgent: BrowserUa.pc, referer: HttpString.baseUrl);
     PlaybackDiagnostics.event('startup.videoController.create.end');
