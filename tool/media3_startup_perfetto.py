@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--warm', action='store_true')
 parser.add_argument('--index', type=int, default=6)
 parser.add_argument('--label', default='startup')
+parser.add_argument('--host-recording', action='store_true')
 args = parser.parse_args()
 OUT = ROOT / 'diagnostics/startup-20261016/perfetto' / args.label
 OUT.mkdir(parents=True, exist_ok=True)
@@ -23,6 +24,7 @@ data_sources { config { name: "linux.ftrace" ftrace_config {
   atrace_categories: "am"
   atrace_categories: "wm"
   atrace_categories: "dalvik"
+  atrace_categories: "audio"
   atrace_categories: "binder_driver"
   atrace_apps: "com.personal.piliplus"
 } } }
@@ -45,6 +47,8 @@ with (OUT / 'capture.log').open('wb') as log:
         'perfetto-' + args.label, '--index', str(args.index), '--seconds', '10', '--no-back']
     if not args.warm:
         command.append('--cold')
+    if args.host_recording:
+        command.append('--host-recording')
     subprocess.run(command, check=True)
     capture.wait(timeout=25)
 adb('pull', '/data/misc/perfetto-traces/pili-startup.perfetto-trace', str(OUT / 'startup.perfetto-trace'))
