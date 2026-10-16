@@ -4,6 +4,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
+import android.util.Log
+import android.view.MotionEvent
 import android.view.WindowManager.LayoutParams
 import com.ryanheise.audioservice.AudioServiceActivity
 
@@ -11,6 +14,15 @@ class MainActivity : AudioServiceActivity() {
     private var pipCoordinator: PipCoordinator? = null
     private var playbackDiagnostics: PlaybackDiagnostics? = null
     private var media3Engine: Media3Engine? = null
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN || event.actionMasked == MotionEvent.ACTION_UP) {
+            // Device-clock markers let recordings start at the actual tap,
+            // including any input queue delay. No coordinates/content are logged.
+            Log.i("Media3Input", "action=${event.actionMasked} eventUptimeMs=${event.eventTime} dispatchUptimeMs=${SystemClock.uptimeMillis()}")
+        }
+        return super.dispatchTouchEvent(event)
+    }
 
     override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

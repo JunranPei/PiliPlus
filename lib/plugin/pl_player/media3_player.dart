@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -20,6 +21,10 @@ class Media3Player extends PlatformPlayer {
   static int _nextId = 0;
   static final Map<int, ValueChanged<double>> _exportProgress = {};
   static bool _listening = false;
+  static bool _batchStartupOptions = true;
+  // Group startup options by default. Profile builds can compare the pinned
+  // reference sequence without reinstalling the app or replacing the backend.
+  static bool get batchStartupOptions => !kProfileMode || _batchStartupOptions;
   final int playerId;
   final ValueNotifier<int?> textureId = ValueNotifier(null);
   final ValueNotifier<ui.Rect?> rect = ValueNotifier(null);
@@ -40,6 +45,19 @@ class Media3Player extends PlatformPlayer {
   static Future<Media3Player> create() async {
     if (!_listening) {
       _listening = true;
+      if (kProfileMode) {
+        developer.registerExtension('ext.piliplus.media3StartupMode', (
+          method,
+          parameters,
+        ) async {
+          if (parameters['batch'] case final value?) {
+            _batchStartupOptions = value == 'true';
+          }
+          return developer.ServiceExtensionResponse.result(
+            jsonEncode({'batch': batchStartupOptions, 'backend': 'Media3'}),
+          );
+        });
+      }
       _channel.setMethodCallHandler((call) async {
         final data = (call.arguments as Map?)?.cast<String, dynamic>();
         if (data == null) return;

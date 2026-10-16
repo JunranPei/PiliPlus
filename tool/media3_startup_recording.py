@@ -17,7 +17,11 @@ parser.add_argument('label')
 parser.add_argument('--index', type=int, default=6)
 parser.add_argument('--seconds', type=int, default=22)
 parser.add_argument('--cold', action='store_true')
+parser.add_argument('--tap', nargs=2, type=int, metavar=('X', 'Y'))
+parser.add_argument('--no-back', action='store_true')
 args = parser.parse_args()
+if args.cold and args.tap:
+    parser.error('Open the app home before measuring a card tap')
 out = ROOT / 'diagnostics/startup-20261016/startup-recordings' / args.label
 out.mkdir(parents=True, exist_ok=True)
 adb_command = ['adb', '-s', 'emulator-5554']
@@ -47,7 +51,7 @@ videos = json.loads((ROOT / 'diagnostics/startup-20261016/videos.json').read_tex
 video = videos[args.index]
 if args.cold:
     adb('shell', 'am', 'force-stop', package)
-else:
+elif not args.no_back:
     adb('shell', 'input', 'keyevent', '4')
     time.sleep(.8)
 adb('logcat', '-c')
@@ -63,13 +67,16 @@ if recording.poll() is not None:
 adb('shell', 'log', '-t', 'Media3Test', 'open-request ' + args.label)
 begin = time.monotonic()
 uri = f'bilibili://video/{video["bvid"]}?cid={video["cid"]}&start_progress=0'
-launch = adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW',
-             '-n', package + '/com.personal.piliplus.MainActivity', '-d', shlex.quote(uri))
+if args.tap:
+    launch = adb('shell', 'input', 'tap', *map(str, args.tap))
+else:
+    launch = adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW',
+                 '-n', package + '/com.personal.piliplus.MainActivity', '-d', shlex.quote(uri))
 (out / 'launch.txt').write_bytes(launch)
 recording.wait(timeout=args.seconds + 8)
 adb('pull', remote, str(out / 'screen.mp4'))
 log = adb('logcat', '-d', '-v', 'epoch', '-s', 'Media3Startup',
-          'Media3Playback', 'Media3Test', 'flutter', 'AndroidRuntime').decode('utf-8', 'replace')
+          'Media3Playback', 'Media3Input', 'Media3Test', 'flutter', 'AndroidRuntime').decode('utf-8', 'replace')
 (out / 'playback.log').write_text(log, encoding='utf-8')
 states = re.findall(r'positionMs=(\d+) state=(\d+) playWhenReady=(true|false) bufferMs=(\d+)', log)
 intents = re.findall(r'intent id=\d+ source=\d+ playWhenReady=(true|false)', log)
@@ -78,11 +85,20 @@ request_line = next((line for line in log.splitlines() if 'open-request ' + args
 frame_line = next((line for line in log.splitlines() if 'firstFrame id=' in line), None)
 request_to_frame = (round((float(frame_line.split()[0]) - float(request_line.split()[0])) * 1000)
                     if request_line and frame_line else None)
+tap_line = next((line for line in log.splitlines() if 'Media3Input' in line and 'action=0 ' in line), None)
+tap_epoch_ms = None
+if tap_line:
+    timing = re.search(r'eventUptimeMs=(\d+) dispatchUptimeMs=(\d+)', tap_line)
+    tap_epoch_ms = float(tap_line.split()[0]) * 1000 - (int(timing[2]) - int(timing[1]))
+source_cid = re.search(r'open id=\d+ source=\d+ cid=(\d+)', log)
 result = {
-    'video': video, 'coldProcess': args.cold, 'preservedDiskCache': True,
+    'video': ({'cid': int(source_cid[1]) if source_cid else None, 'entry': 'UI card tap'} if args.tap else video),
+    'coldProcess': args.cold, 'preservedDiskCache': True,
     'recordedSeconds': args.seconds, 'observationSeconds': round(time.monotonic() - begin, 2),
     'nativeFirstFrameMs': int(first[1]) if first else None,
     'requestToNativeFirstFrameMs': request_to_frame,
+    'tapDownEpochMs': tap_epoch_ms,
+    'tapToNativeFirstFrameMs': round(float(frame_line.split()[0]) * 1000 - tap_epoch_ms) if frame_line and tap_epoch_ms is not None else None,
     'pidBeforeRequest': pid_before,
     'pidAfterRequest': pid(),
     'playIntents': intents, 'lastPositionMs': int(states[-1][0]) if states else None,

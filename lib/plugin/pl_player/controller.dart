@@ -966,15 +966,25 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     danmakuController?.clear();
     final player = _videoPlayerController ??= await _initPlayer();
     request.checkCurrent();
-    await player.openSource(
-      source,
-      seekTo: seekTo,
-      volume: PlatformUtils.isMobile
-          ? Pref.playerVolume
-          : this.volume.value * 100,
-      videoEnabled: !onlyPlayAudio.value,
-      rate: isLive ? 1.0 : playbackSpeed,
-    );
+    final initialVolume = PlatformUtils.isMobile
+        ? Pref.playerVolume
+        : this.volume.value * 100;
+    if (Media3Player.batchStartupOptions) {
+      await player.openSource(
+        source,
+        seekTo: seekTo,
+        volume: initialVolume,
+        videoEnabled: !onlyPlayAudio.value,
+        rate: isLive ? 1.0 : playbackSpeed,
+      );
+    } else {
+      await player.setVolume(initialVolume);
+      await player.setProperty(
+        'file-local-options/vid',
+        onlyPlayAudio.value ? 'no' : 'auto',
+      );
+      await player.openSource(source, seekTo: seekTo);
+    }
     request.checkCurrent();
     // The registered native texture can receive frames before its Flutter
     // widget mounts. Start loading before waiting for the original UI to paint.
