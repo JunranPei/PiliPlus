@@ -1,6 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 
+/// Keep overlay state and data subscriptions mounted while a cover hides it.
+/// The native video texture remains a separate, continuously painted child.
+class VideoOverlayPaint extends StatelessWidget {
+  const VideoOverlayPaint({
+    super.key,
+    required this.visible,
+    required this.child,
+  });
+  final bool visible;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      Opacity(opacity: visible ? 1 : 0, child: child);
+}
+
 /// Keeps the playback surface mounted while a cover conceals an unready video.
 ///
 /// Supply the same player type and key throughout loading and cover changes.

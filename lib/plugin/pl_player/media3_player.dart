@@ -25,6 +25,8 @@ class Media3Player extends PlatformPlayer {
   static bool _progressiveStartup = false;
   static bool _startupCache = true;
   static String? _startupCodec;
+  static bool _deferDanmakuPaint = false;
+  static bool get deferDanmakuPaint => kProfileMode && _deferDanmakuPaint;
   static String? get startupCodec => kProfileMode ? _startupCodec : null;
   // Group startup options by default. Profile builds can compare the pinned
   // reference sequence without reinstalling the app or replacing the backend.
@@ -78,6 +80,9 @@ class Media3Player extends PlatformPlayer {
             }
             _startupCodec = value == 'default' ? null : value;
           }
+          if (parameters['deferDanmakuPaint'] case final value?) {
+            _deferDanmakuPaint = value == 'true';
+          }
           return developer.ServiceExtensionResponse.result(
             jsonEncode({
               'batch': batchStartupOptions,
@@ -85,6 +90,7 @@ class Media3Player extends PlatformPlayer {
               'source': _progressiveStartup ? 'progressive' : 'dash',
               'cache': _startupCache,
               'codec': startupCodec ?? 'default',
+              'deferDanmakuPaint': deferDanmakuPaint,
             }),
           );
         });

@@ -2,6 +2,8 @@ import 'dart:async' show Completer, unawaited;
 import 'dart:io' show Platform;
 import 'dart:math';
 
+import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
+
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/custom_icon.dart';
 import 'package:PiliPlus/common/widgets/flutter/pop_scope.dart';
@@ -1392,14 +1394,21 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                 danmuWidget: isPipMode && pipNoDanmaku
                     ? null
                     : Obx(
-                        () => PlDanmaku(
-                          key: ValueKey(videoDetailController.cid.value),
-                          isPipMode: isPipMode,
-                          cid: videoDetailController.cid.value,
-                          playerController: plPlayerController!,
-                          isFullScreen: plPlayerController!.isFullScreen.value,
-                          isFileSource: videoDetailController.isFileSource,
-                          size: Size(width, height),
+                        () => VideoOverlayPaint(
+                          visible:
+                              !Media3Player.deferDanmakuPaint ||
+                              (videoDetailController.autoPlay &&
+                                  videoDetailController.frameReady.value),
+                          child: PlDanmaku(
+                            key: ValueKey(videoDetailController.cid.value),
+                            isPipMode: isPipMode,
+                            cid: videoDetailController.cid.value,
+                            playerController: plPlayerController!,
+                            isFullScreen:
+                                plPlayerController!.isFullScreen.value,
+                            isFileSource: videoDetailController.isFileSource,
+                            size: Size(width, height),
+                          ),
                         ),
                       ),
                 showEpisodes: showEpisodes,
