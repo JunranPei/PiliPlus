@@ -108,12 +108,23 @@ class Media3Player extends PlatformPlayer {
     unawaited(_channel.invokeMethod<void>('cancelExport', {'exportId': id}));
   }
 
-  Future<void> openSource(DataSource source, {Duration? seekTo}) async {
+  Future<void> openSource(
+    DataSource source, {
+    Duration? seekTo,
+    double? volume,
+    bool? videoEnabled,
+    double? rate,
+  }) async {
+    if (volume != null) state.volume = volume;
+    if (rate != null) state.rate = rate;
     await _open({
       if (source is NetworkSource) ...?source.nativeMetadata,
       'videoUrl': source.videoSource,
       'audioUrl': source.audioSource,
       'positionMs': seekTo?.inMilliseconds ?? 0,
+      if (volume != null) 'volume': volume / 100,
+      if (videoEnabled != null) 'videoEnabled': videoEnabled,
+      if (rate != null) 'speed': rate,
     }, play: false);
   }
 

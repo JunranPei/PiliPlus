@@ -56,6 +56,31 @@ void main() {
   tearDown(() => messenger.setMockMethodCallHandler(channel, null));
 
   test(
+    'opening a source applies startup options in one native request',
+    () async {
+      final player = await Media3Player.create();
+      await player.openSource(
+        NetworkSource(
+          videoSource: 'https://example.com/audio.mp4',
+          audioSource: null,
+        ),
+        volume: 65,
+        videoEnabled: false,
+        rate: 1.25,
+      );
+      expect(calls.map((call) => call.method), ['create', 'open']);
+      final options = calls.last.arguments as Map;
+      expect(options['volume'], .65);
+      expect(options['videoEnabled'], isFalse);
+      expect(options['speed'], 1.25);
+      expect(options['play'], isFalse);
+      expect(player.state.volume, 65);
+      expect(player.state.rate, 1.25);
+      await player.dispose();
+    },
+  );
+
+  test(
     'native failure releases the first frame wait immediately',
     () async {
       final player = await Media3Player.create();

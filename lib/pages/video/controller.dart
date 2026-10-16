@@ -72,7 +72,8 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart' show Options;
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     show ExtendedNestedScrollViewState;
-import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:flutter/foundation.dart'
+    show debugPrintSynchronously, kDebugMode, kProfileMode;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
@@ -122,6 +123,17 @@ class VideoDetailController extends GetxController
   final RxBool preparingPlayback = false.obs;
   bool playbackRouteActive = true;
   int _playbackRevision = 0;
+  void _startupMark(String phase) {
+    if (!kDebugMode && !kProfileMode) return;
+    debugPrintSynchronously(
+      '[Media3Flow] ${jsonEncode({
+        'phase': phase,
+        'cid': cid.value,
+        'epochUs': DateTime.now().microsecondsSinceEpoch,
+      })}',
+    );
+  }
+
   bool _playWhenPrepared = false;
   Future<bool> Function()? waitForPlaybackRoute;
 
@@ -851,10 +863,11 @@ class VideoDetailController extends GetxController
         revision == _playbackRevision &&
         cid.value == requestedCid;
     if (!isCurrent()) return;
-    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) {
-      return;
-    }
-    if (!isCurrent()) return;
+    _startupMark('route.wait.begin');
+    final routeReady =
+        waitForPlaybackRoute == null || await waitForPlaybackRoute!();
+    _startupMark('route.wait.end');
+    if (!routeReady || !isCurrent()) return;
     preparingPlayback.value = true;
     _playWhenPrepared = false;
     final startWhenReady = autoplay ?? _autoPlay.value;
@@ -937,6 +950,7 @@ class VideoDetailController extends GetxController
         owner: this,
         onPrepared: () async {
           if (!isCurrent()) return;
+          _startupMark('ui.mount.begin');
           if (PlaybackDiagnostics.enabled) {
             PlaybackDiagnostics.event('ui.mount.request', playbackTraceState());
           }
@@ -944,6 +958,7 @@ class VideoDetailController extends GetxController
           if (plPlayerController.visible) {
             await WidgetsBinding.instance.endOfFrame;
           }
+          _startupMark('ui.mount.end');
           if (kDebugMode) {
             debugPrint(
               '[PLAYBACK_UI] mounted revision=$revision cid=$requestedCid ms=${preparationTime.elapsedMilliseconds}',
@@ -952,6 +967,7 @@ class VideoDetailController extends GetxController
         },
         onFrameReady: () async {
           if (!isCurrent()) return;
+          _startupMark('ui.reveal.begin');
           if (PlaybackDiagnostics.enabled) {
             PlaybackDiagnostics.event(
               'ui.frameReady.before',
@@ -968,6 +984,7 @@ class VideoDetailController extends GetxController
           if (plPlayerController.visible) {
             await WidgetsBinding.instance.endOfFrame;
           }
+          _startupMark('ui.reveal.end');
           if (kDebugMode) {
             debugPrint(
               '[PLAYBACK_UI] presented revision=$revision cid=$requestedCid ms=${preparationTime.elapsedMilliseconds} poster=${!_autoPlay.value}',
@@ -1063,7 +1080,9 @@ class VideoDetailController extends GetxController
   ) async {
     final quality = model.missingVideoQualityBelowHighest;
     if (quality == -1) return;
+    _startupMark('query.qualities.begin');
     final result = await _getVideoUrl(quality, requestedCid: requestedCid);
+    _startupMark('query.qualities.end');
     if (result case Success(:final response)) {
       model.dash!.video!.merge(response.dash?.video);
     }
@@ -1087,6 +1106,7 @@ class VideoDetailController extends GetxController
       PlaybackDiagnostics.arm('source.query', playbackTraceState());
     }
     isQuerying = true;
+    _startupMark('query.begin');
     final queryRevision = ++_queryRevision;
     final queryCid = cid.value;
     try {
@@ -1127,10 +1147,12 @@ class VideoDetailController extends GetxController
     }
 
     if (!isCurrent()) return;
+    _startupMark('query.primary.begin');
     final result = await _getVideoUrl(
       VideoQuality.hdrVivid.code,
       requestedCid: queryCid,
     );
+    _startupMark('query.primary.end');
     if (!isCurrent()) return;
 
     if (result case Success(:final response)) {

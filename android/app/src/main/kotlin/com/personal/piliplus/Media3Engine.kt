@@ -145,6 +145,13 @@ internal class Media3Engine(
             }
             firstFrame = false
             firstOutput = false
+            call.argument<Number>("volume")?.let { player.volume = it.toFloat().coerceIn(0f, 1f) }
+            call.argument<Number>("speed")?.let { player.setPlaybackSpeed(it.toFloat()) }
+            call.argument<Boolean>("videoEnabled")?.let { enabled ->
+                player.trackSelectionParameters = player.trackSelectionParameters.buildUpon()
+                    .setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, !enabled).build()
+            }
+            startupTrace?.mark("source.options", "volume=${player.volume} speed=${player.playbackParameters.speed} video=${!player.trackSelectionParameters.disabledTrackTypes.contains(C.TRACK_TYPE_VIDEO)}")
             sourceArgs = Media3SourceArgs(
                 bvid = call.argument<String>("bvid") ?: "",
                 cid = call.argument<Number>("cid")?.toLong() ?: 0L,

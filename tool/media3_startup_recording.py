@@ -7,6 +7,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import time
 
@@ -63,12 +64,12 @@ adb('shell', 'log', '-t', 'Media3Test', 'open-request ' + args.label)
 begin = time.monotonic()
 uri = f'bilibili://video/{video["bvid"]}?cid={video["cid"]}&start_progress=0'
 launch = adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW',
-             '-n', package + '/com.personal.piliplus.MainActivity', '-d', uri)
+             '-n', package + '/com.personal.piliplus.MainActivity', '-d', shlex.quote(uri))
 (out / 'launch.txt').write_bytes(launch)
 recording.wait(timeout=args.seconds + 8)
 adb('pull', remote, str(out / 'screen.mp4'))
 log = adb('logcat', '-d', '-v', 'epoch', '-s', 'Media3Startup',
-          'Media3Playback', 'Media3Test', 'AndroidRuntime').decode('utf-8', 'replace')
+          'Media3Playback', 'Media3Test', 'flutter', 'AndroidRuntime').decode('utf-8', 'replace')
 (out / 'playback.log').write_text(log, encoding='utf-8')
 states = re.findall(r'positionMs=(\d+) state=(\d+) playWhenReady=(true|false) bufferMs=(\d+)', log)
 intents = re.findall(r'intent id=\d+ source=\d+ playWhenReady=(true|false)', log)
