@@ -72,7 +72,9 @@ internal object Media3PlayerManager {
         preparedKey = null
         val source = createSource(context.applicationContext, args)
         val loadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(100, 800, 100, 100)
+            // Keep the first frame eager, but retain enough data after reveal
+            // to avoid turning normal network jitter into a visible stall.
+            .setBufferDurationsMs(2_000, 10_000, 500, 2_000)
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
         preparedPlayer = ExoPlayer.Builder(context.applicationContext)
@@ -83,12 +85,23 @@ internal object Media3PlayerManager {
             it.addListener(object : androidx.media3.common.Player.Listener {
                 override fun onRenderedFirstFrame() {
                     Log.i(TAG, "preload.firstFrame")
-                    if (preparedPlayer != null) {
-                        it.playWhenReady = false
-                    }
+                }
+
+                override fun onPlaybackStateChanged(playbackState: Int) {
+                    Log.i(
+                        TAG,
+                        "state=$playbackState playWhenReady=${it.playWhenReady} " +
+                            "isPlaying=${it.isPlaying} bufferedMs=${it.bufferedPosition - it.currentPosition}",
+                    )
+                }
+
+                override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                    Log.i(TAG, "playWhenReady=$playWhenReady reason=$reason")
                 }
             })
-            it.playWhenReady = true
+            // Prepare and buffer the source without advancing playback. The
+            // first user tap starts playback from position zero.
+            it.playWhenReady = false
             it.prepare()
         }
         preparedKey = videoUrl

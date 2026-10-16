@@ -6,7 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.WindowManager.LayoutParams
+import android.view.WindowInsets
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.media3.common.PlaybackException
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -51,7 +53,7 @@ class MainActivity : AudioServiceActivity() {
                 if (call.method == "preload") {
                     Media3PlayerManager.preload(this, args)
                     Media3PlayerManager.peek()?.let {
-                        showWarmMedia3Overlay(it, args.videoUrl)
+                        showWarmMedia3Overlay(it, args.videoUrl, args.videoWidth, args.videoHeight)
                     }
                 } else {
                     if (media3OverlayPlayer != null && media3Overlay != null) {
@@ -70,7 +72,7 @@ class MainActivity : AudioServiceActivity() {
                             reused.playWhenReady = true
                             android.util.Log.i("Media3Overlay", "reveal")
                         } else {
-                            showMedia3Overlay(reused)
+                            showMedia3Overlay(reused, args.videoWidth, args.videoHeight)
                         }
                     } else {
                         startActivity(Intent(this, Media3ProbeActivity::class.java).apply {
@@ -93,13 +95,16 @@ class MainActivity : AudioServiceActivity() {
         }
     }
 
-    private fun showMedia3Overlay(player: ExoPlayer) {
+    private fun showMedia3Overlay(player: ExoPlayer, videoWidth: Int, videoHeight: Int) {
         closeMedia3Overlay()
         val view = PlayerView(this).apply {
-            useController = true
+            useController = false
             this.player = player
             setBackgroundColor(android.graphics.Color.BLACK)
             alpha = 1f
+            isClickable = false
+            isFocusable = false
+            isEnabled = false
         }
         player.addListener(object : androidx.media3.common.Player.Listener {
             override fun onRenderedFirstFrame() {
@@ -111,18 +116,23 @@ class MainActivity : AudioServiceActivity() {
                 closeMedia3Overlay()
             }
         })
-        addContentView(view, ViewGroup.LayoutParams(-1, -1))
+        addContentView(view, videoLayoutParams(videoWidth, videoHeight))
         media3Overlay = view
         media3OverlayPlayer = player
         media3OverlayKey = null
         player.playWhenReady = true
     }
 
-    private fun showWarmMedia3Overlay(player: ExoPlayer, key: String?) {
+    private fun showWarmMedia3Overlay(
+        player: ExoPlayer,
+        key: String?,
+        videoWidth: Int,
+        videoHeight: Int,
+    ) {
         if (media3OverlayPlayer === player && media3Overlay != null) return
         closeMedia3Overlay()
         val view = PlayerView(this).apply {
-            useController = true
+            useController = false
             this.player = player
             alpha = 0.01f
             isClickable = false
@@ -130,10 +140,31 @@ class MainActivity : AudioServiceActivity() {
             isEnabled = false
             setBackgroundColor(android.graphics.Color.TRANSPARENT)
         }
-        addContentView(view, ViewGroup.LayoutParams(-1, -1))
+        addContentView(view, videoLayoutParams(videoWidth, videoHeight))
         media3Overlay = view
         media3OverlayPlayer = player
         media3OverlayKey = key
+    }
+
+    private fun videoLayoutParams(videoWidth: Int, videoHeight: Int): FrameLayout.LayoutParams {
+        val metrics = resources.displayMetrics
+        val width = metrics.widthPixels
+        val ratio = if (videoWidth > 0 && videoHeight > 0) {
+            videoHeight.toFloat() / videoWidth.toFloat()
+        } else {
+            9f / 16f
+        }
+        val height = (width * ratio).toInt().coerceAtMost(metrics.heightPixels)
+        val topInset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.decorView.rootWindowInsets?.getInsets(WindowInsets.Type.statusBars())?.top ?: 0
+        } else {
+            resources.getIdentifier("status_bar_height", "dimen", "android")
+                .takeIf { it > 0 }
+                ?.let(resources::getDimensionPixelSize) ?: 0
+        }
+        return FrameLayout.LayoutParams(-1, height).apply {
+            topMargin = topInset
+        }
     }
 
     private fun revealWarmMedia3Overlay() {
