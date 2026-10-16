@@ -83,7 +83,10 @@ import 'package:media_kit/media_kit.dart' hide Subtitle;
 
 const _media3NativePlayer = bool.fromEnvironment(
   'MEDIA3_NATIVE_PLAYER',
-  defaultValue: true,
+  // Keep the established PlPlayerController path as the production default.
+  // The native Media3 surface still exists behind an explicit opt-in flag
+  // until its controls, danmaku, progress and playback state are bridged.
+  defaultValue: false,
 );
 const _media3Channel = MethodChannel('com.personal.piliplus/media3');
 
