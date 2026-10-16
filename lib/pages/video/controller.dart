@@ -192,7 +192,11 @@ class VideoDetailController extends GetxController
     }
     if (!sameSource) frameReady.value = false;
     _autoPlay.value = true;
-    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) return;
+    if (!(_media3NativePlayer && !isFileSource) &&
+        waitForPlaybackRoute != null &&
+        !await waitForPlaybackRoute!()) {
+      return;
+    }
     if (!playbackRouteActive || isClosed || revision != _playbackRevision) {
       return;
     }
@@ -507,12 +511,29 @@ class VideoDetailController extends GetxController
       watchLaterTitle = args['favTitle'];
       _mediaDesc = args['desc'];
       getMediaList();
+    } else {
+      // Start resolving the playback URL as soon as bvid/cid are available;
+      // the view's post-frame initialization will reuse this in-flight query.
+      _preloadMedia3Api();
+      unawaited(queryVideoUrl());
     }
 
     tabCtr = TabController(
       length: 2,
       vsync: this,
       initialIndex: Pref.defaultShowComment ? 1 : 0,
+    );
+  }
+
+  void _preloadMedia3Api() {
+    if (!_media3NativePlayer || isFileSource || isPlayAll) return;
+    unawaited(
+      _media3Channel
+          .invokeMethod<void>('preloadApi', {
+            'bvid': bvid,
+            'cid': cid.value,
+          })
+          .catchError((_) {}),
     );
   }
 
@@ -894,7 +915,11 @@ class VideoDetailController extends GetxController
         revision == _playbackRevision &&
         cid.value == requestedCid;
     if (!isCurrent()) return;
-    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) return;
+    if (!(_media3NativePlayer && !isFileSource) &&
+        waitForPlaybackRoute != null &&
+        !await waitForPlaybackRoute!()) {
+      return;
+    }
     if (!isCurrent()) return;
     preparingPlayback.value = true;
     _playWhenPrepared = false;
@@ -906,27 +931,34 @@ class VideoDetailController extends GetxController
       );
     }
     frameReady.value = false;
+
+    // Media3 is attached as a native overlay and does not need the mpv
+    // source queue, first-segment skip calculation, or Flutter output settle
+    // before the native launch. Keep the old preparation path below as the
+    // fallback if this invocation fails.
+    if (_media3NativePlayer && !isFileSource) {
+      try {
+        final arguments = _media3Arguments();
+        if (arguments == null) {
+          throw StateError('Media3 source is unavailable');
+        }
+        await _media3Channel.invokeMethod<void>('launch', arguments);
+        preparingPlayback.value = false;
+        videoState.value = false;
+        return;
+      } catch (error, stackTrace) {
+        if (kDebugMode) {
+          debugPrint('Media3 launch failed, falling back to mpv: $error');
+          debugPrintStack(stackTrace: stackTrace);
+        }
+      }
+    }
+
     Duration? seek = defaultST ?? playedTime;
     if (seek == null || seek == Duration.zero) {
       seek = getFirstSegment();
     }
     try {
-      if (_media3NativePlayer && !isFileSource) {
-        try {
-          final arguments = _media3Arguments();
-          if (arguments == null)
-            throw StateError('Media3 source is unavailable');
-          await _media3Channel.invokeMethod<void>('launch', arguments);
-          preparingPlayback.value = false;
-          videoState.value = false;
-          return;
-        } catch (error, stackTrace) {
-          if (kDebugMode) {
-            debugPrint('Media3 launch failed, falling back to mpv: $error');
-            debugPrintStack(stackTrace: stackTrace);
-          }
-        }
-      }
       await plPlayerController.setDataSource(
         isFileSource
             ? FileSource(

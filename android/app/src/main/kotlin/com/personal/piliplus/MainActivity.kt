@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.WindowManager.LayoutParams
 import android.view.ViewGroup
 import androidx.media3.common.PlaybackException
@@ -18,6 +19,7 @@ class MainActivity : AudioServiceActivity() {
     private var media3Channel: MethodChannel? = null
     private var media3Overlay: PlayerView? = null
     private var media3OverlayPlayer: ExoPlayer? = null
+    private var media3OverlayKey: String? = null
 
 
     override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
@@ -26,6 +28,17 @@ class MainActivity : AudioServiceActivity() {
         playbackDiagnostics = PlaybackDiagnostics(this, flutterEngine.dartExecutor.binaryMessenger, flutterEngine)
         media3Channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, MEDIA3_CHANNEL).also { channel ->
             channel.setMethodCallHandler { call, result ->
+                if (call.method == "preloadApi") {
+                    val bvid = call.argument<String>("bvid")
+                    val cid = call.argument<Number>("cid")?.toLong()
+                    if (bvid.isNullOrBlank() || cid == null || cid <= 0L) {
+                        result.error("INVALID_ARGUMENT", "bvid and cid are required", null)
+                        return@setMethodCallHandler
+                    }
+                    Media3PlayerManager.preloadApi(this, bvid, cid)
+                    result.success(null)
+                    return@setMethodCallHandler
+                }
                 if (call.method != "launch" && call.method != "preload") {
                     result.notImplemented()
                     return@setMethodCallHandler
@@ -37,10 +50,28 @@ class MainActivity : AudioServiceActivity() {
                 }
                 if (call.method == "preload") {
                     Media3PlayerManager.preload(this, args)
+                    Media3PlayerManager.peek()?.let {
+                        showWarmMedia3Overlay(it, args.videoUrl)
+                    }
                 } else {
+                    if (media3OverlayPlayer != null && media3Overlay != null) {
+                        revealWarmMedia3Overlay()
+                        result.success(null)
+                        return@setMethodCallHandler
+                    }
                     val reused = args.videoUrl?.let { Media3PlayerManager.take(it) }
+                        ?: Media3PlayerManager.takeAny()
                     if (reused != null) {
-                        showMedia3Overlay(reused)
+                        if (media3OverlayPlayer === reused && media3Overlay != null) {
+                            media3Overlay?.alpha = 1f
+                            media3Overlay?.isClickable = true
+                            media3Overlay?.isEnabled = true
+                            reused.volume = 1f
+                            reused.playWhenReady = true
+                            android.util.Log.i("Media3Overlay", "reveal")
+                        } else {
+                            showMedia3Overlay(reused)
+                        }
                     } else {
                         startActivity(Intent(this, Media3ProbeActivity::class.java).apply {
                             putExtra("bvid", args.bvid)
@@ -68,6 +99,7 @@ class MainActivity : AudioServiceActivity() {
             useController = true
             this.player = player
             setBackgroundColor(android.graphics.Color.BLACK)
+            alpha = 1f
         }
         player.addListener(object : androidx.media3.common.Player.Listener {
             override fun onRenderedFirstFrame() {
@@ -82,7 +114,50 @@ class MainActivity : AudioServiceActivity() {
         addContentView(view, ViewGroup.LayoutParams(-1, -1))
         media3Overlay = view
         media3OverlayPlayer = player
+        media3OverlayKey = null
         player.playWhenReady = true
+    }
+
+    private fun showWarmMedia3Overlay(player: ExoPlayer, key: String?) {
+        if (media3OverlayPlayer === player && media3Overlay != null) return
+        closeMedia3Overlay()
+        val view = PlayerView(this).apply {
+            useController = true
+            this.player = player
+            alpha = 0.01f
+            isClickable = false
+            isFocusable = false
+            isEnabled = false
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
+        addContentView(view, ViewGroup.LayoutParams(-1, -1))
+        media3Overlay = view
+        media3OverlayPlayer = player
+        media3OverlayKey = key
+    }
+
+    private fun revealWarmMedia3Overlay() {
+        val view = media3Overlay ?: return
+        val player = media3OverlayPlayer ?: return
+        media3OverlayKey?.let { Media3PlayerManager.take(it) }
+        view.alpha = 1f
+        view.isClickable = true
+        view.isEnabled = true
+        player.volume = 1f
+        player.playWhenReady = true
+        android.util.Log.i("Media3Overlay", "reveal.touch")
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (media3Overlay?.alpha != null &&
+            media3Overlay!!.alpha < 1f &&
+            event.action == MotionEvent.ACTION_UP &&
+            event.y < 800f
+        ) {
+            revealWarmMedia3Overlay()
+            return true
+        }
+        return super.dispatchTouchEvent(event)
     }
 
     private fun closeMedia3Overlay() {
@@ -90,6 +165,7 @@ class MainActivity : AudioServiceActivity() {
         media3Overlay = null
         media3OverlayPlayer?.release()
         media3OverlayPlayer = null
+        media3OverlayKey = null
     }
 
     override fun onBackPressed() {

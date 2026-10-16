@@ -1,6 +1,8 @@
 package com.personal.piliplus
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
 import androidx.media3.common.MediaItem
@@ -20,6 +22,10 @@ import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.database.StandaloneDatabaseProvider
 import org.json.JSONObject
 import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
+import java.util.concurrent.Executors
 
 internal data class Media3SourceArgs(
     val bvid: String,
@@ -43,6 +49,7 @@ internal object Media3PlayerManager {
     private var preparedKey: String? = null
     private var preparedPlayer: ExoPlayer? = null
     private var mediaCache: SimpleCache? = null
+    private val apiExecutor = Executors.newCachedThreadPool()
 
     @Synchronized
     private fun cache(context: Context): SimpleCache {
@@ -88,6 +95,42 @@ internal object Media3PlayerManager {
         Log.i(TAG, "preload.ready")
     }
 
+    fun preloadApi(context: Context, bvid: String, cid: Long) {
+        apiExecutor.execute {
+            runCatching {
+                val endpoint = "https://api.bilibili.com/x/player/playurl?fnval=4048&fnver=0&fourk=1" +
+                    "&bvid=${URLEncoder.encode(bvid, Charsets.UTF_8.name())}&cid=$cid"
+                val connection = (URL(endpoint).openConnection() as HttpURLConnection).apply {
+                    connectTimeout = 3_000
+                    readTimeout = 5_000
+                    requestMethod = "GET"
+                    setRequestProperty("User-Agent", USER_AGENT)
+                    setRequestProperty("Referer", "https://www.bilibili.com/video/$bvid")
+                }
+                val body = connection.inputStream.bufferedReader().use { it.readText() }
+                connection.disconnect()
+                val data = JSONObject(body).getJSONObject("data")
+                val dash = data.getJSONObject("dash")
+                val video = dash.getJSONArray("video").getJSONObject(0)
+                val audio = dash.optJSONArray("audio")?.optJSONObject(0)
+                val args = Media3SourceArgs(
+                        bvid = bvid,
+                        cid = cid,
+                        videoUrl = video.optString("baseUrl", video.optString("base_url")),
+                        audioUrl = audio?.optString("baseUrl", audio.optString("base_url")),
+                        videoSegmentBase = video.optJSONObject("SegmentBase")?.toString(),
+                        audioSegmentBase = audio?.optJSONObject("SegmentBase")?.toString(),
+                        videoCodecs = video.optString("codecs"),
+                        videoWidth = video.optInt("width"),
+                        videoHeight = video.optInt("height"),
+                        audioCodecs = audio?.optString("codecs"),
+                        durationMs = (dash.optDouble("duration", 0.0) * 1000.0).toLong(),
+                    )
+                Handler(Looper.getMainLooper()).post { preload(context, args) }
+            }.onFailure { Log.w(TAG, "preload.api.failed", it) }
+        }
+    }
+
     @Synchronized
     fun take(videoUrl: String): ExoPlayer? {
         if (preparedKey != videoUrl) return null
@@ -98,6 +141,19 @@ internal object Media3PlayerManager {
         // surface. Releasing it here would reset the decoder on a cold tap.
         result?.volume = 1f
         if (result != null) Log.i(TAG, "preload.take")
+        return result
+    }
+
+    @Synchronized
+    fun peek(): ExoPlayer? = preparedPlayer
+
+    @Synchronized
+    fun takeAny(): ExoPlayer? {
+        val result = preparedPlayer
+        preparedPlayer = null
+        preparedKey = null
+        result?.volume = 1f
+        if (result != null) Log.i(TAG, "preload.takeAny")
         return result
     }
 
