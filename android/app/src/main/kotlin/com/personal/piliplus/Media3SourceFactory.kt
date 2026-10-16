@@ -36,12 +36,19 @@ internal data class Media3SourceArgs(
 
 internal object Media3SourceFactory {
     private var cache: SimpleCache? = null
+    private var cacheKeys: Media3CacheKeys? = null
 
     private fun cache(context: Context): SimpleCache = cache ?: SimpleCache(
         File(context.cacheDir, "media3-cache"),
         LeastRecentlyUsedCacheEvictor(128L * 1024L * 1024L),
         StandaloneDatabaseProvider(context.applicationContext),
-    ).also { cache = it }
+    ).also { instance ->
+        cache = instance
+        cacheKeys = Media3CacheKeys(
+            existingKeys = { instance.keys },
+            cachedPrefixBytes = { key -> instance.getCachedBytes(key, 0, 1024L * 1024L) },
+        )
+    }
 
     fun createSource(context: Context, args: Media3SourceArgs, trace: Media3StartupTrace? = null): MediaSource {
         val http = DefaultHttpDataSource.Factory()
@@ -51,14 +58,13 @@ internal object Media3SourceFactory {
                 "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
                 "Referer" to "https://www.bilibili.com",
             ) + args.headers)
+        val sharedCache = cache(context)
+        val keyIndex = checkNotNull(cacheKeys)
         val dataSource = CacheDataSource.Factory()
-            .setCache(cache(context))
+            .setCache(sharedCache)
             .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context, http))
             .setCacheKeyFactory(CacheKeyFactory { spec ->
-                val host = spec.uri.host.orEmpty()
-                if (host.endsWith(".bilivideo.com") || host.endsWith(".bilivideo.cn")) {
-                    spec.uri.buildUpon().clearQuery().build().toString()
-                } else CacheKeyFactory.DEFAULT.buildCacheKey(spec)
+                keyIndex.key(spec.uri.toString(), spec.key)
             })
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         val videoUrl = args.videoUrl ?: error("videoUrl is required")
@@ -108,5 +114,5 @@ internal object Media3SourceFactory {
     }
 
     private fun xml(value: String) = value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
-    fun dispose() { cache?.release(); cache = null }
+    fun dispose() { cache?.release(); cache = null; cacheKeys = null }
 }
