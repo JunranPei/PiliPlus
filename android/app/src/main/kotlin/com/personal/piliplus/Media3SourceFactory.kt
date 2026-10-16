@@ -6,6 +6,7 @@ import androidx.media3.common.MimeTypes
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.cache.CacheDataSource
 import androidx.media3.datasource.cache.CacheKeyFactory
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
@@ -32,6 +33,8 @@ internal data class Media3SourceArgs(
     val durationMs: Long,
     val headers: Map<String, String> = emptyMap(),
     val segments: List<String> = emptyList(),
+    val preferProgressive: Boolean = false,
+    val bypassCache: Boolean = false,
 )
 
 internal object Media3SourceFactory {
@@ -60,15 +63,17 @@ internal object Media3SourceFactory {
             ) + args.headers)
         val sharedCache = cache(context)
         val keyIndex = checkNotNull(cacheKeys)
-        val dataSource = CacheDataSource.Factory()
+        val upstream = DefaultDataSource.Factory(context, http)
+        val cachedDataSource = CacheDataSource.Factory()
             .setCache(sharedCache)
-            .setUpstreamDataSourceFactory(DefaultDataSource.Factory(context, http))
+            .setUpstreamDataSourceFactory(upstream)
             .setCacheKeyFactory(CacheKeyFactory { spec ->
                 keyIndex.key(spec.uri.toString(), spec.key)
             })
             .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        val dataSource: DataSource.Factory = if (args.bypassCache) upstream else cachedDataSource
         val videoUrl = args.videoUrl ?: error("videoUrl is required")
-        if (!args.videoSegmentBase.isNullOrBlank()) {
+        if (!args.videoSegmentBase.isNullOrBlank() && !args.preferProgressive) {
             val video = JSONObject().apply {
                 put("baseUrl", videoUrl); put("codecs", args.videoCodecs.orEmpty())
                 put("width", args.videoWidth); put("height", args.videoHeight)

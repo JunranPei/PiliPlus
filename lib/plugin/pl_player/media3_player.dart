@@ -22,6 +22,8 @@ class Media3Player extends PlatformPlayer {
   static final Map<int, ValueChanged<double>> _exportProgress = {};
   static bool _listening = false;
   static bool _batchStartupOptions = true;
+  static bool _progressiveStartup = false;
+  static bool _startupCache = true;
   // Group startup options by default. Profile builds can compare the pinned
   // reference sequence without reinstalling the app or replacing the backend.
   static bool get batchStartupOptions => !kProfileMode || _batchStartupOptions;
@@ -53,8 +55,25 @@ class Media3Player extends PlatformPlayer {
           if (parameters['batch'] case final value?) {
             _batchStartupOptions = value == 'true';
           }
+          if (parameters['source'] case final value?) {
+            if (value != 'dash' && value != 'progressive') {
+              return developer.ServiceExtensionResponse.error(
+                developer.ServiceExtensionResponse.invalidParams,
+                'source must be dash or progressive',
+              );
+            }
+            _progressiveStartup = value == 'progressive';
+          }
+          if (parameters['cache'] case final value?) {
+            _startupCache = value == 'true';
+          }
           return developer.ServiceExtensionResponse.result(
-            jsonEncode({'batch': batchStartupOptions, 'backend': 'Media3'}),
+            jsonEncode({
+              'batch': batchStartupOptions,
+              'backend': 'Media3',
+              'source': _progressiveStartup ? 'progressive' : 'dash',
+              'cache': _startupCache,
+            }),
           );
         });
       }
@@ -137,6 +156,8 @@ class Media3Player extends PlatformPlayer {
     if (rate != null) state.rate = rate;
     await _open({
       if (source is NetworkSource) ...?source.nativeMetadata,
+      if (kProfileMode) 'preferProgressive': _progressiveStartup,
+      if (kProfileMode) 'bypassCache': !_startupCache,
       'videoUrl': source.videoSource,
       'audioUrl': source.audioSource,
       'positionMs': seekTo?.inMilliseconds ?? 0,

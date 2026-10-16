@@ -19,6 +19,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('label')
 parser.add_argument('--index', type=int, default=6)
 parser.add_argument('--seconds', type=int, default=16)
+parser.add_argument('--compare', choices=['batch', 'source'], default='batch')
+parser.add_argument('--uncached', action='store_true')
 args = parser.parse_args()
 out = ROOT / 'diagnostics/startup-20261016/startup-ab' / args.label
 out.mkdir(parents=True, exist_ok=True)
@@ -68,10 +70,16 @@ pid = adb('shell', 'pidof', package).decode().strip()
 time.sleep(1)
 results = []
 try:
-    for number, batch in enumerate([False, True, True, False], 1):
-        mode = 'batched' if batch else 'baseline'
-        selected = rpc('ext.piliplus.media3StartupMode', {'isolateId': isolate, 'batch': str(batch).lower()})
-        if selected.get('batch') != batch or selected.get('backend') != 'Media3':
+    for number, candidate in enumerate([False, True, True, False], 1):
+        mode = ('progressive' if candidate else 'dash') if args.compare == 'source' else ('batched' if candidate else 'baseline')
+        batch = candidate if args.compare == 'batch' else True
+        source = mode if args.compare == 'source' else 'dash'
+        selected = rpc('ext.piliplus.media3StartupMode', {
+            'isolateId': isolate, 'batch': str(batch).lower(), 'source': source,
+            'cache': str(not args.uncached).lower(),
+        })
+        if (selected.get('batch') != batch or selected.get('backend') != 'Media3'
+                or selected.get('source') != source or selected.get('cache') != (not args.uncached)):
             raise RuntimeError('The requested Media3 startup mode was not selected')
         label = f'{args.label}-{number}-{mode}'
         completed = subprocess.run([sys.executable, str(ROOT / 'tool/media3_startup_recording.py'),
@@ -100,4 +108,6 @@ try:
         print(json.dumps({key: result[key] for key in ['number', 'mode', 'primaryApiMs', 'postApiToUiRevealMs',
             'requestToNativeFirstFrameMs', 'requestToUiRevealMs', 'postStartPauseIntent', 'lastPositionMs']}), flush=True)
 finally:
-    rpc('ext.piliplus.media3StartupMode', {'isolateId': isolate, 'batch': 'false'})
+    rpc('ext.piliplus.media3StartupMode', {
+        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true',
+    })

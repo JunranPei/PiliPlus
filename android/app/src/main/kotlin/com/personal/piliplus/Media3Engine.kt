@@ -166,6 +166,8 @@ internal class Media3Engine(
                 durationMs = call.argument<Number>("durationMs")?.toLong() ?: 0L,
                 headers = call.argument<Map<String, String>>("headers") ?: emptyMap(),
                 segments = call.argument<List<String>>("segments") ?: emptyList(),
+                preferProgressive = call.argument<Boolean>("preferProgressive") ?: false,
+                bypassCache = call.argument<Boolean>("bypassCache") ?: false,
             )
             Log.i("Media3Playback", "open id=$id source=$sourceId cid=${sourceArgs!!.cid} codec=${sourceArgs!!.videoCodecs}")
             val generation = sourceId

@@ -74,6 +74,8 @@ void main() {
       expect(options['videoEnabled'], isFalse);
       expect(options['speed'], 1.25);
       expect(options['play'], isFalse);
+      expect(options.containsKey('preferProgressive'), isFalse);
+      expect(options.containsKey('bypassCache'), isFalse);
       expect(player.state.volume, 65);
       expect(player.state.rate, 1.25);
       await player.dispose();
