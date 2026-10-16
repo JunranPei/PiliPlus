@@ -42,10 +42,11 @@ internal class Media3Engine(
     }
 
     private inner class Session(var id: Int) {
+        @Volatile private var audioStartMs = 0
         val texture: TextureRegistry.SurfaceTextureEntry = engine.renderer.createSurfaceTexture()
         val surface = Surface(texture.surfaceTexture())
         val player = ExoPlayer.Builder(context.applicationContext)
-            .setRenderersFactory(RetainedRenderersFactory(context.applicationContext)
+            .setRenderersFactory(RetainedRenderersFactory(context.applicationContext, { audioStartMs }, { startupTrace })
                 .setEnableDecoderFallback(true))
             .setLoadControl(DefaultLoadControl.Builder()
                 .setBufferDurationsMs(5_000, 30_000, 100, 1_000)
@@ -142,6 +143,7 @@ internal class Media3Engine(
         }
 
         fun open(call: MethodCall) {
+            audioStartMs = (call.argument<Number>("audioStartMs")?.toInt() ?: 0).coerceIn(0, 100)
             startedAt = SystemClock.elapsedRealtime()
             sourceListener?.let(player::removeListener)
             startupTrace?.let(player::removeAnalyticsListener)
