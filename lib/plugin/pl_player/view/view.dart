@@ -50,7 +50,7 @@ import 'package:PiliPlus/plugin/pl_player/widgets/backward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/bottom_control.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/common_btn.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/forward_seek.dart';
-import 'package:PiliPlus/plugin/pl_player/widgets/mpv_convert_webp.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/native_convert_webp.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/play_pause_btn.dart';
 import 'package:PiliPlus/utils/cache_manager.dart';
 import 'package:PiliPlus/utils/connectivity_utils.dart';
@@ -82,7 +82,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:PiliPlus/plugin/pl_player/media3_texture.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/native_subtitle_view.dart';
 import 'package:screen_brightness_platform_interface/screen_brightness_platform_interface.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -133,7 +134,6 @@ class PLVideoPlayer extends StatefulWidget {
 class _PLVideoPlayerState extends State<PLVideoPlayer>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   late AnimationController _animationController;
-  late VideoController videoController;
   late final CommonIntroController introController = widget.introController!;
   late final VideoDetailController videoDetailController =
       widget.videoDetailController!;
@@ -308,7 +308,6 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    videoController = plPlayerController.videoController!;
 
     if (PlatformUtils.isMobile) {
       Future.microtask(() {
@@ -1446,8 +1445,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
             child: IgnorePointer(
               ignoring: !plPlayerController.enableDragSubtitle,
               child: Obx(
-                () => SubtitleView(
-                  controller: videoController,
+                () => NativeSubtitleView(
+                  controller: plPlayerController.videoPlayerController!,
                   configuration: plPlayerController.subtitleConfig.value,
                   enableDragSubtitle: plPlayerController.enableDragSubtitle,
                   onUpdatePadding: plPlayerController.onUpdatePadding,
@@ -2128,8 +2127,8 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         ? (plPlayerController.width! /
                               plPlayerController.height!)
                         : null);
-                final video = SimpleVideo(
-                  controller: plPlayerController.videoController!,
+                final video = Media3Texture(
+                  controller: plPlayerController.videoPlayerController!,
                   fill: widget.fill,
                   aspectRatio: aspect,
                 );
@@ -2276,7 +2275,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
         '${ctr.cid}-${segment.first.toStringAsFixed(3)}_${segment.second.toStringAsFixed(3)}.webp';
     final file = '$tmpDirPath/$name';
 
-    final mpv = MpvConvertWebp(
+    final mpv = NativeConvertWebp(
       url!,
       file,
       segment.first,

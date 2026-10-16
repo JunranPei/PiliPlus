@@ -1,12 +1,9 @@
-import 'dart:async' show Completer, StreamSubscription, Timer, unawaited;
-import 'dart:convert' show ascii, utf8;
+import 'dart:async' show StreamSubscription, Timer, unawaited;
+import 'dart:convert' show ascii;
 import 'dart:io' show Platform;
 import 'dart:math' show max, min;
 import 'dart:ui' as ui;
 
-import 'package:PiliPlus/common/assets.dart';
-import 'package:PiliPlus/http/browser_ua.dart';
-import 'package:PiliPlus/http/constants.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/video.dart';
 import 'package:PiliPlus/models/common/account_type.dart';
@@ -17,14 +14,11 @@ import 'package:PiliPlus/models/user/danmaku_rule.dart';
 import 'package:PiliPlus/models/video/play/url.dart';
 import 'package:PiliPlus/models_new/video/video_shot/data.dart';
 import 'package:PiliPlus/pages/danmaku/danmaku_model.dart';
-import 'package:PiliPlus/pages/setting/models/play_settings.dart'
-    show kMaxVolume;
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
-import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
-import 'package:PiliPlus/plugin/pl_player/playback/startup_probe.dart';
+import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -38,7 +32,6 @@ import 'package:PiliPlus/plugin/pl_player/utils/danmaku_options.dart';
 import 'package:PiliPlus/plugin/pl_player/utils/fullscreen.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:PiliPlus/utils/accounts.dart';
-import 'package:PiliPlus/utils/asset_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/extension/box_ext.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
@@ -46,7 +39,6 @@ import 'package:PiliPlus/utils/extension/size_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
 import 'package:PiliPlus/utils/image_utils.dart';
 import 'package:PiliPlus/utils/ios/pip_helper.dart';
-import 'package:PiliPlus/utils/path_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
@@ -54,7 +46,6 @@ import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:archive/archive.dart' show getCrc32;
 import 'package:canvas_danmaku/canvas_danmaku.dart';
-import 'package:easy_debounce/easy_throttle.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart'
     show DeviceOrientation, HapticFeedback, KeyDownEvent, LogicalKeyboardKey;
@@ -64,9 +55,9 @@ import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:media_kit_video/media_kit_video.dart'
+    show SubtitleViewConfiguration;
 import 'package:native_device_orientation/native_device_orientation.dart';
-import 'package:path/path.dart' as path;
 import 'package:screen_brightness_platform_interface/screen_brightness_platform_interface.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
@@ -75,8 +66,7 @@ typedef PlayCallback = Future<void>? Function();
 typedef PlayOwner = ({String tag, Type type});
 
 class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
-  Player? _videoPlayerController;
-  VideoController? _videoController;
+  Media3Player? _videoPlayerController;
   final _sourceQueue = PlaybackSourceQueue();
   Object? _readySourceOwner;
   Object? _sourceOwner;
@@ -87,11 +77,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   int _pendingFrameReadyRevision = 0;
   VoidCallback? _traceRectChanged;
   VoidCallback? _traceIdChanged;
-  VideoController? _traceVideoController;
+  Media3Player? _traceVideoController;
 
   Map<String, Object?> playbackTraceState() {
     final state = _videoPlayerController?.state;
-    final rect = _videoController?.rect.value;
+    final rect = _videoPlayerController?.rect.value;
     return {
       'requestId': _diagnosticRequest,
       'sourceRevision': _sourceRevision,
@@ -104,10 +94,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       'playerId': _videoPlayerController == null
           ? null
           : identityHashCode(_videoPlayerController!),
-      'videoControllerId': _videoController == null
-          ? null
-          : identityHashCode(_videoController!),
-      'textureId': _videoController?.id.value,
+      'textureId': _videoPlayerController?.textureId.value,
       'textureRect': rect == null
           ? null
           : [rect.left, rect.top, rect.right, rect.bottom],
@@ -124,16 +111,15 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     };
   }
 
-  void _installPlaybackTrace() {
+  void _installPlaybackTrace(Media3Player controller) {
     if (!PlaybackDiagnostics.enabled) return;
-    final controller = _videoController!;
     _traceVideoController = controller;
     _traceRectChanged = () =>
         PlaybackDiagnostics.event('media.textureRect', playbackTraceState());
     _traceIdChanged = () =>
         PlaybackDiagnostics.event('media.textureId', playbackTraceState());
     controller.rect.addListener(_traceRectChanged!);
-    controller.id.addListener(_traceIdChanged!);
+    controller.textureId.addListener(_traceIdChanged!);
     PlaybackDiagnostics.register(
       'player#${identityHashCode(this)}',
       playbackTraceState,
@@ -144,7 +130,9 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   Future<void> Function()? _reloadSource;
 
   bool hasSourceFor(Object owner, int? cid) =>
-      _readySourceOwner == owner && this.cid == cid && _videoController != null;
+      _readySourceOwner == owner &&
+      this.cid == cid &&
+      _videoPlayerController != null;
 
   void cancelSource(Object owner) {
     _sourceQueue.cancel(owner);
@@ -246,10 +234,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   double get longPressSpeed => _longPressSpeed.value;
 
   /// [videoPlayerController] instance of Player
-  Player? get videoPlayerController => _videoPlayerController;
-
-  /// [videoController] instance of Player
-  VideoController? get videoController => _videoController;
+  Media3Player? get videoPlayerController => _videoPlayerController;
 
   bool isMuted = false;
 
@@ -462,7 +447,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   Future<bool> enterPip({bool autoEnter = false}) async {
     if (Platform.isIOS) {
       final player = videoPlayerController;
-      final textureId = videoController?.id.value;
+      final textureId = _videoPlayerController?.textureId.value;
       if (player == null || textureId == null || !IOSPipHelper.isAvailable) {
         return false;
       }
@@ -486,7 +471,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       width: state.width == 0 ? (width ?? 16) : state.width,
       height: state.height == 0 ? (height ?? 9) : state.height,
       isLive: isLive,
-      // media_kit's player state is updated before the derived Rx status;
+      // Native state is updated before the derived Rx status;
       // use it here so an auto-entry request is never armed as paused during
       // the short play-state propagation window.
       isPlaying: player.state.playing,
@@ -841,11 +826,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         _readySourceOwner = null;
         _sourceOwner = owner ?? this;
         _sourceRevision++;
-        // The first mpv output only proves that the source can render.  The
-        // Android surface may still receive its final video parameters when
-        // play() starts.  Keep the presentation callback pending until that
-        // second handoff has settled, otherwise the poster exposes the
-        // intermediate texture geometry for one or more frames.
+        // Keep the previous picture covered until Media3 renders this source.
         _pendingFrameReady = null;
         _pendingFrameReadyRevision = _sourceRevision;
         _reloadSource = onReload;
@@ -882,18 +863,12 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         request.checkCurrent();
         if (_playerCount == 0) return false;
         // 配置Player 音轨、字幕等等
-        await _createVideoController(
+        await _prepareMedia3Source(
           dataSource,
           seekTo,
           volume,
           request: request,
           onPrepared: onPrepared,
-          // Autoplay must start as soon as mpv accepts the source.  The
-          // presentation callback below keeps the poster in front until the
-          // post-play surface handoff is stable.  Only paused/preloaded media
-          // needs the old-frame gate before returning to the caller.
-          waitForFrame:
-              owner != null && !isLive && !onlyPlayAudio.value && !autoplay,
         );
         request.checkCurrent();
 
@@ -901,7 +876,6 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           _removeListeners();
           _videoPlayerController?.dispose();
           _videoPlayerController = null;
-          _videoController = null;
           return false;
         }
 
@@ -926,7 +900,14 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           _pendingFrameReadyRevision = _sourceRevision;
         }
         request.checkCurrent();
-        if (autoplay) await play();
+        if (autoplay) {
+          await Future.any<void>([
+            play(),
+            request.cancelled.then<void>(
+              (_) => throw const PlaybackSourceCancelled(),
+            ),
+          ]);
+        }
         if (kDebugMode) {
           debugPrint(
             '[PLAYBACK] ready request=${request.id} cid=$cid autoplay=$autoplay',
@@ -956,170 +937,46 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     });
   }
 
-  String? shadersDirPath;
-  Future<String> get copyShadersToExternalDirectory async {
-    if (shadersDirPath != null) {
-      return shadersDirPath!;
-    }
-
-    return shadersDirPath = await AssetUtils.getOrCopy(
-      'assets/shaders',
-      Assets.mpvAnime4KShaders.followedBy(Assets.mpvAnime4KShadersLite),
-      path.join(appSupportDirPath, 'anime_shaders'),
-    );
-  }
-
   late final isAnim = _pgcType == 1 || _pgcType == 4;
   late final Rx<SuperResolutionType> superResolutionType =
-      (isAnim ? Pref.superResolutionType : SuperResolutionType.disable).obs;
-  Future<void> setShader([SuperResolutionType? type, NativePlayer? pp]) async {
-    if (type == null) {
-      type = superResolutionType.value;
-    } else {
-      superResolutionType.value = type;
-      if (isAnim && !tempPlayerConf) {
-        setting.put(SettingBoxKey.superResolutionType, type.index);
-      }
-    }
-    pp ??= _videoPlayerController!;
-    switch (type) {
-      case SuperResolutionType.disable:
-        return pp.command(const ['change-list', 'glsl-shaders', 'clr', '']);
-      case SuperResolutionType.efficiency:
-        return pp.command([
-          'change-list',
-          'glsl-shaders',
-          'set',
-          PathUtils.buildShadersAbsolutePath(
-            await copyShadersToExternalDirectory,
-            Assets.mpvAnime4KShadersLite,
-          ),
-        ]);
-      case SuperResolutionType.quality:
-        return pp.command([
-          'change-list',
-          'glsl-shaders',
-          'set',
-          PathUtils.buildShadersAbsolutePath(
-            await copyShadersToExternalDirectory,
-            Assets.mpvAnime4KShaders,
-          ),
-        ]);
-    }
+      SuperResolutionType.disable.obs;
+
+  Future<void> setShader([SuperResolutionType? type, Object? player]) async {
+    if (type == SuperResolutionType.disable || type == null) return;
+    // Keep the original menu visible without reporting an unapplied shader as active.
+    SmartDialog.showToast('超分辨率功能仍在迁移中');
   }
 
-  Future<Player> _initPlayer() async {
-    assert(_videoPlayerController == null);
-    PlaybackDiagnostics.event('startup.player.create.begin');
-    String ao = Pref.audioOutput;
-    if (ao == 'opensles,aaudio,audiotrack') {
-      ao = 'audiotrack,aaudio,opensles';
-    }
-    final opt = {
-      'video-sync': Pref.videoSync,
-      if (Platform.isAndroid) 'ao': ao,
-      'volume':
-          (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
-              .toString(),
-      'volume-max': kMaxVolume.toString(),
-      if (hwdec != null && hwdec != 'no')
-        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec!,
-      if (Platform.isAndroid) 'profile': 'fast',
-      if (Platform.isWindows) 'gpu-api': 'd3d11',
-      'vd-lavc-fast': 'yes',
-      'vd-lavc-dr': 'yes',
-      'vd-lavc-threads': '0',
-    };
-    final autosync = Pref.autosync;
-    if (autosync != '0') {
-      opt['autosync'] = autosync;
-    }
-
-    final player = await Player.create(
-      configuration: PlayerConfiguration(
-        logLevel: StartupProbe.verbose
-            ? .debug
-            : kDebugMode
-            ? .warn
-            : .error,
-        options: opt,
-      ),
-    );
-
-    assert(_videoController == null);
-    PlaybackDiagnostics.event('startup.player.create.end');
-    PlaybackDiagnostics.event('startup.videoController.create.begin');
-
-    _videoController = await VideoController.create(
-      player,
-      configuration: VideoControllerConfiguration(
-        enableHardwareAcceleration: hwdec != null,
-        // The Android fork of media_kit provides a MediaCodec-backed output
-        // which attaches the decoder surface without the GPU output's second
-        // SurfaceTexture resize/reconfigure pass.  The startup probe showed
-        // that this is the first visible-output bottleneck after play(); keep
-        // desktop and iOS on their existing platform defaults.
-        vo: Platform.isAndroid ? 'mediacodec_embed' : null,
-        // Attach the Android surface immediately. Waiting for video parameters
-        // makes the loading cover disappear before the first picture on slow
-        // streams and regresses startup against the original player.
-        androidAttachSurfaceAfterVideoParameters: false,
-        hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
-      ),
-    );
-
-    if (PlaybackDiagnostics.enabled) {
-      PlaybackDiagnostics.event('startup.output.config', {
-        'requestedVo': Platform.isAndroid ? 'mediacodec_embed' : 'default',
-        'attachSurfaceAfterVideoParameters': false,
-        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec,
-      });
-    }
-
-    player.setMediaHeader(userAgent: BrowserUa.pc, referer: HttpString.baseUrl);
-    PlaybackDiagnostics.event('startup.videoController.create.end');
-
-    _installPlaybackTrace();
-
+  Future<Media3Player> _initPlayer() async {
+    final player = await Media3Player.create();
     _startListeners(player);
-
+    _installPlaybackTrace(player);
     return player;
   }
 
-  late final buffer = Pref.initBuffer(_playbackSpeed.value);
-  late final liveBuffer = Pref.initLiveBuffer();
-
-  // 配置播放器
-  Future<void> _createVideoController(
-    DataSource dataSource,
+  Future<void> _prepareMedia3Source(
+    DataSource source,
     Duration? seekTo,
     Volume? volume, {
     required PlaybackSourceRequest request,
     Future<void> Function()? onPrepared,
-    required bool waitForFrame,
   }) async {
-    isBuffering.value = false;
+    isBuffering.value = true;
     _heartDuration = 0;
     danmakuController?.clear();
-
-    var player = _videoPlayerController;
-
-    if (player == null) {
-      player = await _initPlayer();
-      if (_playerCount == 0) {
-        _removeListeners();
-        player.dispose();
-        player = null;
-        _videoController = null;
-        return;
-      }
-      _videoPlayerController = player;
-      if (isAnim && superResolutionType.value != .disable) {
-        await setShader();
-      }
-    }
-
+    final player = _videoPlayerController ??= await _initPlayer();
     request.checkCurrent();
+    await player.setVolume(
+      PlatformUtils.isMobile ? Pref.playerVolume : this.volume.value * 100,
+    );
+    await player.setProperty(
+      'file-local-options/vid',
+      onlyPlayAudio.value ? 'no' : 'auto',
+    );
+    await player.openSource(source, seekTo: seekTo);
+    request.checkCurrent();
+    // The registered native texture can receive frames before its Flutter
+    // widget mounts. Start loading before waiting for the original UI to paint.
     if (onPrepared != null) {
       await Future.any<void>([
         onPrepared(),
@@ -1129,203 +986,6 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       ]);
     }
     request.checkCurrent();
-
-    final Map<String, String> extras = {};
-
-    if (dataSource is FileSource) {
-      extras['cache'] = 'no';
-    } else {
-      if (isLive) {
-        extras.addAll(liveBuffer);
-      } else {
-        extras.addAll(buffer);
-      }
-    }
-
-    final source = StartupProbe.enabled
-        ? await StartupProbe.resolve(dataSource, cid)
-        : (video: dataSource.videoSource, audio: dataSource.audioSource);
-    String video = source.video;
-    if (source.audio case final audio? when (audio.isNotEmpty)) {
-      if (onlyPlayAudio.value) {
-        video = audio;
-      } else {
-        // dely_open need provide length
-        video =
-            ('edl://'
-            '!no_chapters;'
-            // '!delay_open,media_type=video;'
-            '%${isFileSource ? utf8.encode(video).length : video.length}%$video;'
-            '!new_stream;!no_chapters;'
-            // '!delay_open,media_type=audio;'
-            '%${isFileSource ? utf8.encode(audio).length : audio.length}%$audio');
-      }
-      audioFilterExtras(volume, map: extras);
-    }
-
-    assert(!isLive || seekTo == null);
-    final gate = waitForFrame ? MpvFrameGate(player, source: video) : null;
-    _diagnosticSource = PlaybackDiagnostics.sourceId(video);
-    if (PlaybackDiagnostics.enabled) {
-      PlaybackDiagnostics.event('source.open.begin', playbackTraceState());
-    }
-    try {
-      await player.open(
-        Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
-        play: false,
-      );
-      if (PlaybackDiagnostics.enabled) {
-        PlaybackDiagnostics.event('source.open.return', playbackTraceState());
-      }
-      request.checkCurrent();
-      if (gate != null) {
-        await Future.any<void>([
-          gate.ready,
-          request.cancelled.then<void>(
-            (_) => throw const PlaybackSourceCancelled(),
-          ),
-        ]);
-        request.checkCurrent();
-        await _waitForVideoOutput(request);
-      }
-    } finally {
-      gate?.dispose();
-    }
-  }
-
-  Future<void> _waitForVideoOutput(PlaybackSourceRequest request) async {
-    final controller = _videoController!;
-    final ready = Completer<void>();
-    void check() {
-      final rect = controller.rect.value;
-      final state = controller.player.state;
-      if (!ready.isCompleted &&
-          controller.id.value != null &&
-          rect != null &&
-          rect.width > 1 &&
-          rect.height > 1 &&
-          state.width > 0 &&
-          state.height > 0 &&
-          (!Platform.isAndroid ||
-              (rect.width == state.width && rect.height == state.height))) {
-        if (kDebugMode) {
-          debugPrint(
-            '[PLAYBACK] output request=${request.id} texture=${controller.id.value} size=${state.width}x${state.height} rect=$rect',
-          );
-        }
-        ready.complete();
-      }
-    }
-
-    controller.rect.addListener(check);
-    controller.id.addListener(check);
-    final subscription = controller.player.stream.size.listen((_) => check());
-    try {
-      check();
-      await Future.any<void>([
-        ready.future.timeout(const Duration(seconds: 10)),
-        request.cancelled.then<void>(
-          (_) => throw const PlaybackSourceCancelled(),
-        ),
-      ]);
-    } finally {
-      controller.rect.removeListener(check);
-      controller.id.removeListener(check);
-      await subscription.cancel();
-    }
-  }
-
-  /// Wait until the output exposed by media_kit has stopped changing after a
-  /// play command.  mpv can report a usable frame before the Android surface
-  /// is resized to the final decoded stream; revealing Flutter in that gap
-  /// causes the old texture geometry to flash before the final one replaces
-  /// it.  Three equal samples across frame boundaries make the handoff atomic
-  /// from the UI's point of view while retaining the same texture.
-  Future<void> _waitForStableVideoOutput({
-    required int sourceRevision,
-    // Autoplay starts before Android has attached the decoded surface. On the
-    // emulator that handoff can take a few seconds; a short fallback reveals
-    // the cover onto an empty texture and makes startup look slower.
-    Duration timeout = const Duration(seconds: 5),
-  }) async {
-    final controller = _videoController;
-    if (controller == null) return;
-    final started = Stopwatch()..start();
-    String? previous;
-    var stableSamples = 0;
-    while (started.elapsed < timeout) {
-      // PiP owns the transition surface once Android marks the entry as
-      // pending.  Waiting for the normal-page geometry here leaves Flutter
-      // covered while SystemUI captures the transition, which can produce an
-      // app-icon frame for sources whose final output arrives a little later.
-      // The already-playing texture is the correct source for PiP's native
-      // scaling, so hand it over immediately in this case.
-      if (Platform.isAndroid &&
-          AndroidPipController.instance.protectsPlayback) {
-        if (PlaybackDiagnostics.enabled) {
-          PlaybackDiagnostics.event('output.stable.pip-bypass', {
-            ...playbackTraceState(),
-            'sourceRevision': sourceRevision,
-            'elapsedMs': started.elapsedMilliseconds,
-          });
-        }
-        return;
-      }
-      if (sourceRevision != _sourceRevision || _videoController != controller) {
-        return;
-      }
-      final rect = controller.rect.value;
-      final state = controller.player.state;
-      final id = controller.id.value;
-      final valid =
-          id != null &&
-          rect != null &&
-          rect.width > 1 &&
-          rect.height > 1 &&
-          state.width > 0 &&
-          state.height > 0;
-      if (valid) {
-        final signature =
-            '$id|${rect.left.toStringAsFixed(3)},'
-            '${rect.top.toStringAsFixed(3)},'
-            '${rect.width.toStringAsFixed(3)},'
-            '${rect.height.toStringAsFixed(3)}|'
-            '${state.width}x${state.height}';
-        if (signature == previous) {
-          stableSamples++;
-        } else {
-          previous = signature;
-          stableSamples = 1;
-        }
-        // Give the post-play surface resize at least one display interval to
-        // arrive before accepting the first repeated sample.
-        if (started.elapsed >= const Duration(milliseconds: 120) &&
-            stableSamples >= 3) {
-          if (PlaybackDiagnostics.enabled) {
-            PlaybackDiagnostics.event('output.stable', {
-              ...playbackTraceState(),
-              'sourceRevision': sourceRevision,
-              'samples': stableSamples,
-              'elapsedMs': started.elapsedMilliseconds,
-              'signature': signature,
-            });
-          }
-          return;
-        }
-      } else {
-        previous = null;
-        stableSamples = 0;
-      }
-      await Future<void>.delayed(const Duration(milliseconds: 16));
-    }
-    if (PlaybackDiagnostics.enabled) {
-      PlaybackDiagnostics.event('output.stable.timeout', {
-        ...playbackTraceState(),
-        'sourceRevision': sourceRevision,
-        'elapsedMs': started.elapsedMilliseconds,
-        'lastSignature': previous,
-      });
-    }
   }
 
   Future<void> _presentPendingFrameIfNeeded() async {
@@ -1333,23 +993,15 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     if (callback == null) return;
     final revision = _pendingFrameReadyRevision;
     _pendingFrameReady = null;
-    if (PlaybackDiagnostics.enabled) {
-      PlaybackDiagnostics.event('output.stable.wait', {
-        ...playbackTraceState(),
-        'sourceRevision': revision,
-      });
-    }
-    await _waitForStableVideoOutput(sourceRevision: revision);
-    if (revision != _sourceRevision) return;
-    await callback();
+    if (!onlyPlayAudio.value) await waitForStableVideoOutput();
+    if (revision == _sourceRevision) await callback();
   }
 
-  /// Public counterpart used when a source is already loaded but its Flutter
-  /// presentation is still covered (for example, after returning to a video
-  /// route).  It intentionally does not reveal anything by itself; the owner
-  /// changes its frame-ready flag only after this future completes.
-  Future<void> waitForStableVideoOutput() =>
-      _waitForStableVideoOutput(sourceRevision: _sourceRevision);
+  Future<void> waitForStableVideoOutput() async {
+    await _videoPlayerController?.firstFrame.timeout(
+      const Duration(seconds: 15),
+    );
+  }
 
   Future<void>? refreshPlayer() {
     if (dataSource is FileSource || processing) {
@@ -1421,11 +1073,10 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   }
 
   /// 播放事件监听
-  void _startListeners(NativePlayer player) {
+  void _startListeners(Media3Player player) {
     assert(_subscriptions == null);
     final stream = player.stream;
     _subscriptions = [
-      if (StartupProbe.verbose) stream.log.listen(StartupProbe.onLog),
       if (PlaybackDiagnostics.enabled) ...[
         stream.videoParams.listen(
           (event) => PlaybackDiagnostics.event('media.videoParams', {
@@ -1544,62 +1195,14 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           }
         })),
       stream.error.listen((String event) {
-        final failedRevision = _sourceRevision;
-        if (dataSource is FileSource &&
-            event.startsWith("Failed to open file")) {
-          return;
-        }
-        if (isLive) {
-          if (event.startsWith('tcp: ffurl_read returned ') ||
-              event.startsWith("Failed to open https://") ||
-              event.startsWith("Can not open external file https://")) {
-            Future.delayed(const Duration(milliseconds: 3000), () {
-              if (failedRevision == _sourceRevision) refreshPlayer();
-            });
-          }
-          return;
-        }
-        if (event.startsWith("Failed to open https://") ||
-            event.startsWith("Can not open external file https://") ||
-            //tcp: ffurl_read returned 0xdfb9b0bb
-            //tcp: ffurl_read returned 0xffffff99
-            event.startsWith('tcp: ffurl_read returned ')) {
-          EasyThrottle.throttle(
-            'controllerStream.error.listen',
-            const Duration(milliseconds: 10000),
-            () {
-              Future.delayed(const Duration(milliseconds: 3000), () {
-                if (failedRevision != _sourceRevision) return;
-                // if (kDebugMode) {
-                //   debugPrint("isBuffering.value: ${isBuffering.value}");
-                // }
-                // if (kDebugMode) {
-                //   debugPrint("_buffered.value: ${_buffered.value}");
-                // }
-                if (isBuffering.value && buffered.value == 0) {
-                  SmartDialog.showToast(
-                    '视频链接打开失败，重试中',
-                    displayTime: const Duration(milliseconds: 500),
-                  );
-                  refreshPlayer();
-                }
-              });
-            },
-          );
-        } else if (event.startsWith('Could not open codec')) {
-          SmartDialog.showToast('无法加载解码器, $event，可能会切换至软解');
-        } else if (!onlyPlayAudio.value) {
-          if (event.startsWith("error running") ||
-              event.startsWith("Failed to open .") ||
-              event.startsWith("Cannot open") ||
-              event.startsWith("Can not open")) {
-            return;
-          }
-          if (!kDebugMode) {
-            Utils.reportError('$event\n${player.state.playlist}');
-          }
-          // SmartDialog.showToast('视频加载错误, $event');
-        }
+        isBuffering.value = false;
+        dataStatus.value = DataStatus.error;
+        PlaybackDiagnostics.event('media3.error', {
+          'sourceRevision': _sourceRevision,
+          'code': event.split(':').first,
+        });
+        SmartDialog.showToast('视频播放失败，点击重试');
+        if (kDebugMode) debugPrint('Media3: $event');
       }),
     ];
   }
@@ -1613,7 +1216,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           controller.rect.removeListener(_traceRectChanged!);
         }
         if (_traceIdChanged != null) {
-          controller.id.removeListener(_traceIdChanged!);
+          controller.textureId.removeListener(_traceIdChanged!);
         }
       }
       _traceVideoController = null;
@@ -1634,7 +1237,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   Future<void> seek(Duration position, {bool isSeek = false}) async {
     if (isSeek) {
       /// 拖动进度条调节时，不等待第一帧，防止抖动
-      await _videoPlayerController?.stream.buffer.first;
+      // Native seeking reports its own buffering state without awaiting a new buffer event.
     }
     danmakuController?.clear();
     try {
@@ -1656,7 +1259,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     _heartDuration = position.inSeconds;
 
     if (duration.value != 0) {
-      seek(position, isSeek: isSeek);
+      await seek(position, isSeek: isSeek);
     } else {
       // if (kDebugMode) debugPrint('seek duration else');
       _subForSeek?.cancel();
@@ -1690,6 +1293,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
   /// 播放视频
   Future<void> play({bool repeat = false, bool hideControls = true}) async {
+    final revision = _sourceRevision;
     if (PlaybackDiagnostics.enabled) {
       PlaybackDiagnostics.event('command.play', playbackTraceState());
     }
@@ -1700,16 +1304,14 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     if (repeat) {
       await seekTo(Duration.zero, isSeek: false);
     }
-
+    if (revision != _sourceRevision) return;
+    await audioSessionHandler?.setActive(true);
+    if (revision != _sourceRevision) return;
     await _videoPlayerController?.play();
 
-    // Do not reveal the Flutter presentation until the post-play surface
-    // handoff has converged.  This is a no-op for ordinary play commands
-    // without a pending source callback.
+    // Reveal the prepared frame immediately after requesting playback.
     await _presentPendingFrameIfNeeded();
-
-    audioSessionHandler?.setActive(true);
-
+    if (revision != _sourceRevision) return;
     playerStatus = .playing;
   }
 
@@ -2168,7 +1770,6 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
     _videoPlayerController?.dispose();
     _videoPlayerController = null;
-    _videoController = null;
     _instance = null;
     videoPlayerServiceHandler?.clear();
   }

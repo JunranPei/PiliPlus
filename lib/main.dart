@@ -43,7 +43,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:media_kit/media_kit.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:screen_brightness_platform_interface/screen_brightness_platform_interface.dart';
@@ -93,7 +92,6 @@ Future<void> _initAppPath() async {
 
 void main() async {
   ScaledWidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
   await _initAppPath();
   try {
     await GStorage.init();
@@ -201,8 +199,7 @@ void main() async {
         format: DateFormatUtils.longFormatDs,
       ),
       'Commit Hash': BuildConfig.commitHash,
-      'MPV Api Version':
-          '${NativePlayer.apiVersion >> 16}.${NativePlayer.apiVersion & 0xFFFF}',
+      'Playback Backend': 'Native Media3',
     };
     final fileHandler = await JsonFileHandler.init();
 

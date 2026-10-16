@@ -1374,7 +1374,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       () {
         final canAttach =
             videoDetailController.videoState.value &&
-            plPlayerController?.videoController != null;
+            plPlayerController?.videoPlayerController != null;
         final player = canAttach
             ? PLVideoPlayer(
                 maxWidth: width,

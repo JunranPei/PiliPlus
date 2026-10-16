@@ -73,22 +73,12 @@ import 'package:dio/dio.dart' show Options;
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     show ExtendedNestedScrollViewState;
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:media_kit/media_kit.dart' hide Subtitle;
-
-const _media3NativePlayer = bool.fromEnvironment(
-  'MEDIA3_NATIVE_PLAYER',
-  // Keep the established PlPlayerController path as the production default.
-  // The native Media3 surface still exists behind an explicit opt-in flag
-  // until its controls, danmaku, progress and playback state are bridged.
-  defaultValue: false,
-);
-const _media3Channel = MethodChannel('com.personal.piliplus/media3');
 
 class VideoDetailController extends GetxController
     with GetTickerProviderStateMixin, BlockMixin {
@@ -195,9 +185,7 @@ class VideoDetailController extends GetxController
     }
     if (!sameSource) frameReady.value = false;
     _autoPlay.value = true;
-    if (!(_media3NativePlayer && !isFileSource) &&
-        waitForPlaybackRoute != null &&
-        !await waitForPlaybackRoute!()) {
+    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) {
       return;
     }
     if (!playbackRouteActive || isClosed || revision != _playbackRevision) {
@@ -517,7 +505,6 @@ class VideoDetailController extends GetxController
     } else {
       // Start resolving the playback URL as soon as bvid/cid are available;
       // the view's post-frame initialization will reuse this in-flight query.
-      _preloadMedia3Api();
       unawaited(queryVideoUrl());
     }
 
@@ -525,18 +512,6 @@ class VideoDetailController extends GetxController
       length: 2,
       vsync: this,
       initialIndex: Pref.defaultShowComment ? 1 : 0,
-    );
-  }
-
-  void _preloadMedia3Api() {
-    if (!_media3NativePlayer || isFileSource || isPlayAll) return;
-    unawaited(
-      _media3Channel
-          .invokeMethod<void>('preloadApi', {
-            'bvid': bvid,
-            'cid': cid.value,
-          })
-          .catchError((_) {}),
     );
   }
 
@@ -677,7 +652,7 @@ class VideoDetailController extends GetxController
   @override
   BlockConfigMixin get blockConfig => plPlayerController;
   @override
-  Player? get player => plPlayerController.videoPlayerController;
+  PlatformPlayer? get player => plPlayerController.videoPlayerController;
   @override
   bool get isFullScreen => plPlayerController.isFullScreen.value;
   @override
@@ -843,49 +818,7 @@ class VideoDetailController extends GetxController
       audioUrl = VideoUtils.getCdnUrl(firstAudio.playUrls, isAudio: true);
     }
 
-    _preloadMedia3();
     playerInit();
-  }
-
-  Map<String, dynamic>? _media3Arguments() {
-    if (!_media3NativePlayer || isFileSource || videoUrl?.isEmpty != false) {
-      return null;
-    }
-    final media3Video = firstVideo;
-    AudioItem? selectedAudio;
-    final audioItems = data.dash?.audio;
-    if (audioItems != null && audioItems.isNotEmpty && currentAudioQa != null) {
-      selectedAudio = audioItems.firstWhereOrNull(
-        (item) => item.id == currentAudioQa!.code,
-      );
-    }
-    return {
-      'bvid': bvid,
-      'cid': cid.value,
-      'videoUrl': VideoUtils.getCdnUrl(media3Video.playUrls),
-      'audioUrl': audioUrl,
-      'videoSegmentBase': media3Video.segmentBase == null
-          ? null
-          : jsonEncode(media3Video.segmentBase),
-      'audioSegmentBase': selectedAudio?.segmentBase == null
-          ? null
-          : jsonEncode(selectedAudio!.segmentBase),
-      'videoCodecs': media3Video.codecs,
-      'videoWidth': media3Video.width,
-      'videoHeight': media3Video.height,
-      'audioCodecs': selectedAudio?.codecs,
-      'durationMs': data.timeLength,
-    };
-  }
-
-  void _preloadMedia3() {
-    final arguments = _media3Arguments();
-    if (arguments == null) return;
-    unawaited(
-      _media3Channel
-          .invokeMethod<void>('preload', arguments)
-          .catchError((_) {}),
-    );
   }
 
   Future<void>? initPlayerIfNeeded(bool autoFullScreenFlag) {
@@ -918,9 +851,7 @@ class VideoDetailController extends GetxController
         revision == _playbackRevision &&
         cid.value == requestedCid;
     if (!isCurrent()) return;
-    if (!(_media3NativePlayer && !isFileSource) &&
-        waitForPlaybackRoute != null &&
-        !await waitForPlaybackRoute!()) {
+    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) {
       return;
     }
     if (!isCurrent()) return;
@@ -934,28 +865,6 @@ class VideoDetailController extends GetxController
       );
     }
     frameReady.value = false;
-
-    // Media3 is attached as a native overlay and does not need the mpv
-    // source queue, first-segment skip calculation, or Flutter output settle
-    // before the native launch. Keep the old preparation path below as the
-    // fallback if this invocation fails.
-    if (_media3NativePlayer && !isFileSource) {
-      try {
-        final arguments = _media3Arguments();
-        if (arguments == null) {
-          throw StateError('Media3 source is unavailable');
-        }
-        await _media3Channel.invokeMethod<void>('launch', arguments);
-        preparingPlayback.value = false;
-        videoState.value = false;
-        return;
-      } catch (error, stackTrace) {
-        if (kDebugMode) {
-          debugPrint('Media3 launch failed, falling back to mpv: $error');
-          debugPrintStack(stackTrace: stackTrace);
-        }
-      }
-    }
 
     Duration? seek = defaultST ?? playedTime;
     if (seek == null || seek == Duration.zero) {
@@ -973,6 +882,43 @@ class VideoDetailController extends GetxController
             : NetworkSource(
                 videoSource: videoUrl!,
                 audioSource: audioUrl,
+                nativeMetadata: data.dash == null
+                    ? {
+                        'segments': data.durl
+                            ?.map((part) => VideoUtils.getCdnUrl(part.playUrls))
+                            .toList(),
+                      }
+                    : {
+                        'bvid': bvid,
+                        'cid': requestedCid,
+                        'videoSegmentBase': firstVideo.segmentBase == null
+                            ? null
+                            : jsonEncode(firstVideo.segmentBase),
+                        'audioSegmentBase':
+                            data.dash?.audio
+                                    ?.firstWhereOrNull(
+                                      (item) => item.id == currentAudioQa?.code,
+                                    )
+                                    ?.segmentBase ==
+                                null
+                            ? null
+                            : jsonEncode(
+                                data.dash!.audio!
+                                    .firstWhere(
+                                      (item) => item.id == currentAudioQa!.code,
+                                    )
+                                    .segmentBase,
+                              ),
+                        'videoCodecs': firstVideo.codecs,
+                        'audioCodecs': data.dash?.audio
+                            ?.firstWhereOrNull(
+                              (item) => item.id == currentAudioQa?.code,
+                            )
+                            ?.codecs,
+                        'videoWidth': firstVideo.width,
+                        'videoHeight': firstVideo.height,
+                        'durationMs': data.timeLength,
+                      },
               ),
         seekTo: seek,
         duration: data.timeLength == null
@@ -982,9 +928,7 @@ class VideoDetailController extends GetxController
         aid: aid,
         bvid: bvid,
         cid: cid.value,
-        // Let the player start underneath the cover for autoplay. The
-        // controller reveals the frame only after the post-play surface handoff
-        // settles, while paused/preloaded sources keep the old-frame gate.
+        // Keep the original cover until Media3 renders this source's first frame.
         autoplay: startWhenReady,
         epid: isUgc ? null : epId,
         seasonId: isUgc ? null : seasonId,
@@ -1223,18 +1167,7 @@ class VideoDetailController extends GetxController
       }
       if (data.dash == null) {
         if (data.durl case final durl?) {
-          // it will cause all files to be opened simultaneously
-          if (durl.length > 1) {
-            // TODO: refa
-            final sb = StringBuffer('edl://!no_chapters;');
-            for (var i in durl) {
-              final video = VideoUtils.getCdnUrl(i.playUrls);
-              sb.write('%${video.length}%$video,length=${i.length! / 1000};');
-            }
-            videoUrl = sb.toString();
-          } else {
-            videoUrl = VideoUtils.getCdnUrl(durl.single.playUrls);
-          }
+          videoUrl = VideoUtils.getCdnUrl(durl.first.playUrls);
 
           audioUrl = '';
 
@@ -1249,7 +1182,6 @@ class VideoDetailController extends GetxController
           _setVideoHeight();
           currentDecodeFormats = VideoDecodeFormatType.AVC;
           currentVideoQa.value = videoQuality;
-          _preloadMedia3();
           await initPlayerIfNeeded(autoFullScreenFlag);
           return;
         } else {
@@ -1318,7 +1250,6 @@ class VideoDetailController extends GetxController
       } else {
         audioUrl = '';
       }
-      _preloadMedia3();
       await initPlayerIfNeeded(autoFullScreenFlag);
     } else {
       _autoPlay.value = false;
