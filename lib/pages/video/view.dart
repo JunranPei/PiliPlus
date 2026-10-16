@@ -1817,6 +1817,33 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
     bool needRelated = true,
     bool needCtr = true,
   }) {
+    Widget buildIntro() => _videoIntro(
+      width: width,
+      height: height,
+      isHorizontal: isHorizontal,
+      needRelated: needRelated,
+      needCtr: needCtr,
+    );
+    // Profile comparison only: isolate the cost of constructing the details
+    // and resolving cached images while the decoder and first frame start.
+    // The release UI and source/play intent are unchanged.
+    if (!Media3Player.deferDetailsBuild) return buildIntro();
+    return Obx(() {
+      if (!videoDetailController.autoPlay ||
+          videoDetailController.frameReady.value) {
+        return buildIntro();
+      }
+      return const SizedBox.expand();
+    });
+  }
+
+  Widget _videoIntro({
+    double? width,
+    double? height,
+    bool? isHorizontal,
+    bool needRelated = true,
+    bool needCtr = true,
+  }) {
     if (videoDetailController.isFileSource) {
       return localIntroPanel(needCtr: needCtr);
     }

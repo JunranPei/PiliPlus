@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('label')
 parser.add_argument('--index', type=int, default=6)
 parser.add_argument('--seconds', type=int, default=16)
-parser.add_argument('--compare', choices=['batch', 'source', 'codec', 'overlay'], default='batch')
+parser.add_argument('--compare', choices=['batch', 'source', 'codec', 'overlay', 'details'], default='batch')
 parser.add_argument('--uncached', action='store_true')
 parser.add_argument('--host-recording', action='store_true')
 args = parser.parse_args()
@@ -50,6 +50,7 @@ while time.monotonic() < deadline:
 else:
     raise RuntimeError('Setup did not reach the first frame and VM service')
 
+(out / 'setup-playback.log').write_text(log, encoding='utf-8')
 parts = urllib.parse.urlsplit(service[1])
 port = int(adb('forward', 'tcp:0', 'tcp:' + str(parts.port)).strip())
 base = urllib.parse.urlunsplit(('http', f'127.0.0.1:{port}', parts.path, '', ''))
@@ -78,6 +79,8 @@ try:
             mode = 'avc1' if candidate else 'hvc1'
         elif args.compare == 'overlay':
             mode = 'covered-overlay-skipped' if candidate else 'covered-overlay-painted'
+        elif args.compare == 'details':
+            mode = 'details-after-frame' if candidate else 'details-before-frame'
         else:
             mode = 'batched' if candidate else 'baseline'
         batch = candidate if args.compare == 'batch' else True
@@ -88,11 +91,13 @@ try:
             'cache': str(not args.uncached).lower(),
             'codec': codec,
             'deferDanmakuPaint': str(args.compare == 'overlay' and candidate).lower(),
+            'deferDetailsBuild': str(args.compare == 'details' and candidate).lower(),
         })
         if (selected.get('batch') != batch or selected.get('backend') != 'Media3'
                 or selected.get('source') != source or selected.get('cache') != (not args.uncached)
                 or selected.get('codec') != codec
-                or selected.get('deferDanmakuPaint') != (args.compare == 'overlay' and candidate)):
+                or selected.get('deferDanmakuPaint') != (args.compare == 'overlay' and candidate)
+                or selected.get('deferDetailsBuild') != (args.compare == 'details' and candidate)):
             raise RuntimeError('The requested Media3 startup mode was not selected')
         label = f'{args.label}-{number}-{mode}'
         command = [sys.executable, str(ROOT / 'tool/media3_startup_recording.py'),
@@ -134,5 +139,5 @@ try:
             'requestToNativeFirstFrameMs', 'requestToUiRevealMs', 'postStartPauseIntent', 'lastPositionMs']}), flush=True)
 finally:
     rpc('ext.piliplus.media3StartupMode', {
-        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default', 'deferDanmakuPaint': 'false',
+        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default', 'deferDanmakuPaint': 'false', 'deferDetailsBuild': 'false',
     })

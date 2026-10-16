@@ -26,7 +26,9 @@ class Media3Player extends PlatformPlayer {
   static bool _startupCache = true;
   static String? _startupCodec;
   static bool _deferDanmakuPaint = false;
+  static bool _deferDetailsBuild = false;
   static bool get deferDanmakuPaint => kProfileMode && _deferDanmakuPaint;
+  static bool get deferDetailsBuild => kProfileMode && _deferDetailsBuild;
   static String? get startupCodec => kProfileMode ? _startupCodec : null;
   // Group startup options by default. Profile builds can compare the pinned
   // reference sequence without reinstalling the app or replacing the backend.
@@ -83,6 +85,9 @@ class Media3Player extends PlatformPlayer {
           if (parameters['deferDanmakuPaint'] case final value?) {
             _deferDanmakuPaint = value == 'true';
           }
+          if (parameters['deferDetailsBuild'] case final value?) {
+            _deferDetailsBuild = value == 'true';
+          }
           return developer.ServiceExtensionResponse.result(
             jsonEncode({
               'batch': batchStartupOptions,
@@ -91,6 +96,7 @@ class Media3Player extends PlatformPlayer {
               'cache': _startupCache,
               'codec': startupCodec ?? 'default',
               'deferDanmakuPaint': deferDanmakuPaint,
+              'deferDetailsBuild': deferDetailsBuild,
             }),
           );
         });
