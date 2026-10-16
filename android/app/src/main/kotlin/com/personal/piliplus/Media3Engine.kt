@@ -58,6 +58,8 @@ internal class Media3Engine(
         var sourceListener: Player.Listener? = null
         var startupTrace: Media3StartupTrace? = null
         @Volatile var firstOutput = false
+        private var firstPresentationUs = Long.MIN_VALUE
+        @Volatile private var advancedOutput = false
         var firstFrame = false
         var released = false
         var lastLogSecond = -1L
@@ -77,6 +79,7 @@ internal class Media3Engine(
             player.setForegroundMode(true)
             player.setVideoFrameMetadataListener { presentationUs, releaseNs, _, _ ->
                 if (!firstOutput) {
+                    firstPresentationUs = presentationUs
                     firstOutput = true
                     startupTrace?.mark("video.firstOutput", "presentationUs=$presentationUs releaseDelayMs=${(releaseNs - System.nanoTime()) / 1_000_000}")
                     val trace = startupTrace
@@ -84,6 +87,10 @@ internal class Media3Engine(
                     handler.post {
                         trace?.mark("main.afterVideoOutput", "queueDelayMs=${SystemClock.elapsedRealtime() - queuedAt}")
                     }
+                }
+                if (!advancedOutput && presentationUs > firstPresentationUs) {
+                    advancedOutput = true
+                    startupTrace?.mark("video.firstAdvance", "presentationUs=$presentationUs releaseDelayMs=${(releaseNs - System.nanoTime()) / 1_000_000}")
                 }
             }
             handler.post(tick)
@@ -145,6 +152,8 @@ internal class Media3Engine(
                 it.mark("open")
             }
             firstFrame = false
+            firstPresentationUs = Long.MIN_VALUE
+            advancedOutput = false
             firstOutput = false
             call.argument<Number>("volume")?.let { player.volume = it.toFloat().coerceIn(0f, 1f) }
             call.argument<Number>("speed")?.let { player.setPlaybackSpeed(it.toFloat()) }

@@ -111,6 +111,7 @@ intents = re.findall(r'intent id=\d+ source=\d+ playWhenReady=(true|false)', log
 first = re.search(r'firstFrame id=\d+ source=\d+ elapsedMs=(\d+)', log)
 request_line = next((line for line in log.splitlines() if 'open-request ' + args.label in line), None)
 frame_line = next((line for line in log.splitlines() if 'firstFrame id=' in line), None)
+advance_line = next((line for line in log.splitlines() if 'phase=video.firstAdvance ' in line), None)
 request_to_frame = (round((float(frame_line.split()[0]) - float(request_line.split()[0])) * 1000)
                     if request_line and frame_line else None)
 tap_line = next((line for line in log.splitlines() if 'Media3Input' in line and 'action=0 ' in line), None)
@@ -127,6 +128,7 @@ result = {
     'recordedSeconds': args.seconds, 'observationSeconds': round(time.monotonic() - begin, 2),
     'nativeFirstFrameMs': int(first[1]) if first else None,
     'requestToNativeFirstFrameMs': request_to_frame,
+    'requestToNativeFirstAdvanceMs': round((float(advance_line.split()[0]) - float(request_line.split()[0])) * 1000) if advance_line and request_line else None,
     'tapDownEpochMs': tap_epoch_ms,
     'tapToNativeFirstFrameMs': round(float(frame_line.split()[0]) * 1000 - tap_epoch_ms) if frame_line and tap_epoch_ms is not None else None,
     'pidBeforeRequest': pid_before,

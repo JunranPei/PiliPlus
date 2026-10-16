@@ -22,6 +22,7 @@ internal class Media3StartupTrace(
     private data class Transfer(val begin: Long, var bytes: Long = 0)
     private val transfers = IdentityHashMap<DataSource, Transfer>()
     @Volatile private var untilMs = beginMs + 15_000
+    private var underruns = 0
 
     fun mark(name: String, detail: String = "", timestampMs: Long = SystemClock.elapsedRealtime()) {
         if (timestampMs > untilMs) return
@@ -59,6 +60,18 @@ internal class Media3StartupTrace(
 
     override fun onAudioTrackInitialized(eventTime: AnalyticsListener.EventTime, config: AudioSink.AudioTrackConfig) {
         mark("audio.track", timestampMs = eventTime.realtimeMs)
+    }
+
+    override fun onAudioPositionAdvancing(eventTime: AnalyticsListener.EventTime, playoutStartSystemTimeMs: Long) {
+        val delay = System.currentTimeMillis() - playoutStartSystemTimeMs
+        mark("audio.advancing", "callbackDelayMs=$delay",
+            SystemClock.elapsedRealtime() - delay.coerceAtLeast(0))
+    }
+
+    override fun onAudioUnderrun(eventTime: AnalyticsListener.EventTime, bufferSize: Int, bufferSizeMs: Long, elapsedSinceLastFeedMs: Long) {
+        if (++underruns <= 10) {
+            Log.w("Media3Playback", "audioUnderrun id=$playerId source=$sourceId count=$underruns bufferMs=$bufferSizeMs sinceFeedMs=$elapsedSinceLastFeedMs")
+        }
     }
 
     override fun onPlaybackStateChanged(eventTime: AnalyticsListener.EventTime, state: Int) {
