@@ -25,7 +25,6 @@ class Media3Player extends PlatformPlayer {
   static bool _progressiveStartup = false;
   static bool _startupCache = true;
   static String? _startupCodec;
-  static int _audioStartMs = 0;
   static String? get startupCodec => kProfileMode ? _startupCodec : null;
   // Group startup options by default. Profile builds can compare the pinned
   // reference sequence without reinstalling the app or replacing the backend.
@@ -79,18 +78,6 @@ class Media3Player extends PlatformPlayer {
             }
             _startupCodec = value == 'default' ? null : value;
           }
-          if (parameters['audioStartMs'] case final value?) {
-            final milliseconds = int.tryParse(value);
-            if (milliseconds == null ||
-                milliseconds < 0 ||
-                milliseconds > 100) {
-              return developer.ServiceExtensionResponse.error(
-                developer.ServiceExtensionResponse.invalidParams,
-                'audioStartMs must be between 0 and 100',
-              );
-            }
-            _audioStartMs = milliseconds;
-          }
           return developer.ServiceExtensionResponse.result(
             jsonEncode({
               'batch': batchStartupOptions,
@@ -98,7 +85,6 @@ class Media3Player extends PlatformPlayer {
               'source': _progressiveStartup ? 'progressive' : 'dash',
               'cache': _startupCache,
               'codec': startupCodec ?? 'default',
-              'audioStartMs': _audioStartMs,
             }),
           );
         });
@@ -184,7 +170,6 @@ class Media3Player extends PlatformPlayer {
       if (source is NetworkSource) ...?source.nativeMetadata,
       if (kProfileMode) 'preferProgressive': _progressiveStartup,
       if (kProfileMode) 'bypassCache': !_startupCache,
-      if (kProfileMode) 'audioStartMs': _audioStartMs,
       'videoUrl': source.videoSource,
       'audioUrl': source.audioSource,
       'positionMs': seekTo?.inMilliseconds ?? 0,

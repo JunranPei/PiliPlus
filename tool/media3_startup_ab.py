@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('label')
 parser.add_argument('--index', type=int, default=6)
 parser.add_argument('--seconds', type=int, default=16)
-parser.add_argument('--compare', choices=['batch', 'source', 'codec', 'audio'], default='batch')
+parser.add_argument('--compare', choices=['batch', 'source', 'codec'], default='batch')
 parser.add_argument('--uncached', action='store_true')
 parser.add_argument('--host-recording', action='store_true')
 args = parser.parse_args()
@@ -76,23 +76,19 @@ try:
             mode = 'progressive' if candidate else 'dash'
         elif args.compare == 'codec':
             mode = 'avc1' if candidate else 'hvc1'
-        elif args.compare == 'audio':
-            mode = 'audio-start-50ms' if candidate else 'audio-default'
         else:
             mode = 'batched' if candidate else 'baseline'
         batch = candidate if args.compare == 'batch' else True
         source = mode if args.compare == 'source' else 'dash'
         codec = mode if args.compare == 'codec' else 'default'
-        audio_start = 50 if args.compare == 'audio' and candidate else 0
         selected = rpc('ext.piliplus.media3StartupMode', {
             'isolateId': isolate, 'batch': str(batch).lower(), 'source': source,
             'cache': str(not args.uncached).lower(),
             'codec': codec,
-            'audioStartMs': str(audio_start),
         })
         if (selected.get('batch') != batch or selected.get('backend') != 'Media3'
                 or selected.get('source') != source or selected.get('cache') != (not args.uncached)
-                or selected.get('codec') != codec or selected.get('audioStartMs') != audio_start):
+                or selected.get('codec') != codec):
             raise RuntimeError('The requested Media3 startup mode was not selected')
         label = f'{args.label}-{number}-{mode}'
         command = [sys.executable, str(ROOT / 'tool/media3_startup_recording.py'),
@@ -126,22 +122,13 @@ try:
             'requestToUiRevealMs': round((phases['ui.reveal.end'] - request_us) / 1000),
             'recordingFolder': str(folder.relative_to(ROOT)),
         })
-        buffer_line = next((line for line in lines if 'phase=audio.buffer ' in line), '')
-        result['audioBuffer'] = {key: int(value) for key, value in re.findall(r'(rate|capacityFrames|defaultThresholdFrames|thresholdFrames|requestedMs)=(\d+)', buffer_line)}
-        if args.compare == 'audio':
-            buffer = result['audioBuffer']
-            if not buffer or buffer['requestedMs'] != audio_start:
-                raise RuntimeError('The requested AudioTrack threshold was not observed')
-            if results and buffer['capacityFrames'] != results[0]['audioBuffer']['capacityFrames']:
-                raise RuntimeError('Audio buffer capacity changed; the comparison is not isolated')
         if args.compare == 'codec' and results and result['actualResolution'] != results[0]['actualResolution']:
             raise RuntimeError('Codec comparison changed the actual resolution; results are not comparable')
         results.append(result)
         (out / 'results.json').write_text(json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8')
         print(json.dumps({key: result[key] for key in ['number', 'mode', 'primaryApiMs', 'postApiToUiRevealMs',
-            'requestToNativeFirstFrameMs', 'requestToNativeFirstAdvanceMs', 'requestToUiRevealMs',
-            'audioUnderrunCountLowerBound', 'postStartPauseIntent', 'lastPositionMs']}), flush=True)
+            'requestToNativeFirstFrameMs', 'requestToUiRevealMs', 'postStartPauseIntent', 'lastPositionMs']}), flush=True)
 finally:
     rpc('ext.piliplus.media3StartupMode', {
-        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default', 'audioStartMs': '0',
+        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default',
     })

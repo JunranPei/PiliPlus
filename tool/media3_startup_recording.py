@@ -135,6 +135,7 @@ result = {
     'pidAfterRequest': pid(),
     'playIntents': intents, 'lastPositionMs': int(states[-1][0]) if states else None,
     'postStartPauseIntent': 'false' in intents[intents.index('true') + 1:] if 'true' in intents else None,
+    'audioUnderrunCountLowerBound': len(re.findall(r'audioUnderrun id=', log)),
     'boundary': 'Emulator recording; native first-frame timing starts at source open, not UI tap. Review video for visible motion and pauses.'
 }
 (out / 'result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
