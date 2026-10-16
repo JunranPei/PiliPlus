@@ -5,6 +5,10 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams
+import android.view.ViewGroup
+import androidx.media3.common.PlaybackException
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import com.ryanheise.audioservice.AudioServiceActivity
 import io.flutter.plugin.common.MethodChannel
 
@@ -12,6 +16,8 @@ class MainActivity : AudioServiceActivity() {
     private var pipCoordinator: PipCoordinator? = null
     private var playbackDiagnostics: PlaybackDiagnostics? = null
     private var media3Channel: MethodChannel? = null
+    private var media3Overlay: PlayerView? = null
+    private var media3OverlayPlayer: ExoPlayer? = null
 
 
     override fun configureFlutterEngine(flutterEngine: io.flutter.embedding.engine.FlutterEngine) {
@@ -20,41 +26,96 @@ class MainActivity : AudioServiceActivity() {
         playbackDiagnostics = PlaybackDiagnostics(this, flutterEngine.dartExecutor.binaryMessenger, flutterEngine)
         media3Channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, MEDIA3_CHANNEL).also { channel ->
             channel.setMethodCallHandler { call, result ->
-                if (call.method != "launch") {
+                if (call.method != "launch" && call.method != "preload") {
                     result.notImplemented()
                     return@setMethodCallHandler
                 }
-                val bvid = call.argument<String>("bvid")
-                val cid = call.argument<Number>("cid")?.toLong()
-                val videoUrl = call.argument<String>("videoUrl")
-                val audioUrl = call.argument<String>("audioUrl")
-                val videoSegmentBase = call.argument<String>("videoSegmentBase")
-                val audioSegmentBase = call.argument<String>("audioSegmentBase")
-                val videoCodecs = call.argument<String>("videoCodecs")
-                val videoWidth = call.argument<Number>("videoWidth")?.toInt()
-                val videoHeight = call.argument<Number>("videoHeight")?.toInt()
-                val audioCodecs = call.argument<String>("audioCodecs")
-                val durationMs = call.argument<Number>("durationMs")?.toLong()
-                if (bvid.isNullOrBlank() || cid == null || cid <= 0L) {
+                val args = readMedia3Args(call)
+                if (args == null) {
                     result.error("INVALID_ARGUMENT", "bvid and cid are required", null)
                     return@setMethodCallHandler
                 }
-                startActivity(Intent(this, Media3ProbeActivity::class.java).apply {
-                    putExtra("bvid", bvid)
-                    putExtra("cid", cid)
-                    putExtra("video_url", videoUrl)
-                    putExtra("audio_url", audioUrl)
-                    putExtra("video_segment_base", videoSegmentBase)
-                    putExtra("audio_segment_base", audioSegmentBase)
-                    putExtra("video_codecs", videoCodecs)
-                    putExtra("video_width", videoWidth ?: 0)
-                    putExtra("video_height", videoHeight ?: 0)
-                    putExtra("audio_codecs", audioCodecs)
-                    putExtra("duration_ms", durationMs ?: 0L)
-                })
+                if (call.method == "preload") {
+                    Media3PlayerManager.preload(this, args)
+                } else {
+                    val reused = args.videoUrl?.let { Media3PlayerManager.take(it) }
+                    if (reused != null) {
+                        showMedia3Overlay(reused)
+                    } else {
+                        startActivity(Intent(this, Media3ProbeActivity::class.java).apply {
+                            putExtra("bvid", args.bvid)
+                            putExtra("cid", args.cid)
+                            putExtra("video_url", args.videoUrl)
+                            putExtra("audio_url", args.audioUrl)
+                            putExtra("video_segment_base", args.videoSegmentBase)
+                            putExtra("audio_segment_base", args.audioSegmentBase)
+                            putExtra("video_codecs", args.videoCodecs)
+                            putExtra("video_width", args.videoWidth)
+                            putExtra("video_height", args.videoHeight)
+                            putExtra("audio_codecs", args.audioCodecs)
+                            putExtra("duration_ms", args.durationMs)
+                        })
+                    }
+                }
                 result.success(null)
             }
         }
+    }
+
+    private fun showMedia3Overlay(player: ExoPlayer) {
+        closeMedia3Overlay()
+        val view = PlayerView(this).apply {
+            useController = true
+            this.player = player
+            setBackgroundColor(android.graphics.Color.BLACK)
+        }
+        player.addListener(object : androidx.media3.common.Player.Listener {
+            override fun onRenderedFirstFrame() {
+                android.util.Log.i("Media3Overlay", "firstFrame")
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                android.util.Log.e("Media3Overlay", "playbackError=${error.errorCodeName}")
+                closeMedia3Overlay()
+            }
+        })
+        addContentView(view, ViewGroup.LayoutParams(-1, -1))
+        media3Overlay = view
+        media3OverlayPlayer = player
+        player.playWhenReady = true
+    }
+
+    private fun closeMedia3Overlay() {
+        media3Overlay?.let { (it.parent as? ViewGroup)?.removeView(it) }
+        media3Overlay = null
+        media3OverlayPlayer?.release()
+        media3OverlayPlayer = null
+    }
+
+    override fun onBackPressed() {
+        if (media3Overlay != null) {
+            closeMedia3Overlay()
+            return
+        }
+        super.onBackPressed()
+    }
+
+    private fun readMedia3Args(call: io.flutter.plugin.common.MethodCall): Media3SourceArgs? {
+        val bvid = call.argument<String>("bvid") ?: return null
+        val cid = call.argument<Number>("cid")?.toLong()?.takeIf { it > 0L } ?: return null
+        return Media3SourceArgs(
+            bvid = bvid,
+            cid = cid,
+            videoUrl = call.argument<String>("videoUrl"),
+            audioUrl = call.argument<String>("audioUrl"),
+            videoSegmentBase = call.argument<String>("videoSegmentBase"),
+            audioSegmentBase = call.argument<String>("audioSegmentBase"),
+            videoCodecs = call.argument<String>("videoCodecs"),
+            videoWidth = call.argument<Number>("videoWidth")?.toInt() ?: 0,
+            videoHeight = call.argument<Number>("videoHeight")?.toInt() ?: 0,
+            audioCodecs = call.argument<String>("audioCodecs"),
+            durationMs = call.argument<Number>("durationMs")?.toLong() ?: 0L,
+        )
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -76,6 +137,8 @@ class MainActivity : AudioServiceActivity() {
     }
 
     override fun onDestroy() {
+        closeMedia3Overlay()
+        Media3PlayerManager.clear()
         playbackDiagnostics?.dispose()
         playbackDiagnostics = null
         media3Channel?.setMethodCallHandler(null)

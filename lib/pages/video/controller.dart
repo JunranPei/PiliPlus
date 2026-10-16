@@ -819,7 +819,49 @@ class VideoDetailController extends GetxController
       audioUrl = VideoUtils.getCdnUrl(firstAudio.playUrls, isAudio: true);
     }
 
+    _preloadMedia3();
     playerInit();
+  }
+
+  Map<String, dynamic>? _media3Arguments() {
+    if (!_media3NativePlayer || isFileSource || videoUrl?.isEmpty != false) {
+      return null;
+    }
+    final media3Video = firstVideo;
+    AudioItem? selectedAudio;
+    final audioItems = data.dash?.audio;
+    if (audioItems != null && audioItems.isNotEmpty && currentAudioQa != null) {
+      selectedAudio = audioItems.firstWhereOrNull(
+        (item) => item.id == currentAudioQa!.code,
+      );
+    }
+    return {
+      'bvid': bvid,
+      'cid': cid.value,
+      'videoUrl': VideoUtils.getCdnUrl(media3Video.playUrls),
+      'audioUrl': audioUrl,
+      'videoSegmentBase': media3Video.segmentBase == null
+          ? null
+          : jsonEncode(media3Video.segmentBase),
+      'audioSegmentBase': selectedAudio?.segmentBase == null
+          ? null
+          : jsonEncode(selectedAudio!.segmentBase),
+      'videoCodecs': media3Video.codecs,
+      'videoWidth': media3Video.width,
+      'videoHeight': media3Video.height,
+      'audioCodecs': selectedAudio?.codecs,
+      'durationMs': data.timeLength,
+    };
+  }
+
+  void _preloadMedia3() {
+    final arguments = _media3Arguments();
+    if (arguments == null) return;
+    unawaited(
+      _media3Channel
+          .invokeMethod<void>('preload', arguments)
+          .catchError((_) {}),
+    );
   }
 
   Future<void>? initPlayerIfNeeded(bool autoFullScreenFlag) {
@@ -871,32 +913,10 @@ class VideoDetailController extends GetxController
     try {
       if (_media3NativePlayer && !isFileSource) {
         try {
-          AudioItem? selectedAudio;
-          final audioItems = data.dash?.audio;
-          if (audioItems != null &&
-              audioItems.isNotEmpty &&
-              currentAudioQa != null) {
-            selectedAudio = audioItems.firstWhereOrNull(
-              (item) => item.id == currentAudioQa!.code,
-            );
-          }
-          await _media3Channel.invokeMethod<void>('launch', {
-            'bvid': bvid,
-            'cid': cid.value,
-            'videoUrl': videoUrl,
-            'audioUrl': audioUrl,
-            'videoSegmentBase': firstVideo.segmentBase == null
-                ? null
-                : jsonEncode(firstVideo.segmentBase),
-            'audioSegmentBase': selectedAudio?.segmentBase == null
-                ? null
-                : jsonEncode(selectedAudio!.segmentBase),
-            'videoCodecs': firstVideo.codecs,
-            'videoWidth': firstVideo.width,
-            'videoHeight': firstVideo.height,
-            'audioCodecs': selectedAudio?.codecs,
-            'durationMs': data.timeLength,
-          });
+          final arguments = _media3Arguments();
+          if (arguments == null)
+            throw StateError('Media3 source is unavailable');
+          await _media3Channel.invokeMethod<void>('launch', arguments);
           preparingPlayback.value = false;
           videoState.value = false;
           return;
@@ -1194,6 +1214,7 @@ class VideoDetailController extends GetxController
           _setVideoHeight();
           currentDecodeFormats = VideoDecodeFormatType.AVC;
           currentVideoQa.value = videoQuality;
+          _preloadMedia3();
           await initPlayerIfNeeded(autoFullScreenFlag);
           return;
         } else {
@@ -1262,6 +1283,7 @@ class VideoDetailController extends GetxController
       } else {
         audioUrl = '';
       }
+      _preloadMedia3();
       await initPlayerIfNeeded(autoFullScreenFlag);
     } else {
       _autoPlay.value = false;

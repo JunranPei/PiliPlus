@@ -58,7 +58,11 @@ class Media3ProbeActivity : Activity() {
                 if (!directVideo.isNullOrBlank()) {
                     Log.i(TAG, "source.direct.begin")
                     runOnUiThread {
-                        if (!directVideoSegmentBase.isNullOrBlank()) {
+                        val reused = Media3PlayerManager.take(directVideo)
+                        if (reused != null) {
+                            Log.i(TAG, "player.reuse elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
+                            attachPlayerInstance(reused)
+                        } else if (!directVideoSegmentBase.isNullOrBlank()) {
                             attachDirectDash(
                                 directVideo,
                                 directAudio,
@@ -179,26 +183,29 @@ class Media3ProbeActivity : Activity() {
 
     private fun attachSource(source: MediaSource) {
         Log.i(TAG, "player.attach elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
-        val exo = ExoPlayer.Builder(this).build().also { candidate ->
-            candidate.setMediaSource(source)
-            candidate.addListener(object : androidx.media3.common.Player.Listener {
-                override fun onRenderedFirstFrame() {
-                    Log.i(TAG, "firstFrame elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
-                }
+        val exo = ExoPlayer.Builder(this).build()
+        exo.setMediaSource(source)
+        exo.prepare()
+        attachPlayerInstance(exo)
+    }
 
-                override fun onPlayerError(error: PlaybackException) {
-                    showMessage("Media3 播放失败：${error.errorCodeName}")
-                }
-            })
-            candidate.prepare()
-            candidate.playWhenReady = true
-        }
-        player = exo
+    private fun attachPlayerInstance(candidate: ExoPlayer) {
+        candidate.addListener(object : androidx.media3.common.Player.Listener {
+            override fun onRenderedFirstFrame() {
+                Log.i(TAG, "firstFrame elapsedMs=${SystemClock.elapsedRealtime() - startedAt}")
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                showMessage("Media3 播放失败：${error.errorCodeName}")
+            }
+        })
+        candidate.playWhenReady = true
+        player = candidate
         root.removeAllViews()
         root.addView(
             PlayerView(this).apply {
                 useController = true
-                player = exo
+                player = candidate
                 layoutParams = ViewGroup.LayoutParams(-1, -1)
             },
         )
@@ -232,7 +239,7 @@ class Media3ProbeActivity : Activity() {
         private const val DEFAULT_CID = 137649199L
         private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
 
-        private fun buildManifest(dash: JSONObject, video: JSONObject, audio: JSONObject): String {
+        internal fun buildManifest(dash: JSONObject, video: JSONObject, audio: JSONObject): String {
             val duration = dash.optDouble("duration", 0.0)
             return """
                 <?xml version="1.0" encoding="UTF-8"?>
