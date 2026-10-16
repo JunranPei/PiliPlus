@@ -24,6 +24,8 @@ class Media3Player extends PlatformPlayer {
   static bool _batchStartupOptions = true;
   static bool _progressiveStartup = false;
   static bool _startupCache = true;
+  static String? _startupCodec;
+  static String? get startupCodec => kProfileMode ? _startupCodec : null;
   // Group startup options by default. Profile builds can compare the pinned
   // reference sequence without reinstalling the app or replacing the backend.
   static bool get batchStartupOptions => !kProfileMode || _batchStartupOptions;
@@ -67,12 +69,22 @@ class Media3Player extends PlatformPlayer {
           if (parameters['cache'] case final value?) {
             _startupCache = value == 'true';
           }
+          if (parameters['codec'] case final value?) {
+            if (!const ['default', 'avc1', 'hvc1'].contains(value)) {
+              return developer.ServiceExtensionResponse.error(
+                developer.ServiceExtensionResponse.invalidParams,
+                'codec must be default, avc1 or hvc1',
+              );
+            }
+            _startupCodec = value == 'default' ? null : value;
+          }
           return developer.ServiceExtensionResponse.result(
             jsonEncode({
               'batch': batchStartupOptions,
               'backend': 'Media3',
               'source': _progressiveStartup ? 'progressive' : 'dash',
               'cache': _startupCache,
+              'codec': startupCodec ?? 'default',
             }),
           );
         });

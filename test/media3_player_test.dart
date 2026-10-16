@@ -76,6 +76,7 @@ void main() {
       expect(options['play'], isFalse);
       expect(options.containsKey('preferProgressive'), isFalse);
       expect(options.containsKey('bypassCache'), isFalse);
+      expect(Media3Player.startupCodec, isNull);
       expect(player.state.volume, 65);
       expect(player.state.rate, 1.25);
       await player.dispose();

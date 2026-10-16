@@ -51,6 +51,7 @@ import 'package:PiliPlus/pages/video/send_danmaku/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
+import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
 import 'package:PiliPlus/plugin/pl_player/models/heart_beat_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/services/download/download_service.dart';
@@ -1240,6 +1241,19 @@ class VideoDetailController extends GetxController
       final videosList = data.dash!.video!
           .where((e) => e.quality.code == targetVideoQa)
           .toList();
+
+      // Profile-only codec comparison keeps the requested quality and settings.
+      // Only select the diagnostic codec when that same quality offers it.
+      if (kProfileMode && Media3Player.startupCodec != null) {
+        final requested = VideoDecodeFormatType.fromString(
+          Media3Player.startupCodec!,
+        );
+        if (videosList.any(
+          (video) => requested.codes.any(video.codecs!.startsWith),
+        )) {
+          currentDecodeFormats = requested;
+        }
+      }
 
       /// 取出符合当前解码格式的videoItem
       firstVideo = videosList.firstWhere(

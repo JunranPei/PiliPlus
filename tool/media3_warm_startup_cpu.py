@@ -15,6 +15,7 @@ parser.add_argument('connection', type=Path)
 parser.add_argument('label')
 parser.add_argument('--source', choices=['dash', 'progressive'], default='dash')
 parser.add_argument('--index', type=int, default=6)
+parser.add_argument('--codec', choices=['default', 'avc1', 'hvc1'], default='default')
 args = parser.parse_args()
 connection = json.loads(args.connection.read_text(encoding='utf-8'))
 out = ROOT / 'diagnostics/startup-20261016/startup-cpu' / args.label
@@ -38,7 +39,7 @@ isolate = connection['isolate']
 rpc('setFlag', {'name': 'profiler', 'value': 'true'})
 try:
     rpc('ext.piliplus.media3StartupMode', {
-        'isolateId': isolate, 'batch': 'true', 'source': args.source, 'cache': 'false',
+        'isolateId': isolate, 'batch': 'true', 'source': args.source, 'cache': 'false', 'codec': args.codec,
     })
     # Emulator wall time can drift from the host by seconds. Both clocks used
     # for this mapping must come from the Android device.
@@ -80,6 +81,6 @@ try:
 finally:
     rpc('setFlag', {'name': 'profiler', 'value': 'false'})
     rpc('ext.piliplus.media3StartupMode', {
-        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true',
+        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default',
     })
     subprocess.run(adb + ['shell', 'input', 'keyevent', '4'], check=True)
