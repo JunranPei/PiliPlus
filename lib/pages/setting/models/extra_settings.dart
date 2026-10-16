@@ -310,7 +310,7 @@ List<SettingsModel> get extraSettings => [
     subtitle: '相对减少手动播放加载时间',
     leading: Icon(Icons.play_circle_outlined),
     setKey: SettingBoxKey.preInitPlayer,
-    defaultVal: false,
+    defaultVal: true,
   ),
   const SwitchModel(
     title: '首页切换页面动画',
