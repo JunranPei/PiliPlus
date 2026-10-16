@@ -13,6 +13,11 @@ import androidx.media3.exoplayer.source.MergingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.CacheKeyFactory
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
+import androidx.media3.database.StandaloneDatabaseProvider
 import org.json.JSONObject
 import java.io.File
 
@@ -37,6 +42,16 @@ internal object Media3PlayerManager {
 
     private var preparedKey: String? = null
     private var preparedPlayer: ExoPlayer? = null
+    private var mediaCache: SimpleCache? = null
+
+    @Synchronized
+    private fun cache(context: Context): SimpleCache {
+        return mediaCache ?: SimpleCache(
+            java.io.File(context.cacheDir, "media3-cache"),
+            LeastRecentlyUsedCacheEvictor(128L * 1024L * 1024L),
+            StandaloneDatabaseProvider(context),
+        ).also { mediaCache = it }
+    }
 
     @Synchronized
     fun preload(context: Context, args: Media3SourceArgs) {
@@ -91,6 +106,8 @@ internal object Media3PlayerManager {
         preparedPlayer?.release()
         preparedPlayer = null
         preparedKey = null
+        mediaCache?.release()
+        mediaCache = null
     }
 
     private fun createSource(context: Context, args: Media3SourceArgs): MediaSource {
@@ -100,7 +117,16 @@ internal object Media3PlayerManager {
             .setDefaultRequestProperties(
                 mapOf("User-Agent" to USER_AGENT, "Referer" to "https://www.bilibili.com"),
             )
-        val dataSourceFactory = DefaultDataSource.Factory(context, httpFactory)
+        val upstreamFactory = DefaultDataSource.Factory(context, httpFactory)
+        val dataSourceFactory = CacheDataSource.Factory()
+            .setCache(cache(context))
+            .setUpstreamDataSourceFactory(upstreamFactory)
+            .setCacheKeyFactory(
+                CacheKeyFactory { dataSpec ->
+                    dataSpec.uri.buildUpon().clearQuery().build().toString()
+                },
+            )
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
         val videoUrl = args.videoUrl ?: error("Media3 video URL is missing")
         if (!args.videoSegmentBase.isNullOrBlank()) {
             val video = JSONObject().apply {
