@@ -12,12 +12,18 @@ internal class Media3CacheKeys(
     private var aliases: MutableMap<String, String>? = null
 
     @Synchronized
+    fun prepare() {
+        if (aliases == null) aliases = buildAliases()
+    }
+
+    @Synchronized
     fun key(uri: String, customKey: String? = null): String {
         // DASH supplies the resolved media URL as a custom key. Normalize that
         // URL too, while preserving genuinely application-defined custom keys.
         val candidate = customKey ?: uri
         val canonical = canonical(candidate) ?: return candidate
-        val index = aliases ?: buildAliases().also { aliases = it }
+        prepare()
+        val index = checkNotNull(aliases)
         return index.getOrPut(canonical) { canonical }
     }
 

@@ -1,10 +1,16 @@
 """Capture only a bounded startup trace to locate Android main-thread blocking."""
 from pathlib import Path
+import argparse
 import subprocess
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'diagnostics/startup-20261016/perfetto'
+parser = argparse.ArgumentParser()
+parser.add_argument('--warm', action='store_true')
+parser.add_argument('--index', type=int, default=6)
+parser.add_argument('--label', default='startup')
+args = parser.parse_args()
+OUT = ROOT / 'diagnostics/startup-20261016/perfetto' / args.label
 OUT.mkdir(parents=True, exist_ok=True)
 ADB = ['adb', '-s', 'emulator-5554']
 config = '''buffers { size_kb: 32768 fill_policy: RING_BUFFER }
@@ -27,16 +33,20 @@ data_sources { config { name: "android.log" } }
 def adb(*args):
     return subprocess.run(ADB + list(args), capture_output=True, check=True)
 
-adb('shell', 'am', 'force-stop', 'com.personal.piliplus')
+if not args.warm:
+    adb('shell', 'am', 'force-stop', 'com.personal.piliplus')
 with (OUT / 'capture.log').open('wb') as log:
     capture = subprocess.Popen(ADB + ['shell', 'perfetto', '--txt', '-c', '-',
         '-o', '/data/misc/perfetto-traces/pili-startup.perfetto-trace'], stdin=subprocess.PIPE, stdout=log, stderr=log)
     capture.stdin.write(config.encode('utf-8'))
     capture.stdin.close()
     time.sleep(.8)
-    adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW',
-        '-n', 'com.personal.piliplus/com.personal.piliplus.MainActivity',
-        '-d', 'bilibili://video/BV15BJX6dEoR?cid=42790290231')
+    command = ['python', str(ROOT / 'tool/media3_startup_recording.py'),
+        'perfetto-' + args.label, '--index', str(args.index), '--seconds', '10', '--no-back']
+    if not args.warm:
+        command.append('--cold')
+    subprocess.run(command, check=True)
     capture.wait(timeout=25)
 adb('pull', '/data/misc/perfetto-traces/pili-startup.perfetto-trace', str(OUT / 'startup.perfetto-trace'))
 print('Captured startup trace', (OUT / 'startup.perfetto-trace').stat().st_size, flush=True)
+adb('shell', 'input', 'keyevent', '4')

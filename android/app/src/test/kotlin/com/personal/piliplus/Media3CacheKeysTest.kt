@@ -58,6 +58,16 @@ class Media3CacheKeysTest {
         assertEquals(canonical, keys.key(mirror))
     }
 
+    @Test fun cacheWarmupPreparesLegacyAliasesBeforeAnyMediaRequest() {
+        val scans = AtomicInteger()
+        val keys = Media3CacheKeys({ scans.incrementAndGet(); setOf(first) }, { 4096L })
+        keys.prepare()
+        keys.prepare()
+        assertEquals(1, scans.get())
+        assertEquals(first, keys.key(mirror))
+        assertEquals(1, scans.get())
+    }
+
     @Test fun parallelAudioVideoRequestsBuildTheAliasIndexOnce() {
         val scans = AtomicInteger()
         val keys = Media3CacheKeys({ scans.incrementAndGet(); setOf(first) }, { 10000L })

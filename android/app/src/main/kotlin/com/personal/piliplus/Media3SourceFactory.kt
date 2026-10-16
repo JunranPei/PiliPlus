@@ -1,6 +1,9 @@
 package com.personal.piliplus
 
 import android.content.Context
+import android.os.Process
+import android.os.SystemClock
+import android.util.Log
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.database.StandaloneDatabaseProvider
@@ -40,7 +43,9 @@ internal data class Media3SourceArgs(
 internal object Media3SourceFactory {
     private var cache: SimpleCache? = null
     private var cacheKeys: Media3CacheKeys? = null
+    private var warmToken: Any? = null
 
+    @Synchronized
     private fun cache(context: Context): SimpleCache = cache ?: SimpleCache(
         File(context.cacheDir, "media3-cache"),
         LeastRecentlyUsedCacheEvictor(128L * 1024L * 1024L),
@@ -51,6 +56,35 @@ internal object Media3SourceFactory {
             existingKeys = { instance.keys },
             cachedPrefixBytes = { key -> instance.getCachedBytes(key, 0, 1024L * 1024L) },
         )
+    }
+
+    /** Open the index before the first video loader needs its database lock. */
+    @Synchronized
+    fun prewarm(context: Context) {
+        val token = Any()
+        warmToken = token
+        val application = context.applicationContext
+        Thread({
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)
+            val begin = SystemClock.elapsedRealtime()
+            try {
+                val index = synchronized(this) {
+                    if (warmToken !== token) return@Thread
+                    cache(application)
+                    checkNotNull(cacheKeys)
+                }
+                // Building aliases waits for SimpleCacheInit on this worker,
+                // rather than on the first media loader or the Android UI.
+                index.prepare()
+                synchronized(this) {
+                    if (warmToken === token) {
+                        Log.i("Media3Playback", "cacheWarmReady elapsedMs=${SystemClock.elapsedRealtime() - begin}")
+                    }
+                }
+            } catch (error: Exception) {
+                Log.w("Media3Playback", "Cache warmup unavailable: ${error.javaClass.simpleName}")
+            }
+        }, "Media3CacheWarmup").start()
     }
 
     fun createSource(context: Context, args: Media3SourceArgs, trace: Media3StartupTrace? = null): MediaSource {
@@ -119,5 +153,6 @@ internal object Media3SourceFactory {
     }
 
     private fun xml(value: String) = value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
-    fun dispose() { cache?.release(); cache = null; cacheKeys = null }
+    @Synchronized
+    fun dispose() { warmToken = null; cache?.release(); cache = null; cacheKeys = null }
 }

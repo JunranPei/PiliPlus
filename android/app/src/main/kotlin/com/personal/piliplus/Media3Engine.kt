@@ -35,6 +35,7 @@ internal class Media3Engine(
 
     init {
         channel.setMethodCallHandler(this)
+        Media3SourceFactory.prewarm(context)
         // Prepare the retained decoder while the existing Flutter page/API loads.
         // This local frame never enters the UI or accesses the network.
         idleSession = Session(0).apply { warm() }
