@@ -4,6 +4,7 @@ Native callbacks and position logs are supporting evidence. The recording is
 retained for visual review; callback timestamps are never labeled pixel timing.
 """
 import argparse
+import atexit
 import json
 from pathlib import Path
 import re
@@ -19,6 +20,8 @@ parser.add_argument('--seconds', type=int, default=22)
 parser.add_argument('--cold', action='store_true')
 parser.add_argument('--tap', nargs=2, type=int, metavar=('X', 'Y'))
 parser.add_argument('--no-back', action='store_true')
+parser.add_argument('--host-recording', action='store_true')
+parser.add_argument('--show-touches', action='store_true')
 args = parser.parse_args()
 if args.cold and args.tap:
     parser.error('Open the app home before measuring a card tap')
@@ -36,6 +39,15 @@ def adb(*arguments):
 def pid():
     return subprocess.run(adb_command + ['shell', 'pidof', package],
                           capture_output=True, timeout=10).stdout.decode().strip()
+
+
+if args.show_touches:
+    old_touches = adb('shell', 'settings', 'get', 'system', 'show_touches').decode().strip()
+    def restore_touches():
+        operation = ['delete', 'system', 'show_touches'] if old_touches == 'null' else ['put', 'system', 'show_touches', old_touches]
+        adb('shell', 'settings', *operation)
+    atexit.register(restore_touches)
+    adb('shell', 'settings', 'put', 'system', 'show_touches', '1')
 
 
 active_builds = subprocess.run([
@@ -57,12 +69,22 @@ elif not args.no_back:
 adb('logcat', '-c')
 pid_before = pid()
 remote = '/sdcard/media3-startup-review.mp4'
-recording = subprocess.Popen(adb_command + [
-    'shell', 'screenrecord', '--bugreport', '--size', '540x1200', '--bit-rate', '2000000',
-    '--time-limit', str(args.seconds), remote
-], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+recording_begin = time.monotonic()
+if args.host_recording:
+    video_file = out / 'screen.webm'
+    reply = adb('emu', 'screenrecord', 'start', '--size', '540x1200', '--bit-rate', '2000000',
+                '--fps', '30', '--time-limit', str(args.seconds + 3), str(video_file))
+    if b'KO:' in reply:
+        raise RuntimeError('The host recorder failed to start')
+    recording = None
+else:
+    video_file = out / 'screen.mp4'
+    recording = subprocess.Popen(adb_command + [
+        'shell', 'screenrecord', '--bugreport', '--size', '540x1200', '--bit-rate', '2000000',
+        '--time-limit', str(args.seconds), remote
+    ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(.8)
-if recording.poll() is not None:
+if recording is not None and recording.poll() is not None:
     raise RuntimeError('Screen recording failed before the video was opened')
 adb('shell', 'log', '-t', 'Media3Test', 'open-request ' + args.label)
 begin = time.monotonic()
@@ -73,8 +95,14 @@ else:
     launch = adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW',
                  '-n', package + '/com.personal.piliplus.MainActivity', '-d', shlex.quote(uri))
 (out / 'launch.txt').write_bytes(launch)
-recording.wait(timeout=args.seconds + 8)
-adb('pull', remote, str(out / 'screen.mp4'))
+if recording is None:
+    time.sleep(max(0, recording_begin + args.seconds - time.monotonic()))
+    adb('emu', 'screenrecord', 'stop')
+    if not video_file.exists() or video_file.stat().st_size == 0:
+        raise RuntimeError('The host recorder did not produce a video')
+else:
+    recording.wait(timeout=args.seconds + 8)
+    adb('pull', remote, str(video_file))
 log = adb('logcat', '-d', '-v', 'epoch', '-s', 'Media3Startup',
           'Media3Playback', 'Media3Input', 'Media3Test', 'flutter', 'AndroidRuntime').decode('utf-8', 'replace')
 (out / 'playback.log').write_text(log, encoding='utf-8')
@@ -94,6 +122,8 @@ source_cid = re.search(r'open id=\d+ source=\d+ cid=(\d+)', log)
 result = {
     'video': ({'cid': int(source_cid[1]) if source_cid else None, 'entry': 'UI card tap'} if args.tap else video),
     'coldProcess': args.cold, 'preservedDiskCache': True,
+    'recordingMode': 'emulator host' if args.host_recording else 'Android screenrecord',
+    'recordingFile': video_file.name,
     'recordedSeconds': args.seconds, 'observationSeconds': round(time.monotonic() - begin, 2),
     'nativeFirstFrameMs': int(first[1]) if first else None,
     'requestToNativeFirstFrameMs': request_to_frame,
