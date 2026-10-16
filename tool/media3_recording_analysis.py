@@ -38,7 +38,8 @@ for number, folder in enumerate(folders):
         if cid != records[number]['video']['cid'] or cid in actual_cids:
             raise RuntimeError('Recorded source is missing, repeated, or differs from the requested video')
         actual_cids.add(cid)
-    raw = subprocess.run([FFMPEG, '-v', 'error', '-i', str(folder / 'screen.mp4'),
+    recording_file = records[number].get('recordingFile', 'screen.mp4') if records else 'screen.mp4'
+    raw = subprocess.run([FFMPEG, '-v', 'error', '-i', str(folder / recording_file),
         '-vf', 'fps=10,crop=360:90:90:170,scale=120:30', '-pix_fmt', 'gray',
         '-f', 'rawvideo', '-'], capture_output=True, check=True).stdout
     frames = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 30, 120).astype(np.float32)
@@ -59,7 +60,7 @@ for number, folder in enumerate(folders):
     print(json.dumps(result), flush=True)
     if args.overview:
         row = OUT / f'overview-{number + 1:02d}.jpg'
-        subprocess.run([FFMPEG, '-v', 'error', '-y', '-ss', '3', '-i', str(folder / 'screen.mp4'),
+        subprocess.run([FFMPEG, '-v', 'error', '-y', '-ss', '3', '-i', str(folder / recording_file),
             '-vf', 'fps=1/5,crop=540:340:0:0,scale=270:170,tile=7x1',
             '-frames:v', '1', str(row)], check=True)
         overview_rows.append(row)

@@ -9,6 +9,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument('label')
+parser.add_argument('--host-recording', action='store_true')
 args = parser.parse_args()
 videos = json.loads((ROOT / 'diagnostics/startup-20261016/videos.json').read_text(encoding='utf-8'))
 if len(videos) != 10 or len({video['cid'] for video in videos}) != 10:
@@ -21,6 +22,8 @@ try:
         label = f'{args.label}-{index + 1:02d}'
         command = [sys.executable, str(ROOT / 'tool/media3_startup_recording.py'),
                    label, '--index', str(index), '--seconds', '35']
+        if args.host_recording:
+            command.append('--host-recording')
         if index == 0:
             command.append('--no-back')
         recording = subprocess.run(command, capture_output=True, text=True)
