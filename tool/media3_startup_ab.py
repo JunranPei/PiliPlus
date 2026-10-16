@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('label')
 parser.add_argument('--index', type=int, default=6)
 parser.add_argument('--seconds', type=int, default=16)
-parser.add_argument('--compare', choices=['batch', 'source', 'codec', 'overlay', 'details'], default='batch')
+parser.add_argument('--compare', choices=['batch', 'source', 'codec', 'overlay', 'details', 'preferences'], default='batch')
 parser.add_argument('--uncached', action='store_true')
 parser.add_argument('--host-recording', action='store_true')
 args = parser.parse_args()
@@ -81,6 +81,8 @@ try:
             mode = 'covered-overlay-skipped' if candidate else 'covered-overlay-painted'
         elif args.compare == 'details':
             mode = 'details-after-frame' if candidate else 'details-before-frame'
+        elif args.compare == 'preferences':
+            mode = 'parallel-preferences' if candidate else 'serial-preferences'
         else:
             mode = 'batched' if candidate else 'baseline'
         batch = candidate if args.compare == 'batch' else True
@@ -92,12 +94,14 @@ try:
             'codec': codec,
             'deferDanmakuPaint': str(args.compare == 'overlay' and candidate).lower(),
             'deferDetailsBuild': str(args.compare == 'details' and candidate).lower(),
+            'parallelNetworkPreferences': str(args.compare != 'preferences' or candidate).lower(),
         })
         if (selected.get('batch') != batch or selected.get('backend') != 'Media3'
                 or selected.get('source') != source or selected.get('cache') != (not args.uncached)
                 or selected.get('codec') != codec
                 or selected.get('deferDanmakuPaint') != (args.compare == 'overlay' and candidate)
-                or selected.get('deferDetailsBuild') != (args.compare == 'details' and candidate)):
+                or selected.get('deferDetailsBuild') != (args.compare == 'details' and candidate)
+                or selected.get('parallelNetworkPreferences') != (args.compare != 'preferences' or candidate)):
             raise RuntimeError('The requested Media3 startup mode was not selected')
         label = f'{args.label}-{number}-{mode}'
         command = [sys.executable, str(ROOT / 'tool/media3_startup_recording.py'),
@@ -120,6 +124,8 @@ try:
             raise RuntimeError('The requested codec is unavailable at this quality; do not change resolution')
         flow = [json.loads(line.split('[Media3Flow] ', 1)[1]) for line in lines if '[Media3Flow] ' in line]
         phases = {event['phase']: event['epochUs'] for event in flow}
+        preference_begin = phases.get('query.preferences.begin')
+        preference_end = phases.get('query.preferences.end')
         request_line = next(line for line in lines if 'open-request ' + label in line)
         request_us = round(float(request_line.split()[0]) * 1_000_000)
         result.update({
@@ -127,6 +133,8 @@ try:
             'actualCodec': format_match[1] if format_match else None,
             'actualResolution': format_match[2] if format_match else None,
             'primaryApiMs': round((phases['query.primary.end'] - phases['query.primary.begin']) / 1000),
+            'networkPreferencesMs': round((preference_end - preference_begin) / 1000) if preference_end is not None and preference_begin is not None else None,
+            'preferenceApiOverlapMs': round(max(0, min(preference_end, phases['query.primary.end']) - max(preference_begin, phases['query.primary.begin'])) / 1000) if preference_end is not None and preference_begin is not None else None,
             'postApiToUiRevealMs': round((phases['ui.reveal.end'] - phases['query.primary.end']) / 1000),
             'requestToUiRevealMs': round((phases['ui.reveal.end'] - request_us) / 1000),
             'recordingFolder': str(folder.relative_to(ROOT)),
@@ -139,5 +147,5 @@ try:
             'requestToNativeFirstFrameMs', 'requestToUiRevealMs', 'postStartPauseIntent', 'lastPositionMs']}), flush=True)
 finally:
     rpc('ext.piliplus.media3StartupMode', {
-        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default', 'deferDanmakuPaint': 'false', 'deferDetailsBuild': 'false',
+        'isolateId': isolate, 'batch': 'true', 'source': 'dash', 'cache': 'true', 'codec': 'default', 'deferDanmakuPaint': 'false', 'deferDetailsBuild': 'false', 'parallelNetworkPreferences': 'true',
     })

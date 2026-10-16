@@ -1135,8 +1135,12 @@ class VideoDetailController extends GetxController
     if (plPlayerController.enableSponsorBlock && isBlock && !fromReset) {
       querySponsorBlock(bvid: bvid, cid: cid.value);
     }
-    if (plPlayerController.cacheVideoQa == null) {
+    Future<void> prepareNetworkPreferences() async {
+      if (plPlayerController.cacheVideoQa != null) return;
+      _startupMark('query.preferences.begin');
       final isWiFi = await ConnectivityUtils.isWiFi;
+      _startupMark('query.preferences.end');
+      if (!isCurrent()) return;
       plPlayerController
         ..cacheVideoQa = isWiFi
             ? Pref.defaultVideoQa
@@ -1147,6 +1151,11 @@ class VideoDetailController extends GetxController
       preferCodecs = isWiFi ? Pref.preferCodecs : Pref.preferCodecsCellular;
     }
 
+    // The primary request always asks for the same quality ceiling; network
+    // preferences only select a stream after that response. Resolve both in
+    // parallel, and still await the preferences before selecting any stream.
+    final preferencesReady = prepareNetworkPreferences();
+    if (!Media3Player.parallelNetworkPreferences) await preferencesReady;
     if (!isCurrent()) return;
     _startupMark('query.primary.begin');
     final result = await _getVideoUrl(
@@ -1154,6 +1163,7 @@ class VideoDetailController extends GetxController
       requestedCid: queryCid,
     );
     _startupMark('query.primary.end');
+    await preferencesReady;
     if (!isCurrent()) return;
 
     if (result case Success(:final response)) {
