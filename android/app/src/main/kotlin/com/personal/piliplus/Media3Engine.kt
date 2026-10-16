@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal class Media3Engine(
     private val context: Context,
     private val engine: FlutterEngine,
+    warmRetainedPlayer: Boolean = true,
 ) : MethodChannel.MethodCallHandler {
     private val channel = MethodChannel(engine.dartExecutor.binaryMessenger, "com.personal.piliplus/media3")
     private val handler = Handler(Looper.getMainLooper())
@@ -39,7 +40,8 @@ internal class Media3Engine(
         Media3SourceFactory.prewarm(context)
         // Prepare the retained decoder while the existing Flutter page/API loads.
         // This local frame never enters the UI or accesses the network.
-        idleSession = Session(0).apply { warm() }
+        Log.i("Media3Playback", "warmupMode enabled=$warmRetainedPlayer")
+        if (warmRetainedPlayer) idleSession = Session(0).apply { warm() }
     }
 
     private inner class Session(var id: Int) {

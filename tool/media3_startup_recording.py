@@ -22,9 +22,12 @@ parser.add_argument('--tap', nargs=2, type=int, metavar=('X', 'Y'))
 parser.add_argument('--no-back', action='store_true')
 parser.add_argument('--host-recording', action='store_true')
 parser.add_argument('--show-touches', action='store_true')
+parser.add_argument('--skip-player-warmup', action='store_true')
 args = parser.parse_args()
 if args.cold and args.tap:
     parser.error('Open the app home before measuring a card tap')
+if args.skip_player_warmup and not args.cold:
+    parser.error('The retained-player warmup switch requires a new cold process')
 out = ROOT / 'diagnostics/startup-20261016/startup-recordings' / args.label
 out.mkdir(parents=True, exist_ok=True)
 adb_command = ['adb', '-s', 'emulator-5554']
@@ -93,7 +96,8 @@ if args.tap:
     launch = adb('shell', 'input', 'tap', *map(str, args.tap))
 else:
     launch = adb('shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW',
-                 '-n', package + '/com.personal.piliplus.MainActivity', '-d', shlex.quote(uri))
+                 '-n', package + '/com.personal.piliplus.MainActivity', '-d', shlex.quote(uri),
+                 *(['--ez', 'media3_skip_warmup', 'true'] if args.skip_player_warmup else []))
 (out / 'launch.txt').write_bytes(launch)
 if recording is None:
     time.sleep(max(0, recording_begin + args.seconds - time.monotonic()))
@@ -123,6 +127,7 @@ source_cid = re.search(r'open id=\d+ source=\d+ cid=(\d+)', log)
 result = {
     'video': ({'cid': int(source_cid[1]) if source_cid else None, 'entry': 'UI card tap'} if args.tap else video),
     'coldProcess': args.cold, 'preservedDiskCache': True,
+    'skipRetainedWarmupRequested': args.skip_player_warmup,
     'recordingMode': 'emulator host' if args.host_recording else 'Android screenrecord',
     'recordingFile': video_file.name,
     'recordedSeconds': args.seconds, 'observationSeconds': round(time.monotonic() - begin, 2),

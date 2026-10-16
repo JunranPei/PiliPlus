@@ -28,7 +28,9 @@ class MainActivity : AudioServiceActivity() {
         super.configureFlutterEngine(flutterEngine)
         pipCoordinator = PipCoordinator(this, flutterEngine.dartExecutor.binaryMessenger)
         playbackDiagnostics = PlaybackDiagnostics(this, flutterEngine.dartExecutor.binaryMessenger, flutterEngine)
-        media3Engine = Media3Engine(this, flutterEngine)
+        val skipWarmup = BuildConfig.BUILD_TYPE == "profile" &&
+            intent?.getBooleanExtra("media3_skip_warmup", false) == true
+        media3Engine = Media3Engine(this, flutterEngine, warmRetainedPlayer = !skipWarmup)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
