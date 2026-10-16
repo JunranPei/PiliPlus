@@ -21,6 +21,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.view.TextureRegistry
 import java.io.ByteArrayOutputStream
+import java.util.concurrent.atomic.AtomicBoolean
 
 /** A Media3 player renders into a persistent Flutter texture, below the original UI. */
 internal class Media3Engine(
@@ -53,13 +54,11 @@ internal class Media3Engine(
                 .build())
             .build()
         var sourceId = 0
+        @Volatile private var callbackEpoch = 0L
         var sourceArgs: Media3SourceArgs? = null
         var startedAt = 0L
         var sourceListener: Player.Listener? = null
         var startupTrace: Media3StartupTrace? = null
-        @Volatile var firstOutput = false
-        private var firstPresentationUs = Long.MIN_VALUE
-        @Volatile private var advancedOutput = false
         var firstFrame = false
         var released = false
         var lastLogSecond = -1L
@@ -77,39 +76,48 @@ internal class Media3Engine(
             // Keep decoder resources across page changes; source replacement
             // reuses this player and texture instead of recreating the output.
             player.setForegroundMode(true)
+            installFrameMetadataListener()
+            handler.post(tick)
+        }
+
+        private fun installFrameMetadataListener(onFirstOutput: () -> Unit = {}) {
+            val epoch = callbackEpoch
+            val trace = startupTrace
+            var firstPresentationUs: Long? = null
+            var advancedOutput = false
             player.setVideoFrameMetadataListener { presentationUs, releaseNs, _, _ ->
-                if (!firstOutput) {
+                if (released || epoch != callbackEpoch) return@setVideoFrameMetadataListener
+                if (firstPresentationUs == null) {
                     firstPresentationUs = presentationUs
-                    firstOutput = true
-                    startupTrace?.mark("video.firstOutput", "presentationUs=$presentationUs releaseDelayMs=${(releaseNs - System.nanoTime()) / 1_000_000}")
-                    val trace = startupTrace
+                    onFirstOutput()
+                    trace?.mark("video.firstOutput", "presentationUs=$presentationUs releaseDelayMs=${(releaseNs - System.nanoTime()) / 1_000_000}")
                     val queuedAt = SystemClock.elapsedRealtime()
                     handler.post {
                         trace?.mark("main.afterVideoOutput", "queueDelayMs=${SystemClock.elapsedRealtime() - queuedAt}")
                     }
                 }
-                if (!advancedOutput && presentationUs > firstPresentationUs) {
+                if (!advancedOutput && presentationUs > checkNotNull(firstPresentationUs)) {
                     advancedOutput = true
-                    startupTrace?.mark("video.firstAdvance", "presentationUs=$presentationUs releaseDelayMs=${(releaseNs - System.nanoTime()) / 1_000_000}")
+                    trace?.mark("video.firstAdvance", "presentationUs=$presentationUs releaseDelayMs=${(releaseNs - System.nanoTime()) / 1_000_000}")
                 }
             }
-            handler.post(tick)
         }
 
         fun warm() {
             val begin = SystemClock.elapsedRealtime()
+            val epoch = callbackEpoch
             sourceListener = object : Player.Listener {
                 override fun onRenderedFirstFrame() {
-                    if (id != 0 || sourceId != 0) return
+                    if (released || epoch != callbackEpoch || id != 0 || sourceId != 0) return
                     handler.postDelayed({
-                        if (id == 0 && sourceId == 0) {
+                        if (!released && epoch == callbackEpoch && id == 0 && sourceId == 0) {
                             park()
                             Log.i("Media3Playback", "warmReady elapsedMs=${SystemClock.elapsedRealtime() - begin}")
                         }
                     }, 100)
                 }
                 override fun onPlayerError(error: PlaybackException) {
-                    if (id == 0 && sourceId == 0) park()
+                    if (!released && epoch == callbackEpoch && id == 0 && sourceId == 0) park()
                 }
             }.also(player::addListener)
             player.setMediaItem(MediaItem.fromUri("asset:///media3-warmup.mp4"))
@@ -142,19 +150,21 @@ internal class Media3Engine(
         }
 
         fun open(call: MethodCall) {
+            callbackEpoch++
+            val generation = callbackEpoch
+            val currentOutputSeen = AtomicBoolean(false)
             startedAt = SystemClock.elapsedRealtime()
             sourceListener?.let(player::removeListener)
             startupTrace?.let(player::removeAnalyticsListener)
             player.stop()
             sourceId = call.argument<Number>("sourceId")!!.toInt()
-            startupTrace = Media3StartupTrace(id, sourceId, startedAt).also {
+            startupTrace = Media3StartupTrace(id, sourceId, startedAt) { renderTime ->
+                if (currentOutputSeen.get()) publishFrame(generation, renderTime)
+            }.also {
                 player.addAnalyticsListener(it)
                 it.mark("open")
             }
             firstFrame = false
-            firstPresentationUs = Long.MIN_VALUE
-            advancedOutput = false
-            firstOutput = false
             call.argument<Number>("volume")?.let { player.volume = it.toFloat().coerceIn(0f, 1f) }
             call.argument<Number>("speed")?.let { player.setPlaybackSpeed(it.toFloat()) }
             call.argument<Boolean>("videoEnabled")?.let { enabled ->
@@ -179,45 +189,37 @@ internal class Media3Engine(
                 preferProgressive = call.argument<Boolean>("preferProgressive") ?: false,
                 bypassCache = call.argument<Boolean>("bypassCache") ?: false,
             )
-            Log.i("Media3Playback", "open id=$id source=$sourceId cid=${sourceArgs!!.cid} codec=${sourceArgs!!.videoCodecs}")
-            val generation = sourceId
+            Log.i("Media3Playback", "open id=$id source=$sourceId cid=${sourceArgs!!.cid} codec=${sourceArgs!!.videoCodecs} epoch=$callbackEpoch")
+            // A retained session serves different Dart players, each of which
+            // starts source IDs at 1. The native epoch must span those owners.
+            installFrameMetadataListener { currentOutputSeen.set(true) }
             sourceListener = object : Player.Listener {
                 override fun onVideoSizeChanged(videoSize: VideoSize) {
-                    if (generation != sourceId) return
+                    if (released || generation != callbackEpoch) return
                     startupTrace?.mark("surface.resize.begin", "size=${videoSize.width}x${videoSize.height}")
                     texture.surfaceTexture().setDefaultBufferSize(videoSize.width.coerceAtLeast(1), videoSize.height.coerceAtLeast(1))
                     startupTrace?.mark("surface.resize.end")
                     sendState()
                 }
 
-                override fun onRenderedFirstFrame() {
-                    if (generation != sourceId || firstFrame) return
-                    firstFrame = true
-                    sendState()
-                    val elapsed = SystemClock.elapsedRealtime() - startedAt
-                    Log.i("Media3Playback", "firstFrame id=$id source=$sourceId elapsedMs=$elapsed")
-                    startupTrace?.firstFrame()
-                    event("firstFrame", mapOf("elapsedMs" to elapsed))
-                }
-
                 override fun onPlaybackStateChanged(playbackState: Int) {
-                    if (generation == sourceId) {
+                    if (!released && generation == callbackEpoch) {
                         Log.i("Media3Playback", "stateChange id=$id source=$sourceId state=$playbackState positionMs=${player.currentPosition} bufferMs=${player.totalBufferedDuration}")
                         sendState()
                     }
                 }
                 override fun onPlayWhenReadyChanged(ready: Boolean, reason: Int) {
-                    if (generation != sourceId) return
+                    if (released || generation != callbackEpoch) return
                     Log.i("Media3Playback", "intent id=$id source=$sourceId playWhenReady=$ready reason=$reason")
                     sendState()
                 }
                 override fun onPlayerError(error: PlaybackException) {
-                    if (generation != sourceId) return
+                    if (released || generation != callbackEpoch) return
                     event("error", mapOf("code" to error.errorCodeName, "message" to error.message))
                     Log.e("Media3Playback", "error id=$id source=$sourceId code=${error.errorCodeName}")
                 }
                 override fun onCues(cueGroup: CueGroup) {
-                    if (generation != sourceId) return
+                    if (released || generation != callbackEpoch) return
                     event("subtitle", mapOf("text" to cueGroup.cues.mapNotNull { it.text }.joinToString("\n")))
                 }
             }.also(player::addListener)
@@ -229,6 +231,16 @@ internal class Media3Engine(
             player.playWhenReady = call.argument<Boolean>("play") == true
             player.prepare()
             startupTrace?.mark("prepare.command")
+        }
+
+        private fun publishFrame(epoch: Long, renderTimeMs: Long) {
+            if (released || epoch != callbackEpoch || renderTimeMs < startedAt || firstFrame) return
+            firstFrame = true
+            sendState()
+            val elapsed = SystemClock.elapsedRealtime() - startedAt
+            Log.i("Media3Playback", "firstFrame id=$id source=$sourceId elapsedMs=$elapsed")
+            startupTrace?.firstFrame()
+            event("firstFrame", mapOf("elapsedMs" to elapsed))
         }
 
         fun screenshot(result: MethodChannel.Result) {
@@ -249,6 +261,7 @@ internal class Media3Engine(
         }
 
         fun release() {
+            callbackEpoch++
             released = true
             handler.removeCallbacks(tick)
             player.clearVideoSurface()
@@ -258,6 +271,7 @@ internal class Media3Engine(
         }
 
         fun park() {
+            callbackEpoch++
             player.pause()
             // Stop network loading while preserving the foreground decoder.
             player.stop()
@@ -267,6 +281,7 @@ internal class Media3Engine(
         }
 
         fun activate(playerId: Int) {
+            callbackEpoch++
             sourceListener?.let(player::removeListener)
             sourceListener = null
             id = playerId

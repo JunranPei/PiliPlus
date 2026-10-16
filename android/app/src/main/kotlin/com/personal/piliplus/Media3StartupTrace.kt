@@ -18,6 +18,7 @@ internal class Media3StartupTrace(
     private val playerId: Int,
     private val sourceId: Int,
     private val beginMs: Long,
+    private val onCurrentSurfaceFrame: (Long) -> Unit = {},
 ) : AnalyticsListener, TransferListener {
     private data class Transfer(val begin: Long, var bytes: Long = 0)
     private val transfers = IdentityHashMap<DataSource, Transfer>()
@@ -79,7 +80,12 @@ internal class Media3StartupTrace(
     }
 
     override fun onRenderedFirstFrame(eventTime: AnalyticsListener.EventTime, output: Any, renderTimeMs: Long) {
+        if (renderTimeMs < beginMs) {
+            mark("video.staleSurfaceFrame", "ageMs=${beginMs - renderTimeMs}")
+            return
+        }
         mark("video.surfaceRendered", "callbackDelayMs=${SystemClock.elapsedRealtime() - renderTimeMs}", renderTimeMs)
+        onCurrentSurfaceFrame(renderTimeMs)
     }
 
     override fun onTransferInitializing(source: DataSource, spec: DataSpec, isNetwork: Boolean) {
