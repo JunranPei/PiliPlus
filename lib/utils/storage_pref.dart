@@ -497,7 +497,7 @@ abstract final class Pref {
   }
 
   static bool get preInitPlayer =>
-      _setting.get(SettingBoxKey.preInitPlayer, defaultValue: true);
+      _setting.get(SettingBoxKey.preInitPlayer, defaultValue: false);
 
   static bool get mainTabBarView =>
       _setting.get(SettingBoxKey.mainTabBarView, defaultValue: false);

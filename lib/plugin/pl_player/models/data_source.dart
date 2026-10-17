@@ -12,12 +12,9 @@ sealed class DataSource {
 }
 
 class NetworkSource extends DataSource {
-  final Map<String, Object?>? nativeMetadata;
-
   NetworkSource({
     required super.videoSource,
     required super.audioSource,
-    this.nativeMetadata,
   });
 }
 

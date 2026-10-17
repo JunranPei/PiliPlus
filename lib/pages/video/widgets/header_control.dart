@@ -72,7 +72,7 @@ import 'package:hive_ce/hive.dart';
 import 'package:intl/intl.dart' show DateFormat;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:material_ui/material_ui.dart' hide showBottomSheet;
-import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
+import 'package:media_kit/media_kit.dart' show NativePlayer;
 
 mixin TimeBatteryMixin<T extends StatefulWidget> on State<T> {
   PlPlayerController get plPlayerController;
@@ -807,7 +807,7 @@ class HeaderControlState extends State<HeaderControl>
 
   static void showPlayerInfo(
     BuildContext context, {
-    required Media3Player player,
+    required NativePlayer player,
   }) {
     final hwdec = player.getProperty('hwdec-current');
     final volume = player.getProperty('volume');

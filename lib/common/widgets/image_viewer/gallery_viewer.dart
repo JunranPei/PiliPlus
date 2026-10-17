@@ -46,8 +46,7 @@ import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart' hide Image;
 import 'package:media_kit/media_kit.dart';
-import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
-import 'package:PiliPlus/plugin/pl_player/media3_texture.dart';
+import 'package:media_kit_video/media_kit_video.dart';
 
 ///
 /// created by dom on 2026/02/14
@@ -86,7 +85,8 @@ class _GalleryViewerState extends State<GalleryViewer>
   EdgeInsets? _padding;
 
   late bool _hasInit = false;
-  Media3Player? _player;
+  Player? _player;
+  VideoController? _videoController;
 
   late final PageController _pageController;
 
@@ -115,9 +115,11 @@ class _GalleryViewerState extends State<GalleryViewer>
 
   Future<void> _initPlayer() async {
     assert(_player == null);
-    final player = await Media3Player.create();
+    final player = await Player.create();
+    _videoController = await VideoController.create(player);
     if (!mounted) {
       player.dispose();
+      _videoController = null;
       return;
     }
     _player = player;
@@ -288,6 +290,7 @@ class _GalleryViewerState extends State<GalleryViewer>
   void dispose() {
     _player?.dispose();
     _player = null;
+    _videoController = null;
     _pageController.dispose();
     _animateController.dispose();
     _tapGestureRecognizer.dispose();
@@ -498,7 +501,7 @@ class _GalleryViewerState extends State<GalleryViewer>
       case SourceType.livePhoto:
         child = Obx(
           key: _key,
-          () => _currIndex.value == index && _player != null
+          () => _currIndex.value == index && _videoController != null
               ? Viewer(
                   minScale: widget.minScale,
                   maxScale: widget.maxScale,
@@ -512,8 +515,8 @@ class _GalleryViewerState extends State<GalleryViewer>
                       _horizontalDragGestureRecognizer,
                   onChangePage: _onChangePage,
                   child: FittedBox(
-                    child: Media3Texture(
-                      controller: _player!,
+                    child: SimpleVideo(
+                      controller: _videoController!,
                       fill: Colors.transparent,
                     ),
                   ),

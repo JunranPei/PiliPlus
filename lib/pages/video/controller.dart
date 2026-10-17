@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert' show jsonEncode;
 import 'dart:math' show min;
 import 'dart:ui';
 
@@ -51,7 +50,6 @@ import 'package:PiliPlus/pages/video/send_danmaku/view.dart';
 import 'package:PiliPlus/pages/video/widgets/header_control.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
-import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
 import 'package:PiliPlus/plugin/pl_player/models/heart_beat_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/play_status.dart';
 import 'package:PiliPlus/services/download/download_service.dart';
@@ -73,8 +71,7 @@ import 'package:collection/collection.dart';
 import 'package:dio/dio.dart' show Options;
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart'
     show ExtendedNestedScrollViewState;
-import 'package:flutter/foundation.dart'
-    show debugPrintSynchronously, kDebugMode, kProfileMode;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_volume_controller/flutter_volume_controller.dart';
 import 'package:get/get.dart';
@@ -124,17 +121,6 @@ class VideoDetailController extends GetxController
   final RxBool preparingPlayback = false.obs;
   bool playbackRouteActive = true;
   int _playbackRevision = 0;
-  void _startupMark(String phase) {
-    if (!kDebugMode && !kProfileMode) return;
-    debugPrintSynchronously(
-      '[Media3Flow] ${jsonEncode({
-        'phase': phase,
-        'cid': cid.value,
-        'epochUs': DateTime.now().microsecondsSinceEpoch,
-      })}',
-    );
-  }
-
   bool _playWhenPrepared = false;
   Future<bool> Function()? waitForPlaybackRoute;
 
@@ -198,9 +184,7 @@ class VideoDetailController extends GetxController
     }
     if (!sameSource) frameReady.value = false;
     _autoPlay.value = true;
-    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) {
-      return;
-    }
+    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) return;
     if (!playbackRouteActive || isClosed || revision != _playbackRevision) {
       return;
     }
@@ -515,10 +499,6 @@ class VideoDetailController extends GetxController
       watchLaterTitle = args['favTitle'];
       _mediaDesc = args['desc'];
       getMediaList();
-    } else {
-      // Start resolving the playback URL as soon as bvid/cid are available;
-      // the view's post-frame initialization will reuse this in-flight query.
-      unawaited(queryVideoUrl());
     }
 
     tabCtr = TabController(
@@ -665,7 +645,7 @@ class VideoDetailController extends GetxController
   @override
   BlockConfigMixin get blockConfig => plPlayerController;
   @override
-  PlatformPlayer? get player => plPlayerController.videoPlayerController;
+  Player? get player => plPlayerController.videoPlayerController;
   @override
   bool get isFullScreen => plPlayerController.isFullScreen.value;
   @override
@@ -864,11 +844,8 @@ class VideoDetailController extends GetxController
         revision == _playbackRevision &&
         cid.value == requestedCid;
     if (!isCurrent()) return;
-    _startupMark('route.wait.begin');
-    final routeReady =
-        waitForPlaybackRoute == null || await waitForPlaybackRoute!();
-    _startupMark('route.wait.end');
-    if (!routeReady || !isCurrent()) return;
+    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) return;
+    if (!isCurrent()) return;
     preparingPlayback.value = true;
     _playWhenPrepared = false;
     final startWhenReady = autoplay ?? _autoPlay.value;
@@ -879,7 +856,6 @@ class VideoDetailController extends GetxController
       );
     }
     frameReady.value = false;
-
     Duration? seek = defaultST ?? playedTime;
     if (seek == null || seek == Duration.zero) {
       seek = getFirstSegment();
@@ -896,43 +872,6 @@ class VideoDetailController extends GetxController
             : NetworkSource(
                 videoSource: videoUrl!,
                 audioSource: audioUrl,
-                nativeMetadata: data.dash == null
-                    ? {
-                        'segments': data.durl
-                            ?.map((part) => VideoUtils.getCdnUrl(part.playUrls))
-                            .toList(),
-                      }
-                    : {
-                        'bvid': bvid,
-                        'cid': requestedCid,
-                        'videoSegmentBase': firstVideo.segmentBase == null
-                            ? null
-                            : jsonEncode(firstVideo.segmentBase),
-                        'audioSegmentBase':
-                            data.dash?.audio
-                                    ?.firstWhereOrNull(
-                                      (item) => item.id == currentAudioQa?.code,
-                                    )
-                                    ?.segmentBase ==
-                                null
-                            ? null
-                            : jsonEncode(
-                                data.dash!.audio!
-                                    .firstWhere(
-                                      (item) => item.id == currentAudioQa!.code,
-                                    )
-                                    .segmentBase,
-                              ),
-                        'videoCodecs': firstVideo.codecs,
-                        'audioCodecs': data.dash?.audio
-                            ?.firstWhereOrNull(
-                              (item) => item.id == currentAudioQa?.code,
-                            )
-                            ?.codecs,
-                        'videoWidth': firstVideo.width,
-                        'videoHeight': firstVideo.height,
-                        'durationMs': data.timeLength,
-                      },
               ),
         seekTo: seek,
         duration: data.timeLength == null
@@ -942,7 +881,9 @@ class VideoDetailController extends GetxController
         aid: aid,
         bvid: bvid,
         cid: cid.value,
-        // Keep the original cover until Media3 renders this source's first frame.
+        // Let the player start underneath the cover for autoplay. The
+        // controller reveals the frame only after the post-play surface handoff
+        // settles, while paused/preloaded sources keep the old-frame gate.
         autoplay: startWhenReady,
         epid: isUgc ? null : epId,
         seasonId: isUgc ? null : seasonId,
@@ -951,7 +892,6 @@ class VideoDetailController extends GetxController
         owner: this,
         onPrepared: () async {
           if (!isCurrent()) return;
-          _startupMark('ui.mount.begin');
           if (PlaybackDiagnostics.enabled) {
             PlaybackDiagnostics.event('ui.mount.request', playbackTraceState());
           }
@@ -959,7 +899,6 @@ class VideoDetailController extends GetxController
           if (plPlayerController.visible) {
             await WidgetsBinding.instance.endOfFrame;
           }
-          _startupMark('ui.mount.end');
           if (kDebugMode) {
             debugPrint(
               '[PLAYBACK_UI] mounted revision=$revision cid=$requestedCid ms=${preparationTime.elapsedMilliseconds}',
@@ -968,7 +907,6 @@ class VideoDetailController extends GetxController
         },
         onFrameReady: () async {
           if (!isCurrent()) return;
-          _startupMark('ui.reveal.begin');
           if (PlaybackDiagnostics.enabled) {
             PlaybackDiagnostics.event(
               'ui.frameReady.before',
@@ -985,7 +923,6 @@ class VideoDetailController extends GetxController
           if (plPlayerController.visible) {
             await WidgetsBinding.instance.endOfFrame;
           }
-          _startupMark('ui.reveal.end');
           if (kDebugMode) {
             debugPrint(
               '[PLAYBACK_UI] presented revision=$revision cid=$requestedCid ms=${preparationTime.elapsedMilliseconds} poster=${!_autoPlay.value}',
@@ -1081,9 +1018,7 @@ class VideoDetailController extends GetxController
   ) async {
     final quality = model.missingVideoQualityBelowHighest;
     if (quality == -1) return;
-    _startupMark('query.qualities.begin');
     final result = await _getVideoUrl(quality, requestedCid: requestedCid);
-    _startupMark('query.qualities.end');
     if (result case Success(:final response)) {
       model.dash!.video!.merge(response.dash?.video);
     }
@@ -1107,7 +1042,6 @@ class VideoDetailController extends GetxController
       PlaybackDiagnostics.arm('source.query', playbackTraceState());
     }
     isQuerying = true;
-    _startupMark('query.begin');
     final queryRevision = ++_queryRevision;
     final queryCid = cid.value;
     try {
@@ -1135,12 +1069,8 @@ class VideoDetailController extends GetxController
     if (plPlayerController.enableSponsorBlock && isBlock && !fromReset) {
       querySponsorBlock(bvid: bvid, cid: cid.value);
     }
-    Future<void> prepareNetworkPreferences() async {
-      if (plPlayerController.cacheVideoQa != null) return;
-      _startupMark('query.preferences.begin');
+    if (plPlayerController.cacheVideoQa == null) {
       final isWiFi = await ConnectivityUtils.isWiFi;
-      _startupMark('query.preferences.end');
-      if (!isCurrent()) return;
       plPlayerController
         ..cacheVideoQa = isWiFi
             ? Pref.defaultVideoQa
@@ -1151,19 +1081,11 @@ class VideoDetailController extends GetxController
       preferCodecs = isWiFi ? Pref.preferCodecs : Pref.preferCodecsCellular;
     }
 
-    // The primary request always asks for the same quality ceiling; network
-    // preferences only select a stream after that response. Resolve both in
-    // parallel, and still await the preferences before selecting any stream.
-    final preferencesReady = prepareNetworkPreferences();
-    if (!Media3Player.parallelNetworkPreferences) await preferencesReady;
     if (!isCurrent()) return;
-    _startupMark('query.primary.begin');
     final result = await _getVideoUrl(
       VideoQuality.hdrVivid.code,
       requestedCid: queryCid,
     );
-    _startupMark('query.primary.end');
-    await preferencesReady;
     if (!isCurrent()) return;
 
     if (result case Success(:final response)) {
@@ -1200,7 +1122,18 @@ class VideoDetailController extends GetxController
       }
       if (data.dash == null) {
         if (data.durl case final durl?) {
-          videoUrl = VideoUtils.getCdnUrl(durl.first.playUrls);
+          // it will cause all files to be opened simultaneously
+          if (durl.length > 1) {
+            // TODO: refa
+            final sb = StringBuffer('edl://!no_chapters;');
+            for (var i in durl) {
+              final video = VideoUtils.getCdnUrl(i.playUrls);
+              sb.write('%${video.length}%$video,length=${i.length! / 1000};');
+            }
+            videoUrl = sb.toString();
+          } else {
+            videoUrl = VideoUtils.getCdnUrl(durl.single.playUrls);
+          }
 
           audioUrl = '';
 
@@ -1251,19 +1184,6 @@ class VideoDetailController extends GetxController
       final videosList = data.dash!.video!
           .where((e) => e.quality.code == targetVideoQa)
           .toList();
-
-      // Profile-only codec comparison keeps the requested quality and settings.
-      // Only select the diagnostic codec when that same quality offers it.
-      if (kProfileMode && Media3Player.startupCodec != null) {
-        final requested = VideoDecodeFormatType.fromString(
-          Media3Player.startupCodec!,
-        );
-        if (videosList.any(
-          (video) => requested.codes.any(video.codecs!.startsWith),
-        )) {
-          currentDecodeFormats = requested;
-        }
-      }
 
       /// 取出符合当前解码格式的videoItem
       firstVideo = videosList.firstWhere(

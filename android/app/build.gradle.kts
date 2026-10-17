@@ -56,7 +56,6 @@ android {
     }
 
     buildFeatures {
-        buildConfig = true
         if (project.hasProperty("dev")) {
             resValues = true
         }
@@ -112,10 +111,6 @@ flutter {
 }
 
 dependencies {
-    implementation("androidx.media3:media3-exoplayer:1.8.0")
-    implementation("androidx.media3:media3-exoplayer-dash:1.8.0")
-    implementation("androidx.media3:media3-exoplayer-hls:1.8.0")
-    implementation("androidx.media3:media3-ui:1.8.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.16.1") {
         // These tests exercise View measurement/layout, not native raster.

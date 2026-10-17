@@ -2,8 +2,6 @@ import 'dart:async' show Completer, unawaited;
 import 'dart:io' show Platform;
 import 'dart:math';
 
-import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
-
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/custom_icon.dart';
 import 'package:PiliPlus/common/widgets/flutter/pop_scope.dart';
@@ -1376,7 +1374,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
       () {
         final canAttach =
             videoDetailController.videoState.value &&
-            plPlayerController?.videoPlayerController != null;
+            plPlayerController?.videoController != null;
         final player = canAttach
             ? PLVideoPlayer(
                 maxWidth: width,
@@ -1394,21 +1392,14 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                 danmuWidget: isPipMode && pipNoDanmaku
                     ? null
                     : Obx(
-                        () => VideoOverlayPaint(
-                          visible:
-                              !Media3Player.deferDanmakuPaint ||
-                              (videoDetailController.autoPlay &&
-                                  videoDetailController.frameReady.value),
-                          child: PlDanmaku(
-                            key: ValueKey(videoDetailController.cid.value),
-                            isPipMode: isPipMode,
-                            cid: videoDetailController.cid.value,
-                            playerController: plPlayerController!,
-                            isFullScreen:
-                                plPlayerController!.isFullScreen.value,
-                            isFileSource: videoDetailController.isFileSource,
-                            size: Size(width, height),
-                          ),
+                        () => PlDanmaku(
+                          key: ValueKey(videoDetailController.cid.value),
+                          isPipMode: isPipMode,
+                          cid: videoDetailController.cid.value,
+                          playerController: plPlayerController!,
+                          isFullScreen: plPlayerController!.isFullScreen.value,
+                          isFileSource: videoDetailController.isFileSource,
+                          size: Size(width, height),
                         ),
                       ),
                 showEpisodes: showEpisodes,
@@ -1811,33 +1802,6 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   }
 
   Widget videoIntro({
-    double? width,
-    double? height,
-    bool? isHorizontal,
-    bool needRelated = true,
-    bool needCtr = true,
-  }) {
-    Widget buildIntro() => _videoIntro(
-      width: width,
-      height: height,
-      isHorizontal: isHorizontal,
-      needRelated: needRelated,
-      needCtr: needCtr,
-    );
-    // Profile comparison only: isolate the cost of constructing the details
-    // and resolving cached images while the decoder and first frame start.
-    // The release UI and source/play intent are unchanged.
-    if (!Media3Player.deferDetailsBuild) return buildIntro();
-    return Obx(() {
-      if (!videoDetailController.autoPlay ||
-          videoDetailController.frameReady.value) {
-        return buildIntro();
-      }
-      return const SizedBox.expand();
-    });
-  }
-
-  Widget _videoIntro({
     double? width,
     double? height,
     bool? isHorizontal,

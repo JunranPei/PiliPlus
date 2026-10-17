@@ -105,7 +105,7 @@ class PipCoordinator(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-        diagnostics.event("channel.receive", mapOf("method" to call.method, "arguments" to call.arguments?.toString()))
+        diagnostics.event("channel.receive", mapOf("method" to call.method, "arguments" to call.arguments.toString()))
         if (destroyed) {
             result.error("PIP_DESTROYED", "PiP coordinator is no longer attached", null)
             return

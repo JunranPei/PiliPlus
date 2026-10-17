@@ -109,13 +109,11 @@ class _PlDanmakuState extends State<PlDanmaku> {
     if (currentPosition == latestAddedPosition) {
       return;
     }
+    latestAddedPosition = currentPosition;
+
     List<DanmakuElem>? currentDanmakuList = _plDanmakuController
         .getCurrentDanmaku(currentPosition);
     if (currentDanmakuList != null) {
-      // A first position event may precede the asynchronous segment response.
-      // Keep retrying that bucket until it has data instead of losing it while
-      // the video remains at its initial position.
-      latestAddedPosition = currentPosition;
       final blockColorful = DanmakuOptions.blockColorful;
       final danmakuWeight = DanmakuOptions.danmakuWeight;
       for (DanmakuElem e in currentDanmakuList) {

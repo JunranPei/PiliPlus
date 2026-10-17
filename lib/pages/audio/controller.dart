@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/widgets/dialog/simple_dialog_option.dart';
@@ -50,7 +51,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:PiliPlus/plugin/pl_player/media3_player.dart';
 
 class AudioController extends GetxController
     with
@@ -73,7 +73,7 @@ class AudioController extends GetxController
 
   bool _hasInit = false;
   @override
-  Media3Player? player;
+  Player? player;
   late int cacheAudioQa;
 
   late bool isDragging = false;
@@ -368,6 +368,7 @@ class AudioController extends GetxController
     player
       ?..setMediaHeader(
         userAgent: ua,
+        // mpv cannot clear referer option
         headers: {'Referer': ?referer},
       )
       ..open(Media(url, start: _start, extras: extras));
@@ -390,7 +391,17 @@ class AudioController extends GetxController
     if (_hasInit) return;
     _hasInit = true;
     assert(player == null, _subscriptions = null);
-    player = await Media3Player.create();
+    player = await Player.create(
+      configuration: PlayerConfiguration(
+        options: {
+          if (Platform.isAndroid) 'ao': Pref.audioOutput,
+          'volume': PlatformUtils.isDesktop
+              ? (desktopVolume.value * 100).toString()
+              : Pref.playerVolume.toString(),
+          ...Pref.initBuffer(),
+        },
+      ),
+    );
     if (isClosed) {
       player!.dispose();
       player = null;
