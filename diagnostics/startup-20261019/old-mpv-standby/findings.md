@@ -1,6 +1,6 @@
 # 旧 mpv 版本移植待命：当前状态
 
-已先保存新版待命提交fca5f2aa1，再在codex/mpv-old-output-standby分支重建旧运行版本（2bdf889aa）并移植待命（2fd859459）。两个新APK均已编译，尚未完成视频画面对照，不能声称比旧版更快。
+已先保存新版待命提交fca5f2aa1，再在codex/mpv-old-output-standby分支重建旧运行版本（2bdf889aa）并移植待命（2fd859459）。两包已完成同视频4次A/B/B/A录制，未证明待命稳定提速。当前详细分段、原因与未知见cause-investigation.md和evaluation.json。
 
 ## 已完成
 
@@ -16,14 +16,16 @@
 
 ## 已测范围
 
-有效视频录制0条、不同视频0个；首页机制检查2条（关闭/开启各1）。第一条视频对照在进入录制前被内存门槛拒绝，不计为播放样本；未产生画面耗时或卡顿结论。
+有效视频录制4条、不同视频1个；首页机制检查2条（关闭/开启各1）。顺序为关闭/开启/开启/关闭：确认真实动态画面耗时5.199/2.935/3.758/2.446秒。每条35秒，约20秒日志内没有起播后重新缓冲/暂停，后段抽帧未见持续停止；仍不能排除短暂卡顿。最初被资源门槛拒绝的尝试和重启未完成导致安装拒绝的尝试不计播放样本。
 
-待命首页日志：PLAYER_STANDBY begin到ready约118.632ms；输出准备约10.484ms，currentVo=mediacodec_embed、configured=yes、mediaCount=0、playing=false、videoCodec为空。原生日志未创建CCodec/MediaCodec解码器。尚未通过实际视频证明接管和画面收益。
+待命首页日志：PLAYER_STANDBY begin到ready约118.632ms；输出准备约10.484ms，currentVo=mediacodec_embed、configured=yes、mediaCount=0、playing=false、videoCodec为空。原生日志未创建CCodec/MediaCodec解码器。两条实际视频均验证同Player/Surface接管、点击后无CreateSurface，未证明稳定画面收益。
 
 两次首页截图均可使用。空闲PSS分别87689/158149KiB，SWAP PSS分别55617/549KiB；交换内存差异大，不能将PSS差额解释为净待命开销。ActivityLaunch记录是内部指标，不是视频真实画面。
 
-## 暂停录制的具体原因
+## 首次中断与当前续查
 
 本任务编译完成并清理自己的Gradle后台进程后，仅启动了一个PiliPlus原AVD。随后另一项目启动CodexLabelsQuickSortQA模拟器及Gradle/Kotlin进程，导致宿主提交余量低于不变的8GiB录制门槛：首次拒绝时7.835GiB，随后观察到约5.577GiB。没有降低门槛或尝试双模拟器录制。
 
-已恢复本任务临时的heads-up通知设置为1并关闭本任务的PiliPlus模拟器；未停止另一项目的进程。保留capture-refused-a1.json及resource-interruption.json。待资源可用且先后安排明确后，继续protocol.md中的4条A/B/B/A同条件录制。仅编译通过、首页输出ready及内部通知不能作为提速结果。
+用户随后允许继续，资源门槛通过后，在原AVD的一次启动中完成上述4条录制，未并行构建。录制最小可用内存均超过8.9GiB、提交余量均超过12.3GiB。录完恢复heads-up通知为1并关闭本任务模拟器；最后装的是关闭待命控制包bc6e2951…。保留capture-refused-a1.json及resource-interruption.json，未停止其他项目进程。
+
+用户追加要求查清2秒多发生了什么。已定位接口、两轨打开识别、解码链以及占位参数导致的UI稳定判断差异。尚缺解码首输入/首输出边界；新增独立诊断开关但尚未通过编译/运行。另一任务再次构建并启动模拟器，诊断构建按资源门槛拒绝；已安排资源释放后在本对话继续这项原因诊断，不重复4次对照或恢复失败方案。

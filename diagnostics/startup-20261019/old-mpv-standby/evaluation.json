@@ -1,0 +1,723 @@
+{
+  "validVideoTrials": 4,
+  "distinctVideos": 1,
+  "order": [
+    "control",
+    "standby",
+    "standby",
+    "control"
+  ],
+  "recordedSecondsEach": 35,
+  "result": "Standby handoff works but stable click-to-motion benefit is not demonstrated; no ten-video expansion.",
+  "continuity": "Startup and ~2-second later frame samples reviewed; bounded trace has no renewed buffering/pause. Later brief stalls are not excluded.",
+  "rows": [
+    {
+      "label": "a1r",
+      "mode": "control",
+      "pid": "2712",
+      "playerId": 452642968,
+      "apkSha256": "bc6e2951df05d06a27bd002230e9bc18cab9f77e51aecb12827549857e023aa1",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.44,
+      "lastLoadingOrCoverPts": 6.472,
+      "firstImagePts": 6.505,
+      "confirmedMotionPts": 6.639,
+      "firstImageAfterClickSeconds": 5.065,
+      "confirmedMotionAfterClickSeconds": 5.199,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 1626.303,
+      "apiEndToOpenMs": 654.137,
+      "openToRealResolutionParamsMs": 2482.338,
+      "milestonesAfterQueryMs": [
+        {
+          "event": "startup.player.create.begin",
+          "stage": null,
+          "ms": 1633.596
+        },
+        {
+          "event": "startup.player.create.end",
+          "stage": null,
+          "ms": 1819.095
+        },
+        {
+          "event": "startup.videoController.create.begin",
+          "stage": null,
+          "ms": 1819.159
+        },
+        {
+          "event": "startup.videoController.create.end",
+          "stage": null,
+          "ms": 2150.391
+        },
+        {
+          "event": "source.open.begin",
+          "stage": null,
+          "ms": 2280.44
+        },
+        {
+          "event": "command.play",
+          "stage": null,
+          "ms": 2307.744
+        },
+        {
+          "event": "startup.surfaceHook.begin",
+          "stage": null,
+          "ms": 2308.965
+        },
+        {
+          "event": "startup.surfaceHook.end",
+          "stage": null,
+          "ms": 2618.63
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 2621.407
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 2621.921
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 2648.827
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 2865.779
+        },
+        {
+          "event": "output.stable",
+          "stage": null,
+          "ms": 3036.984
+        },
+        {
+          "event": "ui.frameReady.after",
+          "stage": null,
+          "ms": 3037.147
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 3038.36
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 3038.447
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 3038.616
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 3038.67
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 3227.953
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 3229.085
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 3243.471
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 4095.271
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.hardware",
+          "ms": 4763.29
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "output.configured",
+          "ms": 4764.152
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.firstFrame",
+          "ms": 4781.624
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.video.start",
+          "ms": 4809.934
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.audio.start",
+          "ms": 5143.426
+        }
+      ],
+      "sameStandbySurfaceHandedOff": false,
+      "sameStandbyPlayerClaimed": false,
+      "postClickCalls": [
+        {
+          "call": "VideoOutputManager.CreateSurface",
+          "args": "nullxnull",
+          "afterQueryMs": 2310.905,
+          "durationMs": 292.071
+        },
+        {
+          "call": "setOption",
+          "args": "wid=15818",
+          "afterQueryMs": 2603.236,
+          "durationMs": 11.474
+        },
+        {
+          "call": "setOption",
+          "args": "vo=mediacodec_embed",
+          "afterQueryMs": 2614.867,
+          "durationMs": 3.591
+        }
+      ],
+      "codecMarkersAfterQueryMs": {
+        "allocate": 3707.878,
+        "created": 3818.878,
+        "inputFormat": 3865.878
+      },
+      "allocateToCreatedMs": 111.0,
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 21.665,
+      "minimumCommitHeadroomGiB": 12.796,
+      "minimumAvailableRamGiB": 8.954,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-standby-a1r-20261019-5",
+      "boundary": "mpv stages use Dart delivery time; exact HTTP first byte, decoder first input/output and compositor fences are absent. Motion comes from original recording."
+    },
+    {
+      "label": "b1",
+      "mode": "standby",
+      "pid": "4169",
+      "playerId": 426349750,
+      "apkSha256": "32290cf8c85c8d02a47ac244198663a38b7fabd3a520f83d8234296bbe168f46",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "pointerPts": 0.978,
+      "lastLoadingOrCoverPts": 3.842,
+      "firstImagePts": 3.879,
+      "confirmedMotionPts": 3.913,
+      "firstImageAfterClickSeconds": 2.901,
+      "confirmedMotionAfterClickSeconds": 2.935,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 523.858,
+      "apiEndToOpenMs": 20.629,
+      "openToRealResolutionParamsMs": 1747.018,
+      "milestonesAfterQueryMs": [
+        {
+          "event": "source.open.begin",
+          "stage": null,
+          "ms": 544.487
+        },
+        {
+          "event": "command.play",
+          "stage": null,
+          "ms": 552.888
+        },
+        {
+          "event": "startup.surfaceHook.begin",
+          "stage": null,
+          "ms": 554.579
+        },
+        {
+          "event": "startup.surfaceHook.end",
+          "stage": null,
+          "ms": 555.315
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 557.832
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 558.247
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 601.032
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 636.055
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 991.56
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 991.667
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 991.936
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 992.011
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1115.3
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1115.73
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 1116.668
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 1469.669
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.hardware",
+          "ms": 1834.594
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "output.configured",
+          "ms": 1924.729
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.firstFrame",
+          "ms": 1965.054
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.video.start",
+          "ms": 1982.29
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.audio.start",
+          "ms": 1982.884
+        },
+        {
+          "event": "output.stable",
+          "stage": null,
+          "ms": 2388.888
+        },
+        {
+          "event": "ui.frameReady.after",
+          "stage": null,
+          "ms": 2389.027
+        }
+      ],
+      "sameStandbySurfaceHandedOff": true,
+      "sameStandbyPlayerClaimed": true,
+      "postClickCalls": [
+        {
+          "call": "setOption",
+          "args": "wid=15370",
+          "afterQueryMs": 554.776,
+          "durationMs": 0.342
+        },
+        {
+          "call": "setOption",
+          "args": "vo=mediacodec_embed",
+          "afterQueryMs": 555.164,
+          "durationMs": 0.083
+        }
+      ],
+      "codecMarkersAfterQueryMs": {
+        "allocate": 1250.988,
+        "created": 1365.988,
+        "inputFormat": 1409.988
+      },
+      "allocateToCreatedMs": 115.0,
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.528,
+      "minimumCommitHeadroomGiB": 12.629,
+      "minimumAvailableRamGiB": 9.728,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-standby-b1-20261019-5",
+      "boundary": "mpv stages use Dart delivery time; exact HTTP first byte, decoder first input/output and compositor fences are absent. Motion comes from original recording."
+    },
+    {
+      "label": "b2",
+      "mode": "standby",
+      "pid": "4562",
+      "playerId": 94959690,
+      "apkSha256": "32290cf8c85c8d02a47ac244198663a38b7fabd3a520f83d8234296bbe168f46",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.076,
+      "lastLoadingOrCoverPts": 4.768,
+      "firstImagePts": 4.802,
+      "confirmedMotionPts": 4.834,
+      "firstImageAfterClickSeconds": 3.726,
+      "confirmedMotionAfterClickSeconds": 3.758,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 838.578,
+      "apiEndToOpenMs": 95.937,
+      "openToRealResolutionParamsMs": 2142.452,
+      "milestonesAfterQueryMs": [
+        {
+          "event": "source.open.begin",
+          "stage": null,
+          "ms": 934.515
+        },
+        {
+          "event": "command.play",
+          "stage": null,
+          "ms": 1091.689
+        },
+        {
+          "event": "startup.surfaceHook.begin",
+          "stage": null,
+          "ms": 1215.037
+        },
+        {
+          "event": "startup.surfaceHook.end",
+          "stage": null,
+          "ms": 1217.471
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1224.141
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 1224.34
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 1284.558
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 1284.766
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1597.259
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 1597.368
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 1607.996
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 1630.736
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1816.808
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1817.622
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 1853.428
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 2450.116
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.hardware",
+          "ms": 2852.905
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "output.configured",
+          "ms": 3064.217
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.firstFrame",
+          "ms": 3065.218
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.video.start",
+          "ms": 3077.788
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.audio.start",
+          "ms": 3079.801
+        },
+        {
+          "event": "output.stable",
+          "stage": null,
+          "ms": 3299.403
+        },
+        {
+          "event": "ui.frameReady.after",
+          "stage": null,
+          "ms": 3300.911
+        }
+      ],
+      "sameStandbySurfaceHandedOff": true,
+      "sameStandbyPlayerClaimed": true,
+      "postClickCalls": [
+        {
+          "call": "setOption",
+          "args": "wid=15494",
+          "afterQueryMs": 1216.278,
+          "durationMs": 0.267
+        },
+        {
+          "call": "setOption",
+          "args": "vo=mediacodec_embed",
+          "afterQueryMs": 1216.617,
+          "durationMs": 0.181
+        }
+      ],
+      "codecMarkersAfterQueryMs": {
+        "allocate": 2215.012,
+        "created": 2345.012,
+        "inputFormat": 2404.012
+      },
+      "allocateToCreatedMs": 130.0,
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.847,
+      "minimumCommitHeadroomGiB": 12.346,
+      "minimumAvailableRamGiB": 9.376,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-standby-b2-20261019-5",
+      "boundary": "mpv stages use Dart delivery time; exact HTTP first byte, decoder first input/output and compositor fences are absent. Motion comes from original recording."
+    },
+    {
+      "label": "a2",
+      "mode": "control",
+      "pid": "4942",
+      "playerId": 655998432,
+      "apkSha256": "bc6e2951df05d06a27bd002230e9bc18cab9f77e51aecb12827549857e023aa1",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.007,
+      "lastLoadingOrCoverPts": 3.35,
+      "firstImagePts": 3.384,
+      "confirmedMotionPts": 3.453,
+      "firstImageAfterClickSeconds": 2.377,
+      "confirmedMotionAfterClickSeconds": 2.446,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 604.276,
+      "apiEndToOpenMs": 80.158,
+      "openToRealResolutionParamsMs": 1471.459,
+      "milestonesAfterQueryMs": [
+        {
+          "event": "startup.player.create.begin",
+          "stage": null,
+          "ms": 607.208
+        },
+        {
+          "event": "startup.player.create.end",
+          "stage": null,
+          "ms": 649.638
+        },
+        {
+          "event": "startup.videoController.create.begin",
+          "stage": null,
+          "ms": 649.704
+        },
+        {
+          "event": "startup.videoController.create.end",
+          "stage": null,
+          "ms": 667.314
+        },
+        {
+          "event": "source.open.begin",
+          "stage": null,
+          "ms": 684.434
+        },
+        {
+          "event": "command.play",
+          "stage": null,
+          "ms": 686.874
+        },
+        {
+          "event": "startup.surfaceHook.begin",
+          "stage": null,
+          "ms": 688.633
+        },
+        {
+          "event": "startup.surfaceHook.end",
+          "stage": null,
+          "ms": 732.262
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 734.817
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 734.903
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 742.614
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 800.881
+        },
+        {
+          "event": "output.stable",
+          "stage": null,
+          "ms": 864.63
+        },
+        {
+          "event": "ui.frameReady.after",
+          "stage": null,
+          "ms": 865.322
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1061.858
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "edl.segment.open",
+          "ms": 1061.956
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.begin",
+          "ms": 1062.14
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "connect.end",
+          "ms": 1118.911
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1339.05
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "demux.detected",
+          "ms": 1339.384
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 1340.419
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.open",
+          "ms": 1630.396
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "decoder.hardware",
+          "ms": 2151.731
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "output.configured",
+          "ms": 2152.876
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.firstFrame",
+          "ms": 2156.511
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.video.start",
+          "ms": 2176.427
+        },
+        {
+          "event": "startup.mpv",
+          "stage": "mpv.audio.start",
+          "ms": 2315.332
+        }
+      ],
+      "sameStandbySurfaceHandedOff": false,
+      "sameStandbyPlayerClaimed": false,
+      "postClickCalls": [
+        {
+          "call": "VideoOutputManager.CreateSurface",
+          "args": "nullxnull",
+          "afterQueryMs": 688.78,
+          "durationMs": 38.347
+        },
+        {
+          "call": "setOption",
+          "args": "wid=15910",
+          "afterQueryMs": 727.321,
+          "durationMs": 2.474
+        },
+        {
+          "call": "setOption",
+          "args": "vo=mediacodec_embed",
+          "afterQueryMs": 729.846,
+          "durationMs": 2.12
+        }
+      ],
+      "codecMarkersAfterQueryMs": {
+        "allocate": 1454.114,
+        "created": 1571.114,
+        "inputFormat": 1598.114
+      },
+      "allocateToCreatedMs": 117.0,
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.615,
+      "minimumCommitHeadroomGiB": 12.396,
+      "minimumAvailableRamGiB": 9.472,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-standby-a2-20261019-5",
+      "boundary": "mpv stages use Dart delivery time; exact HTTP first byte, decoder first input/output and compositor fences are absent. Motion comes from original recording."
+    }
+  ]
+}
