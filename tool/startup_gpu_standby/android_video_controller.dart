@@ -101,7 +101,7 @@ class AndroidVideoController extends PlatformVideoController {
   bool _standbySurface = false;
   static void _gpuMark(String event, Map<String, Object?> data) {
     print(
-      '[GPU_STANDBY] ${DateTime.now().microsecondsSinceEpoch} $event $data',
+      '[OUTPUT_STANDBY] ${DateTime.now().microsecondsSinceEpoch} $event $data',
     );
   }
 
@@ -117,20 +117,22 @@ class AndroidVideoController extends PlatformVideoController {
         'handle': player.handle.toString(),
       });
       _wid = surface['wid'];
-      // This is an idle output buffer size, not a guessed media resolution.
-      // It matches mpv's force-window placeholder; media params still resize it.
-      await _timedInvoke('VideoOutputManager.SetSurfaceTextureSize', {
-        'handle': player.handle.toString(),
-        'width': '960',
-        'height': '540',
-      });
-      _timedSetOption('android-surface-size', '960x540');
+      if (vo == 'gpu') {
+        // GPU idle buffers follow the existing mpv placeholder dimensions.
+        // Direct MediaCodec output retains its normal decoder-controlled size.
+        await _timedInvoke('VideoOutputManager.SetSurfaceTextureSize', {
+          'handle': player.handle.toString(),
+          'width': '960',
+          'height': '540',
+        });
+        _timedSetOption('android-surface-size', '960x540');
+      }
       _timedSetOption('wid', _wid.toString());
-      _timedSetOption('vo', 'gpu');
+      _timedSetOption('vo', vo);
       final currentVo = player.getProperty('current-vo');
       final configured = player.getProperty('vo-configured');
-      if (currentVo != 'gpu' || configured != 'yes') {
-        throw StateError('Idle GPU output not configured');
+      if (currentVo != vo || configured != 'yes') {
+        throw StateError('Idle configured output not ready');
       }
       _standbySurface = true;
       _gpuMark('ready', {

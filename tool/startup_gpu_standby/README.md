@@ -1,4 +1,8 @@
-# GPU standby experimental checkpoint
+# Historical mpv output standby transplant
+
+This branch ports the preserved `fca5f2aa1` experiment onto the reconstructed historical `mediacodec_embed` baseline. It retains that output route and its original autoplay/cover handling. Only GPU output uses the idle 960x540 buffer setup; direct MediaCodec output keeps decoder-controlled sizing. Both build variants include the same observers and historical verbose logging; `--control` disables only startup standby. The older runtime baseline reconstruction is committed as `2bdf889aa` and documented in `diagnostics/startup-20261019/old-mpv-standby/provenance.md`.
+
+The following paragraph documents the preserved c35 checkpoint, not a performance claim for this transplant:
 
 This checkpoint preserves the exact App and Android controller sources used to build the tested APK `51a4eb198abe20df0ac08eb44ffce2a534c646a00a85b5244dcdbdc40fe08b73`. It is an investigation checkpoint, not an accepted performance fix. The base is `c35b53769e9577416e89aeab3f06fbbc5b8200f6`, with the original mpv/media_kit, UI and features.
 

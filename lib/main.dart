@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'dart:async' show unawaited;
+
+import 'package:PiliPlus/plugin/pl_player/controller.dart';
 
 import 'package:PiliPlus/build_config.dart';
 import 'package:PiliPlus/common/constants.dart';
@@ -214,6 +217,11 @@ void main() async {
     );
   } else {
     runApp(const MyApp());
+  }
+  if (Platform.isAndroid && const bool.fromEnvironment('PLAYER_STANDBY')) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(PlPlayerController.prepareStandby());
+    });
   }
 }
 

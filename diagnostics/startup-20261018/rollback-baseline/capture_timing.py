@@ -79,7 +79,8 @@ def main():
             (out/'pre-click-standby.log').write_text('\n'.join(
                 line for line in log.splitlines() if '[PLAYER_STANDBY]' in line), encoding='utf-8')
             (out/'pre-click-output.log').write_text('\n'.join(
-                line for line in log.splitlines() if '[GPU_STANDBY]' in line or '[SURFACE_CALL]' in line), encoding='utf-8')
+                line for line in log.splitlines() if any(tag in line for tag in (
+                    '[GPU_STANDBY]', '[OUTPUT_STANDBY]', '[SURFACE_CALL]'))), encoding='utf-8')
             (out/'pre-click-meminfo.txt').write_bytes(original_adb('shell', 'dumpsys', 'meminfo', recorder.PACKAGE))
         if args.keep_player and arguments == ('shell', 'input', 'keyevent', '4'):
             return b''

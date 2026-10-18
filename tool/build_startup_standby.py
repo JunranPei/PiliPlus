@@ -37,7 +37,7 @@ if guard.returncode: raise SystemExit(guard.returncode)
 output.parent.mkdir(parents=True,exist_ok=True)
 try:
     dependency.write_bytes((ROOT/'tool/startup_gpu_standby/android_video_controller.dart').read_bytes())
-    flags = ['PLAYBACK_TRACE=true','STARTUP_TIMING=true',f'PLAYER_STANDBY={str(not args.control).lower()}']
+    flags = ['PLAYBACK_TRACE=true','PLAYBACK_STARTUP_VERBOSE=true','STARTUP_TIMING=true',f'PLAYER_STANDBY={str(not args.control).lower()}']
     defines = ','.join(base64.b64encode(f.encode()).decode() for f in flags)
     command = [str(ROOT/'android/gradlew.bat'),'-p','android','assembleRelease',
         '-Ptarget-platform=android-x64','-Ptarget=lib/main.dart',f'-Pdart-defines={defines}',

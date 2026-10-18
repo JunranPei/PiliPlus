@@ -1008,8 +1008,63 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
   }
 
-  Future<Player> _initPlayer() async {
-    assert(_videoPlayerController == null);
+  static Future<({Player player, VideoController video})>? _standbyEngine;
+  static String? _standbySettings;
+
+  static String _engineSettings() => [
+    Pref.videoSync,
+    Pref.audioOutput,
+    Pref.playerVolume,
+    Pref.enableHA,
+    Pref.hardwareDecoding,
+    Pref.autosync,
+  ].join('|');
+
+  static void _standbyMark(
+    String event, [
+    Map<String, Object?> data = const {},
+  ]) {
+    if (PlaybackDiagnostics.enabled) {
+      // This diagnostic marker must remain visible in release-mode logcat.
+      // ignore: avoid_print
+      print(
+        '[PLAYER_STANDBY] ${DateTime.now().microsecondsSinceEpoch} $event $data',
+      );
+    }
+  }
+
+  /// Reserve exactly one engine, without creating a playback owner, opening
+  /// media, requesting URLs, audio focus, or attaching a source Surface.
+  static Future<void> prepareStandby() async {
+    if (!Platform.isAndroid || _instance != null || _standbyEngine != null) {
+      return;
+    }
+    _standbySettings = _engineSettings();
+    _standbyMark('begin');
+    final pending = _createEngine(
+      hwdec: Pref.enableHA ? Pref.hardwareDecoding : null,
+      desktopVolume: 1.0,
+      warmOutput: true,
+    );
+    _standbyEngine = pending;
+    try {
+      final engine = await pending;
+      _standbyMark('ready', {
+        'playerId': identityHashCode(engine.player),
+        'mediaCount': engine.player.current.length,
+        'playing': engine.player.state.playing,
+      });
+    } catch (error) {
+      if (identical(_standbyEngine, pending)) _standbyEngine = null;
+      _standbyMark('failed', {'errorType': error.runtimeType.toString()});
+    }
+  }
+
+  static Future<({Player player, VideoController video})> _createEngine({
+    required String? hwdec,
+    required double desktopVolume,
+    bool warmOutput = false,
+  }) async {
     PlaybackDiagnostics.event('startup.player.create.begin');
     String ao = Pref.audioOutput;
     if (ao == 'opensles,aaudio,audiotrack') {
@@ -1019,11 +1074,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       'video-sync': Pref.videoSync,
       if (Platform.isAndroid) 'ao': ao,
       'volume':
-          (PlatformUtils.isMobile ? Pref.playerVolume : volume.value * 100)
+          (PlatformUtils.isMobile ? Pref.playerVolume : desktopVolume * 100)
               .toString(),
       'volume-max': kMaxVolume.toString(),
       if (hwdec != null && hwdec != 'no')
-        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec!,
+        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec,
       if (Platform.isAndroid) 'profile': 'fast',
       if (Platform.isWindows) 'gpu-api': 'd3d11',
       'vd-lavc-fast': 'yes',
@@ -1046,7 +1101,6 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       ),
     );
 
-    assert(_videoController == null);
     if (PlaybackDiagnostics.enabled) {
       player.onLoadHooks.add(() {
         PlaybackDiagnostics.event('startup.surfaceHook.begin');
@@ -1055,46 +1109,88 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     PlaybackDiagnostics.event('startup.player.create.end');
     PlaybackDiagnostics.event('startup.videoController.create.begin');
 
-    _videoController = await VideoController.create(
-      player,
-      configuration: VideoControllerConfiguration(
-        enableHardwareAcceleration: hwdec != null,
-        // The Android fork of media_kit provides a MediaCodec-backed output
-        // which attaches the decoder surface without the GPU output's second
-        // SurfaceTexture resize/reconfigure pass.  The startup probe showed
-        // that this is the first visible-output bottleneck after play(); keep
-        // desktop and iOS on their existing platform defaults.
-        vo: Platform.isAndroid ? 'mediacodec_embed' : null,
-        // Attach the Android surface immediately. Waiting for video parameters
-        // makes the loading cover disappear before the first picture on slow
-        // streams and regresses startup against the original player.
-        androidAttachSurfaceAfterVideoParameters: false,
-        hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
-      ),
-    );
+    try {
+      final video = await VideoController.create(
+        player,
+        configuration: VideoControllerConfiguration(
+          enableHardwareAcceleration: hwdec != null,
+          // The Android fork of media_kit provides a MediaCodec-backed output
+          // which attaches the decoder surface without the GPU output's second
+          // SurfaceTexture resize/reconfigure pass.  The startup probe showed
+          // that this is the first visible-output bottleneck after play(); keep
+          // desktop and iOS on their existing platform defaults.
+          vo: Platform.isAndroid ? 'mediacodec_embed' : null,
+          // Attach the Android surface immediately. Waiting for video parameters
+          // makes the loading cover disappear before the first picture on slow
+          // streams and regresses startup against the original player.
+          androidAttachSurfaceAfterVideoParameters: false,
+          hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
+        ),
+      );
 
-    if (PlaybackDiagnostics.enabled) {
-      player.onLoadHooks.add(() {
-        PlaybackDiagnostics.event('startup.surfaceHook.end');
-      });
+      if (PlaybackDiagnostics.enabled) {
+        player.onLoadHooks.add(() {
+          PlaybackDiagnostics.event('startup.surfaceHook.end');
+        });
+      }
+
+      if (PlaybackDiagnostics.enabled) {
+        PlaybackDiagnostics.event('startup.output.config', {
+          'requestedVo': Platform.isAndroid ? 'mediacodec_embed' : 'default',
+          'attachSurfaceAfterVideoParameters': false,
+          'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec,
+        });
+      }
+
+      player.setMediaHeader(
+        userAgent: BrowserUa.pc,
+        referer: HttpString.baseUrl,
+      );
+      PlaybackDiagnostics.event('startup.videoController.create.end');
+
+      if (warmOutput) {
+        await (video as dynamic).prepareStandbyOutput();
+      }
+      return (player: player, video: video);
+    } catch (_) {
+      await player.dispose();
+      rethrow;
     }
+  }
 
-    if (PlaybackDiagnostics.enabled) {
-      PlaybackDiagnostics.event('startup.output.config', {
-        'requestedVo': Platform.isAndroid ? 'mediacodec_embed' : 'default',
-        'attachSurfaceAfterVideoParameters': false,
-        'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec,
-      });
+  Future<Player> _initPlayer() async {
+    assert(_videoPlayerController == null);
+    final pending = _standbyEngine;
+    final matches = _standbySettings == _engineSettings();
+    _standbyEngine = null;
+    ({Player player, VideoController video})? engine;
+    if (pending != null) {
+      try {
+        final prepared = await pending;
+        if (matches) {
+          engine = prepared;
+          _standbyMark('claimed', {
+            'playerId': identityHashCode(prepared.player),
+            'mediaCount': prepared.player.current.length,
+          });
+        } else {
+          await prepared.player.dispose();
+          _standbyMark('discarded-settings-changed');
+        }
+      } catch (_) {
+        // A failed speculative creation must retain normal on-demand startup.
+      }
     }
-
-    player.setMediaHeader(userAgent: BrowserUa.pc, referer: HttpString.baseUrl);
-    PlaybackDiagnostics.event('startup.videoController.create.end');
-
+    final selected =
+        engine ??
+        await _createEngine(
+          hwdec: hwdec,
+          desktopVolume: volume.value,
+        );
+    _videoController = selected.video;
     _installPlaybackTrace();
-
-    _startListeners(player);
-
-    return player;
+    _startListeners(selected.player);
+    return selected.player;
   }
 
   late final buffer = Pref.initBuffer(_playbackSpeed.value);
