@@ -14,8 +14,13 @@ abstract final class StartupProbe {
   static const directory = String.fromEnvironment('PLAYBACK_STARTUP_PROBE_DIR');
   static const enabled = PlaybackDiagnostics.enabled && directory != '';
   static const verbose =
-      enabled && bool.fromEnvironment('PLAYBACK_STARTUP_VERBOSE');
+      PlaybackDiagnostics.enabled &&
+      bool.fromEnvironment('PLAYBACK_STARTUP_VERBOSE');
   static int _messages = 0;
+
+  static void beginSource() {
+    if (verbose) _messages = 0;
+  }
 
   static Future<({String video, String? audio})> resolve(
     DataSource source,
@@ -79,9 +84,10 @@ abstract final class StartupProbe {
   // Deliberately retain only milestone names. libmpv debug messages may contain
   // signed URLs and request headers, which must not enter the general trace.
   static void onLog(PlayerLog log) {
-    if (!enabled || !PlaybackDiagnostics.active || _messages >= 512) return;
+    if (!verbose || !PlaybackDiagnostics.active || _messages >= 512) return;
     final text = log.text.toLowerCase();
     for (final entry in const <String, String>{
+      'opening segment': 'edl.segment.open',
       'starting connection attempt': 'connect.begin',
       'successfully connected': 'connect.end',
       'request: get': 'http.request',
@@ -100,6 +106,7 @@ abstract final class StartupProbe {
       'first video frame after restart shown': 'mpv.firstFrame',
       'starting video playback': 'mpv.video.start',
       'starting audio playback': 'mpv.audio.start',
+      'cache underrun': 'cache.underrun',
     }.entries) {
       if (text.contains(entry.key)) {
         _messages++;

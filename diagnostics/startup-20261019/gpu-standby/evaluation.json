@@ -1,0 +1,290 @@
+{
+  "validVideoTrials": 4,
+  "distinctVideos": 1,
+  "homeProbes": 1,
+  "order": [
+    "control",
+    "gpu-standby",
+    "gpu-standby",
+    "control"
+  ],
+  "labelNote": "home-control is the first VIDEO control capture, despite its label; it is not a homepage probe.",
+  "mechanism": "Idle GPU output configured and first-load handoff confirmed in both candidates; no software-to-hardware transition in candidate params.",
+  "acceptance": "Mechanism works, candidate timings promising but small and within broad control variation. Stable end-to-end benefit remains unproven; no ten-video extension or production adoption.",
+  "rows": [
+    {
+      "label": "home-control",
+      "mode": "control",
+      "pid": "3190",
+      "playerId": 985100081,
+      "recording": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\gpu-standby-home-control-20261019-5",
+      "appColdStarted": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.101,
+      "lastCoverPts": 5.279,
+      "firstImagePts": 5.319,
+      "motionConfirmedPts": 5.489,
+      "firstImageAfterClickSeconds": 4.218,
+      "motionConfirmedAfterClickSeconds": 4.388,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 671.602,
+      "openToUiReadyMs": 2594.012,
+      "realResolutionParams": [
+        {
+          "afterOpenMs": 930.11,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "rotate": 0,
+          "aspect": 1.7777777777777777,
+          "pixelformat": "yuv420p",
+          "hwPixelformat": null
+        },
+        {
+          "afterOpenMs": 2316.242,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "rotate": 0,
+          "aspect": 1.7777777777777777,
+          "pixelformat": "mediacodec",
+          "hwPixelformat": null
+        }
+      ],
+      "sameStandbySurfaceHandedOff": false,
+      "postClickSurfaceCreates": [
+        {
+          "id": 1,
+          "call": "VideoOutputManager.CreateSurface",
+          "args": "nullxnull",
+          "beginMs": 1614.05,
+          "durationMs": 63.4
+        }
+      ],
+      "postClickVoSets": [
+        {
+          "id": 5,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 2596.45,
+          "durationMs": 527.94
+        },
+        {
+          "id": 9,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 3680.0,
+          "durationMs": 0.04
+        },
+        {
+          "id": 13,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 3927.21,
+          "durationMs": 0.1
+        }
+      ],
+      "postPlayBufferOrPauseEvents": [],
+      "boundedTraceSpanSeconds": 21.115,
+      "continuity": "35-second recording; startup frame review plus ~2-second later samples. Bounded trace shows no post-play pause/buffering; later brief stalls not ruled out.",
+      "nativeCodecMarkersAfterOpenMs": {
+        "allocate": 1397.597,
+        "created": 1454.597,
+        "inputFormatLogged": 1469.597
+      },
+      "nativeAllocateToCreatedMs": 57.0,
+      "minimumHostCommitHeadroomGiB": 11.798
+    },
+    {
+      "label": "b1",
+      "mode": "gpu-standby",
+      "pid": "4444",
+      "playerId": 784301208,
+      "recording": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\gpu-standby-b1-20261019-5",
+      "appColdStarted": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.008,
+      "lastCoverPts": 4.46,
+      "firstImagePts": 4.493,
+      "motionConfirmedPts": 4.526,
+      "firstImageAfterClickSeconds": 3.485,
+      "motionConfirmedAfterClickSeconds": 3.518,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 518.783,
+      "openToUiReadyMs": 2504.689,
+      "realResolutionParams": [
+        {
+          "afterOpenMs": 2168.386,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "rotate": 0,
+          "aspect": 1.7777777777777777,
+          "pixelformat": "mediacodec",
+          "hwPixelformat": null
+        }
+      ],
+      "sameStandbySurfaceHandedOff": true,
+      "postClickSurfaceCreates": [],
+      "postClickVoSets": [
+        {
+          "id": 13,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 3088.97,
+          "durationMs": 0.27
+        }
+      ],
+      "postPlayBufferOrPauseEvents": [],
+      "boundedTraceSpanSeconds": 20.795,
+      "continuity": "35-second recording; startup frame review plus ~2-second later samples. Bounded trace shows no post-play pause/buffering; later brief stalls not ruled out.",
+      "nativeCodecMarkersAfterOpenMs": {
+        "allocate": 1142.964,
+        "created": 1273.964,
+        "inputFormatLogged": 1325.964
+      },
+      "nativeAllocateToCreatedMs": 131.0,
+      "minimumHostCommitHeadroomGiB": 11.13
+    },
+    {
+      "label": "b2",
+      "mode": "gpu-standby",
+      "pid": "4845",
+      "playerId": 705437698,
+      "recording": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\gpu-standby-b2-20261019-5",
+      "appColdStarted": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.109,
+      "lastCoverPts": 4.377,
+      "firstImagePts": 4.412,
+      "motionConfirmedPts": 4.446,
+      "firstImageAfterClickSeconds": 3.303,
+      "motionConfirmedAfterClickSeconds": 3.337,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 668.423,
+      "openToUiReadyMs": 2123.67,
+      "realResolutionParams": [
+        {
+          "afterOpenMs": 1737.006,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "rotate": 0,
+          "aspect": 1.7777777777777777,
+          "pixelformat": "mediacodec",
+          "hwPixelformat": null
+        }
+      ],
+      "sameStandbySurfaceHandedOff": true,
+      "postClickSurfaceCreates": [],
+      "postClickVoSets": [
+        {
+          "id": 13,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 2889.56,
+          "durationMs": 0.04
+        }
+      ],
+      "postPlayBufferOrPauseEvents": [],
+      "boundedTraceSpanSeconds": 20.846,
+      "continuity": "35-second recording; startup frame review plus ~2-second later samples. Bounded trace shows no post-play pause/buffering; later brief stalls not ruled out.",
+      "nativeCodecMarkersAfterOpenMs": {
+        "allocate": 976.719,
+        "created": 1063.719,
+        "inputFormatLogged": 1096.719
+      },
+      "nativeAllocateToCreatedMs": 87.0,
+      "minimumHostCommitHeadroomGiB": 11.444
+    },
+    {
+      "label": "a2",
+      "mode": "control",
+      "pid": "5236",
+      "playerId": 566096093,
+      "recording": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\gpu-standby-a2-20261019-5",
+      "appColdStarted": true,
+      "mediaPreloaded": false,
+      "pointerPts": 0.976,
+      "lastCoverPts": 4.381,
+      "firstImagePts": 4.419,
+      "motionConfirmedPts": 4.653,
+      "firstImageAfterClickSeconds": 3.443,
+      "motionConfirmedAfterClickSeconds": 3.677,
+      "motionIsConservativeConfirmationUpperBound": true,
+      "apiMs": 504.721,
+      "openToUiReadyMs": 2609.437,
+      "realResolutionParams": [
+        {
+          "afterOpenMs": 928.477,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "rotate": 0,
+          "aspect": 1.7777777777777777,
+          "pixelformat": "yuv420p",
+          "hwPixelformat": null
+        },
+        {
+          "afterOpenMs": 2290.234,
+          "w": 1920,
+          "h": 1080,
+          "dw": 1920,
+          "dh": 1080,
+          "rotate": 0,
+          "aspect": 1.7777777777777777,
+          "pixelformat": "mediacodec",
+          "hwPixelformat": null
+        }
+      ],
+      "sameStandbySurfaceHandedOff": false,
+      "postClickSurfaceCreates": [
+        {
+          "id": 1,
+          "call": "VideoOutputManager.CreateSurface",
+          "args": "nullxnull",
+          "beginMs": 786.67,
+          "durationMs": 24.46
+        }
+      ],
+      "postClickVoSets": [
+        {
+          "id": 5,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 1767.78,
+          "durationMs": 571.66
+        },
+        {
+          "id": 9,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 2999.67,
+          "durationMs": 6.59
+        },
+        {
+          "id": 13,
+          "call": "setOption",
+          "args": "vo=gpu",
+          "beginMs": 3245.8,
+          "durationMs": 2.11
+        }
+      ],
+      "postPlayBufferOrPauseEvents": [],
+      "boundedTraceSpanSeconds": 20.646,
+      "continuity": "35-second recording; startup frame review plus ~2-second later samples. Bounded trace shows no post-play pause/buffering; later brief stalls not ruled out.",
+      "nativeCodecMarkersAfterOpenMs": {
+        "allocate": 1428.565,
+        "created": 1483.565,
+        "inputFormatLogged": 1514.565
+      },
+      "nativeAllocateToCreatedMs": 55.0,
+      "minimumHostCommitHeadroomGiB": 11.602
+    }
+  ]
+}

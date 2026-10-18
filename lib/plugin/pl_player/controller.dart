@@ -1047,6 +1047,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     );
 
     assert(_videoController == null);
+    if (PlaybackDiagnostics.enabled) {
+      player.onLoadHooks.add(() {
+        PlaybackDiagnostics.event('startup.surfaceHook.begin');
+      });
+    }
     PlaybackDiagnostics.event('startup.player.create.end');
     PlaybackDiagnostics.event('startup.videoController.create.begin');
 
@@ -1067,6 +1072,12 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         hwdec: Platform.isAndroid ? 'mediacodec' : hwdec,
       ),
     );
+
+    if (PlaybackDiagnostics.enabled) {
+      player.onLoadHooks.add(() {
+        PlaybackDiagnostics.event('startup.surfaceHook.end');
+      });
+    }
 
     if (PlaybackDiagnostics.enabled) {
       PlaybackDiagnostics.event('startup.output.config', {
@@ -1170,6 +1181,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       PlaybackDiagnostics.event('source.open.begin', playbackTraceState());
     }
     try {
+      StartupProbe.beginSource();
       await player.open(
         Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
         play: false,
@@ -1526,6 +1538,10 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         buffered.value = buffer.inSeconds;
       }),
       stream.buffering.listen((bool buffering) {
+        PlaybackDiagnostics.event('media.buffering', {
+          ...playbackTraceState(),
+          'value': buffering,
+        });
         isBuffering.value = buffering;
         if (!playerStatus.isCompleted) {
           _stopWakeLockTimer();

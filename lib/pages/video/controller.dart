@@ -3,6 +3,7 @@ import 'dart:math' show min;
 import 'dart:ui';
 
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_stream_readiness.dart';
 
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/pair.dart';
@@ -982,6 +983,15 @@ class VideoDetailController extends GetxController
 
   bool isQuerying = false;
   int _queryRevision = 0;
+  Future<void>? _qualitySupplementReady;
+
+  Future<bool> waitForQualityOptions() async {
+    final revision = _queryRevision;
+    final requestedCid = cid.value;
+    final ready = _qualitySupplementReady;
+    if (ready != null) await ready;
+    return !isClosed && revision == _queryRevision && requestedCid == cid.value;
+  }
 
   final languages = Rxn<List<LanguageItem>>();
   final currLang = Rxn<String>();
@@ -1014,14 +1024,37 @@ class VideoDetailController extends GetxController
 
   Future<void> _supplementVideoQualities(
     PlayUrlModel model,
-    int requestedCid,
-  ) async {
+    int requestedCid, {
+    required bool Function() isCurrent,
+  }) async {
     final quality = model.missingVideoQualityBelowHighest;
     if (quality == -1) return;
     final result = await _getVideoUrl(quality, requestedCid: requestedCid);
+    if (!isCurrent() || !identical(data, model)) return;
     if (result case Success(:final response)) {
       model.dash!.video!.merge(response.dash?.video);
     }
+  }
+
+  bool _canDeferQualitySupplement(PlayUrlModel model) {
+    final formats = model.supportFormats;
+    if (formats == null || formats.isEmpty) return false;
+    final quality = model.findAvailableVideoQuality(
+      plPlayerController.cacheVideoQa!,
+    );
+    final format = formats.firstWhere(
+      (item) => item.quality == quality,
+      orElse: () => formats.first,
+    );
+    final codecs = format.codecs;
+    if (codecs == null || codecs.isEmpty) return false;
+    final selectedCodec = VideoUtils.selectCodec(codecs, preferCodecs);
+    return StartupStreamReadiness.hasSelectedTracks(
+      model,
+      videoQuality: quality,
+      videoCodecPrefixes: selectedCodec.codes,
+      audioQuality: plPlayerController.cacheAudioQa,
+    );
   }
 
   Volume? volume;
@@ -1043,6 +1076,7 @@ class VideoDetailController extends GetxController
     }
     isQuerying = true;
     final queryRevision = ++_queryRevision;
+    _qualitySupplementReady = null;
     final queryCid = cid.value;
     try {
       await _queryVideoUrl(
@@ -1069,8 +1103,12 @@ class VideoDetailController extends GetxController
     if (plPlayerController.enableSponsorBlock && isBlock && !fromReset) {
       querySponsorBlock(bvid: bvid, cid: cid.value);
     }
-    if (plPlayerController.cacheVideoQa == null) {
+    Future<void> prepareNetworkPreferences() async {
+      if (plPlayerController.cacheVideoQa != null) return;
+      PlaybackDiagnostics.event('query.preferences.begin', {'cid': queryCid});
       final isWiFi = await ConnectivityUtils.isWiFi;
+      PlaybackDiagnostics.event('query.preferences.end', {'cid': queryCid});
+      if (!isCurrent()) return;
       plPlayerController
         ..cacheVideoQa = isWiFi
             ? Pref.defaultVideoQa
@@ -1081,16 +1119,62 @@ class VideoDetailController extends GetxController
       preferCodecs = isWiFi ? Pref.preferCodecs : Pref.preferCodecsCellular;
     }
 
-    if (!isCurrent()) return;
-    final result = await _getVideoUrl(
-      VideoQuality.hdrVivid.code,
-      requestedCid: queryCid,
-    );
+    late LoadingState<PlayUrlModel> result;
+    Future<void> fetchPrimary() async {
+      PlaybackDiagnostics.event('query.primary.begin', {'cid': queryCid});
+      result = await _getVideoUrl(
+        VideoQuality.hdrVivid.code,
+        requestedCid: queryCid,
+      );
+      PlaybackDiagnostics.event('query.primary.end', {'cid': queryCid});
+    }
+
+    // The request uses the same quality ceiling on every network. Preferences
+    // are needed for stream selection, so await both before choosing tracks.
+    await Future.wait<void>([prepareNetworkPreferences(), fetchPrimary()]);
     if (!isCurrent()) return;
 
     if (result case Success(:final response)) {
       data = response;
-      if (data.dash != null) await _supplementVideoQualities(data, queryCid);
+      if (data.dash != null) {
+        final missingQuality = data.missingVideoQualityBelowHighest;
+        if (missingQuality != -1) {
+          final defer = _canDeferQualitySupplement(data);
+          PlaybackDiagnostics.event('query.supplement.begin', {
+            'cid': queryCid,
+            'quality': missingQuality,
+            'deferred': defer,
+          });
+          Future<void> supplement() async {
+            try {
+              await _supplementVideoQualities(
+                response,
+                queryCid,
+                isCurrent: isCurrent,
+              );
+            } catch (error) {
+              if (!defer) rethrow;
+              PlaybackDiagnostics.event('query.supplement.error', {
+                'cid': queryCid,
+                'type': error.runtimeType.toString(),
+              });
+            } finally {
+              PlaybackDiagnostics.event('query.supplement.end', {
+                'cid': queryCid,
+                'current': isCurrent(),
+              });
+            }
+          }
+
+          final ready = supplement();
+          _qualitySupplementReady = ready;
+          if (defer) {
+            unawaited(ready);
+          } else {
+            await ready;
+          }
+        }
+      }
       if (!isCurrent()) return;
 
       languages.value = data.language?.items;

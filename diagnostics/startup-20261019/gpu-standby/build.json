@@ -1,0 +1,8 @@
+{
+  "apk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261019\\gpu-standby\\c35b53769-gpu-standby.apk",
+  "sha256": "51a4eb198abe20df0ac08eb44ffce2a534c646a00a85b5244dcdbdc40fe08b73",
+  "mediaPreload": false,
+  "gpuOutputStandby": true,
+  "decoderPrewarm": false,
+  "engineCount": 1
+}

@@ -1,0 +1,53 @@
+*** Begin Patch
+*** Update File: D:/workplace/antigravity/PiliPlus/lib/plugin/pl_player/playback/startup_probe.dart
+@@
+   static const enabled = PlaybackDiagnostics.enabled && directory != '';
+   static const verbose =
+-      enabled && bool.fromEnvironment('PLAYBACK_STARTUP_VERBOSE');
++      PlaybackDiagnostics.enabled &&
++      bool.fromEnvironment('PLAYBACK_STARTUP_VERBOSE');
+   static int _messages = 0;
++
++  static void beginSource() {
++    if (verbose) _messages = 0;
++  }
+@@
+-    if (!enabled || !PlaybackDiagnostics.active || _messages >= 512) return;
++    if (!verbose || !PlaybackDiagnostics.active || _messages >= 512) return;
+@@
+     for (final entry in const <String, String>{
++      'opening segment': 'edl.segment.open',
+       'starting connection attempt': 'connect.begin',
+@@
+       'starting audio playback': 'mpv.audio.start',
++      'cache underrun': 'cache.underrun',
+*** Update File: D:/workplace/antigravity/PiliPlus/lib/plugin/pl_player/controller.dart
+@@
+     assert(_videoController == null);
++    if (PlaybackDiagnostics.enabled) {
++      player.onLoadHooks.add(() {
++        PlaybackDiagnostics.event('startup.surfaceHook.begin');
++      });
++    }
+@@
+     _videoController = await VideoController.create(
+@@
+     );
++
++    if (PlaybackDiagnostics.enabled) {
++      player.onLoadHooks.add(() {
++        PlaybackDiagnostics.event('startup.surfaceHook.end');
++      });
++    }
+@@
+     try {
++      StartupProbe.beginSource();
+       await player.open(
+@@
+       stream.buffering.listen((bool buffering) {
++        PlaybackDiagnostics.event('media.buffering', {
++          ...playbackTraceState(),
++          'value': buffering,
++        });
+         isBuffering.value = buffering;
+*** End Patch

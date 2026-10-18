@@ -906,7 +906,8 @@ class HeaderControlState extends State<HeaderControl>
   }
 
   /// 选择画质
-  void showSetVideoQa() {
+  Future<void> showSetVideoQa() async {
+    if (!await videoDetailCtr.waitForQualityOptions() || !mounted) return;
     if (videoInfo.dash == null) {
       SmartDialog.showToast('当前视频不支持选择画质');
       return;
@@ -1087,7 +1088,8 @@ class HeaderControlState extends State<HeaderControl>
   }
 
   // 选择解码格式
-  void showSetDecodeFormats() {
+  Future<void> showSetDecodeFormats() async {
+    if (!await videoDetailCtr.waitForQualityOptions() || !mounted) return;
     final firstCode = videoDetailCtr.firstVideo.quality.code;
     // 当前视频可用的解码格式
     final videoFormat = videoInfo.supportFormats!;
