@@ -1092,7 +1092,9 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
     final player = await Player.create(
       configuration: PlayerConfiguration(
-        logLevel: StartupProbe.verbose
+        logLevel: StartupProbe.deep
+            ? .trace
+            : StartupProbe.verbose
             ? .debug
             : kDebugMode
             ? .warn

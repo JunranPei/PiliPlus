@@ -16,10 +16,13 @@ abstract final class StartupProbe {
   static const verbose =
       PlaybackDiagnostics.enabled &&
       bool.fromEnvironment('PLAYBACK_STARTUP_VERBOSE');
+  static const deep = verbose && bool.fromEnvironment('PLAYBACK_STARTUP_DEEP');
   static int _messages = 0;
+  static final Map<String, int> _deepCounts = {};
 
   static void beginSource() {
     if (verbose) _messages = 0;
+    if (deep) _deepCounts.clear();
   }
 
   static Future<({String video, String? audio})> resolve(
@@ -86,6 +89,44 @@ abstract final class StartupProbe {
   static void onLog(PlayerLog log) {
     if (!verbose || !PlaybackDiagnostics.active || _messages >= 512) return;
     final text = log.text.toLowerCase();
+    if (deep) {
+      // Store only classified milestones, never raw URLs, headers or packets.
+      for (final entry in const <String, String>{
+        'request: get': 'http.request',
+        'header=\'http/': 'http.response.line',
+        'http/1.1 206': 'http.response.partial',
+        'http/1.1 200': 'http.response.ok',
+        'before avformat_find_stream_info': 'demux.probe.begin',
+        'after avformat_find_stream_info': 'demux.probe.end',
+        'mediacodec ': 'codec.message',
+        'started successfully': 'codec.started',
+        'queued input buffer': 'codec.input.queued',
+        'got output buffer': 'codec.output.received',
+        'output mediaformat changed': 'codec.output.format',
+        'flushing': 'codec.flush',
+        'av_read_frame': 'demux.packet.read',
+        'received frame': 'decoder.frame.received',
+      }.entries) {
+        if (text.contains(entry.key)) {
+          final key = '${entry.value}|${log.prefix}';
+          final count = (_deepCounts[key] ?? 0) + 1;
+          _deepCounts[key] = count;
+          if (count <= 3) {
+            final size = RegExp(r'\bsize=(\d+)').firstMatch(text);
+            final pts = RegExp(r'\bts=(-?\d+)').firstMatch(text);
+            PlaybackDiagnostics.event('startup.deep', {
+              'stage': entry.value,
+              'prefix': log.prefix,
+              'level': log.level,
+              'occurrence': count,
+              if (size != null) 'size': int.tryParse(size[1]!),
+              if (pts != null) 'pts': int.tryParse(pts[1]!),
+              'timing': 'Dart log delivery, not native call time or display',
+            });
+          }
+        }
+      }
+    }
     for (final entry in const <String, String>{
       'opening segment': 'edl.segment.open',
       'starting connection attempt': 'connect.begin',

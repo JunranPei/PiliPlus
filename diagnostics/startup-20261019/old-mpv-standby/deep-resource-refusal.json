@@ -1,0 +1,19 @@
+{
+  "buildSucceeded": true,
+  "apkSha256": "e00b8dcca376e5782d34af9a932a2e50adcf07c8c02e71ba46216c8be63d5a17",
+  "videoTrials": 0,
+  "captureRefusedBeforeRecording": true,
+  "hostCommitGiB": 41.148,
+  "commitHeadroomGiB": 9.693,
+  "availableRamGiB": 5.881,
+  "requiredAvailableRamGiB": 6,
+  "ourGradleDaemonStopped": 69164,
+  "ourEmulatorClosed": true,
+  "notificationsRestored": 1,
+  "otherProjectIdleDaemons": [
+    89320,
+    65232
+  ],
+  "otherProjectDaemonsUntouched": true,
+  "pendingUserChoice": "May close the two idle gallery compilation backends; authorization has not arrived"
+}

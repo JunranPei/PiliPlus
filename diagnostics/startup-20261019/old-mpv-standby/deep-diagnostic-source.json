@@ -1,0 +1,10 @@
+{
+  "files": {
+    "lib/plugin/pl_player/controller.dart": "efd3744a1d18ac3760e44bbdd06334135b9bb138556b15b4643152509b6ece2d",
+    "lib/plugin/pl_player/playback/startup_probe.dart": "205502debb5be2fc2e5deab74b4c20617ff2b5fd2e2fc640dae6e02e693dc96e",
+    "tool/startup_gpu_standby/android_video_controller.dart": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92",
+    "tool/build_startup_standby.py": "7c34a6c6ad3d7a3eb31b7e21e6aa9725d389c66f19eb1f7adeccc8eb446da70a"
+  },
+  "zipSha256": "7773bb92a59823eefad0e497085a9ba067da193a0e477d43113ca17739f0eead",
+  "purpose": "classified diagnosis only, not performance candidate"
+}

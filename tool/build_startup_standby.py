@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--control', action='store_true', help='Same source, with startup standby disabled')
+parser.add_argument('--deep', action='store_true', help='Bounded classified decoder/HTTP diagnosis; not a performance candidate')
 args = parser.parse_args()
 output = args.output.resolve()
 if output.exists():
@@ -38,6 +39,8 @@ output.parent.mkdir(parents=True,exist_ok=True)
 try:
     dependency.write_bytes((ROOT/'tool/startup_gpu_standby/android_video_controller.dart').read_bytes())
     flags = ['PLAYBACK_TRACE=true','PLAYBACK_STARTUP_VERBOSE=true','STARTUP_TIMING=true',f'PLAYER_STANDBY={str(not args.control).lower()}']
+    if args.deep:
+        flags.append('PLAYBACK_STARTUP_DEEP=true')
     defines = ','.join(base64.b64encode(f.encode()).decode() for f in flags)
     command = [str(ROOT/'android/gradlew.bat'),'-p','android','assembleRelease',
         '-Ptarget-platform=android-x64','-Ptarget=lib/main.dart',f'-Pdart-defines={defines}',
