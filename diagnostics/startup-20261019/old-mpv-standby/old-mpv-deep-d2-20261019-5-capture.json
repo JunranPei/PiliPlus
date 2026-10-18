@@ -1,0 +1,158 @@
+{
+  "status": "recorded; pixel and foreground review required",
+  "serial": "emulator-5556",
+  "apkSha256": "e00b8dcca376e5782d34af9a932a2e50adcf07c8c02e71ba46216c8be63d5a17",
+  "appForceStoppedBeforeSearch": true,
+  "mediaPreloaded": false,
+  "leftVideoPageAlive": true,
+  "playerRetention": "verify previous.playerId in source.prepare.begin",
+  "timingEntry": "tap on in-app search button submitting a video URI",
+  "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-deep-d2-20261019-5",
+  "memorySamples": [
+    {
+      "hostMonotonicSeconds": 226961.1161283,
+      "commitGiB": 37.701,
+      "commitHeadroomGiB": 13.14,
+      "availableRamGiB": 9.866
+    },
+    {
+      "hostMonotonicSeconds": 226963.4263338,
+      "commitGiB": 37.892,
+      "commitHeadroomGiB": 12.949,
+      "availableRamGiB": 9.715
+    },
+    {
+      "hostMonotonicSeconds": 226965.5172326,
+      "commitGiB": 38.117,
+      "commitHeadroomGiB": 12.724,
+      "availableRamGiB": 9.477
+    },
+    {
+      "hostMonotonicSeconds": 226967.5477138,
+      "commitGiB": 38.151,
+      "commitHeadroomGiB": 12.69,
+      "availableRamGiB": 9.43
+    },
+    {
+      "hostMonotonicSeconds": 226969.5657551,
+      "commitGiB": 38.192,
+      "commitHeadroomGiB": 12.649,
+      "availableRamGiB": 9.393
+    },
+    {
+      "hostMonotonicSeconds": 226971.6152935,
+      "commitGiB": 38.488,
+      "commitHeadroomGiB": 12.353,
+      "availableRamGiB": 9.124
+    },
+    {
+      "hostMonotonicSeconds": 226973.6414299,
+      "commitGiB": 38.421,
+      "commitHeadroomGiB": 12.42,
+      "availableRamGiB": 9.168
+    },
+    {
+      "hostMonotonicSeconds": 226975.6729735,
+      "commitGiB": 38.483,
+      "commitHeadroomGiB": 12.359,
+      "availableRamGiB": 9.106
+    },
+    {
+      "hostMonotonicSeconds": 226977.7119903,
+      "commitGiB": 38.459,
+      "commitHeadroomGiB": 12.382,
+      "availableRamGiB": 9.121
+    },
+    {
+      "hostMonotonicSeconds": 226979.74487,
+      "commitGiB": 38.448,
+      "commitHeadroomGiB": 12.393,
+      "availableRamGiB": 9.135
+    },
+    {
+      "hostMonotonicSeconds": 226981.7652303,
+      "commitGiB": 38.404,
+      "commitHeadroomGiB": 12.437,
+      "availableRamGiB": 9.174
+    },
+    {
+      "hostMonotonicSeconds": 226983.784532,
+      "commitGiB": 38.395,
+      "commitHeadroomGiB": 12.446,
+      "availableRamGiB": 9.184
+    },
+    {
+      "hostMonotonicSeconds": 226985.809306,
+      "commitGiB": 38.392,
+      "commitHeadroomGiB": 12.449,
+      "availableRamGiB": 9.185
+    },
+    {
+      "hostMonotonicSeconds": 226987.843375,
+      "commitGiB": 38.385,
+      "commitHeadroomGiB": 12.456,
+      "availableRamGiB": 9.198
+    },
+    {
+      "hostMonotonicSeconds": 226989.8659797,
+      "commitGiB": 38.386,
+      "commitHeadroomGiB": 12.456,
+      "availableRamGiB": 9.199
+    },
+    {
+      "hostMonotonicSeconds": 226991.9105788,
+      "commitGiB": 38.537,
+      "commitHeadroomGiB": 12.304,
+      "availableRamGiB": 9.092
+    },
+    {
+      "hostMonotonicSeconds": 226993.943921,
+      "commitGiB": 38.382,
+      "commitHeadroomGiB": 12.46,
+      "availableRamGiB": 9.184
+    },
+    {
+      "hostMonotonicSeconds": 226995.9688952,
+      "commitGiB": 38.431,
+      "commitHeadroomGiB": 12.41,
+      "availableRamGiB": 9.138
+    },
+    {
+      "hostMonotonicSeconds": 226997.9966197,
+      "commitGiB": 38.439,
+      "commitHeadroomGiB": 12.402,
+      "availableRamGiB": 9.144
+    },
+    {
+      "hostMonotonicSeconds": 227000.0302227,
+      "commitGiB": 38.412,
+      "commitHeadroomGiB": 12.429,
+      "availableRamGiB": 9.157
+    },
+    {
+      "hostMonotonicSeconds": 227002.0576111,
+      "commitGiB": 38.406,
+      "commitHeadroomGiB": 12.435,
+      "availableRamGiB": 9.172
+    },
+    {
+      "hostMonotonicSeconds": 227004.0920301,
+      "commitGiB": 38.367,
+      "commitHeadroomGiB": 12.474,
+      "availableRamGiB": 9.202
+    },
+    {
+      "hostMonotonicSeconds": 227006.1215937,
+      "commitGiB": 38.359,
+      "commitHeadroomGiB": 12.482,
+      "availableRamGiB": 9.216
+    }
+  ],
+  "visibleMotionSeconds": null,
+  "collectStandbyBeforeMeasuredClick": true,
+  "memoryPolicy": {
+    "minimumCaptureStartHeadroomGiB": 8,
+    "abortHeadroomGiB": 3,
+    "buildOrEmulatorLaunchMinimumHeadroomGiB": 10
+  }
+}

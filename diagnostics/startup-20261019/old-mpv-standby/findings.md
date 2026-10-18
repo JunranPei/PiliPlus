@@ -2,6 +2,8 @@
 
 已先保存新版待命提交fca5f2aa1，再在codex/mpv-old-output-standby分支重建旧运行版本（2bdf889aa）并移植待命（2fd859459）。两包已完成同视频4次A/B/B/A录制，未证明待命稳定提速。当前详细分段、原因与未知见cause-investigation.md和evaluation.json。
 
+后续原因诊断已新增同视频2条，各35秒，见deep-findings.md和deep-evaluation.json：真实运动确认上界6.318/3.221秒，第一条首画停留后跳变；仅用于诊断，不与原4条混算速度。补到了首个输入提交到首个输出的551/692ms日志间隔，仍不能全部称为纯解码计算。已关闭本任务模拟器、恢复设置；没有操作相册后台。
+
 ## 已完成
 
 - 从原始会话恢复e79之后的请求并行、选轨补全及阶段诊断改动，见provenance.md和三份原始补丁。旧mediacodec_embed、立即附着Surface、自动播放及封面流程保持。

@@ -1,0 +1,72 @@
+{
+  "newVideoTrials": 2,
+  "newDistinctVideos": 1,
+  "secondsEach": 35,
+  "purpose": "Cause diagnosis only; no playback optimization",
+  "result": "Input-to-first-output waiting confirmed; pure computation versus queueing, reorder, resets and scheduling not isolated. No new optimization accepted.",
+  "continuity": "No post-start buffering or pause flags in bounded logs. d1 visibly holds its first image and jumps; smooth playback is not established. Later ~2-second frame samples cannot exclude brief stalls.",
+  "rows": [
+    {
+      "label": "d1",
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-deep-d1-20261019-5",
+      "apkSha256": "e00b8dcca376e5782d34af9a932a2e50adcf07c8c02e71ba46216c8be63d5a17",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.39,
+      "lastLoadingPts": 6.898,
+      "firstImagePts": 6.937,
+      "motionConfirmedPts": 7.708,
+      "firstImageAfterClickSeconds": 5.547,
+      "motionConfirmedAfterClickSeconds": 6.318,
+      "motionConfirmationIsConservativeUpperBound": true,
+      "motionReviewNote": "Wide first scene holds until a jump to a later scene; visible startup discontinuity.",
+      "apiMs": 1306.635,
+      "decoderOpenToStartedMs": 773.285,
+      "startedToFirstInputMs": 36.37,
+      "firstInputToFirstOutputMs": 550.75,
+      "decoderOpenToFirstOutputMs": 1360.405,
+      "nativeCodecAfterQueryMs": {
+        "allocate": 2793.135,
+        "created": 2921.135,
+        "inputFormat": 2942.135
+      },
+      "nativeAllocateToCreatedMs": 128.0,
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 21.905,
+      "minimumAvailableRamGiB": 8.938,
+      "minimumCommitHeadroomGiB": 12.229,
+      "boundary": "Classifier events are Dart delivery times, not pure native decode CPU time. Trace instrumentation may affect latency. Do not transfer these durations directly onto the historical 2.446-second recording."
+    },
+    {
+      "label": "d2",
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\old-mpv-deep-d2-20261019-5",
+      "apkSha256": "e00b8dcca376e5782d34af9a932a2e50adcf07c8c02e71ba46216c8be63d5a17",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "pointerPts": 1.012,
+      "lastLoadingPts": 4.162,
+      "firstImagePts": 4.197,
+      "motionConfirmedPts": 4.233,
+      "firstImageAfterClickSeconds": 3.185,
+      "motionConfirmedAfterClickSeconds": 3.221,
+      "motionConfirmationIsConservativeUpperBound": true,
+      "motionReviewNote": "Car and smoke movement visible in adjacent frames.",
+      "apiMs": 617.658,
+      "decoderOpenToStartedMs": 361.67,
+      "startedToFirstInputMs": 189.394,
+      "firstInputToFirstOutputMs": 691.996,
+      "decoderOpenToFirstOutputMs": 1243.06,
+      "nativeCodecAfterQueryMs": {
+        "allocate": 1631.814,
+        "created": 1747.814,
+        "inputFormat": 1801.814
+      },
+      "nativeAllocateToCreatedMs": 116.0,
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.623,
+      "minimumAvailableRamGiB": 9.092,
+      "minimumCommitHeadroomGiB": 12.304,
+      "boundary": "Classifier events are Dart delivery times, not pure native decode CPU time. Trace instrumentation may affect latency. Do not transfer these durations directly onto the historical 2.446-second recording."
+    }
+  ]
+}
