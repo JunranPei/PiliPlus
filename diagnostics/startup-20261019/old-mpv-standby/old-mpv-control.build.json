@@ -1,0 +1,16 @@
+{
+  "head": "2fd859459ae1424958f5204d55ab303a7df4890d",
+  "apk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261019\\old-mpv-standby\\old-mpv-control.apk",
+  "sha256": "bc6e2951df05d06a27bd002230e9bc18cab9f77e51aecb12827549857e023aa1",
+  "defines": [
+    "PLAYBACK_TRACE=true",
+    "PLAYBACK_STARTUP_VERBOSE=true",
+    "STARTUP_TIMING=true",
+    "PLAYER_STANDBY=false"
+  ],
+  "dependencyRevision": "fd8421d21eade4d6d12de137fa7df902fec20292",
+  "dependencySourceSha256": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92",
+  "standbyEnabled": false,
+  "mediaPreload": false,
+  "acceptedPerformanceFix": false
+}

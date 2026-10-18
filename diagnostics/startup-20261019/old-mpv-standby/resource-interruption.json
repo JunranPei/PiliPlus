@@ -1,0 +1,19 @@
+{
+  "status": "Video capture deferred by unchanged memory gate; our emulator shut down to avoid concurrent emulators",
+  "validVideoTrials": 0,
+  "homeProbes": 2,
+  "captureRefusals": 1,
+  "currentCheckpoint": "fca5f2aa1",
+  "oldRuntimeCheckpoint": "2bdf889aa",
+  "oldStandbyCheckpoint": "2fd859459",
+  "otherAvdObserved": "CodexLabelsQuickSortQA on emulator-5558",
+  "ourAvd": "PiliPlusStartupProbe_20261011 on emulator-5556",
+  "otherProcessesLeftRunning": true,
+  "headsUpSettingRestoredBeforeShutdown": 1,
+  "latestHostMemory": {
+    "hostMonotonicSeconds": 208206.0469791,
+    "commitGiB": 37.065,
+    "commitHeadroomGiB": 13.776,
+    "availableRamGiB": 11.235
+  }
+}

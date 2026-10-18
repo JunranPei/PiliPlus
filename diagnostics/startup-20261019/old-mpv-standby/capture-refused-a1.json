@@ -1,0 +1,10 @@
+{
+  "reason": "Capture gate refused before recording; headroom 7.835 GiB below unchanged 8 GiB threshold",
+  "validPlaybackTrial": false,
+  "latestMemory": {
+    "hostMonotonicSeconds": 208129.4144198,
+    "commitGiB": 45.264,
+    "commitHeadroomGiB": 5.577,
+    "availableRamGiB": 6.027
+  }
+}

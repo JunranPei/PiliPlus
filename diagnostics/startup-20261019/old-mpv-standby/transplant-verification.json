@@ -1,0 +1,11 @@
+{
+  "historicalRuntimeCheckpoint": "2bdf889aa",
+  "transplantCheckpoint": "2fd859459",
+  "videoControllerConfigurationUnchanged": true,
+  "videoPageAndQualityMenuAndHttpUnchanged": true,
+  "output": "mediacodec_embed",
+  "attachSurfaceAfterVideoParameters": false,
+  "preloadedMedia": false,
+  "dartAnalysis": "No issues found",
+  "selectedTrackTestsPassed": 8
+}

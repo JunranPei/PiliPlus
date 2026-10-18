@@ -1,0 +1,10 @@
+{
+  "historical": {
+    "lib/x86_64/libmpv.so": "e4b3a7aee0d7826d1b2c455027081ca8fddffbde82e1f26fcc8256556bd79ced",
+    "lib/x86_64/libflutter.so": "e7233d989b5454bb1ac5ca0359522749c068fa7821e9cdc0c1b056fd43561265"
+  },
+  "rebuiltControl": {
+    "lib/x86_64/libmpv.so": "e4b3a7aee0d7826d1b2c455027081ca8fddffbde82e1f26fcc8256556bd79ced",
+    "lib/x86_64/libflutter.so": "e7233d989b5454bb1ac5ca0359522749c068fa7821e9cdc0c1b056fd43561265"
+  }
+}

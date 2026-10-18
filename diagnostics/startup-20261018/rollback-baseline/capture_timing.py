@@ -82,6 +82,7 @@ def main():
                 line for line in log.splitlines() if any(tag in line for tag in (
                     '[GPU_STANDBY]', '[OUTPUT_STANDBY]', '[SURFACE_CALL]'))), encoding='utf-8')
             (out/'pre-click-meminfo.txt').write_bytes(original_adb('shell', 'dumpsys', 'meminfo', recorder.PACKAGE))
+            (out/'pre-click-guest-meminfo.txt').write_bytes(original_adb('shell', 'cat', '/proc/meminfo'))
         if args.keep_player and arguments == ('shell', 'input', 'keyevent', '4'):
             return b''
         return original_adb(*arguments, **kwargs)
