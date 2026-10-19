@@ -24,6 +24,7 @@ import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/source_preparation.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/startup_probe.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
@@ -1229,7 +1230,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
 
     request.checkCurrent();
-    if (onPrepared != null) {
+    if (!SourcePreparation.enabled && onPrepared != null) {
       await Future.any<void>([
         onPrepared(),
         request.cancelled.then<void>(
@@ -1280,10 +1281,28 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
     try {
       StartupProbe.beginSource();
-      await player.open(
-        Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
-        play: false,
-      );
+      Future<void> openPaused() async {
+        await player!.open(
+          Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
+          play: false,
+        );
+        if (PlaybackDiagnostics.enabled) {
+          PlaybackDiagnostics.event(
+            'source.open.accepted',
+            playbackTraceState(),
+          );
+        }
+      }
+
+      if (SourcePreparation.enabled && onPrepared != null) {
+        await SourcePreparation.overlap(
+          request: request,
+          openPaused: openPaused,
+          preparePresentation: onPrepared,
+        );
+      } else {
+        await openPaused();
+      }
       if (PlaybackDiagnostics.enabled) {
         PlaybackDiagnostics.event('source.open.return', playbackTraceState());
       }

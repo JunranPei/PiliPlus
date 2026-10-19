@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--control', action='store_true', help='Same source, with startup standby disabled')
 parser.add_argument('--deep', action='store_true', help='Bounded classified decoder/HTTP diagnosis; not a performance candidate')
+parser.add_argument('--early-source', action='store_true', help='Prepare the selected real source while its page is mounting')
 args = parser.parse_args()
 output = args.output.resolve()
 if output.exists():
@@ -41,6 +42,8 @@ try:
     flags = ['PLAYBACK_TRACE=true','PLAYBACK_STARTUP_VERBOSE=true','STARTUP_TIMING=true',f'PLAYER_STANDBY={str(not args.control).lower()}']
     if args.deep:
         flags.append('PLAYBACK_STARTUP_DEEP=true')
+    if args.early_source:
+        flags.append('SOURCE_EARLY_PREPARE=true')
     defines = ','.join(base64.b64encode(f.encode()).decode() for f in flags)
     command = [str(ROOT/'android/gradlew.bat'),'-p','android','assembleRelease',
         '-Ptarget-platform=android-x64','-Ptarget=lib/main.dart',f'-Pdart-defines={defines}',
@@ -57,7 +60,9 @@ try:
         'apk':str(output),'sha256':hashlib.file_digest(output.open('rb'),'sha256').hexdigest(),
         'defines':flags,'dependencyRevision':revision,
         'dependencySourceSha256':hashlib.sha256(dependency.read_bytes()).hexdigest(),
-        'standbyEnabled':not args.control,'mediaPreload':False,'acceptedPerformanceFix':False}
+        'standbyEnabled':not args.control,'mediaPreload':False,
+        'sourcePreparationOverlapsPresentation':args.early_source,
+        'acceptedPerformanceFix':False}
     output.with_suffix('.build.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
     print(json.dumps(manifest),flush=True)
 finally:

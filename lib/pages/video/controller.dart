@@ -4,6 +4,8 @@ import 'dart:ui';
 
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/startup_stream_readiness.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/source_preparation.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
 
 import 'package:PiliPlus/common/style.dart';
 import 'package:PiliPlus/common/widgets/pair.dart';
@@ -845,7 +847,11 @@ class VideoDetailController extends GetxController
         revision == _playbackRevision &&
         cid.value == requestedCid;
     if (!isCurrent()) return;
-    if (waitForPlaybackRoute != null && !await waitForPlaybackRoute!()) return;
+    if (!SourcePreparation.enabled &&
+        waitForPlaybackRoute != null &&
+        !await waitForPlaybackRoute!()) {
+      return;
+    }
     if (!isCurrent()) return;
     preparingPlayback.value = true;
     _playWhenPrepared = false;
@@ -892,7 +898,17 @@ class VideoDetailController extends GetxController
         videoType: videoType,
         owner: this,
         onPrepared: () async {
-          if (!isCurrent()) return;
+          if (SourcePreparation.enabled &&
+              waitForPlaybackRoute != null &&
+              !await waitForPlaybackRoute!()) {
+            throw const PlaybackSourceCancelled();
+          }
+          if (!isCurrent()) {
+            if (SourcePreparation.enabled) {
+              throw const PlaybackSourceCancelled();
+            }
+            return;
+          }
           if (PlaybackDiagnostics.enabled) {
             PlaybackDiagnostics.event('ui.mount.request', playbackTraceState());
           }
