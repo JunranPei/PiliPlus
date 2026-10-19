@@ -50,4 +50,4 @@ inspect.sql/txt、scheduler.sql/txt、server-states.sql/txt可在保存的startu
 - [Perfetto系统ATrace与SQL切片](https://perfetto.dev/docs/data-sources/atrace)：系统类别跨进程采集，slice表示调用区间，追踪本身有开销。
 - [FFmpeg MediaCodec接收路径](https://github.com/FFmpeg/FFmpeg/blob/n9.0.1/libavcodec/mediacodecdec_common.c)：首个输出前非阻塞读取，不能把draining的一秒等待分支泛化为首次输出必等一秒。
 
-本条结束后本任务模拟器已关闭，未留下编译进程；本轮进入时通知值为0，按本轮备份保留0。更早old-mpv-standby备份为1，两者不同，不能宣称本轮恢复成1。最终安装为17b4cf41…对照包。主目标尚未达到，持续目标保持进行。
+本条结束后本任务模拟器已关闭，未留下编译进程；本轮进入时通知值为0，按本轮备份保留0。更早old-mpv-standby备份为1，两者不同，不能宣称本轮恢复成1。最终安装为17b4cf41…对照包。主目标尚未达到。后续曾实际核实get_goal为blocked，此前写“持续目标保持进行”不准确；2026-10-19新一轮已实际核实原goal为active，继续完整调用栈/时间线诊断，当前状态见continuation.md。

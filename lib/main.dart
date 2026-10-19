@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:async' show unawaited;
 
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/runtime_profile.dart';
 
 import 'package:PiliPlus/build_config.dart';
 import 'package:PiliPlus/common/constants.dart';
@@ -95,6 +96,7 @@ Future<void> _initAppPath() async {
 }
 
 void main() async {
+  RuntimeProfile.initialize();
   ScaledWidgetsFlutterBinding.ensureInitialized();
   MediaKit.ensureInitialized();
   await _initAppPath();

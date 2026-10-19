@@ -44,6 +44,7 @@ def main():
     parser.add_argument('--cold-app', action='store_true')
     parser.add_argument('--keep-player', action='store_true')
     parser.add_argument('--perfetto', action='store_true')
+    parser.add_argument('--memory-counters', action='store_true')
     parser.add_argument('--collect-standby', action='store_true')
     parser.add_argument('--verify-search-uri', action='store_true')
     args = parser.parse_args()
@@ -110,7 +111,7 @@ def main():
         # Bound guest tracing to 20 seconds and 32 MiB. No sampling profiler,
         # memory dump, second emulator, or compiler is started.
         config = metadata.with_suffix('.perfetto.pbtxt')
-        config.write_text('''buffers { size_kb: 32768 fill_policy: RING_BUFFER }
+        config_text = '''buffers { size_kb: 32768 fill_policy: RING_BUFFER }
 duration_ms: 20000
 data_sources { config { name: "linux.ftrace" ftrace_config {
   ftrace_events: "sched/sched_switch"
@@ -129,7 +130,25 @@ data_sources { config { name: "linux.process_stats" process_stats_config {
 data_sources { config { name: "android.log" android_log_config {
   filter_tags: "StartupTest"
 } } }
-''', encoding='utf-8')
+'''
+        if args.memory_counters:
+            config_text = config_text.replace(
+                'ftrace_events: "sched/sched_waking"',
+                '''ftrace_events: "sched/sched_waking"
+  ftrace_events: "vmscan/mm_vmscan_kswapd_wake"
+  ftrace_events: "vmscan/mm_vmscan_kswapd_sleep"
+  ftrace_events: "vmscan/mm_vmscan_direct_reclaim_begin"
+  ftrace_events: "vmscan/mm_vmscan_direct_reclaim_end"
+  ftrace_events: "kmem/rss_stat"''')
+            config_text = config_text.replace('scan_all_processes_on_start: true',
+                'scan_all_processes_on_start: true\n  proc_stats_poll_ms: 250')
+            config_text += '''
+data_sources { config { name: "linux.sys_stats" sys_stats_config {
+  meminfo_period_ms: 250
+  vmstat_period_ms: 250
+} } }
+'''
+        config.write_text(config_text, encoding='utf-8')
         original_adb('push', str(config), '/data/misc/perfetto-configs/startup-bounded.pbtxt')
         original_adb('shell', 'perfetto', '--background-wait', '--txt', '-c',
                      '/data/misc/perfetto-configs/startup-bounded.pbtxt', '-o', perfetto_remote)

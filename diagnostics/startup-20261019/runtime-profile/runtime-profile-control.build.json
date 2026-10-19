@@ -1,0 +1,29 @@
+{
+  "head": "e8983cf12f65a0e753c49c2f1bc3dc039506d3ef",
+  "apk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261019\\runtime-profile\\runtime-profile-control.apk",
+  "sha256": "a4fa155e530e93286921f2e96e1f61c1c2953c195bf42ea9fe52d1d4da198c08",
+  "defines": [
+    "PLAYBACK_TRACE=true",
+    "PLAYBACK_STARTUP_VERBOSE=true",
+    "STARTUP_TIMING=true",
+    "PLAYER_STANDBY=true",
+    "PLAYBACK_FULL_PROFILE=true"
+  ],
+  "dependencyRevision": "fd8421d21eade4d6d12de137fa7df902fec20292",
+  "buildMode": "profile",
+  "dependencySourceSha256": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92",
+  "standbyEnabled": true,
+  "mediaPreload": false,
+  "sourcePreparationOverlapsPresentation": false,
+  "acceptedPerformanceFix": false,
+  "diagnosticSourcesSha256": {
+    "lib/main.dart": "f0359ad1623dd3c31e2fab472a8dcaa33a7595558bab266fffdb88e8691dcc27",
+    "lib/http/init.dart": "10e7c6237a9e0d87f9eab5915c117c64c656401d2c81c7dbdfb288e0d1d4efab",
+    "lib/plugin/pl_player/playback/runtime_profile.dart": "853d469f8b972c686f9395303c9aca7d7845cba37d89333470f8af5956e82bef",
+    "lib/plugin/pl_player/playback/playback_diagnostics.dart": "3f4d17ccab9d4ce42613fd00fa15ab54a9de92d784de11c4331ab46b932d3ac6",
+    "android/app/src/profile/AndroidManifest.xml": "1d99c45f4cbcae02c89a85e8ecb9bb199c655743a2c593b3a182b68c28356285",
+    "tool/build_startup_standby.py": "c590a40427f82d39c64cc7cd84ae213aa45e9bd617c42e806d17bcaf911f7705",
+    "tool/startup_gpu_standby/android_video_controller.dart": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92"
+  },
+  "releaseSpeedComparable": false
+}

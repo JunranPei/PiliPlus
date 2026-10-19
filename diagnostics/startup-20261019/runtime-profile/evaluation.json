@@ -1,0 +1,76 @@
+{
+  "validPlaybackTrials": 2,
+  "distinctVideos": 1,
+  "preClickFailedAttempts": 1,
+  "releaseSpeedComparable": false,
+  "acceptedPlaybackOptimization": false,
+  "profileApkSha256": "a4fa155e530e93286921f2e96e1f61c1c2953c195bf42ea9fe52d1d4da198c08",
+  "trials": [
+    {
+      "folder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\runtime-profile-d1r-20261019-5",
+      "pointerPts": 1.178,
+      "firstMediaImagePts": 5.849,
+      "firstConfirmedMotionPts": 5.917,
+      "clickToMediaImageSeconds": 4.671,
+      "clickToConfirmedMotionSeconds": 4.739,
+      "recordedSeconds": 25,
+      "minimumAvailableRamGiB": 7.736,
+      "minimumCommitHeadroomGiB": 11.023,
+      "renewedBufferPauseFlags": [],
+      "continuousSmoothnessProven": false,
+      "evidenceSha256": {
+        "screen.webm": "3fc4437829161055094e31c763505559d2cca54b1333fd7c2fdc98aed9dcb9ec",
+        "startup-bounded.pftrace": "7f3fd3c5251c7c02d115174f150f97bb1820206f7b57d3ce778cce86fbd7e5e6",
+        "clock-start.json": "ff92633edf5fbe8e6ffdd07c24b55f7dd8ea9e7a94d2ea7f8c7c09cfb74415b0",
+        "codec-audio.log": "0a9ee7f0143e602153f56d5b4c3525c66a69286eb362e0f872d02ff50cb3d281"
+      }
+    },
+    {
+      "folder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\runtime-profile-d2-20261019-5",
+      "pointerPts": 1.108,
+      "firstMediaImagePts": 6.164,
+      "firstConfirmedMotionPts": 6.197,
+      "clickToMediaImageSeconds": 5.056,
+      "clickToConfirmedMotionSeconds": 5.089,
+      "recordedSeconds": 25,
+      "minimumAvailableRamGiB": 7.135,
+      "minimumCommitHeadroomGiB": 10.411,
+      "renewedBufferPauseFlags": [],
+      "continuousSmoothnessProven": false,
+      "evidenceSha256": {
+        "screen.webm": "2a53753e7804bc344d039df8a3c0b558eab269aa7032f8eed1d76403b900c8c2",
+        "startup-bounded.pftrace": "25c36727b36dc9bbdf32d01d884cdca79e951bf0effcae511a1d10a204856c47",
+        "clock-start.json": "6443094695e4e4d2aea582caf186078c2eeca3007bcccd4d2a9a2692a7fca0c9",
+        "codec-audio.log": "5ca6698eb5d9462e1a68abb5887e4e9410ebf1e0b20af711d53bac139c26fe95"
+      }
+    }
+  ],
+  "d2": {
+    "timelineEvents": 61045,
+    "httpAdapterIntervals": 8,
+    "dartSamples": 2242,
+    "dartSamplePeriodUs": 1000,
+    "dartTruncatedSamples": 40,
+    "nativeSamples": 1790,
+    "nativeLostSamples": 0,
+    "nativeTruncatedStacks": 82,
+    "nativeUnresolvedLeafSamplesHeuristic": 606,
+    "codecInitMs": 194.399,
+    "codecConfigureMs": 46.004,
+    "codecStartMs": 86.754,
+    "postFlushClientInputToSurfaceReleaseMs": 874.88,
+    "hevcServiceScheduledRunningInInputOutputMs": 696.547,
+    "kswapdScheduledRunningInInputOutputMs": 544.707,
+    "kswapdScheduledRunningInPrimaryFirst5500Ms": 3256.747,
+    "observabilityRelatedNativeSamples": 421
+  },
+  "checks": {
+    "dartAnalyzeChangedFourFiles": "passed, no issues",
+    "pythonFiveToolsCompile": "passed",
+    "profileBuild": "passed",
+    "runtimeGoal": "active, original goal not completed"
+  },
+  "restoredInstalledReleaseSha256": "17b4cf41b6ab605ef4cdb8b63078b2123a636887207d29f2124929e0aee1f03e",
+  "emulatorClosed": true,
+  "notificationRestoredToThisTurnSavedValue": "0"
+}

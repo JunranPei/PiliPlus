@@ -7,6 +7,7 @@ import 'package:PiliPlus/http/constants.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/retry_interceptor.dart';
 import 'package:PiliPlus/http/user.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/runtime_profile.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
 import 'package:PiliPlus/utils/accounts/account_manager/account_mgr.dart';
@@ -102,8 +103,11 @@ class Request {
 
   static Dio _cloneHttp11Dio() {
     final h11 = dio.clone(
-      httpClientAdapter:
-          (dio.httpClientAdapter as Http2Adapter).fallbackAdapter,
+      httpClientAdapter: RuntimeProfileAdapter.wrap(
+        (RuntimeProfileAdapter.unwrap(
+          dio.httpClientAdapter,
+        ) as Http2Adapter).fallbackAdapter,
+      ),
     );
     final interceptors = h11.interceptors;
     for (var i = 0; i < interceptors.length; i++) {
@@ -220,9 +224,11 @@ class Request {
     final (h11, connectionManager) = _createPool();
 
     dio = Dio(options)
-      ..httpClientAdapter = _enableHttp2
-          ? Http2Adapter(connectionManager, fallbackAdapter: h11)
-          : h11;
+      ..httpClientAdapter = RuntimeProfileAdapter.wrap(
+        _enableHttp2
+            ? Http2Adapter(connectionManager, fallbackAdapter: h11)
+            : h11,
+      );
 
     // 先于其他Interceptor
     if (Pref.retryCount != 0) {

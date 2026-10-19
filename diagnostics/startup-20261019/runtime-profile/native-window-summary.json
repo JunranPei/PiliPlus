@@ -1,0 +1,2278 @@
+{
+  "wholeNativeCapture": {
+    "self": [
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        184
+      ],
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        168
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        65
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool) (libc.so)",
+        28
+      ],
+      [
+        "libflutter.so[+bf0d41] (libflutter.so)",
+        23
+      ],
+      [
+        "artQuickGenericJniTrampoline (libart.so)",
+        20
+      ],
+      [
+        "memmove_avx2 (libc.so)",
+        19
+      ],
+      [
+        "libflutter.so[+c05a8f] (libflutter.so)",
+        16
+      ],
+      [
+        "__vfprintf (libc.so)",
+        15
+      ],
+      [
+        "java.lang.AbstractStringBuilder.append ([JIT app cache])",
+        12
+      ],
+      [
+        "pthread_mutex_lock (libc.so)",
+        11
+      ],
+      [
+        "strlen (libc.so)",
+        11
+      ],
+      [
+        "libflutter.so[+bca83c] (libflutter.so)",
+        11
+      ],
+      [
+        "com.personal.piliplus.PlaybackTextureProbe.refresh (dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428)",
+        10
+      ],
+      [
+        "art::(anonymous namespace)::ScopedCheck::CheckPossibleHeapValue(art::ScopedObjectAccess&, char, art::(anonymous namespace)::JniValueType) (.__uniq.99033978352804627313491551960229047428) (libart.so)",
+        9
+      ],
+      [
+        "java.lang.StringBuilder.append ([JIT app cache])",
+        9
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::deallocate(void*, scudo::Chunk::Origin, unsigned long, unsigned long) (libc.so)",
+        7
+      ],
+      [
+        "memset_avx2 (libc.so)",
+        7
+      ],
+      [
+        "clock_gettime (libc.so)",
+        6
+      ],
+      [
+        "org.json.JSONStringer.string ([JIT app cache])",
+        6
+      ],
+      [
+        "java.lang.StringFactory.newStringFromBytes ([JIT app cache])",
+        6
+      ],
+      [
+        "art::(anonymous namespace)::ScopedCheck::Check(art::ScopedObjectAccess&, bool, char const*, art::(anonymous namespace)::JniValueType*) (.__uniq.99033978352804627313491551960229047428) (libart.so)",
+        6
+      ],
+      [
+        "pthread_getspecific (libc.so)",
+        6
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        6
+      ],
+      [
+        "__vdso_clock_gettime ([vdso])",
+        6
+      ]
+    ],
+    "inclusive": [
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        990
+      ],
+      [
+        "__start_thread (libc.so)",
+        989
+      ],
+      [
+        "android.os.Looper.loopOnce ([JIT app cache])",
+        486
+      ],
+      [
+        "android.os.Looper.loop (framework.jar)",
+        457
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        403
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        321
+      ],
+      [
+        "libflutter.so[+58a1a5] (libflutter.so)",
+        301
+      ],
+      [
+        "android.app.ActivityThread.main (framework.jar)",
+        272
+      ],
+      [
+        "android.os.MessageQueue.nextLegacy ([JIT app cache])",
+        266
+      ],
+      [
+        "libflutter.so[+b6ff78] (libflutter.so)",
+        263
+      ],
+      [
+        "android.os.MessageQueue.next ([JIT app cache])",
+        259
+      ],
+      [
+        "android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (libandroid_runtime.so)",
+        247
+      ],
+      [
+        "android.os.Looper.dispatchMessage ([JIT app cache])",
+        240
+      ],
+      [
+        "android.os.Handler.dispatchMessage ([JIT app cache])",
+        238
+      ],
+      [
+        "android.os.Handler.handleCallback ([JIT app cache])",
+        236
+      ],
+      [
+        "libapp.so[+1c8790f] (libapp.so)",
+        219
+      ],
+      [
+        "libflutter.so[+ad379f] (libflutter.so)",
+        193
+      ],
+      [
+        "java.lang.Thread.run (core-oj.jar)",
+        193
+      ],
+      [
+        "libflutter.so[+cdae94] (libflutter.so)",
+        192
+      ],
+      [
+        "java.lang.Daemons$Daemon.run (core-libart.jar)",
+        191
+      ],
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        190
+      ],
+      [
+        "java.lang.Daemons$HeapTaskDaemon.runInternal (core-libart.jar)",
+        190
+      ],
+      [
+        "art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*) (.__uniq.165753521025965369065708152063621506277) (libart.so)",
+        182
+      ],
+      [
+        "libflutter.so[+5857c5] (libflutter.so)",
+        178
+      ],
+      [
+        "pthread_kill (libc.so)",
+        168
+      ]
+    ],
+    "threads": [
+      [
+        "com.personal.piliplus",
+        564
+      ],
+      [
+        "HeapTaskDaemon",
+        194
+      ],
+      [
+        "Dart Profiler T",
+        187
+      ],
+      [
+        "1.raster",
+        179
+      ],
+      [
+        "PlaybackTraceIO",
+        156
+      ],
+      [
+        "Jit thread pool",
+        113
+      ],
+      [
+        "Thread-6",
+        105
+      ],
+      [
+        "DartWorker",
+        92
+      ],
+      [
+        "demux",
+        36
+      ],
+      [
+        "io.worker.1",
+        23
+      ],
+      [
+        "MediaCodec_loop",
+        21
+      ],
+      [
+        "io.worker.2",
+        19
+      ],
+      [
+        "HwBinder:4844_1",
+        19
+      ],
+      [
+        "Thread-8",
+        16
+      ],
+      [
+        "opener",
+        13
+      ],
+      [
+        "ao/audiotrack",
+        10
+      ],
+      [
+        "1.io",
+        9
+      ],
+      [
+        "pool-8-thread-1",
+        8
+      ],
+      [
+        "dart:io EventHa",
+        6
+      ],
+      [
+        "binder:4844_2",
+        4
+      ],
+      [
+        "CodecLooper",
+        4
+      ],
+      [
+        "core",
+        3
+      ],
+      [
+        "binder:4844_1",
+        3
+      ],
+      [
+        "binder:4844_4",
+        2
+      ],
+      [
+        "RenderThread",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        445
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        113
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        39
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libvmservice_snapshot.so",
+        9
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        445
+      ],
+      [
+        "/apex/com.android.art/lib64/libart.so",
+        368
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        340
+      ],
+      [
+        "[JIT app cache]",
+        256
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        113
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        63
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428",
+        28
+      ],
+      [
+        "/system/lib64/libutils.so",
+        21
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464",
+        16
+      ],
+      [
+        "/system/framework/framework.jar",
+        13
+      ],
+      [
+        "/system/lib64/libbinder.so",
+        9
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libvmservice_snapshot.so",
+        9
+      ],
+      [
+        "/vendor/lib64/libOpenglCodecCommon.so",
+        9
+      ],
+      [
+        "/system/lib64/libstagefright_foundation.so",
+        7
+      ],
+      [
+        "/system/lib64/libc++.so",
+        7
+      ],
+      [
+        "[vdso]",
+        6
+      ],
+      [
+        "/system/lib64/libcodec2_vndk.so",
+        6
+      ],
+      [
+        "/system/lib64/libcutils.so",
+        5
+      ],
+      [
+        "/system/lib64/libhwui.so",
+        5
+      ],
+      [
+        "/vendor/lib64/egl/libEGL_emulation.so",
+        4
+      ],
+      [
+        "/apex/com.android.art/lib64/libartbase.so",
+        4
+      ],
+      [
+        "/system/lib64/libgui.so",
+        4
+      ],
+      [
+        "/vendor/lib64/libGLESv2_enc.so",
+        3
+      ],
+      [
+        "/system/lib64/libtracing_perfetto.so",
+        3
+      ],
+      [
+        "/apex/com.android.art/lib64/libjavacore.so",
+        3
+      ]
+    ]
+  },
+  "primaryAPI": {
+    "self": [
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        24
+      ],
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        14
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        4
+      ],
+      [
+        "art::RegisterAllocatorLinearScan::LinearScan::Run() (libart.so)",
+        2
+      ],
+      [
+        "artQuickGenericJniTrampoline (libart.so)",
+        2
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool) (libc.so)",
+        2
+      ],
+      [
+        "__vfprintf (libc.so)",
+        2
+      ],
+      [
+        "java.lang.StringFactory.newStringFromBytes ([JIT app cache])",
+        2
+      ],
+      [
+        "java.util.ArrayList$Itr.next ([JIT app cache])",
+        2
+      ],
+      [
+        "libapp.so[+f768be] (libapp.so)",
+        1
+      ],
+      [
+        "libapp.so[+1b99880] (libapp.so)",
+        1
+      ],
+      [
+        "libapp.so[+16adc9f] (libapp.so)",
+        1
+      ],
+      [
+        "libflutter.so[+bca819] (libflutter.so)",
+        1
+      ],
+      [
+        "libapp.so[+18f5c28] (libapp.so)",
+        1
+      ],
+      [
+        "inflate_fast (libz.so)",
+        1
+      ],
+      [
+        "libflutter.so[+c74900] (libflutter.so)",
+        1
+      ],
+      [
+        "libapp.so[+1c677a8] (libapp.so)",
+        1
+      ],
+      [
+        "libflutter.so[+6a7812] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+6362ad] (libflutter.so)",
+        1
+      ],
+      [
+        "atrace_get_enabled_tags (libcutils.so)",
+        1
+      ],
+      [
+        "libflutter.so[+79d893] (libflutter.so)",
+        1
+      ],
+      [
+        "art::HConstantFolding::Run() (libart.so)",
+        1
+      ],
+      [
+        "java.lang.Class.getComponentType ([JIT app cache])",
+        1
+      ],
+      [
+        "art::SsaRedundantPhiElimination::Run() (libart.so)",
+        1
+      ],
+      [
+        "art::HBasicBlock::InsertInstructionBefore(art::HInstruction*, art::HInstruction*) (libart.so)",
+        1
+      ]
+    ],
+    "inclusive": [
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        84
+      ],
+      [
+        "__start_thread (libc.so)",
+        84
+      ],
+      [
+        "android.os.Looper.loopOnce ([JIT app cache])",
+        46
+      ],
+      [
+        "android.os.Looper.loop (framework.jar)",
+        43
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        31
+      ],
+      [
+        "android.app.ActivityThread.main (framework.jar)",
+        27
+      ],
+      [
+        "android.os.Handler.dispatchMessage ([JIT app cache])",
+        26
+      ],
+      [
+        "android.os.Looper.dispatchMessage ([JIT app cache])",
+        26
+      ],
+      [
+        "art::ThreadPoolWorker::Callback(void*) (libart.so)",
+        25
+      ],
+      [
+        "art::jit::JitCompileTask::Run(art::Thread*) (libart.so)",
+        25
+      ],
+      [
+        "art::jit::Jit::CompileMethodInternal(art::ArtMethod*, art::Thread*, art::CompilationKind, bool) (libart.so)",
+        25
+      ],
+      [
+        "art::ThreadPoolWorker::Run() (libart.so)",
+        25
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        24
+      ],
+      [
+        "art::jit::JitCompiler::CompileMethod(art::Thread*, art::jit::JitMemoryRegion*, art::ArtMethod*, art::CompilationKind) (libart.so)",
+        24
+      ],
+      [
+        "android.os.Handler.handleCallback ([JIT app cache])",
+        24
+      ],
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        24
+      ],
+      [
+        "java.lang.Daemons$HeapTaskDaemon.runInternal (core-libart.jar)",
+        24
+      ],
+      [
+        "java.lang.Thread.run (core-oj.jar)",
+        24
+      ],
+      [
+        "java.lang.Daemons$Daemon.run (core-libart.jar)",
+        24
+      ],
+      [
+        "libflutter.so[+58a1a5] (libflutter.so)",
+        23
+      ],
+      [
+        "android.os.MessageQueue.next ([JIT app cache])",
+        21
+      ],
+      [
+        "android.os.MessageQueue.nextLegacy ([JIT app cache])",
+        21
+      ],
+      [
+        "libapp.so[+1c8790f] (libapp.so)",
+        21
+      ],
+      [
+        "android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (libandroid_runtime.so)",
+        21
+      ],
+      [
+        "art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*) (.__uniq.165753521025965369065708152063621506277) (libart.so)",
+        21
+      ]
+    ],
+    "threads": [
+      [
+        "com.personal.piliplus",
+        71
+      ],
+      [
+        "Jit thread pool",
+        25
+      ],
+      [
+        "HeapTaskDaemon",
+        24
+      ],
+      [
+        "Dart Profiler T",
+        16
+      ],
+      [
+        "PlaybackTraceIO",
+        11
+      ],
+      [
+        "1.raster",
+        10
+      ],
+      [
+        "DartWorker",
+        4
+      ],
+      [
+        "binder:4844_2",
+        3
+      ],
+      [
+        "RenderThread",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        30
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        21
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/apex/com.android.art/lib64/libart.so",
+        49
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        30
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        25
+      ],
+      [
+        "[JIT app cache]",
+        22
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        21
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464",
+        5
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428",
+        3
+      ],
+      [
+        "/system/lib64/libutils.so",
+        2
+      ],
+      [
+        "/system/lib64/libz.so",
+        1
+      ],
+      [
+        "/system/lib64/libcutils.so",
+        1
+      ],
+      [
+        "/system/lib64/libandroid.so",
+        1
+      ],
+      [
+        "/vendor/lib64/egl/libEGL_emulation.so",
+        1
+      ],
+      [
+        "/apex/com.android.art/lib64/libartbase.so",
+        1
+      ],
+      [
+        "/system/lib64/libgui.so",
+        1
+      ],
+      [
+        "/apex/com.android.i18n/lib64/libicuuc.so",
+        1
+      ],
+      [
+        "/system/lib64/libbinder.so",
+        1
+      ]
+    ]
+  },
+  "prepare": {
+    "self": [
+      [
+        "libapp.so[+1bf79fd] (libapp.so)",
+        2
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        2
+      ],
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        2
+      ],
+      [
+        "android::properties::PropertyInfoArea::GetPropertyInfoIndexes(char const*, unsigned int*, unsigned int*) const (libc.so)",
+        1
+      ],
+      [
+        "io.flutter.embedding.engine.dart.DartMessenger.handleMessageFromDart (dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464)",
+        1
+      ],
+      [
+        "libapp.so[+e32ed7] (libapp.so)",
+        1
+      ],
+      [
+        "java.lang.Character.digit ([JIT app cache])",
+        1
+      ],
+      [
+        "java.lang.Integer.<init> ([JIT app cache])",
+        1
+      ],
+      [
+        "com.personal.piliplus.PlaybackDiagnostics.info (dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428)",
+        1
+      ],
+      [
+        "artQuickGenericJniTrampoline (libart.so)",
+        1
+      ],
+      [
+        "libflutter.so[+8a36c4] (libflutter.so)",
+        1
+      ],
+      [
+        "libapp.so[+1714ef4] (libapp.so)",
+        1
+      ],
+      [
+        "scudo::HybridMutex::tryLock() (libc.so)",
+        1
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool) (libc.so)",
+        1
+      ],
+      [
+        "libflutter.so[+74da80] (libflutter.so)",
+        1
+      ],
+      [
+        "libapp.so[+16e65ca] (libapp.so)",
+        1
+      ],
+      [
+        "libflutter.so[+b81714] (libflutter.so)",
+        1
+      ]
+    ],
+    "inclusive": [
+      [
+        "android.os.Looper.loopOnce ([JIT app cache])",
+        11
+      ],
+      [
+        "android.os.Looper.loop (framework.jar)",
+        9
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        9
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        8
+      ],
+      [
+        "libflutter.so[+58a1a5] (libflutter.so)",
+        8
+      ],
+      [
+        "libflutter.so[+cdae94] (libflutter.so)",
+        7
+      ],
+      [
+        "android.app.ActivityThread.main (framework.jar)",
+        7
+      ],
+      [
+        "android.os.MessageQueue.next ([JIT app cache])",
+        7
+      ],
+      [
+        "android.os.MessageQueue.nextLegacy ([JIT app cache])",
+        7
+      ],
+      [
+        "libapp.so[+1c8790f] (libapp.so)",
+        7
+      ],
+      [
+        "android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (libandroid_runtime.so)",
+        7
+      ],
+      [
+        "libflutter.so[+ad379f] (libflutter.so)",
+        7
+      ],
+      [
+        "libflutter.so[+585834] (libflutter.so)",
+        6
+      ],
+      [
+        "libapp.so[+e1999a] (libapp.so)",
+        6
+      ],
+      [
+        "libapp.so[+e19b69] (libapp.so)",
+        6
+      ],
+      [
+        "libapp.so[+e199d4] (libapp.so)",
+        6
+      ],
+      [
+        "libflutter.so[+a0314a] (libflutter.so)",
+        6
+      ],
+      [
+        "art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*) (.__uniq.165753521025965369065708152063621506277) (libart.so)",
+        6
+      ],
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        5
+      ],
+      [
+        "__start_thread (libc.so)",
+        5
+      ],
+      [
+        "android.os.Handler.handleCallback ([JIT app cache])",
+        4
+      ],
+      [
+        "android.os.Handler.dispatchMessage ([JIT app cache])",
+        4
+      ],
+      [
+        "android.os.Looper.dispatchMessage ([JIT app cache])",
+        4
+      ],
+      [
+        "libapp.so[+16df02c] (libapp.so)",
+        3
+      ],
+      [
+        "libapp.so[+e185ab] (libapp.so)",
+        3
+      ]
+    ],
+    "threads": [
+      [
+        "com.personal.piliplus",
+        15
+      ],
+      [
+        "PlaybackTraceIO",
+        2
+      ],
+      [
+        "Dart Profiler T",
+        2
+      ],
+      [
+        "1.raster",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        5
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        3
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        5
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        5
+      ],
+      [
+        "[JIT app cache]",
+        4
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        3
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464",
+        1
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428",
+        1
+      ],
+      [
+        "/apex/com.android.art/lib64/libart.so",
+        1
+      ]
+    ]
+  },
+  "sourceOpenToCodecInit": {
+    "self": [
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        19
+      ],
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        9
+      ],
+      [
+        "strlen (libc.so)",
+        4
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        4
+      ],
+      [
+        "mbedtls_mpi_core_sub (libmpv.so)",
+        3
+      ],
+      [
+        "org.json.JSONStringer.value ([JIT app cache])",
+        3
+      ],
+      [
+        "sse42::S32_alpha_D32_filter_DX(SkBitmapProcState const&, unsigned int const*, int, unsigned int*) (libhwui.so)",
+        3
+      ],
+      [
+        "art::ClassTable::Lookup(std::__1::basic_string_view<char, std::__1::char_traits<char>>, unsigned long) (libart.so)",
+        3
+      ],
+      [
+        "memmove_avx2 (libc.so)",
+        3
+      ],
+      [
+        "libflutter.so[+7fd3e2] (libflutter.so)",
+        3
+      ],
+      [
+        "libflutter.so[+7f8393] (libflutter.so)",
+        3
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool) (libc.so)",
+        3
+      ],
+      [
+        "libflutter.so[+53aa30] (libflutter.so)",
+        2
+      ],
+      [
+        "art::(anonymous namespace)::ScopedCheck::CheckMethodAndSig(art::ScopedObjectAccess&, _jobject*, _jclass*, _jmethodID*, art::Primitive::Type, art::InvokeType) (.__uniq.99033978352804627313491551960229047428) (libart.so)",
+        2
+      ],
+      [
+        "com.personal.piliplus.PlaybackTextureProbe.refresh (dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428)",
+        2
+      ],
+      [
+        "com.ryanheise.audioservice.AudioService.putArtToMetadata (dexfile_in_memory_pid_4844_addr_0x7b101e0b5000-0x7b101e0ddd4c)",
+        2
+      ],
+      [
+        "android.compat.Compatibility.isChangeEnabled ([JIT app cache])",
+        2
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::deallocate(void*, scudo::Chunk::Origin, unsigned long, unsigned long) (libc.so)",
+        2
+      ],
+      [
+        "scudo::HybridMutex::tryLock() (libc.so)",
+        2
+      ],
+      [
+        "art::BCEVisitor::CanHandleInfiniteLoop(art::HLoopInformation*, art::HInstruction*, bool) (libart.so)",
+        2
+      ],
+      [
+        "__vfprintf (libc.so)",
+        2
+      ],
+      [
+        "mbedtls_mpi_free (libmpv.so)",
+        2
+      ],
+      [
+        "libflutter.so[+7fd3f0] (libflutter.so)",
+        2
+      ],
+      [
+        "libflutter.so[+c05a8f] (libflutter.so)",
+        2
+      ],
+      [
+        "pthread_getspecific (libc.so)",
+        2
+      ]
+    ],
+    "inclusive": [
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        135
+      ],
+      [
+        "__start_thread (libc.so)",
+        135
+      ],
+      [
+        "android.os.Looper.loopOnce ([JIT app cache])",
+        50
+      ],
+      [
+        "android.os.Looper.loop (framework.jar)",
+        44
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        43
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        42
+      ],
+      [
+        "libflutter.so[+58a1a5] (libflutter.so)",
+        39
+      ],
+      [
+        "art::ThreadPoolWorker::Callback(void*) (libart.so)",
+        39
+      ],
+      [
+        "art::jit::JitCompileTask::Run(art::Thread*) (libart.so)",
+        39
+      ],
+      [
+        "art::OptimizingCompiler::JitCompile(art::Thread*, art::jit::JitCodeCache*, art::jit::JitMemoryRegion*, art::ArtMethod*, art::CompilationKind, art::jit::JitLogger*) (libart.so)",
+        39
+      ],
+      [
+        "art::jit::Jit::CompileMethodInternal(art::ArtMethod*, art::Thread*, art::CompilationKind, bool) (libart.so)",
+        39
+      ],
+      [
+        "art::ThreadPoolWorker::Run() (libart.so)",
+        39
+      ],
+      [
+        "art::jit::JitCompiler::CompileMethod(art::Thread*, art::jit::JitMemoryRegion*, art::ArtMethod*, art::CompilationKind) (libart.so)",
+        39
+      ],
+      [
+        "android.os.MessageQueue.nextLegacy ([JIT app cache])",
+        37
+      ],
+      [
+        "libflutter.so[+b6ff78] (libflutter.so)",
+        36
+      ],
+      [
+        "android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (libandroid_runtime.so)",
+        35
+      ],
+      [
+        "android.os.MessageQueue.next ([JIT app cache])",
+        34
+      ],
+      [
+        "art::OptimizingCompiler::TryCompile(art::ArenaAllocator*, art::ArenaStack*, art::DexCompilationUnit const&, art::ArtMethod*, art::CompilationKind, art::VariableSizedHandleScope*) const (libart.so)",
+        32
+      ],
+      [
+        "libflutter.so[+582d35] (libflutter.so)",
+        31
+      ],
+      [
+        "android.app.ActivityThread.main (framework.jar)",
+        30
+      ],
+      [
+        "libflutter.so[+a22c33] (libflutter.so)",
+        30
+      ],
+      [
+        "libflutter.so[+693346] (libflutter.so)",
+        30
+      ],
+      [
+        "libflutter.so[+a1f377] (libflutter.so)",
+        30
+      ],
+      [
+        "libapp.so[+1c8790f] (libapp.so)",
+        28
+      ],
+      [
+        "libflutter.so[+cdae94] (libflutter.so)",
+        26
+      ]
+    ],
+    "threads": [
+      [
+        "com.personal.piliplus",
+        77
+      ],
+      [
+        "Jit thread pool",
+        39
+      ],
+      [
+        "Dart Profiler T",
+        21
+      ],
+      [
+        "io.worker.1",
+        20
+      ],
+      [
+        "Thread-6",
+        20
+      ],
+      [
+        "DartWorker",
+        15
+      ],
+      [
+        "1.raster",
+        14
+      ],
+      [
+        "opener",
+        13
+      ],
+      [
+        "io.worker.2",
+        11
+      ],
+      [
+        "HeapTaskDaemon",
+        9
+      ],
+      [
+        "PlaybackTraceIO",
+        8
+      ],
+      [
+        "pool-8-thread-1",
+        8
+      ],
+      [
+        "core",
+        3
+      ],
+      [
+        "1.io",
+        3
+      ],
+      [
+        "dart:io EventHa",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        84
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        13
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        3
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libvmservice_snapshot.so",
+        2
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        84
+      ],
+      [
+        "/apex/com.android.art/lib64/libart.so",
+        53
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        47
+      ],
+      [
+        "[JIT app cache]",
+        17
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        13
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        12
+      ],
+      [
+        "/system/framework/framework.jar",
+        10
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428",
+        4
+      ],
+      [
+        "/system/lib64/libhwui.so",
+        4
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464",
+        2
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libvmservice_snapshot.so",
+        2
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b101e0b5000-0x7b101e0ddd4c",
+        2
+      ],
+      [
+        "/apex/com.android.runtime/bin/linker64",
+        2
+      ],
+      [
+        "/system/lib64/libandroid_runtime.so",
+        1
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b1028bfe000-0x7b1028c0fd1c",
+        1
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libm.so",
+        1
+      ],
+      [
+        "/apex/com.android.art/javalib/core-oj.jar",
+        1
+      ],
+      [
+        "/system/lib64/libbinder.so",
+        1
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b0cde283000-0x7b0cdec1c314",
+        1
+      ],
+      [
+        "/apex/com.android.art/lib64/libartbase.so",
+        1
+      ],
+      [
+        "/system/framework/x86_64/boot.oat",
+        1
+      ],
+      [
+        "/vendor/lib64/libOpenglCodecCommon.so",
+        1
+      ],
+      [
+        "/system/lib64/libstagefright_foundation.so",
+        1
+      ]
+    ]
+  },
+  "codecInitConfigureStart": {
+    "self": [
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        19
+      ],
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        5
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        3
+      ],
+      [
+        "com.personal.piliplus.PlaybackDiagnostics.snapshot (dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428)",
+        2
+      ],
+      [
+        "libflutter.so[+804bb8] (libflutter.so)",
+        1
+      ],
+      [
+        "aidl::android::media::IResourceManagerService::fromBinder(ndk::SpAIBinder const&) (.cfi) (libmedia.so)",
+        1
+      ],
+      [
+        "libflutter.so[+80ebb8] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+af8981] (libflutter.so)",
+        1
+      ],
+      [
+        "art::RegisterAllocationResolver::Resolve(art::ArrayRef<art::HInstruction* const>, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long, art::ArrayRef<art::LiveInterval* const>) (libart.so)",
+        1
+      ],
+      [
+        "art::HConstantFolding::Run() (libart.so)",
+        1
+      ],
+      [
+        "libflutter.so[+7f0be2] (libflutter.so)",
+        1
+      ],
+      [
+        "libapp.so[+1739159] (libapp.so)",
+        1
+      ],
+      [
+        "libflutter.so[+6cf1f5] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+a5e4a2] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+bca83c] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+cb9d44] (libflutter.so)",
+        1
+      ],
+      [
+        "java.lang.Long.longValue ([JIT app cache])",
+        1
+      ],
+      [
+        "kotlin.collections.MapsKt__MapsKt.mutableMapOf (dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464)",
+        1
+      ],
+      [
+        "art::LICM::Run() (libart.so)",
+        1
+      ],
+      [
+        "libflutter.so[+6b6b21] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+53a825] (libflutter.so)",
+        1
+      ],
+      [
+        "android.service.media.MediaBrowserService$ServiceState.connectOnHandler ([JIT app cache])",
+        1
+      ],
+      [
+        "strlen (libc.so)",
+        1
+      ],
+      [
+        "libflutter.so[+7fd3f0] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+7fd411] (libflutter.so)",
+        1
+      ]
+    ],
+    "inclusive": [
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        49
+      ],
+      [
+        "__start_thread (libc.so)",
+        49
+      ],
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        19
+      ],
+      [
+        "java.lang.Daemons$Daemon.run (core-libart.jar)",
+        19
+      ],
+      [
+        "java.lang.Thread.run (core-oj.jar)",
+        19
+      ],
+      [
+        "java.lang.Daemons$HeapTaskDaemon.runInternal (core-libart.jar)",
+        19
+      ],
+      [
+        "libflutter.so[+582d35] (libflutter.so)",
+        11
+      ],
+      [
+        "android.os.Looper.loopOnce ([JIT app cache])",
+        11
+      ],
+      [
+        "libflutter.so[+a22c33] (libflutter.so)",
+        10
+      ],
+      [
+        "libflutter.so[+693346] (libflutter.so)",
+        10
+      ],
+      [
+        "libflutter.so[+a1f377] (libflutter.so)",
+        10
+      ],
+      [
+        "android.os.Looper.loop (framework.jar)",
+        10
+      ],
+      [
+        "android.app.ActivityThread.main (framework.jar)",
+        8
+      ],
+      [
+        "libflutter.so[+b6ff78] (libflutter.so)",
+        8
+      ],
+      [
+        "art::ThreadPoolWorker::Callback(void*) (libart.so)",
+        7
+      ],
+      [
+        "art::jit::JitCompileTask::Run(art::Thread*) (libart.so)",
+        7
+      ],
+      [
+        "art::OptimizingCompiler::JitCompile(art::Thread*, art::jit::JitCodeCache*, art::jit::JitMemoryRegion*, art::ArtMethod*, art::CompilationKind, art::jit::JitLogger*) (libart.so)",
+        7
+      ],
+      [
+        "art::jit::Jit::CompileMethodInternal(art::ArtMethod*, art::Thread*, art::CompilationKind, bool) (libart.so)",
+        7
+      ],
+      [
+        "art::ThreadPoolWorker::Run() (libart.so)",
+        7
+      ],
+      [
+        "art::jit::JitCompiler::CompileMethod(art::Thread*, art::jit::JitMemoryRegion*, art::ArtMethod*, art::CompilationKind) (libart.so)",
+        7
+      ],
+      [
+        "android.os.Handler.dispatchMessage ([JIT app cache])",
+        7
+      ],
+      [
+        "android.os.Handler.handleCallback ([JIT app cache])",
+        7
+      ],
+      [
+        "android.os.Looper.dispatchMessage ([JIT app cache])",
+        7
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        6
+      ],
+      [
+        "art::OptimizingCompiler::TryCompile(art::ArenaAllocator*, art::ArenaStack*, art::DexCompilationUnit const&, art::ArtMethod*, art::CompilationKind, art::VariableSizedHandleScope*) const (libart.so)",
+        5
+      ]
+    ],
+    "threads": [
+      [
+        "HeapTaskDaemon",
+        19
+      ],
+      [
+        "com.personal.piliplus",
+        12
+      ],
+      [
+        "io.worker.2",
+        8
+      ],
+      [
+        "Jit thread pool",
+        7
+      ],
+      [
+        "Dart Profiler T",
+        6
+      ],
+      [
+        "1.raster",
+        5
+      ],
+      [
+        "io.worker.1",
+        3
+      ],
+      [
+        "CodecLooper",
+        3
+      ],
+      [
+        "DartWorker",
+        2
+      ],
+      [
+        "Thread-6",
+        1
+      ],
+      [
+        "PlaybackTraceIO",
+        1
+      ],
+      [
+        "dart:io EventHa",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        19
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        2
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/apex/com.android.art/lib64/libart.so",
+        25
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        19
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        11
+      ],
+      [
+        "[JIT app cache]",
+        5
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428",
+        2
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        2
+      ],
+      [
+        "/system/lib64/libmedia.so",
+        1
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b0cddcde000-0x7b0cde1ff464",
+        1
+      ],
+      [
+        "/vendor/lib64/egl/libEGL_emulation.so",
+        1
+      ],
+      [
+        "/system/lib64/libstagefright_foundation.so",
+        1
+      ]
+    ]
+  },
+  "codecStartedToPostFlushInput": {
+    "self": [
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        3
+      ],
+      [
+        "libflutter.so[+7d39f6] (libflutter.so)",
+        1
+      ],
+      [
+        "read (libc.so)",
+        1
+      ],
+      [
+        "libflutter.so[+585506] (libflutter.so)",
+        1
+      ],
+      [
+        "android::SimpleLooperCallback::handleEvent(int, int, void*) (libutils.so)",
+        1
+      ],
+      [
+        "jdk.internal.util.Preconditions.checkIndex ([JIT app cache])",
+        1
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool) (libc.so)",
+        1
+      ],
+      [
+        "libmpv.so[+d9d5c8] (libmpv.so)",
+        1
+      ],
+      [
+        "android.media.MediaCodec.dequeueInputBuffer (framework.jar)",
+        1
+      ],
+      [
+        "libflutter.so[+7d35bf] (libflutter.so)",
+        1
+      ],
+      [
+        "libmpv.so[+4c93dd] (libmpv.so)",
+        1
+      ],
+      [
+        "java.util.HashMap.putVal ([JIT app cache])",
+        1
+      ],
+      [
+        "mbedtls_gcm_update (libmpv.so)",
+        1
+      ],
+      [
+        "libflutter.so[+bca83c] (libflutter.so)",
+        1
+      ],
+      [
+        "mbedtls_cipher_update (libmpv.so)",
+        1
+      ],
+      [
+        "libmpv.so[+d9d31a] (libmpv.so)",
+        1
+      ],
+      [
+        "libmpv.so[+dedef9] (libmpv.so)",
+        1
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::quarantineOrDeallocateChunk(scudo::Options const&, void*, scudo::Chunk::UnpackedHeader*, unsigned long) (libc.so)",
+        1
+      ],
+      [
+        "libmpv.so[+4e2305] (libmpv.so)",
+        1
+      ],
+      [
+        "libmpv.so[+e499a1] (libmpv.so)",
+        1
+      ],
+      [
+        "mbedtls_aesni_gcm_mult (libmpv.so)",
+        1
+      ],
+      [
+        "libapp.so[+1b59324] (libapp.so)",
+        1
+      ],
+      [
+        "memmove_avx2 (libc.so)",
+        1
+      ],
+      [
+        "libmpv.so[+d8e005] (libmpv.so)",
+        1
+      ]
+    ],
+    "inclusive": [
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        19
+      ],
+      [
+        "__start_thread (libc.so)",
+        19
+      ],
+      [
+        "libmpv.so[+4d375a] (libmpv.so)",
+        11
+      ],
+      [
+        "libmpv.so[+4d3539] (libmpv.so)",
+        11
+      ],
+      [
+        "libmpv.so[+4f392d] (libmpv.so)",
+        10
+      ],
+      [
+        "libmpv.so[+4f2e36] (libmpv.so)",
+        10
+      ],
+      [
+        "av_read_frame (libmpv.so)",
+        9
+      ],
+      [
+        "libmpv.so[+4e2217] (libmpv.so)",
+        9
+      ],
+      [
+        "libmpv.so[+d77a3b] (libmpv.so)",
+        9
+      ],
+      [
+        "libmpv.so[+4d1f82] (libmpv.so)",
+        9
+      ],
+      [
+        "ff_read_packet (libmpv.so)",
+        9
+      ],
+      [
+        "libmpv.so[+d733c4] (libmpv.so)",
+        7
+      ],
+      [
+        "avio_read (libmpv.so)",
+        7
+      ],
+      [
+        "libmpv.so[+d9d2ad] (libmpv.so)",
+        7
+      ],
+      [
+        "libmpv.so[+de9987] (libmpv.so)",
+        7
+      ],
+      [
+        "libmpv.so[+d8f617] (libmpv.so)",
+        6
+      ],
+      [
+        "avio_read_partial (libmpv.so)",
+        6
+      ],
+      [
+        "libmpv.so[+4e2cdc] (libmpv.so)",
+        6
+      ],
+      [
+        "libmpv.so[+55dcbc] (libmpv.so)",
+        6
+      ],
+      [
+        "libmpv.so[+d8d7bf] (libmpv.so)",
+        6
+      ],
+      [
+        "libmpv.so[+d72566] (libmpv.so)",
+        6
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        5
+      ],
+      [
+        "libmpv.so[+de7019] (libmpv.so)",
+        5
+      ],
+      [
+        "libmpv.so[+55a57b] (libmpv.so)",
+        5
+      ],
+      [
+        "libmpv.so[+d8dff8] (libmpv.so)",
+        5
+      ]
+    ],
+    "threads": [
+      [
+        "demux",
+        11
+      ],
+      [
+        "1.raster",
+        4
+      ],
+      [
+        "Dart Profiler T",
+        4
+      ],
+      [
+        "com.personal.piliplus",
+        3
+      ],
+      [
+        "PlaybackTraceIO",
+        1
+      ],
+      [
+        "Jit thread pool",
+        1
+      ],
+      [
+        "Thread-6",
+        1
+      ],
+      [
+        "1.io",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        7
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        4
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        1
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        10
+      ],
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        7
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        4
+      ],
+      [
+        "[JIT app cache]",
+        2
+      ],
+      [
+        "/system/lib64/libutils.so",
+        1
+      ],
+      [
+        "/system/framework/framework.jar",
+        1
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        1
+      ]
+    ]
+  },
+  "postFlushInputToFirstSurfaceRelease": {
+    "self": [
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        16
+      ],
+      [
+        "art::gc::TaskProcessor::RunAllTasks(art::Thread*) (libart.so)",
+        7
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        6
+      ],
+      [
+        "memmove_avx2 (libc.so)",
+        4
+      ],
+      [
+        "scudo::Allocator<scudo::AndroidNormalConfig, &scudo_malloc_postinit>::allocate(unsigned long, scudo::Chunk::Origin, unsigned long, bool) (libc.so)",
+        3
+      ],
+      [
+        "libflutter.so[+5877de] (libflutter.so)",
+        2
+      ],
+      [
+        "art::(anonymous namespace)::ScopedCheck::CheckFieldAccess(art::ScopedObjectAccess&, _jobject*, _jfieldID*, bool, art::Primitive::Type) (.__uniq.99033978352804627313491551960229047428) (libart.so)",
+        2
+      ],
+      [
+        "libapp.so[+f4316e] (libapp.so)",
+        2
+      ],
+      [
+        "java.lang.StringBuilder.append ([JIT app cache])",
+        1
+      ],
+      [
+        "libmpv.so[+5bd205] (libmpv.so)",
+        1
+      ],
+      [
+        "mbedtls_aesni_has_support (libmpv.so)",
+        1
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        1
+      ],
+      [
+        "__errno (libc.so)",
+        1
+      ],
+      [
+        "libmpv.so[+e66c90] (libmpv.so)",
+        1
+      ],
+      [
+        "mbedtls_aesni_crypt_ecb (libmpv.so)",
+        1
+      ],
+      [
+        "mbedtls_gcm_update (libmpv.so)",
+        1
+      ],
+      [
+        "libflutter.so[+a03156] (libflutter.so)",
+        1
+      ],
+      [
+        "libflutter.so[+b2dc91] (libflutter.so)",
+        1
+      ],
+      [
+        "scudo_realloc (libc.so)",
+        1
+      ],
+      [
+        "libmpv.so[+4f5787] (libmpv.so)",
+        1
+      ],
+      [
+        "java.util.HashSet.clone (core-oj.jar)",
+        1
+      ],
+      [
+        "libmpv.so[+e66997] (libmpv.so)",
+        1
+      ],
+      [
+        "libmpv.so[+e669c5] (libmpv.so)",
+        1
+      ],
+      [
+        "java.util.HashMap.putVal ([JIT app cache])",
+        1
+      ],
+      [
+        "jdk.internal.util.Preconditions.checkIndex ([JIT app cache])",
+        1
+      ]
+    ],
+    "inclusive": [
+      [
+        "__pthread_start(void*) (.__uniq.67847048707805468364044055584648682506) (libc.so)",
+        62
+      ],
+      [
+        "__start_thread (libc.so)",
+        62
+      ],
+      [
+        "android.os.Looper.loopOnce ([JIT app cache])",
+        44
+      ],
+      [
+        "android.os.Looper.loop (framework.jar)",
+        44
+      ],
+      [
+        "art_jni_trampoline ([JIT app cache])",
+        35
+      ],
+      [
+        "android::Looper::pollOnce(int, int*, int*, void**) (libutils.so)",
+        32
+      ],
+      [
+        "libflutter.so[+58a1a5] (libflutter.so)",
+        30
+      ],
+      [
+        "android.os.MessageQueue.nextLegacy ([JIT app cache])",
+        28
+      ],
+      [
+        "android::android_os_MessageQueue_nativePollOnce(_JNIEnv*, _jobject*, long, int) (libandroid_runtime.so)",
+        27
+      ],
+      [
+        "android.os.MessageQueue.next ([JIT app cache])",
+        27
+      ],
+      [
+        "android.app.ActivityThread.main (framework.jar)",
+        26
+      ],
+      [
+        "libflutter.so[+b6ff78] (libflutter.so)",
+        21
+      ],
+      [
+        "android.os.Handler.dispatchMessage ([JIT app cache])",
+        17
+      ],
+      [
+        "android.os.Handler.handleCallback ([JIT app cache])",
+        17
+      ],
+      [
+        "android.os.Looper.dispatchMessage ([JIT app cache])",
+        17
+      ],
+      [
+        "art::Method_invoke(_JNIEnv*, _jobject*, _jobject*, _jobjectArray*) (.__uniq.165753521025965369065708152063621506277) (libart.so)",
+        17
+      ],
+      [
+        "pthread_kill (libc.so)",
+        16
+      ],
+      [
+        "__pthread_internal_gettid(long, char const*) (libc.so)",
+        16
+      ],
+      [
+        "__pthread_internal_find(long, char const*) (libc.so)",
+        16
+      ],
+      [
+        "libflutter.so[+bca86c] (libflutter.so)",
+        16
+      ],
+      [
+        "libapp.so[+1c8790f] (libapp.so)",
+        16
+      ],
+      [
+        "libflutter.so[+5857c5] (libflutter.so)",
+        15
+      ],
+      [
+        "libflutter.so[+cdae94] (libflutter.so)",
+        15
+      ],
+      [
+        "libflutter.so[+ad379f] (libflutter.so)",
+        15
+      ],
+      [
+        "libmpv.so[+4d375a] (libmpv.so)",
+        12
+      ]
+    ],
+    "threads": [
+      [
+        "com.personal.piliplus",
+        35
+      ],
+      [
+        "Dart Profiler T",
+        18
+      ],
+      [
+        "demux",
+        13
+      ],
+      [
+        "PlaybackTraceIO",
+        11
+      ],
+      [
+        "HeapTaskDaemon",
+        8
+      ],
+      [
+        "1.raster",
+        7
+      ],
+      [
+        "Thread-6",
+        4
+      ],
+      [
+        "Jit thread pool",
+        4
+      ],
+      [
+        "DartWorker",
+        3
+      ],
+      [
+        "1.io",
+        3
+      ],
+      [
+        "binder:4844_2",
+        1
+      ],
+      [
+        "dart:io EventHa",
+        1
+      ]
+    ],
+    "unresolvedLeaf": [
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        20
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        10
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        7
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libvmservice_snapshot.so",
+        1
+      ]
+    ],
+    "leafLibraries": [
+      [
+        "/apex/com.android.runtime/lib64/bionic/libc.so",
+        31
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libflutter.so",
+        20
+      ],
+      [
+        "[JIT app cache]",
+        17
+      ],
+      [
+        "/apex/com.android.art/lib64/libart.so",
+        13
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libmpv.so",
+        10
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libapp.so",
+        10
+      ],
+      [
+        "/system/lib64/libutils.so",
+        1
+      ],
+      [
+        "/apex/com.android.art/javalib/core-oj.jar",
+        1
+      ],
+      [
+        "[vdso]",
+        1
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b1028a5d000-0x7b1028a6fd88",
+        1
+      ],
+      [
+        "/vendor/lib64/libGLESv2_enc.so",
+        1
+      ],
+      [
+        "/data/app/~~9Bjz548gSXL8rV90-5HSCA==/com.personal.piliplus-K5Z_2utqoTM8FSw0BEDc7A==/lib/x86_64/libvmservice_snapshot.so",
+        1
+      ],
+      [
+        "dexfile_in_memory_pid_4844_addr_0x7b10212fd000-0x7b102131a428",
+        1
+      ]
+    ]
+  }
+}

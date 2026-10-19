@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import zipfile
 from urllib.parse import urljoin, urlsplit
 from urllib.request import url2pathname
 
@@ -16,6 +17,7 @@ parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--control', action='store_true', help='Same source, with startup standby disabled')
 parser.add_argument('--deep', action='store_true', help='Bounded classified decoder/HTTP diagnosis; not a performance candidate')
 parser.add_argument('--early-source', action='store_true', help='Prepare the selected real source while its page is mounting')
+parser.add_argument('--full-profile', action='store_true', help='Profile build for bounded Dart/native sampling; not a speed candidate')
 args = parser.parse_args()
 output = args.output.resolve()
 if output.exists():
@@ -44,8 +46,11 @@ try:
         flags.append('PLAYBACK_STARTUP_DEEP=true')
     if args.early_source:
         flags.append('SOURCE_EARLY_PREPARE=true')
+    if args.full_profile:
+        flags.append('PLAYBACK_FULL_PROFILE=true')
+    mode = 'profile' if args.full_profile else 'release'
     defines = ','.join(base64.b64encode(f.encode()).decode() for f in flags)
-    command = [str(ROOT/'android/gradlew.bat'),'-p','android','assembleRelease',
+    command = [str(ROOT/'android/gradlew.bat'),'-p','android','assemble'+mode.title(),
         '-Ptarget-platform=android-x64','-Ptarget=lib/main.dart',f'-Pdart-defines={defines}',
         '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8',
         '--max-workers=1','--console=plain']
@@ -55,14 +60,26 @@ try:
     with output.with_suffix('.build.log').open('w',encoding='utf-8') as log:
         result=subprocess.run(command,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT)
     if result.returncode: raise SystemExit(result.returncode)
-    shutil.copy2(ROOT/'build/app/outputs/apk/release/app-release.apk',output)
+    shutil.copy2(ROOT/f'build/app/outputs/apk/{mode}/app-{mode}.apk',output)
     manifest={'head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
         'apk':str(output),'sha256':hashlib.file_digest(output.open('rb'),'sha256').hexdigest(),
         'defines':flags,'dependencyRevision':revision,
+        'buildMode':mode,
         'dependencySourceSha256':hashlib.sha256(dependency.read_bytes()).hexdigest(),
         'standbyEnabled':not args.control,'mediaPreload':False,
         'sourcePreparationOverlapsPresentation':args.early_source,
         'acceptedPerformanceFix':False}
+    if args.full_profile:
+        sources = ['lib/main.dart','lib/http/init.dart',
+            'lib/plugin/pl_player/playback/runtime_profile.dart',
+            'lib/plugin/pl_player/playback/playback_diagnostics.dart',
+            'android/app/src/profile/AndroidManifest.xml',
+            'tool/build_startup_standby.py','tool/startup_gpu_standby/android_video_controller.dart']
+        manifest['diagnosticSourcesSha256'] = {
+            name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in sources}
+        with zipfile.ZipFile(output.with_suffix('.sources.zip'),'w',zipfile.ZIP_DEFLATED) as archive:
+            for name in sources: archive.write(ROOT/name,name)
+        manifest['releaseSpeedComparable'] = False
     output.with_suffix('.build.json').write_text(json.dumps(manifest,indent=2),encoding='utf-8')
     print(json.dumps(manifest),flush=True)
 finally:

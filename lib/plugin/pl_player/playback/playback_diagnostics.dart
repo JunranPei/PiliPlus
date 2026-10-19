@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' show FramePhase;
+import 'package:PiliPlus/plugin/pl_player/playback/runtime_profile.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
@@ -186,6 +187,7 @@ abstract final class PlaybackDiagnostics {
 
   static void _write(String name, Map<String, Object?> data) {
     if (!enabled) return;
+    RuntimeProfile.playbackEvent(name, data);
     try {
       if (_pending.length > 4 * 1024 * 1024 || _bytes > 64 * 1024 * 1024) {
         _dropped++;
