@@ -1,0 +1,95 @@
+{
+  "source": "Original WebM PTS with pointer overlay; visible media movement, excluding cover, spinner and danmaku",
+  "rows": [
+    {
+      "index": 0,
+      "mode": "candidate",
+      "lastCoverPts": 3.569,
+      "firstImagePts": 3.603,
+      "motionPts": 3.67,
+      "notes": "Hair/earring and background particles change; large head turn occurs later and is not used as earliest motion.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 0,
+      "mode": "control",
+      "lastCoverPts": 3.307,
+      "firstImagePts": 3.34,
+      "motionPts": 3.431,
+      "notes": "Small character/background motion confirmed before the later large head turn.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 1,
+      "mode": "control",
+      "lastCoverPts": 3.658,
+      "firstImagePts": 3.691,
+      "motionPts": 3.725,
+      "notes": "Wide moving hoverboard scene. Earlier close board image is the poster.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 1,
+      "mode": "candidate",
+      "lastCoverPts": 3.059,
+      "firstImagePts": 3.098,
+      "motionPts": 3.185,
+      "notes": "Hoverboard rises between actual video frames; earlier close board image is the poster.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 2,
+      "mode": "candidate",
+      "lastCoverPts": 3.249,
+      "firstImagePts": 3.283,
+      "motionPts": 3.35,
+      "notes": "Recorded game UI background/cursor animation inside the media rectangle, excluding app danmaku.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 2,
+      "mode": "control",
+      "lastCoverPts": 3.199,
+      "firstImagePts": 3.237,
+      "motionPts": 3.305,
+      "notes": "Same recorded game UI background/cursor motion criterion as the candidate.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 3,
+      "mode": "control",
+      "lastCoverPts": 3.359,
+      "firstImagePts": 3.392,
+      "motionPts": 3.464,
+      "notes": "Man and fire/smoke in the actual scene move. Earlier movie-character image is the poster.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 3,
+      "mode": "candidate",
+      "lastCoverPts": 3.41,
+      "firstImagePts": 3.443,
+      "motionPts": 3.51,
+      "notes": "Man and background move; app danmaku is excluded.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 4,
+      "mode": "candidate",
+      "lastCoverPts": 3.336,
+      "firstImagePts": 3.37,
+      "motionPts": 3.438,
+      "notes": "Gloved hand and mouth move. Earlier kidney-stone picture is the poster.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    },
+    {
+      "index": 4,
+      "mode": "control",
+      "lastCoverPts": 3.355,
+      "firstImagePts": 3.388,
+      "motionPts": 3.455,
+      "notes": "Same gloved-hand and face movement criterion as the candidate.",
+      "laterFramesReviewed": "Original PTS samples roughly every two seconds from 10 to 35s advance; brief stalls remain unexcluded."
+    }
+  ]
+}

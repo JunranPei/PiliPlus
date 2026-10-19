@@ -6,6 +6,7 @@ from pathlib import Path
 import shlex
 import subprocess
 import time
+import xml.etree.ElementTree as ET
 from urllib.parse import quote
 
 from ordinary_playback_capture import file_info, selected_logs
@@ -20,7 +21,8 @@ def adb(*args, timeout=40):
                           timeout=timeout).stdout
 
 
-def capture(label, index, seconds, tap, cold, local_link=False):
+def capture(label, index, seconds, tap, cold, local_link=False, verify_search_uri=False,
+            before_recording=None):
     video = json.loads((ROOT / 'diagnostics/startup-20261016/videos.json').read_text(
         encoding='utf-8'))[index]
     out = ROOT / 'diagnostics/startup-20261017/mpv-phase1' / label
@@ -36,8 +38,24 @@ def capture(label, index, seconds, tap, cold, local_link=False):
             'bilibili://search')
         time.sleep(.8)
         uri = f'bilibili://video/{video["bvid"]}?cid={video["cid"]}&start_progress=0'
-        adb('shell', 'input', 'text', shlex.quote(uri))
+        if verify_search_uri:
+            # Cold guest/IME startup can drop the tail of a long input burst.
+            # This is untimed setup; never measure a different CID by accident.
+            for offset in range(0, len(uri), 12):
+                adb('shell', 'input', 'text', shlex.quote(uri[offset:offset+12]))
+                time.sleep(.1)
+        else:
+            adb('shell', 'input', 'text', shlex.quote(uri))
         time.sleep(2)
+        if verify_search_uri:
+            remote_ui = '/sdcard/piliplus-startup-input.xml'
+            adb('shell', 'uiautomator', 'dump', remote_ui)
+            ui = adb('shell', 'cat', remote_ui)
+            (out/'verified-entry-ui.xml').write_bytes(ui)
+            nodes = ET.fromstring(ui).iter('node')
+            if not any(n.get('text') == uri and n.get('focused') == 'true'
+                       for n in nodes):
+                raise RuntimeError('Search input is incomplete before timing; no video tap was measured')
     elif tap:
         adb('shell', 'input', 'keyevent', '4')
         # Searching a BV id navigates directly to playback in PiliPlus. Search
@@ -59,6 +77,8 @@ def capture(label, index, seconds, tap, cold, local_link=False):
         adb('shell', 'settings', 'put', 'system', 'pointer_location', '1')
         time.sleep(.3)
     recording = out / 'screen.webm'
+    if before_recording is not None:
+        before_recording()
     recording_start_before = time.time_ns()
     response = adb('emu', 'screenrecord', 'start', '--size', '540x1200',
                    '--bit-rate', '2000000', '--fps', '30', '--time-limit',

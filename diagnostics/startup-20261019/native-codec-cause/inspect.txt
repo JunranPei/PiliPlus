@@ -1,0 +1,86 @@
+"'clock'","clock_name","ts","clock_value"
+"clock","BOOTTIME",67820521600,67820521600
+"clock","REALTIME",67820521600,1792376170322805700
+"clock","BOOTTIME",67820987700,67820987700
+"clock","REALTIME",67820987700,1792376170323245600
+"clock","BOOTTIME",68738451000,68738451000
+"clock","REALTIME",68738451000,1792376171240744600
+
+"'request'","ts","tag","msg"
+
+"after_query_ms","duration_ms","tid","thread_name","name"
+4794.384000,501.366000,2078,"Thread-6","MediaCodec::Init#native"
+5295.953000,31.669000,2078,"Thread-6","MediaCodec::configure#native"
+5327.667000,278.345000,2078,"Thread-6","MediaCodec::start#native"
+6417.111000,63.410000,2078,"Thread-6","MediaCodec::flush#native"
+
+"name","n"
+"MediaCodec::dequeueOutputBuffer#native",429
+"CCodecBufferChannel::sendOutputBuffers-c2.goldfish.hevc.decoder#100",211
+"CALLBACK_INPUT",157
+"CCodec::LinearInputBuffers::requestNewBuffer",118
+"MediaCodec::dequeueInputBuffer#java",117
+"MediaCodec::onQueueInputBuffer#native",110
+"MediaCodec::queueInputBuffer#native",109
+"MediaCodec::queueInputBuffer#jni",109
+"MediaCodec::queueInputBuffer#java",109
+"MediaCodec::renderOutputBufferAndRelease#native",53
+"Codec2-OutputBufferQueue::outputBuffer",53
+"CCodecBufferChannel::renderOutputBuffer-c2.goldfish.hevc.decoder#100",53
+"CCodec::Codec2Client::Component::queueToOutputSurface",53
+"MediaCodec::releaseOutputBuffer#native",51
+"updateInputFlinger",13
+"BackgroundExecutor::updateInputFlinger",13
+"DrawLayer: InputMethod#109",12
+"setDisplayModePtr {id=0, hwcId=0, resolution=1080x2400, vsyncRate=60.00 Hz, dpi=420.00x420.00, group=0, vrrConfig=N/A, hdrOutputType=SYSTEM}",2
+"latchBuffer InputMethod#109 - 76",2
+"deliverInputEvent",2
+"VRI[InputMethod]#0(BLAST Consumer)0: 2",2
+"PlatformChannel ScheduleHandler on flutter/textinput",2
+"DartMessenger#handleMessageFromDart on flutter/textinput",2
+"{ metadata="outputFormat" android._color-format=2135033992 android._video-scaling=1 rotation-degrees=0 color-standard=1 color-range=2 color-transfer=3 sar-height=1 sar-width=1 width=1920 height=1080 max-height=1080 max-width=1920 mime="video/raw" android._dataspace=260 color-format=2130708361 event="configured" }",1
+"{ metadata="inputFormat" height=1080 level=65536 max-input-size=6291456 mime="video/hevc" profile=1 width=1920 event="configured" }",1
+"{ channelMask=3 contentType="AUDIO_CONTENT_TYPE_UNKNOWN" devices="AUDIO_DEVICE_OUT_SPEAKER" flags="AUDIO_OUTPUT_FLAG_NONE" format="AUDIO_FORMAT_PCM_FLOAT" frameCount=7200 pid=1810 sampleRate=48000 thread.channelMask=3 thread.flags="AUDIO_OUTPUT_FLAG_PRIMARY" thread.format="AUDIO_FORMAT_PCM_16_BIT" thread.frameCount=1088 thread.id=13 thread.sampleRate=48000 thread.type="MIXER" uid=10219 usage="AUDIO_USAGE_MEDIA" event="beginInterval" }",1
+"{ channelMask=3 contentType="AUDIO_CONTENT_TYPE_SONIFICATION" devices="AUDIO_DEVICE_OUT_SPEAKER" flags="AUDIO_OUTPUT_FLAG_NONE" format="AUDIO_FORMAT_PCM_16_BIT" frameCount=4512 pid=756 sampleRate=48000 thread.channelMask=3 thread.flags="AUDIO_OUTPUT_FLAG_PRIMARY" thread.format="AUDIO_FORMAT_PCM_16_BIT" thread.frameCount=1088 thread.id=13 thread.sampleRate=48000 thread.type="MIXER" uid=1000 usage="AUDIO_USAGE_ASSISTANCE_SONIFICATION" event="endInterval" }",1
+"{ channelMask=3 contentType="AUDIO_CONTENT_TYPE_SONIFICATION" devices="AUDIO_DEVICE_OUT_SPEAKER" flags="AUDIO_OUTPUT_FLAG_NONE" format="AUDIO_FORMAT_PCM_16_BIT" frameCount=4512 pid=756 sampleRate=48000 thread.channelMask=3 thread.flags="AUDIO_OUTPUT_FLAG_PRIMARY" thread.format="AUDIO_FORMAT_PCM_16_BIT" thread.frameCount=1088 thread.id=13 thread.sampleRate=48000 thread.type="MIXER" uid=1000 usage="AUDIO_USAGE_ASSISTANCE_SONIFICATION" event="beginInterval" }",1
+"transactionCallback - VRI[InputMethod]#0(f:0,a:1)",1
+"setFrameTimelineInfo(VRI[InputMethod]#0) frameNumber: 76 vsyncId: 12703",1
+
+"name","n"
+
+"after_query_ms","duration_ms","tid","thread_name","name"
+5606.269000,14.653000,3386,"MediaCodec_loop","CCodecBufferChannel::queue(c2.goldfish.hevc.decoder#100@ts=0)"
+5736.673000,2.379000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+5969.947000,0.698000,3388,"CodecLooper","CCodecBufferChannel::onWorkDone(c2.goldfish.hevc.decoder#100@ts=0)"
+6486.792000,1.570000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6492.405000,4.727000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6493.097000,2.617000,3386,"MediaCodec_loop","CCodecBufferChannel::queue(c2.goldfish.hevc.decoder#100@ts=0)"
+6497.257000,0.485000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6501.190000,15.312000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6516.678000,0.379000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6519.851000,9.850000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6529.778000,2.378000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6538.720000,5.089000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6543.903000,0.431000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6549.640000,1.261000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6551.611000,0.860000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6555.607000,50.179000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6673.766000,11.037000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6689.509000,3.162000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6779.262000,10.534000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6793.069000,121.548000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6914.791000,9.170000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6931.588000,9.612000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6941.316000,9.231000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6958.040000,3.688000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6961.385000,0.151000,3388,"CodecLooper","CCodecBufferChannel::onWorkDone(c2.goldfish.hevc.decoder#100@ts=0)"
+6961.815000,2.337000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+7118.653000,0.018000,2103,"Thread-8","MediaCodec::renderOutputBufferAndRelease#native"
+7416.009000,0.030000,2103,"Thread-8","MediaCodec::renderOutputBufferAndRelease#native"
+7733.994000,0.013000,2103,"Thread-8","MediaCodec::renderOutputBufferAndRelease#native"
+7738.675000,9.102000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+7747.844000,95.219000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+7896.591000,0.017000,2103,"Thread-8","MediaCodec::renderOutputBufferAndRelease#native"
+7898.895000,9.117000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+7908.094000,0.427000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+7925.172000,13.812000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"

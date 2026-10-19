@@ -1,0 +1,7 @@
+CREATE PERFETTO TABLE q AS SELECT ts+(1792376173270208000-clock_value) AS ns FROM clock_snapshot WHERE clock_name='REALTIME' LIMIT 1;
+SELECT 'clock',clock_name,ts,clock_value FROM clock_snapshot WHERE clock_name IN ('REALTIME','BOOTTIME') LIMIT 6;
+SELECT 'request',ts,tag,msg FROM android_logs WHERE tag='StartupTest';
+SELECT round((s.ts-q.ns)/1e6,3) AS after_query_ms, round(s.dur/1e6,3) AS duration_ms,t.tid,t.name AS thread_name,s.name FROM slice s JOIN thread_track tt ON s.track_id=tt.id JOIN thread t ON tt.utid=t.utid CROSS JOIN q WHERE s.name IN ('MediaCodec::Init#native','MediaCodec::configure#native','MediaCodec::start#native','MediaCodec::flush#native') ORDER BY s.ts;
+SELECT s.name,count(*) AS n FROM slice s WHERE s.name LIKE '%Output%' OR s.name LIKE '%nput%' GROUP BY s.name ORDER BY n DESC LIMIT 30;
+SELECT name,count(*) AS n FROM counter_track WHERE name LIKE '%Output%' OR name LIKE '%output%' OR name LIKE '%Codec%' GROUP BY name LIMIT 40;
+SELECT round((s.ts-q.ns)/1e6,3) AS after_query_ms, round(s.dur/1e6,3) AS duration_ms,t.tid,t.name AS thread_name,s.name FROM slice s JOIN thread_track tt ON s.track_id=tt.id JOIN thread t ON tt.utid=t.utid CROSS JOIN q WHERE (s.name LIKE 'CCodecBufferChannel::queue(%@ts=0)' OR s.name LIKE 'CCodecBufferChannel::onWorkDone(%@ts=0)' OR s.name IN ('MediaCodec::renderOutputBufferAndRelease#native','MediaCodec::queueInputBuffer#native','MediaCodec::dequeueInputBuffer#java')) ORDER BY s.ts LIMIT 35;

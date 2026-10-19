@@ -1,0 +1,17 @@
+{
+  "head": "6317c4ef6953bfec6745374d5f1d4ba8f9f1c135",
+  "apk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261019\\source-overlap\\source-overlap-control.apk",
+  "sha256": "17b4cf41b6ab605ef4cdb8b63078b2123a636887207d29f2124929e0aee1f03e",
+  "defines": [
+    "PLAYBACK_TRACE=true",
+    "PLAYBACK_STARTUP_VERBOSE=true",
+    "STARTUP_TIMING=true",
+    "PLAYER_STANDBY=true"
+  ],
+  "dependencyRevision": "fd8421d21eade4d6d12de137fa7df902fec20292",
+  "dependencySourceSha256": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92",
+  "standbyEnabled": true,
+  "mediaPreload": false,
+  "sourcePreparationOverlapsPresentation": false,
+  "acceptedPerformanceFix": false
+}

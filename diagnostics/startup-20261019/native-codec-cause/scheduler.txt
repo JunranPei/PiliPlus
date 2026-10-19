@@ -1,0 +1,145 @@
+"label","tid","name","state","ms"
+"configure",2078,"Thread-6","S",30.580000
+"configure",2078,"Thread-6","Running",0.701000
+"configure",2078,"Thread-6","R",0.389000
+"configure",3386,"MediaCodec_loop","S",20.591000
+"configure",3386,"MediaCodec_loop","R",6.361000
+"configure",3386,"MediaCodec_loop","Running",3.199000
+"configure",3386,"MediaCodec_loop","R+",1.517000
+"configure",3388,"CodecLooper","S",15.335000
+"configure",3388,"CodecLooper","R",7.381000
+"configure",3388,"CodecLooper","Running",4.544000
+"configure",3388,"CodecLooper","R+",4.409000
+"decoder_chain",2078,"Thread-6","S",1879.231000
+"decoder_chain",2078,"Thread-6","Running",311.781000
+"decoder_chain",2078,"Thread-6","R",254.374000
+"decoder_chain",2078,"Thread-6","R+",232.836000
+"decoder_chain",2078,"Thread-6","D",58.042000
+"decoder_chain",3386,"MediaCodec_loop","S",1795.111000
+"decoder_chain",3386,"MediaCodec_loop","R",413.134000
+"decoder_chain",3386,"MediaCodec_loop","R+",69.163000
+"decoder_chain",3386,"MediaCodec_loop","Running",61.245000
+"decoder_chain",3386,"MediaCodec_loop","D",0.373000
+"decoder_chain",3388,"CodecLooper","S",1771.614000
+"decoder_chain",3388,"CodecLooper","R",128.551000
+"decoder_chain",3388,"CodecLooper","Running",126.796000
+"decoder_chain",3388,"CodecLooper","R+",113.464000
+"decoder_chain",3388,"CodecLooper","D",105.717000
+"init",2078,"Thread-6","S",452.089000
+"init",2078,"Thread-6","R",30.926000
+"init",2078,"Thread-6","D",12.751000
+"init",2078,"Thread-6","Running",4.981000
+"init",2078,"Thread-6","R+",0.619000
+"init",3386,"MediaCodec_loop","S",477.048000
+"init",3386,"MediaCodec_loop","R+",13.385000
+"init",3386,"MediaCodec_loop","R",7.074000
+"init",3386,"MediaCodec_loop","Running",3.485000
+"init",3386,"MediaCodec_loop","D",0.373000
+"init",3388,"CodecLooper","S",137.985000
+"init",3388,"CodecLooper","R",108.637000
+"init",3388,"CodecLooper","Running",65.812000
+"init",3388,"CodecLooper","D",55.770000
+"init",3388,"CodecLooper","R+",55.035000
+"media_input_to_workdone",2078,"Thread-6","S",418.979000
+"media_input_to_workdone",2078,"Thread-6","R",30.494000
+"media_input_to_workdone",2078,"Thread-6","Running",16.686000
+"media_input_to_workdone",2078,"Thread-6","R+",2.820000
+"media_input_to_workdone",3386,"MediaCodec_loop","R",335.840000
+"media_input_to_workdone",3386,"MediaCodec_loop","S",95.967000
+"media_input_to_workdone",3386,"MediaCodec_loop","Running",29.041000
+"media_input_to_workdone",3386,"MediaCodec_loop","R+",8.132000
+"media_input_to_workdone",3388,"CodecLooper","S",467.917000
+"media_input_to_workdone",3388,"CodecLooper","Running",0.918000
+"media_input_to_workdone",3388,"CodecLooper","R",0.145000
+"start",2078,"Thread-6","S",277.232000
+"start",2078,"Thread-6","R",0.880000
+"start",2078,"Thread-6","Running",0.233000
+"start",3386,"MediaCodec_loop","S",248.898000
+"start",3386,"MediaCodec_loop","R",21.862000
+"start",3386,"MediaCodec_loop","R+",5.925000
+"start",3386,"MediaCodec_loop","Running",1.661000
+"start",3388,"CodecLooper","S",122.629000
+"start",3388,"CodecLooper","R+",50.307000
+"start",3388,"CodecLooper","D",49.947000
+"start",3388,"CodecLooper","Running",44.556000
+"start",3388,"CodecLooper","R",10.905000
+"start_to_media_input",2078,"Thread-6","S",474.714000
+"start_to_media_input",2078,"Thread-6","R+",186.946000
+"start_to_media_input",2078,"Thread-6","R",118.370000
+"start_to_media_input",2078,"Thread-6","Running",90.527000
+"start_to_media_input",2078,"Thread-6","D",15.837000
+"start_to_media_input",3386,"MediaCodec_loop","S",788.918000
+"start_to_media_input",3386,"MediaCodec_loop","R+",39.705000
+"start_to_media_input",3386,"MediaCodec_loop","R",36.428000
+"start_to_media_input",3386,"MediaCodec_loop","Running",21.342000
+"start_to_media_input",3388,"CodecLooper","S",882.687000
+"start_to_media_input",3388,"CodecLooper","Running",3.123000
+"start_to_media_input",3388,"CodecLooper","R",0.583000
+"workdone_to_first_release",2078,"Thread-6","Running",128.275000
+"workdone_to_first_release",2078,"Thread-6","R+",19.771000
+"workdone_to_first_release",2078,"Thread-6","S",6.769000
+"workdone_to_first_release",2078,"Thread-6","R",2.453000
+"workdone_to_first_release",3386,"MediaCodec_loop","S",149.642000
+"workdone_to_first_release",3386,"MediaCodec_loop","R",5.568000
+"workdone_to_first_release",3386,"MediaCodec_loop","Running",2.058000
+"workdone_to_first_release",3388,"CodecLooper","S",144.813000
+"workdone_to_first_release",3388,"CodecLooper","Running",7.842000
+"workdone_to_first_release",3388,"CodecLooper","R+",3.713000
+"workdone_to_first_release",3388,"CodecLooper","R",0.900000
+
+"name","tid","name","cpu_ms"
+"kswapd0",68,"kswapd0",1437.975000
+"/vendor/bin/hw/android.hardware.media.c2@1.0-service-goldfish",3395,"sh.hevc.decoder",651.949000
+"[NULL]",0,"swapper",440.712000
+"com.personal.piliplus",1810,"rsonal.piliplus",411.298000
+"com.personal.piliplus",3373,"demux",363.054000
+"com.personal.piliplus",2078,"Thread-6",311.781000
+"com.personal.piliplus",1912,"1.raster",255.945000
+"zygote64",3372,"id.apps.restore",230.433000
+"<pre-initialized>",3194,"binder:3184_2",210.628000
+"com.google.android.apps.wellbeing",1626,"BG Thread #3",203.859000
+"com.google.android.gms",1315,"HeapTaskDaemon",159.668000
+"com.google.android.tts",2828,"gle.android.tts",153.462000
+"com.google.android.gms",2003,"highpool[4]",141.271000
+"com.android.systemui",1006,"ndroid.systemui",140.214000
+"com.personal.piliplus",3388,"CodecLooper",126.796000
+"/vendor/bin/hw/android.hardware.graphics.composer3-service.ranchu",581,"binder:581_2",115.843000
+"com.android.systemui",1240,"RenderThread",92.872000
+"zygote64",3370,"WM.task-1",92.607000
+"com.personal.piliplus",1915,"io.worker.2",78.527000
+"/system/bin/surfaceflinger",624,"surfaceflinger",75.524000
+"com.google.android.gms",2790,"-Executor] idle",74.005000
+"system_server",813,"PowerManagerSer",73.381000
+"com.google.android.as",1908,"aiai-min-shared",71.273000
+"system_server",756,"system_server",70.951000
+"system_server",972,"binder:756_5",70.105000
+
+"ms","duration_ms","tid","name","name"
+4381.299000,31.483000,2078,"Thread-6","binder transaction"
+4458.669000,54.233000,2078,"Thread-6","binder transaction"
+4516.874000,12.259000,2078,"Thread-6","binder transaction"
+4602.690000,14.600000,2078,"Thread-6","binder transaction"
+4678.606000,13.449000,2078,"Thread-6","binder transaction"
+4794.384000,501.366000,2078,"Thread-6","MediaCodec::Init#native"
+4797.192000,10.584000,2078,"Thread-6","binder transaction"
+5295.953000,31.669000,2078,"Thread-6","MediaCodec::configure#native"
+5327.667000,278.345000,2078,"Thread-6","MediaCodec::start#native"
+5855.750000,104.190000,2078,"Thread-6","binder transaction"
+6059.771000,224.994000,2078,"Thread-6","binder transaction"
+6284.976000,12.600000,2078,"Thread-6","binder transaction"
+6308.111000,12.702000,2078,"Thread-6","binder transaction"
+6340.018000,30.901000,2078,"Thread-6","binder transaction"
+6417.111000,63.410000,2078,"Thread-6","MediaCodec::flush#native"
+6500.415000,16.168000,2078,"Thread-6","MediaCodec::queueInputBuffer#java"
+6501.154000,15.411000,2078,"Thread-6","MediaCodec::queueInputBuffer#jni"
+6501.190000,15.312000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+6555.607000,50.179000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6605.819000,67.813000,2078,"Thread-6","MediaCodec::dequeueOutputBuffer#native"
+6673.766000,11.037000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6692.712000,86.518000,2078,"Thread-6","MediaCodec::dequeueOutputBuffer#native"
+6779.262000,10.534000,2078,"Thread-6","MediaCodec::dequeueInputBuffer#java"
+6793.027000,121.652000,2078,"Thread-6","MediaCodec::queueInputBuffer#java"
+6793.049000,121.616000,2078,"Thread-6","MediaCodec::queueInputBuffer#jni"
+6793.069000,121.548000,2078,"Thread-6","MediaCodec::queueInputBuffer#native"
+
+"name","value"

@@ -4,6 +4,7 @@ import ctypes
 import _thread
 import json
 from pathlib import Path
+import subprocess
 import sys
 import threading
 import time
@@ -44,6 +45,7 @@ def main():
     parser.add_argument('--keep-player', action='store_true')
     parser.add_argument('--perfetto', action='store_true')
     parser.add_argument('--collect-standby', action='store_true')
+    parser.add_argument('--verify-search-uri', action='store_true')
     args = parser.parse_args()
     initial = memory()
     # This only records an already running emulator. The previous 35-second
@@ -73,6 +75,15 @@ def main():
                 _thread.interrupt_main()
                 return
 
+    def guest_pressure(prefix):
+        for suffix, remote in [('vmstat', '/proc/vmstat'),
+                               ('memory-pressure', '/proc/pressure/memory')]:
+            target = out/f'{prefix}-guest-{suffix}.txt'
+            try:
+                target.write_bytes(original_adb('shell', 'cat', remote))
+            except (OSError, subprocess.SubprocessError) as error:
+                target.with_suffix('.unavailable.txt').write_text(str(error), encoding='utf8')
+
     def adb(*arguments, **kwargs):
         if args.collect_standby and arguments == ('logcat', '-c'):
             log = original_adb('logcat', '-d', '-v', 'epoch', '-s', 'flutter').decode('utf-8', 'replace')
@@ -83,6 +94,7 @@ def main():
                     '[GPU_STANDBY]', '[OUTPUT_STANDBY]', '[SURFACE_CALL]'))), encoding='utf-8')
             (out/'pre-click-meminfo.txt').write_bytes(original_adb('shell', 'dumpsys', 'meminfo', recorder.PACKAGE))
             (out/'pre-click-guest-meminfo.txt').write_bytes(original_adb('shell', 'cat', '/proc/meminfo'))
+            guest_pressure('pre-click')
         if args.keep_player and arguments == ('shell', 'input', 'keyevent', '4'):
             return b''
         return original_adb(*arguments, **kwargs)
@@ -93,15 +105,12 @@ def main():
     status = 'failed'
     perfetto_remote = '/data/misc/perfetto-traces/startup-bounded.pftrace'
     perfetto_started = False
-    try:
-        original_adb('shell', 'settings', 'put', 'system', 'show_touches', '1')
-        if args.cold_app:
-            original_adb('shell', 'am', 'force-stop', recorder.PACKAGE)
-        if args.perfetto:
-            # Bound guest tracing to 20 seconds and 32 MiB. No sampling profiler,
-            # memory dump, second emulator, or compiler is started.
-            config = metadata.with_suffix('.perfetto.pbtxt')
-            config.write_text('''buffers { size_kb: 32768 fill_policy: RING_BUFFER }
+    def start_perfetto():
+        nonlocal perfetto_started
+        # Bound guest tracing to 20 seconds and 32 MiB. No sampling profiler,
+        # memory dump, second emulator, or compiler is started.
+        config = metadata.with_suffix('.perfetto.pbtxt')
+        config.write_text('''buffers { size_kb: 32768 fill_policy: RING_BUFFER }
 duration_ms: 20000
 data_sources { config { name: "linux.ftrace" ftrace_config {
   ftrace_events: "sched/sched_switch"
@@ -117,12 +126,24 @@ data_sources { config { name: "linux.ftrace" ftrace_config {
 data_sources { config { name: "linux.process_stats" process_stats_config {
   scan_all_processes_on_start: true
 } } }
+data_sources { config { name: "android.log" android_log_config {
+  filter_tags: "StartupTest"
+} } }
 ''', encoding='utf-8')
-            original_adb('push', str(config), '/data/misc/perfetto-configs/startup-bounded.pbtxt')
-            original_adb('shell', 'perfetto', '--background-wait', '--txt', '-c',
-                         '/data/misc/perfetto-configs/startup-bounded.pbtxt', '-o', perfetto_remote)
-            perfetto_started = True
-        recorder.capture(label, args.index, args.seconds, [990, 135], False, True)
+        original_adb('push', str(config), '/data/misc/perfetto-configs/startup-bounded.pbtxt')
+        original_adb('shell', 'perfetto', '--background-wait', '--txt', '-c',
+                     '/data/misc/perfetto-configs/startup-bounded.pbtxt', '-o', perfetto_remote)
+        perfetto_started = True
+    try:
+        original_adb('shell', 'settings', 'put', 'system', 'show_touches', '1')
+        if args.cold_app:
+            original_adb('shell', 'am', 'force-stop', recorder.PACKAGE)
+        recorder.capture(label, args.index, args.seconds, [990, 135], False, True,
+                         verify_search_uri=args.verify_search_uri,
+                         before_recording=start_perfetto if args.perfetto else None)
+        if args.collect_standby:
+            (out/'post-capture-guest-meminfo.txt').write_bytes(original_adb('shell', 'cat', '/proc/meminfo'))
+            guest_pressure('post-capture')
         (out/'native-plugin.log').write_bytes(original_adb('logcat', '-d', '-v', 'epoch', '-s', 'media_kit'))
         if perfetto_started:
             original_adb('pull', perfetto_remote, str(out/'startup-bounded.pftrace'))
@@ -139,6 +160,7 @@ data_sources { config { name: "linux.process_stats" process_stats_config {
             'serial': args.serial, 'apkSha256': installed_sha,
             'appForceStoppedBeforeSearch': args.cold_app,
             'mediaPreloaded': False, 'leftVideoPageAlive': args.keep_player,
+            'searchUriVerifiedBeforeTiming': args.verify_search_uri,
             'playerRetention': 'verify previous.playerId in source.prepare.begin',
             'timingEntry': 'tap on in-app search button submitting a video URI',
             'recordingFolder': str(out), 'memorySamples': samples,

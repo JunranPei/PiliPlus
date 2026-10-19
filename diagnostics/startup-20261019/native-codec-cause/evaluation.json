@@ -1,0 +1,40 @@
+{
+  "validDiagnosticTrials": 1,
+  "distinctVideos": 1,
+  "recordedSeconds": 35,
+  "apkSha256": "17b4cf41b6ab605ef4cdb8b63078b2123a636887207d29f2124929e0aee1f03e",
+  "playerStandby": true,
+  "sourceOverlap": false,
+  "deepLogTrace": false,
+  "perfettoMaxMiB": 32,
+  "perfettoSeconds": 20,
+  "pointerPts": 1.883,
+  "lastCoverPts": 10.055,
+  "firstMediaImagePts": 10.102,
+  "firstConfirmedMotionPts": 10.334,
+  "firstMediaImageAfterClickSeconds": 8.219,
+  "confirmedMotionAfterClickSeconds": 8.451,
+  "firstImageHoldSeconds": 0.232,
+  "postInitialBufferPauseEvents": [],
+  "traceSpanSeconds": 22.135,
+  "minimumAvailableRamGiB": 7.876,
+  "minimumCommitHeadroomGiB": 11.653,
+  "nativeMs": {
+    "codecInit": 501.366,
+    "codecConfigure": 31.669,
+    "codecStart": 278.345,
+    "flush": 63.41,
+    "postFlushFirstClientQueueToWorkDone": 468.98,
+    "postFlushFirstClientQueueToFirstSurfaceRelease": 626.248,
+    "decoderWindow": 2736.263,
+    "kswapdCpuInDecoderWindow": 1437.975,
+    "codecMessageThreadRunnableInClientQueueToWorkDoneWindow": 343.972
+  },
+  "limits": [
+    "Diagnostic conditions and fresh emulator boot; cannot map these durations onto original 812ms or compare speed with earlier trials.",
+    "Codec2 work completion can contain no output. Client queue flags/size were not captured; do not claim exact first media bytes or nonempty decoded output from these markers.",
+    "First renderOutputBufferAndRelease proves a Surface release call, not compositor presentation.",
+    "No renewed buffer/pause flag does not remove the observed initial hold/choppy image.",
+    "kswapd CPU time is parallel to codec work and cannot be added as blocked wall time. Its underlying trigger and relation to old samples remain unknown."
+  ]
+}
