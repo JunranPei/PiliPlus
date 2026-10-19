@@ -1,0 +1,413 @@
+{
+  "validVideoTrials": 4,
+  "distinctVideos": 1,
+  "order": [
+    "control",
+    "candidate",
+    "candidate",
+    "control"
+  ],
+  "conditions": "One emulator boot, cold App before each search, empty player/output standby, no media preload.",
+  "result": "Both candidates reach motion earlier in this video. Overlap mechanism works; network and decoder variation prevent attributing the entire gap to this change.",
+  "acceptedPerformanceFix": false,
+  "continuity": "No renewed buffering or pause in ~20s traces. Original onset and ~2s later frame samples reviewed. b2 holds its first image ~135ms; later brief stalls remain unexcluded.",
+  "boundary": "Click and motion use original WebM PTS. mpv stages use Dart log delivery time, not native execution. source.open.accepted is asynchronous load acceptance, not first bytes or decode completion.",
+  "rows": [
+    {
+      "label": "a1",
+      "candidate": false,
+      "apkSha256": "17b4cf41b6ab605ef4cdb8b63078b2123a636887207d29f2124929e0aee1f03e",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "recordedSeconds": 35,
+      "pointerPts": 1.06,
+      "lastCoverPts": 4.782,
+      "firstImagePts": 4.815,
+      "confirmedMotionPts": 4.855,
+      "firstImageAfterClickSeconds": 3.755,
+      "confirmedMotionAfterClickSeconds": 3.795,
+      "motionIsConfirmationUpperBound": true,
+      "firstImageToConfirmedMotionSeconds": 0.04,
+      "apiMs": 1005.107,
+      "uiMountRequestMs": 1010.203,
+      "sourceOpenBeginMs": 1161.831,
+      "sourceOpenAcceptedMs": 1192.143,
+      "mediaAndPageJoinedMs": 1192.25,
+      "commandPlayMs": 1192.553,
+      "outputStableMs": 3295.027,
+      "coverReleasedMs": 3295.534,
+      "mpvDeliveredStages": [
+        {
+          "stage": "demux.detected",
+          "ms": 1222.743
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 1222.823
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 1240.39
+        },
+        {
+          "stage": "connect.end",
+          "ms": 1240.75
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1711.872
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 1711.958
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 1748.724
+        },
+        {
+          "stage": "connect.end",
+          "ms": 1757.834
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1920.857
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1921.339
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 1930.549
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 2390.266
+        },
+        {
+          "stage": "decoder.hardware",
+          "ms": 2911.057
+        },
+        {
+          "stage": "output.configured",
+          "ms": 2984.589
+        },
+        {
+          "stage": "mpv.firstFrame",
+          "ms": 2991.029
+        },
+        {
+          "stage": "mpv.video.start",
+          "ms": 3218.034
+        },
+        {
+          "stage": "mpv.audio.start",
+          "ms": 3218.267
+        }
+      ],
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 21.019,
+      "minimumAvailableRamGiB": 7.133,
+      "minimumCommitHeadroomGiB": 11.329,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\source-overlap-a1-20261019-5"
+    },
+    {
+      "label": "b1",
+      "candidate": true,
+      "apkSha256": "b8201d4fe21d8497104e8c66a08953c0385b74f9d6c1222286c065a1f9f3fe17",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "recordedSeconds": 35,
+      "pointerPts": 1.005,
+      "lastCoverPts": 3.823,
+      "firstImagePts": 3.857,
+      "confirmedMotionPts": 3.891,
+      "firstImageAfterClickSeconds": 2.852,
+      "confirmedMotionAfterClickSeconds": 2.886,
+      "motionIsConfirmationUpperBound": true,
+      "firstImageToConfirmedMotionSeconds": 0.034,
+      "apiMs": 573.112,
+      "uiMountRequestMs": 574.793,
+      "sourceOpenBeginMs": 573.888,
+      "sourceOpenAcceptedMs": 579.56,
+      "mediaAndPageJoinedMs": 598.619,
+      "commandPlayMs": 598.896,
+      "outputStableMs": 2603.051,
+      "coverReleasedMs": 2603.394,
+      "mpvDeliveredStages": [
+        {
+          "stage": "demux.detected",
+          "ms": 604.277
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 604.498
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 659.135
+        },
+        {
+          "stage": "connect.end",
+          "ms": 659.221
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1172.185
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 1172.647
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 1191.399
+        },
+        {
+          "stage": "connect.end",
+          "ms": 1220.345
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1372.129
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1372.515
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 1384.632
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 1689.723
+        },
+        {
+          "stage": "decoder.hardware",
+          "ms": 2302.708
+        },
+        {
+          "stage": "output.configured",
+          "ms": 2303.056
+        },
+        {
+          "stage": "mpv.firstFrame",
+          "ms": 2303.183
+        },
+        {
+          "stage": "mpv.video.start",
+          "ms": 2303.257
+        },
+        {
+          "stage": "mpv.audio.start",
+          "ms": 2303.367
+        }
+      ],
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.578,
+      "minimumAvailableRamGiB": 7.21,
+      "minimumCommitHeadroomGiB": 11.273,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\source-overlap-b1-20261019-5"
+    },
+    {
+      "label": "b2",
+      "candidate": true,
+      "apkSha256": "b8201d4fe21d8497104e8c66a08953c0385b74f9d6c1222286c065a1f9f3fe17",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "recordedSeconds": 35,
+      "pointerPts": 1.012,
+      "lastCoverPts": 3.864,
+      "firstImagePts": 3.897,
+      "confirmedMotionPts": 4.032,
+      "firstImageAfterClickSeconds": 2.885,
+      "confirmedMotionAfterClickSeconds": 3.02,
+      "motionIsConfirmationUpperBound": true,
+      "firstImageToConfirmedMotionSeconds": 0.135,
+      "apiMs": 563.707,
+      "uiMountRequestMs": 566.655,
+      "sourceOpenBeginMs": 565.902,
+      "sourceOpenAcceptedMs": 614.947,
+      "mediaAndPageJoinedMs": 615.059,
+      "commandPlayMs": 615.674,
+      "outputStableMs": 2669.335,
+      "coverReleasedMs": 2669.482,
+      "mpvDeliveredStages": [
+        {
+          "stage": "demux.detected",
+          "ms": 651.489
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 651.681
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 651.984
+        },
+        {
+          "stage": "connect.end",
+          "ms": 668.812
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1220.055
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 1220.455
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 1230.529
+        },
+        {
+          "stage": "connect.end",
+          "ms": 1251.305
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1406.36
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1406.71
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 1408.406
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 1787.822
+        },
+        {
+          "stage": "decoder.hardware",
+          "ms": 2482.503
+        },
+        {
+          "stage": "output.configured",
+          "ms": 2491.827
+        },
+        {
+          "stage": "mpv.firstFrame",
+          "ms": 2491.991
+        },
+        {
+          "stage": "mpv.video.start",
+          "ms": 2531.857
+        },
+        {
+          "stage": "mpv.audio.start",
+          "ms": 2531.991
+        }
+      ],
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.571,
+      "minimumAvailableRamGiB": 6.882,
+      "minimumCommitHeadroomGiB": 10.955,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\source-overlap-b2-20261019-5"
+    },
+    {
+      "label": "a2",
+      "candidate": false,
+      "apkSha256": "17b4cf41b6ab605ef4cdb8b63078b2123a636887207d29f2124929e0aee1f03e",
+      "coldApp": true,
+      "mediaPreloaded": false,
+      "recordedSeconds": 35,
+      "pointerPts": 1.014,
+      "lastCoverPts": 4.733,
+      "firstImagePts": 4.767,
+      "confirmedMotionPts": 4.8,
+      "firstImageAfterClickSeconds": 3.753,
+      "confirmedMotionAfterClickSeconds": 3.786,
+      "motionIsConfirmationUpperBound": true,
+      "firstImageToConfirmedMotionSeconds": 0.033,
+      "apiMs": 486.424,
+      "uiMountRequestMs": 487.095,
+      "sourceOpenBeginMs": 734.859,
+      "sourceOpenAcceptedMs": 768.489,
+      "mediaAndPageJoinedMs": 768.577,
+      "commandPlayMs": 768.847,
+      "outputStableMs": 3175.703,
+      "coverReleasedMs": 3175.942,
+      "mpvDeliveredStages": [
+        {
+          "stage": "demux.detected",
+          "ms": 785.652
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 785.87
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 821.271
+        },
+        {
+          "stage": "connect.end",
+          "ms": 821.413
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1528.998
+        },
+        {
+          "stage": "edl.segment.open",
+          "ms": 1529.705
+        },
+        {
+          "stage": "connect.begin",
+          "ms": 1547.704
+        },
+        {
+          "stage": "connect.end",
+          "ms": 1566.318
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1749.328
+        },
+        {
+          "stage": "demux.detected",
+          "ms": 1749.855
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 1756.285
+        },
+        {
+          "stage": "decoder.open",
+          "ms": 2353.924
+        },
+        {
+          "stage": "decoder.hardware",
+          "ms": 3087.244
+        },
+        {
+          "stage": "output.configured",
+          "ms": 3087.866
+        },
+        {
+          "stage": "mpv.firstFrame",
+          "ms": 3102.74
+        },
+        {
+          "stage": "mpv.video.start",
+          "ms": 3119.268
+        },
+        {
+          "stage": "mpv.audio.start",
+          "ms": 3133.683
+        }
+      ],
+      "postInitialBufferPauseEvents": [],
+      "traceSpanSeconds": 20.495,
+      "minimumAvailableRamGiB": 8.468,
+      "minimumCommitHeadroomGiB": 11.018,
+      "recordingFolder": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261017\\mpv-phase1\\source-overlap-a2-20261019-5"
+    }
+  ]
+}

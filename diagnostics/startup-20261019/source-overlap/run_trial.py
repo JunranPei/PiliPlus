@@ -11,6 +11,7 @@ OUT = Path(__file__).resolve().parent
 p = argparse.ArgumentParser()
 p.add_argument('mode', choices=['control','candidate'])
 p.add_argument('label')
+p.add_argument('--index', type=int, default=5)
 a = p.parse_args()
 apk = OUT/f'source-overlap-{a.mode}.apk'
 m = json.loads(apk.with_suffix('.build.json').read_text(encoding='utf8'))
@@ -27,6 +28,6 @@ assert run('shell','sha256sum',remote).decode().split()[0]==m['sha256']
 base = ROOT/'diagnostics/startup-20261018/rollback-baseline'
 label = f'source-overlap-{a.label}-20261019'
 subprocess.run([sys.executable,str(base/'capture_timing.py'),label,
-    '--serial','emulator-5556','--index','5','--cold-app','--keep-player','--collect-standby'],cwd=ROOT,check=True)
-meta=base/f'{label}-5-capture.json'
+    '--serial','emulator-5556','--index',str(a.index),'--cold-app','--keep-player','--collect-standby'],cwd=ROOT,check=True)
+meta=base/f'{label}-{a.index}-capture.json'
 (OUT/meta.name).write_bytes(meta.read_bytes())
