@@ -1,0 +1,12 @@
+[
+  {
+    "command": [
+      "shell",
+      "am",
+      "force-stop",
+      "com.personal.piliplus"
+    ],
+    "returncode": 0,
+    "stderr": ""
+  }
+]

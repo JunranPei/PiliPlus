@@ -1,0 +1,7 @@
+{
+  "sample": "r69-audio-bound-cancel-01",
+  "actualOutcome": "Return and cleanup passed after first frame; does not prove pre-frame cancellation.",
+  "trigger": "queue.first at1509.8985ms; Android input command took458.7987ms, so target frame won before route departure.",
+  "correction": "Use existing receive.first listener, earlier than decode-only reference flag. Keep original sample intact; use fresh output02.",
+  "appChange": false
+}

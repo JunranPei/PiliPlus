@@ -1,0 +1,167 @@
+{
+  "passed": true,
+  "sourceIdentity": {
+    "cid": 42790290231,
+    "requestId": 1,
+    "sourceRevision": 1,
+    "textureId": 0,
+    "playerId": 101302121
+  },
+  "sourceOpenSequence": 316,
+  "firstRouteLeaveSequence": 1546,
+  "closure": [
+    {
+      "event": "isolated.video.closed",
+      "seq": 1614,
+      "elapsedUs": 28131623,
+      "utcUs": 1793464426957186,
+      "source": {
+        "owner": 1052421892,
+        "cid": 42790290231,
+        "revision": 1,
+        "routeActive": true,
+        "videoState": false,
+        "frameReady": false,
+        "preparing": false,
+        "autoPlay": true,
+        "coverSourceId": "1",
+        "mediaSourceId": "aade652",
+        "player": {
+          "requestId": null,
+          "sourceRevision": 0,
+          "owner": null,
+          "readyOwner": null,
+          "cid": null,
+          "mediaSourceId": null,
+          "playerId": null,
+          "videoControllerId": null,
+          "textureId": null,
+          "textureRect": null,
+          "decodedDisplaySize": null,
+          "positionMs": null,
+          "playing": null,
+          "buffering": null,
+          "requestedSize": [
+            null,
+            null
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false
+        }
+      },
+      "receivedBytes": 104688,
+      "deliveredBytes": 104688,
+      "workerElapsedUs": 18157941,
+      "workerUtcUs": 1793464426942024,
+      "requestId": 1,
+      "cid": 42790290231
+    },
+    {
+      "event": "isolated.audio.closed",
+      "seq": 1616,
+      "elapsedUs": 28133495,
+      "utcUs": 1793464426959057,
+      "source": {
+        "owner": 1052421892,
+        "cid": 42790290231,
+        "revision": 1,
+        "routeActive": true,
+        "videoState": false,
+        "frameReady": false,
+        "preparing": false,
+        "autoPlay": true,
+        "coverSourceId": "1",
+        "mediaSourceId": "aade652",
+        "player": {
+          "requestId": null,
+          "sourceRevision": 0,
+          "owner": null,
+          "readyOwner": null,
+          "cid": null,
+          "mediaSourceId": null,
+          "playerId": null,
+          "videoControllerId": null,
+          "textureId": null,
+          "textureRect": null,
+          "decodedDisplaySize": null,
+          "positionMs": null,
+          "playing": null,
+          "buffering": null,
+          "requestedSize": [
+            null,
+            null
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false
+        }
+      },
+      "receivedBytes": 83229,
+      "deliveredBytes": 83229,
+      "workerElapsedUs": 18160444,
+      "workerUtcUs": 1793464426944548,
+      "requestId": 1,
+      "cid": 42790290231
+    },
+    {
+      "event": "isolated.closed",
+      "seq": 1617,
+      "elapsedUs": 28133736,
+      "utcUs": 1793464426959294,
+      "source": {
+        "owner": 1052421892,
+        "cid": 42790290231,
+        "revision": 1,
+        "routeActive": true,
+        "videoState": false,
+        "frameReady": false,
+        "preparing": false,
+        "autoPlay": true,
+        "coverSourceId": "1",
+        "mediaSourceId": "aade652",
+        "player": {
+          "requestId": null,
+          "sourceRevision": 0,
+          "owner": null,
+          "readyOwner": null,
+          "cid": null,
+          "mediaSourceId": null,
+          "playerId": null,
+          "videoControllerId": null,
+          "textureId": null,
+          "textureRect": null,
+          "decodedDisplaySize": null,
+          "positionMs": null,
+          "playing": null,
+          "buffering": null,
+          "requestedSize": [
+            null,
+            null
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false
+        }
+      },
+      "expected": true,
+      "requestId": 1,
+      "cid": 42790290231
+    }
+  ],
+  "activeAudioTrackCounts": [
+    0
+  ],
+  "closeAfterLeaveMs": [
+    348.545,
+    350.417,
+    350.658
+  ],
+  "reviewerSha256": "8f52f537208305029bd502c6403499bf7bdf8efc2e589949d107ab134443a04a"
+}

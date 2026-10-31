@@ -1,0 +1,17 @@
+{
+  "hostBeginNs": 24595923040700,
+  "hostEndNs": 24596381839400,
+  "triggerEvent": {
+    "event": "queue.first",
+    "instance": "0x73610587f540",
+    "monoNs": 2154736730800,
+    "sdk": 36,
+    "enabled": 1,
+    "ptsUs": 61066688,
+    "flags": 32,
+    "eligible": 1,
+    "applied": 1
+  },
+  "pid": "9767",
+  "afterMeasuredInputCommandSeconds": 1.5469729
+}

@@ -1,0 +1,32 @@
+{
+  "round": 90,
+  "savedHead": "43960373442bf22516a7a13435ea529d393ca6ae",
+  "baseline": "Round69 exact native and source archive, decode_only1, callbacks/wait/async off; no video queue or later body recovery. Only backported86 audio limit differs.",
+  "control": "Identical backported source with STARTUP_AUDIO_DECODE_QUEUE_BOUNDED=false",
+  "candidate": "Identical backported source with STARTUP_AUDIO_DECODE_QUEUE_BOUNDED=true",
+  "change": "Audio decoder queue2s to0.08s until current source frame, cancel, replacement, disposal, error or deadline;86 corrected cancel-before-revision order retained.",
+  "protocol": "Same5572 lifetime,8 freshprocess61.5s samples BAABABBA,4 each; disk indexes verified; only withincohort net gain. No heavy tracing/building duringtiming. Preserve every slow sample and exactPTS/continuity failure.",
+  "laterCandidates": [
+    "70 callback notification",
+    "80 video decoder queue",
+    "81 stalled body recovery",
+    "85 slow progress race",
+    "87 asynchronous video input"
+  ],
+  "netGainMs": null,
+  "originalSourceHashes": {
+    "lib/plugin/pl_player/controller.dart": "d18b17d3baeb7aa44bad6b445d51a6749a959b8c931a9f5244ea74f8092139ba",
+    "lib/plugin/pl_player/playback/parallel_audio_source.dart": "cf6f93843679e810a92fb65922dfed0eed36595d99380e27010cfb997f5fdb5c",
+    "lib/plugin/pl_player/playback/bounded_body_warmup.dart": "eec21f8eb2aaa662b46c21709a0e1a466ebc0c38d308356616b309cdcd80de26",
+    "lib/plugin/pl_player/playback/isolated_media_sources.dart": "a5c7d8f60c847ca0705ac6e36bf483b04cb4f09300916a40b411b33a8948cf7a"
+  },
+  "stagedSourceHashes": {
+    "lib/plugin/pl_player/controller.dart": "96bd9aa4c595eb98bcee4c06b53ff0a2a2bb5074ef81973ecd710e474afd0b8f",
+    "lib/plugin/pl_player/playback/parallel_audio_source.dart": "71f183d27fbd4fbbb3c7e8ee6505d2e9836a89f98b39c487355ec856ea936ad7",
+    "lib/plugin/pl_player/playback/bounded_body_warmup.dart": "f069e521f1d659e19d0484dc45dda18c46cf0d74748d4456b91012d51781c10c",
+    "lib/plugin/pl_player/playback/isolated_media_sources.dart": "4cab865228ced12c4baf39038c113238f3318e08d043b05d32923597e212ac81"
+  },
+  "helperSha256": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1",
+  "baselineApkSha256": "189fdd155e1b4f9058ead5b96f8c942ab7cce2398ff7946b1e3e40ddb3b39cbe",
+  "baselineNativeSha256": "0e4a8056c8e73619b6e563f15faf24fed89b69217df9d8be44ec1fd40ddadab7"
+}

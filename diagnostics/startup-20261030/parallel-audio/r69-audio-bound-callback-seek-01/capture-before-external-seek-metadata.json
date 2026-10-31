@@ -1,0 +1,989 @@
+{
+  "pixelsCaptured": false,
+  "errors": [],
+  "seconds": 25,
+  "serial": "emulator-5572",
+  "perfetto": false,
+  "waitTrace": false,
+  "memorySamples": [
+    {
+      "hostMonotonicSeconds": 25571.9873382,
+      "commitGiB": 48.581,
+      "commitHeadroomGiB": 2.26,
+      "availableRamGiB": 7.071
+    },
+    {
+      "hostMonotonicSeconds": 25571.9997293,
+      "commitGiB": 48.581,
+      "commitHeadroomGiB": 2.26,
+      "availableRamGiB": 7.07
+    },
+    {
+      "hostMonotonicSeconds": 25578.5282238,
+      "commitGiB": 48.565,
+      "commitHeadroomGiB": 2.276,
+      "availableRamGiB": 6.955
+    },
+    {
+      "hostMonotonicSeconds": 25578.5964069,
+      "commitGiB": 48.566,
+      "commitHeadroomGiB": 2.275,
+      "availableRamGiB": 6.949
+    },
+    {
+      "hostMonotonicSeconds": 25578.7260303,
+      "commitGiB": 48.555,
+      "commitHeadroomGiB": 2.286,
+      "availableRamGiB": 6.971
+    },
+    {
+      "hostMonotonicSeconds": 25578.8174695,
+      "commitGiB": 48.554,
+      "commitHeadroomGiB": 2.287,
+      "availableRamGiB": 6.97
+    },
+    {
+      "hostMonotonicSeconds": 25582.0318895,
+      "commitGiB": 48.805,
+      "commitHeadroomGiB": 2.036,
+      "availableRamGiB": 6.727
+    },
+    {
+      "hostMonotonicSeconds": 25584.165943,
+      "commitGiB": 48.796,
+      "commitHeadroomGiB": 2.046,
+      "availableRamGiB": 6.752
+    },
+    {
+      "hostMonotonicSeconds": 25584.2417506,
+      "commitGiB": 48.851,
+      "commitHeadroomGiB": 1.99,
+      "availableRamGiB": 6.697
+    },
+    {
+      "hostMonotonicSeconds": 25584.7018689,
+      "commitGiB": 48.87,
+      "commitHeadroomGiB": 1.971,
+      "availableRamGiB": 6.681
+    },
+    {
+      "hostMonotonicSeconds": 25585.0858559,
+      "commitGiB": 48.857,
+      "commitHeadroomGiB": 1.984,
+      "availableRamGiB": 6.687
+    },
+    {
+      "hostMonotonicSeconds": 25585.4223468,
+      "commitGiB": 48.853,
+      "commitHeadroomGiB": 1.988,
+      "availableRamGiB": 6.686
+    },
+    {
+      "hostMonotonicSeconds": 25585.7185379,
+      "commitGiB": 48.85,
+      "commitHeadroomGiB": 1.991,
+      "availableRamGiB": 6.687
+    },
+    {
+      "hostMonotonicSeconds": 25586.0303177,
+      "commitGiB": 48.84,
+      "commitHeadroomGiB": 2.001,
+      "availableRamGiB": 6.685
+    },
+    {
+      "hostMonotonicSeconds": 25586.2702951,
+      "commitGiB": 48.847,
+      "commitHeadroomGiB": 1.994,
+      "availableRamGiB": 6.688
+    },
+    {
+      "hostMonotonicSeconds": 25588.3999091,
+      "commitGiB": 48.824,
+      "commitHeadroomGiB": 2.017,
+      "availableRamGiB": 6.674
+    },
+    {
+      "hostMonotonicSeconds": 25588.4674057,
+      "commitGiB": 48.824,
+      "commitHeadroomGiB": 2.017,
+      "availableRamGiB": 6.677
+    },
+    {
+      "hostMonotonicSeconds": 25588.5378369,
+      "commitGiB": 48.824,
+      "commitHeadroomGiB": 2.017,
+      "availableRamGiB": 6.677
+    },
+    {
+      "hostMonotonicSeconds": 25588.6045683,
+      "commitGiB": 48.824,
+      "commitHeadroomGiB": 2.017,
+      "availableRamGiB": 6.675
+    },
+    {
+      "hostMonotonicSeconds": 25588.6688446,
+      "commitGiB": 48.823,
+      "commitHeadroomGiB": 2.018,
+      "availableRamGiB": 6.671
+    },
+    {
+      "hostMonotonicSeconds": 25588.6823374,
+      "commitGiB": 48.823,
+      "commitHeadroomGiB": 2.018,
+      "availableRamGiB": 6.671
+    },
+    {
+      "hostMonotonicSeconds": 25588.7486624,
+      "commitGiB": 48.826,
+      "commitHeadroomGiB": 2.015,
+      "availableRamGiB": 6.672
+    },
+    {
+      "hostMonotonicSeconds": 25588.813922,
+      "commitGiB": 48.826,
+      "commitHeadroomGiB": 2.015,
+      "availableRamGiB": 6.678
+    },
+    {
+      "hostMonotonicSeconds": 25588.8885016,
+      "commitGiB": 48.824,
+      "commitHeadroomGiB": 2.017,
+      "availableRamGiB": 6.668
+    },
+    {
+      "hostMonotonicSeconds": 25591.0266068,
+      "commitGiB": 48.884,
+      "commitHeadroomGiB": 1.957,
+      "availableRamGiB": 6.607
+    },
+    {
+      "hostMonotonicSeconds": 25593.0455055,
+      "commitGiB": 48.836,
+      "commitHeadroomGiB": 2.005,
+      "availableRamGiB": 6.644
+    },
+    {
+      "hostMonotonicSeconds": 25595.061151,
+      "commitGiB": 49.076,
+      "commitHeadroomGiB": 1.766,
+      "availableRamGiB": 6.454
+    },
+    {
+      "hostMonotonicSeconds": 25597.0765345,
+      "commitGiB": 49.026,
+      "commitHeadroomGiB": 1.815,
+      "availableRamGiB": 6.457
+    },
+    {
+      "hostMonotonicSeconds": 25599.0925126,
+      "commitGiB": 49.042,
+      "commitHeadroomGiB": 1.799,
+      "availableRamGiB": 6.444
+    },
+    {
+      "hostMonotonicSeconds": 25601.106561,
+      "commitGiB": 49.167,
+      "commitHeadroomGiB": 1.674,
+      "availableRamGiB": 6.287
+    },
+    {
+      "hostMonotonicSeconds": 25603.1190258,
+      "commitGiB": 49.093,
+      "commitHeadroomGiB": 1.748,
+      "availableRamGiB": 6.353
+    },
+    {
+      "hostMonotonicSeconds": 25605.1349972,
+      "commitGiB": 49.095,
+      "commitHeadroomGiB": 1.746,
+      "availableRamGiB": 6.351
+    },
+    {
+      "hostMonotonicSeconds": 25607.1488437,
+      "commitGiB": 49.425,
+      "commitHeadroomGiB": 1.416,
+      "availableRamGiB": 5.98
+    },
+    {
+      "hostMonotonicSeconds": 25609.1629663,
+      "commitGiB": 49.429,
+      "commitHeadroomGiB": 1.412,
+      "availableRamGiB": 5.957
+    },
+    {
+      "hostMonotonicSeconds": 25610.0231433,
+      "commitGiB": 49.422,
+      "commitHeadroomGiB": 1.419,
+      "availableRamGiB": 5.955
+    },
+    {
+      "hostMonotonicSeconds": 25610.0354784,
+      "commitGiB": 49.422,
+      "commitHeadroomGiB": 1.419,
+      "availableRamGiB": 5.956
+    },
+    {
+      "hostMonotonicSeconds": 25612.1340453,
+      "commitGiB": 49.791,
+      "commitHeadroomGiB": 1.05,
+      "availableRamGiB": 5.753
+    },
+    {
+      "hostMonotonicSeconds": 25614.02559,
+      "commitGiB": 49.562,
+      "commitHeadroomGiB": 1.279,
+      "availableRamGiB": 6.18
+    },
+    {
+      "hostMonotonicSeconds": 25614.0427413,
+      "commitGiB": 49.563,
+      "commitHeadroomGiB": 1.278,
+      "availableRamGiB": 6.181
+    },
+    {
+      "hostMonotonicSeconds": 25614.1457813,
+      "commitGiB": 49.569,
+      "commitHeadroomGiB": 1.272,
+      "availableRamGiB": 6.168
+    },
+    {
+      "hostMonotonicSeconds": 25614.2534654,
+      "commitGiB": 49.576,
+      "commitHeadroomGiB": 1.265,
+      "availableRamGiB": 6.167
+    },
+    {
+      "hostMonotonicSeconds": 25614.3299,
+      "commitGiB": 49.578,
+      "commitHeadroomGiB": 1.263,
+      "availableRamGiB": 6.175
+    },
+    {
+      "hostMonotonicSeconds": 25614.401288,
+      "commitGiB": 49.58,
+      "commitHeadroomGiB": 1.261,
+      "availableRamGiB": 6.183
+    },
+    {
+      "hostMonotonicSeconds": 25614.4774049,
+      "commitGiB": 49.575,
+      "commitHeadroomGiB": 1.266,
+      "availableRamGiB": 6.192
+    },
+    {
+      "hostMonotonicSeconds": 25614.5853832,
+      "commitGiB": 49.874,
+      "commitHeadroomGiB": 0.967,
+      "availableRamGiB": 6.038
+    }
+  ],
+  "status": "captured",
+  "resourceProfile": {
+    "name": "lean-monitored",
+    "startCommitGiB": 7,
+    "startPhysicalGiB": 5,
+    "abortCommitGiB": 3,
+    "abortPhysicalGiB": 2
+  },
+  "resourceObservationOnly": true,
+  "avd": "PiliPlusStartupIsolated_20261018",
+  "emulatorHostProcesses": [
+    {
+      "pid": 5256,
+      "command": [
+        "D:\\workplace\\antigravity\\PiliPlus\\tmp\\startup-test-emulator-37.2.12\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe",
+        "-avd",
+        "PiliPlusStartupIsolated_20261018",
+        "-port",
+        "5572",
+        "-memory",
+        "2560",
+        "-no-window",
+        "-no-snapshot",
+        "-no-boot-anim",
+        "-gpu",
+        "host",
+        "-feature",
+        "-Vulkan",
+        "-show-kernel"
+      ],
+      "sourceProperties": "Pkg.UserSrc=false\nPkg.Revision=37.2.12\nPkg.Path=emulator\nPkg.Desc=Android Emulator\nPkg.BuildId=16428233"
+    }
+  ],
+  "apkSha256": "726fe2fe519ce3371dd8ce8aea108a7dfa70d1f9252db31c12b4703ce810ce68",
+  "build": {
+    "head": "f9357d8be618badbcafc996150a98cf7b3267ef5",
+    "apk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261030\\parallel-audio\\r69-audio-bound-callback.apk",
+    "sha256": "726fe2fe519ce3371dd8ce8aea108a7dfa70d1f9252db31c12b4703ce810ce68",
+    "defines": [
+      "PLAYBACK_TRACE=true",
+      "STARTUP_TIMING=true",
+      "PLAYER_STANDBY=true",
+      "PLAYBACK_TRACE_GEOMETRY=false",
+      "PLAYBACK_TRACE_TEXTURE=true",
+      "PLAYBACK_TRACE_FRAMES=true",
+      "PLAYBACK_NETWORK_TRACE=true",
+      "PLAYBACK_TRACE_CONTINUITY=true",
+      "PLAYBACK_TRACE_DURATION_MS=60000",
+      "RESUME_STAGE_TIMING=true",
+      "STARTUP_WAIT_TRACE=true",
+      "ASYNC_SOURCE_FRAME_GATE=true",
+      "PREFETCH_RESUME_BODY=true",
+      "REUSE_RESUME_INDEX=true",
+      "PERSIST_RESUME_INDEX=true",
+      "HEDGE_RESUME_PREFETCH=true",
+      "HEDGE_FRESH_RESUME_PREFETCH=true",
+      "DEFER_VIDEO_AUXILIARY=true",
+      "PRIORITIZE_PLAY_URL=true",
+      "STARTUP_AAUDIO_FIRST=true",
+      "STARTUP_AUDIO_DECODE_QUEUE=true",
+      "STARTUP_FILTERED_AUDIO_LEAD=true",
+      "RESERVE_SELECTED_CODEC=true",
+      "SKIP_UNUSED_CODEC_FLUSH=true",
+      "VISIBLE_URL_PREFETCH=true",
+      "VISIBLE_MEDIA_PREFETCH=true",
+      "VISIBLE_NATIVE_PRELOAD=true",
+      "VISIBLE_RESUME_PRELOAD=true",
+      "RETAIN_COMPLETED_PLAY_URL=true",
+      "SOURCE_BUFFER_READY_GATE=true",
+      "SOURCE_FRAME_READY_GATE=true",
+      "WARM_ORIENTATION_SERVICE=true",
+      "STARTUP_TRANSFER_TRACE=true",
+      "SOURCE_EARLY_PREPARE=true",
+      "PARALLEL_AUDIO_SOURCE=true",
+      "CANCEL_CLOSED_MEDIA_DELIVERY=true",
+      "PARALLEL_RESUME_MEDIA=true",
+      "PREFETCH_RESUME_RANGE=true",
+      "PREFETCH_RESUME_AUDIO_MASTER=true",
+      "PREFETCH_RESUME_PRESENTATION_TIME=true",
+      "ISOLATED_MEDIA_SOURCES=true",
+      "HEDGE_AUDIO_SOURCE=true",
+      "HEDGE_MEDIA_SOURCE=true",
+      "MEDIA_HEDGE_DELAY_MS=0",
+      "UNCUT_DASH_TRACKS=true",
+      "STARTUP_AUDIO_DECODE_QUEUE_BOUNDED=true"
+    ],
+    "dependencyRevision": "fd8421d21eade4d6d12de137fa7df902fec20292",
+    "buildMode": "release",
+    "targetPlatform": "android-x64",
+    "nativeLibraryOverride": {
+      "abi": "x86_64",
+      "library": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261030\\parallel-audio\\native-codec-callback-01\\libmpv-codec-callback-x86_64.so",
+      "librarySha256": "22dddc4ca67b0671ba809a4129c996e3706eedf89059646a4742387f06b81369",
+      "apkLibrarySha256": "22dddc4ca67b0671ba809a4129c996e3706eedf89059646a4742387f06b81369",
+      "repacked": true,
+      "nativeSourceHashes": {
+        "mpv/player/playloop.c": "1c7e7e82dd10f20ba5590f4cb6d718f142484d824f838d90d23e1ff27f9582b2",
+        "mpv/player/audio.c": "476a649c36b38663afc90554e7bd536a92ba0763b256428df6f2ff319e0da13b",
+        "mpv/player/video.c": "ddc9761e699bdb7f65de08b51006ee6a4683870585fc598c288827984cc2c880",
+        "mpv/audio/decode/ad_lavc.c": "6a1334775dd92c4d4c90ff02097a2a69b7bfda4c8b6b125f1d6e67e4d19b00ac",
+        "mpv/filters/f_decoder_wrapper.c": "a8eed44458a3c388616899c5cbd227de181e6fb56cc860c156793a862a71c1ba",
+        "mpv/filters/f_swresample.c": "4957706ffb199b15049c7ae91712a25a966057359b840a6429b8e553fd4950b4",
+        "mpv/filters/filter.c": "33d94c700f229c6f82c573c27990adc8fd13897b0982203713ec161126dcc540",
+        "mpv/filters/f_output_chain.c": "e24bc67cd49ce05b59d05089518accb68c641555606f2b08e859b02467a67ea6",
+        "mpv/audio/out/ao.c": "5fd091c800dbeb0d6f2c236ce9b1d88852266994c652f0c5317346ddc1d344e3",
+        "mpv/audio/out/buffer.c": "e053296cdfe58a07b6bd2aa5554774ff5c54ca57c622a56636fb6fe8f0fed105",
+        "mpv/player/core.h": "eef10b1e0faa454d559364a706a30ca32e4180fc2630f8ec9a29cbae95df900f",
+        "mpv/options/options.h": "c12a5e6ab1398c5dc8bf7c2c0fab32f3540f933c3a11b1b0df53531df3b52297",
+        "mpv/options/options.c": "51b3df080449c72de88b571a9a4fdbbb44360bf9858bf01bbd9c1bd2263089e8",
+        "mpv/player/pili_audio_lead.h": "859ff04194a7ced14043c76926cabc276c0bdcb1bb2b47c594ab56a098ea97cc",
+        "mpv/player/pili_audio_lead_log.h": "55d11578641bc3b3cae9dd0f1aa95e273a0f00f13af131b0be858a366eb7322a",
+        "ffmpeg/libavcodec/mediacodec_wrapper.c": "9d185c902553d458979b38c3f0960433e0824690a64a0cd8dfcc5efb136f2b98",
+        "ffmpeg/libavcodec/Makefile": "d4ce5203cc99d3a2afae4895dbcd30c4279f2f77cdab8e6a22b08a8df307e878",
+        "mpv/include/mpv/client.h": "33b024cd0e32c4ec1413f700cd4dee27cc9c00aa714b7ffeabf66406e1b0aa1f",
+        "mpv/player/client.c": "f3451ccfe75d3ffe41317ae0b1d6088669c8356472cdddc94c2569e12a622299",
+        "ffmpeg/libavcodec/mediacodecdec.c": "3d60d5eb3745b1b4129d3ae8bbb3d694cd49f34c0b4066ffc8245e6900f3f9d8",
+        "ffmpeg/libavcodec/pili_codec_flush_trace.h": "f26606726c0505d31591737079ee7e0ff7d92fea830c56ff9833dea8ac773784",
+        "mpv/filters/f_decoder_wrapper.h": "9823c38a0393fe64bd639f7b92ac5d5fadae0119ac72dda7a12146f2f0e98615",
+        "mpv/video/decode/vd_lavc.c": "f8ccd6860c077a5c27235f17bcf6986b051552852b099b4317144ae0adf00e88",
+        "ffmpeg/libavcodec/mediacodecdec_common.c": "d51bca87d3933a0096cf669cef4e813d788ae04eb99abdd1bc8ccea9f0fb2ac3",
+        "ffmpeg/libavcodec/mediacodecdec_common.h": "c60a7c62e29a9aaa95d65c774a80b8c578d259fd0232dcca1d0fbc2267277761",
+        "ffmpeg/libavcodec/pili_decode_only_trace.h": "5576da6bccbe14a4016d01f305237211b2aca471b7a0934c8af9b023fc67673d",
+        "ffmpeg/libavcodec/pili_codec_callbacks_jni.h": "b9910133154d73af5659bb308e244151953b94624d80a647dcf513f2a39c8569",
+        "ffmpeg/libavcodec/pili_codec_callbacks_dex.h": "23a2df99310c40cc02af3409ec9bc324914b2bc392b387cc5a2aecd85b523607"
+      }
+    },
+    "diagnosticCollectionEnabled": true,
+    "resumeStageTiming": true,
+    "startupWaitTrace": true,
+    "asyncSourceFrameGate": true,
+    "dependencySourceSha256": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92",
+    "packageConfigSha256": "2d54d3b00f606c4dcab8c7841e31c508019722bdce9adefa2a8fa302820c0b3c",
+    "materialUiRoot": "D:\\workplace\\antigravity\\PiliPlus\\tmp\\patched-deps\\material_ui-1.5.0",
+    "standbyEnabled": true,
+    "mediaPreload": true,
+    "visibleUrlPrefetch": true,
+    "visibleMediaHttpWarmup": true,
+    "eventDrivenOutputGate": false,
+    "eventDrivenOutputDwell": false,
+    "dmParseWorker": false,
+    "visibleNativePreload": true,
+    "visibleResumePreload": true,
+    "testResumeFixtureMs": 0,
+    "retainCompletedPlayUrl": true,
+    "sourceBufferReadyGate": true,
+    "sourceFrameReadyGate": true,
+    "codecOperatingRate": 0,
+    "prefetchResumeRange": true,
+    "prefetchResumeAudioMaster": true,
+    "prefetchResumeBody": true,
+    "prefetchResumeSegmentBody": false,
+    "reuseResumeIndex": true,
+    "persistResumeIndex": true,
+    "hedgeResumePrefetch": true,
+    "hedgeFreshResumePrefetch": true,
+    "prefetchResumePresentationTime": true,
+    "warmOrientationService": true,
+    "warmCodecRegistry": false,
+    "reserveSelectedCodec": true,
+    "cancelClosedMediaDelivery": true,
+    "skipUnusedCodecFlush": true,
+    "filteredAudioLead": true,
+    "orientationPhaseTiming": true,
+    "asyncOrientationRegistration": true,
+    "textAtlasWarmup": false,
+    "actionTextWarmup": false,
+    "textInventory": false,
+    "orientationDependencyOriginalSha256": {
+      "NativeDeviceOrientationPlugin.java": "4738e67840b35f3b2576dff47a8cde703b6a8dfae8f9cd761ac55aa504a2f2f9",
+      "SensorOrientationListener.java": "212c4d14c08e0639b869ce4067fb21bb56416b038d747579de6eef0938ea942b",
+      "OrientationEventListener.java": "4dc03ec1d7273698fcb98bc5387d11b6323535e0c264717d694105cdb51b8884",
+      "SerialSensorRegistration.java": null
+    },
+    "orientationDependencyPatchedSha256": {
+      "NativeDeviceOrientationPlugin.java": "77d73ba03066bf2811ba2b290d0b7061e8e71cba0d8519da08dc39d1bd0f536c",
+      "SensorOrientationListener.java": "38574250432747078bd6b7cdd3689ea6a24a328fa4aa08390c850cef76280cd3",
+      "OrientationEventListener.java": "b3ecd5b15b071d9b69d7ee41cb2d9ba9d5a7b2d57e0b264e740272f2ab89a1f8",
+      "SerialSensorRegistration.java": "0199acb8f2d22f610c2b975ae591d12d78996cef124e81469084f17f141f918b"
+    },
+    "applicationPrefixPreloaded": null,
+    "selectedTrackPrefetch": "video+audio-worker",
+    "parallelResumeMedia": true,
+    "sourcePreparationOverlapsPresentation": true,
+    "leanTrace": true,
+    "frameTrace": true,
+    "continuityTrace": true,
+    "acceptedPerformanceFix": false,
+    "diagnosticSourcesSha256": {
+      "lib/main.dart": "e558c9423337e8454f8bd94462411fd6c90abef8e41b91c101beebdd916b4f82",
+      "lib/http/init.dart": "abc2e6139b7b089d4b8c45a7f17bd2402630f8082b3cd3878b2683b8c681beb0",
+      "lib/http/video.dart": "0e2cf1f5c58e301d002530b956a0c982ba2629e1bac9159e6e98fe156723d2fa",
+      "lib/plugin/pl_player/playback/codec_registry_warmup.dart": "209d9920ad25de6e10bbb9d5ef80c3b32949e7dc82af6773811b905b4dd14eab",
+      "android/app/src/main/kotlin/com/personal/piliplus/StartupCodecRegistry.kt": "e386abdf0d685ad2276b05afc3c41fc15f227516017edbe9641fe3d14eef975a",
+      "tool/startup_adb_preparation_test.py": "ff4b2e6806fcfc725ac610d7a8a0df5121b0f9fd4775e8f21c274845ed57c2b2",
+      "lib/plugin/pl_player/playback/startup_wait_trace.dart": "a57bf55a72ffd0e252d4f3ddde1cfb6aeabab39b0835d966207acad5759b23b1",
+      "lib/utils/accounts/account_manager/account_mgr.dart": "09b604d5c1782aa37129d7cac58bab416a4225cf8a687e58d4f6bda5a121e508",
+      "lib/grpc/dm.dart": "175e49146af0c1007912a1abd6e8eb5a16a743313ea4c095b20e56567afdada6",
+      "lib/grpc/grpc_req.dart": "eccb13debe20b49743628e8582762f203efcbc1bfe1fe61d444dddbec06dcf54",
+      "lib/grpc/grpc_decode.dart": "f096579bf2242b00c59f2194ced6470d3d448deefe86019400ddab04ee14da6d",
+      "lib/pages/danmaku/controller.dart": "b50507abd195a901b7e53015883653a498435659a7e70cc837f88dd1497e9f41",
+      "test/grpc_decode_test.dart": "995a09c7abedeecd2365ca2b470ec7ecfe31d9b863dd47cfd861b9fd08e7e384",
+      "lib/plugin/pl_player/playback/playback_start.dart": "cbf6772c8a173d52ab740e7473c44428e098e5d3db79d1f7f6a9b2d20ef46d47",
+      "test/playback_start_test.dart": "d070578a01b3937e2747773853a40794c8866400179ac90bad13fc82f680f194",
+      "lib/plugin/pl_player/playback/prepared_resource.dart": "662efc614f2ed9a5cab5a8efacc833bf9c36a8556d22929c2f32c4fd56c5eb0a",
+      "lib/plugin/pl_player/playback/prepared_media_engine.dart": "bca68c34f21cfa9e8418f481b58880e104ea1b5eab1c7b9a15bf31ec23172f64",
+      "lib/plugin/pl_player/playback/mpv_frame_gate.dart": "35eaf02ce4027e3b25bf5d2344c2053c75b1901e3116110c804b927f28ed9fb2",
+      "lib/plugin/pl_player/playback/mpv_async_property_reader.dart": "d0275567ce0845ce8bb3cf6553b1062dada6abc5024c8426bffb902a7574bf94",
+      "test/mpv_async_property_reader_test.dart": "4ca273bab13b776bfb0c6d4f3151adf83c42949378b9557bb3048399eeeac927",
+      "test/mpv_frame_gate_test.dart": "4252d6117789f50421af00b39000b388b9110ab2d95ff4f89238a98b14f29eef",
+      "test/prepared_resource_test.dart": "94c3552d40491754028e832dce930d906b00f4fa012274ce3c174293b83f092d",
+      "lib/pages/rcmd/view.dart": "b94b28e533104f16203248e5804cbe3606306103fc43da22b4be2609ba73a377",
+      "lib/plugin/pl_player/playback/one_shot_prefetch.dart": "92be675b9cadef2d84218c42a1094ea3623cd45b81448e723a29c50fd03cb7b4",
+      "lib/plugin/pl_player/playback/selected_media_warmup.dart": "a39050e2480057cb1a08c8e50f5a3f7c09b1643f073bd0fa2934b20f7be46955",
+      "lib/plugin/pl_player/playback/selected_codec_reservation.dart": "aa89924a8b0e2f042107ef818df283917f0368d6a67cb215b01418e61de939f4",
+      "lib/plugin/pl_player/playback/visible_media_prefetch.dart": "04583e4c19af728ff2097741d614044396fbc0954c66ff4e338f8b8b6a9761f1",
+      "test/selected_media_warmup_test.dart": "28a91bbe1da1bd3e85acf6b4bd85f1b659cb1329208c5ed3dcef627e42346720",
+      "test/one_shot_prefetch_test.dart": "797f5c2656f261dd698a930d3f2f4327e1e374b5941a93877b9d1246a2e85a5f",
+      "lib/plugin/pl_player/playback/stable_output_gate.dart": "14084a5558f2a73a956876438936bcdd5c378353aedf6b059a76e431494d06cd",
+      "test/stable_output_gate_test.dart": "4026337352897c6f43bfb5d5d56e8a43e0cbbb60f952660c1b67ac7345078a30",
+      "test/stable_output_dwell_test.dart": "9622349efeb5c5124722d61862e4e5de049cb9fe472c76886c7ff37b48e03853",
+      "lib/plugin/pl_player/controller.dart": "96bd9aa4c595eb98bcee4c06b53ff0a2a2bb5074ef81973ecd710e474afd0b8f",
+      "lib/plugin/pl_player/models/data_source.dart": "3e8192cdcc812adfae2673e1c01c354aadbd403b383914a16b2711d7462e1fde",
+      "lib/plugin/pl_player/playback/parallel_audio_source.dart": "71f183d27fbd4fbbb3c7e8ee6505d2e9836a89f98b39c487355ec856ea936ad7",
+      "lib/plugin/pl_player/playback/bounded_body_warmup.dart": "f069e521f1d659e19d0484dc45dda18c46cf0d74748d4456b91012d51781c10c",
+      "test/bounded_body_warmup_test.dart": "1f7172d750281959be7c8ed64f67d8d8eb20d09113d98817fab0aad9327c78f4",
+      "lib/plugin/pl_player/playback/resume_index_hint.dart": "c0669987c26bafc142aa6e7b0da24c43e854da86c9252a998b64b0f89df8871a",
+      "lib/plugin/pl_player/playback/persisted_resume_index_hints.dart": "7cb49291f17ed95a63b0bbe59132aea82784913a62c84c91cbe47fdaff8cf6b2",
+      "test/persisted_resume_index_hints_test.dart": "8408e93e372b364122180837ec3664be0e1bf7197238b96dc7fc6de9afb239d6",
+      "test/resume_index_hint_test.dart": "98fc63d9c07ecee2caa795844b54c28d92cb17195e3c61c8ff5df92e977eae83",
+      "test/resume_hint_hedge_test.dart": "cab1047836f5f4d860a4c1db7963b0800d09491996877559f1b54e595092bd2f",
+      "test/isolated_resume_index_test.dart": "38bf54047708cfead284c0827a4701e9f8496adb2b89c63c6436b0cba3e632c0",
+      "lib/plugin/pl_player/playback/mp4_resume_range.dart": "50ea3b0fad5ac392f9b09659cb6cd31056aa5f3508712837d24f4f00c0af9766",
+      "test/mp4_resume_range_test.dart": "744d424112d6fe72745bde81d313b141f2a68664d684c5ae7c9f833b6a7b90de",
+      "test/resume_range_source_test.dart": "f29d7883440aa77456ccdb845c0c50f86c3dbc97d1c6093ea73fd4810aedce97",
+      "test/resume_presentation_source_test.dart": "1974b756766f783167d2fe6f1ab7d2fdb6992c28b79ab45e377074dbb61c9089",
+      "test/isolated_resume_alignment_test.dart": "549575f5a8395379b745a7dd6fca49afdf0363abb3998c4fa41122872e616e75",
+      "test/fixtures/resume_index_fixture.dart": "c2505337b5f4a4fb4277b2f754fc55acafcff305722513ce6d3a5161af794c24",
+      "lib/plugin/pl_player/playback/isolated_media_sources.dart": "4cab865228ced12c4baf39038c113238f3318e08d043b05d32923597e212ac81",
+      "test/isolated_media_sources_test.dart": "5efed73626a5395076b1b86d91c3c088b867fb203f4091dc0544c88a901b9170",
+      "test/parallel_audio_source_test.dart": "ac4ac77315c22d2e0d06c288bd51373e4d93f40c0333520d4c6a605f8c9e86f8",
+      "test/parallel_source_disconnect_test.dart": "ceab7d4f34389a1c45feb1f9416e0f0c21f0a283f69393476e10567c222fb019",
+      "test/hedged_media_source_test.dart": "a923bfa3acae38ddc0f479919a7e2b9e353a38fdebf80731a53dbec1e29a9b51",
+      "test/source_preparation_test.dart": "fed94168ab603ca3c2e6278c5c94a352acff1498731c6f10893cda062e12f36e",
+      "test/playback_source_queue_test.dart": "6f30100e045980246ee3eb3e7adf137a045f4ce12bbd68773a520bb6f4a632da",
+      "tool/capture_startup_listener.py": "ba8f83e29afa57e0fb7f4f43925ed22b01f7af6dc3f701a16b70ca46a361f8c9",
+      "tool/startup_resource_profile.py": "ed40a980747d1ac23e24e95598b8863ebd82d8729a4302de39cfeb692c742587",
+      "tool/startup_resource_profile_test.py": "316df243cde61c5328f15334fee3f37a5cbe4e369967a10aebbc8529ff1e349a",
+      "tool/startup_search_clear_test.py": "e3fb22221e1df7f8ea678321103e074fc31ac06b7d4c9faacb3d488de0b868e6",
+      "tool/startup_history_uri_test.py": "e6ced47eeb7fa86d4ab5f93ac308ca4ce0156d3446a337fd4b0f2750f3945684",
+      "lib/utils/app_scheme.dart": "f0de0523311a0a42e37780cae0696d6332dd44342f9b8bb4d987fc0f124523ba",
+      "tool/startup_vm_timeline.py": "39fa7099e4ee59e68745bfcd6268fc3cf65cd2f565465040269ceda14d65ee9e",
+      "tool/startup_home_card.py": "5c9e35fa0440d670ead27477de636cda66dccb16390fcd6e63ac859f6aaa40ba",
+      "tool/startup_input_target.py": "3e260b91aae545244e9398ccab8dc7ce2f0704228e7bdcdaf6b6c303dd3774fa",
+      "tool/review_startup_return_cleanup.py": "8f52f537208305029bd502c6403499bf7bdf8efc2e589949d107ab134443a04a",
+      "tool/playback_trace_files.py": "dd2e199382ae021c2d9b24779ce2237a59ddd7f8dcdd66736f57f743d80cfa93",
+      "tool/playback_trace_files_test.py": "6e9a1c3b6cd8c009bc28777a80a1ff4879ee87c2695c71f2766803c46805cf50",
+      "tool/run_startup_pairs.py": "81ed438206a2d70b8a5e7e87f4c1b4d0b8543ed8e8450083fdf6968028b616e6",
+      "tool/summarize_parallel_audio.py": "0f08afe020ddff97b463e9da959a82ece184a9084298bc1c3490090009e35b04",
+      "lib/plugin/pl_player/playback/source_preparation.dart": "acf14c54af6cda25b7e2d54c8a64fe25e4689dbdb424d36ae716efec2bd9d2c0",
+      "lib/pages/video/controller.dart": "1033f4b9ee0d42d64a42e13a61d7bdadbca1d50fe3c253246a4fc52b53c2db57",
+      "lib/pages/video/view.dart": "18a306bf6576dab61c169a68afa036f1af9ba97cfa94bd0f674eadbde02ecb16",
+      "lib/pages/common/common_intro_controller.dart": "946755ce19681e0b6fc25ff0da85d65daba192e5209433c0f2da2aa806fb639a",
+      "lib/pages/video/introduction/ugc/controller.dart": "c5c97116cb89cf33458917bc353f69e7b08eb434d5f49649c678c97bd8e2f9ac",
+      "lib/pages/video/related/controller.dart": "8c5bc8b2c9f960a3004e6dcac2560fa5ac65672d5b6016d9a5ba99493396cf60",
+      "lib/plugin/pl_player/playback/startup_auxiliary_gate.dart": "9152b2e5473767a51977a646b3bd7d53e9743a034ae5b635ade67e5d35614bb0",
+      "test/startup_auxiliary_gate_test.dart": "508f1887034edea601ebd2f43d068fb3fe9e26e29e526b49f533c80894803c4d",
+      "tool/summarize_startup_codec.py": "5069a28ab56f71d65094f015fd1acb9ba32ee44d1f8a5fd46e30366d697acef2",
+      "tool/summarize_startup_continuity.py": "916b2edadd742fe6dda3c5a2923d4679bdef5c6392e8bf8c826d1a0c5cfa8933",
+      "tool/summarize_startup_transport.py": "ecde6aa2ffd1d4cefd2f622379e29da2ff0433909d8afd699b36cac7c72bf60b",
+      "tool/set_startup_controls_visibility.py": "7acbd057fcff29f21d6e0054bdec18414a24121f304683d4900e9dc7c25efd9e",
+      "lib/plugin/pl_player/playback/runtime_profile.dart": "6e89548f98cb8d7ebcf91d4f435104be7cc11f5ed3db9f1d3509c3f5143f2c9b",
+      "lib/plugin/pl_player/playback/playback_diagnostics.dart": "4b8dc76a5eb5b85d01d2d1dab781a5563faf7dbe320b698340bcaecae39d8389",
+      "android/app/src/profile/AndroidManifest.xml": "a63ec21b80f50d4d8599dd54f382fdddd35b18b16856985d161c662d8a0e0f6d",
+      "android/app/src/main/kotlin/com/personal/piliplus/PlaybackDiagnostics.kt": "525f34fc9385dc4dd0f295f72a38209505f2cfe5dfdfad8e3543b6a51fc3f089",
+      "android/app/src/main/kotlin/com/personal/piliplus/PlaybackTextureProbe.kt": "bce797ccbe2f35e8c58e2242472eff8b222578f58cde052b53e73654ccb9284e",
+      "android/app/src/main/kotlin/com/personal/piliplus/MainActivity.kt": "138fec5f31d86711b1b251f3b7959bfbf3027139ec184626d8afc3fde3d306fa",
+      "android/app/src/main/kotlin/com/personal/piliplus/StartupOrientationServices.kt": "48e182bff52c3c2302aacb2940b64b227a87d6597b3ea479f89033d532179be3",
+      "lib/plugin/pl_player/playback/orientation_service_warmup.dart": "ef637e38b2d4ed4dfa27301e8bc60b225e503da0265b40c9e546b90f9fca9455",
+      "lib/plugin/pl_player/playback/startup_text_warmup.dart": "0d4e5b1b3f6da84a152f0a5e0f9ef85ab8a713e6703662c0c7ad611cdeb2e0c9",
+      "lib/plugin/pl_player/playback/startup_text_inventory.dart": "06cb1e68c6caa19d37bf75de8d1142a6346fc4cbb2e61f5c41c3b02e937ce7e6",
+      "test/orientation_service_warmup_test.dart": "fe787d1152070e745e520e9f0f4c6cea75c5757b1037afc55267cc17b3948ae6",
+      "tool/startup_orientation_timing/NativeDeviceOrientationPlugin.java": "77d73ba03066bf2811ba2b290d0b7061e8e71cba0d8519da08dc39d1bd0f536c",
+      "tool/startup_orientation_timing/SensorOrientationListener.java": "38574250432747078bd6b7cdd3689ea6a24a328fa4aa08390c850cef76280cd3",
+      "tool/startup_orientation_timing/OrientationEventListener.java": "783bf53c407ccf4e8b73dbc1ed311e110cfd298aa5166a87db7ab72a7e865b25",
+      "tool/startup_orientation_async/OrientationEventListener.java": "b3ecd5b15b071d9b69d7ee41cb2d9ba9d5a7b2d57e0b264e740272f2ab89a1f8",
+      "tool/startup_orientation_async/SerialSensorRegistration.java": "0199acb8f2d22f610c2b975ae591d12d78996cef124e81469084f17f141f918b",
+      "tool/startup_orientation_async/SerialSensorRegistrationTest.java": "b3175c2b6d7c0bbb8dab843cd9d4ede52e1d084f1012c6db515e4cffddcb13df",
+      "tool/build_startup_standby.py": "f33eecb3efdb85609812edb3c82b7497b2d9f89d525163b3bda3c5f466e6b0da",
+      "tool/startup_native_library.py": "e1408b4d1cfdbc2f5e4508b37609b984bb1a2e8264844fb7b0fa4a9f51da31b9",
+      "tool/startup_native_library_test.py": "33b9861d6f8bb405f60fb876811dc43da5ef16001b00eabe67d0b087b0c415f4",
+      "tool/startup_gpu_standby/android_video_controller.dart": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92",
+      "native-format/player-audio.c.before": "7bd21b6dd3827943e107d623aada364754c48e8935015d5585345a0cf56cc031",
+      "native-format/player-audio.c.after": "7c6bc5e54d86d132a4eee48c364988be6f90fa11e3a2a3989aead10248297bec",
+      "native-format/native-build-01.json": "90b61fddc96897d8daab2ba6df83ab8c98137e8d87ab408ec6a95a3ba803d231",
+      "native-format/actual-format.patch": "1cc31d70f23d130a993414bf2fa52bbca273702599055ec7fb5155e76d6a84e1",
+      "native-format/host-validation.json": "855e1192c1f0751bcbc2ab3b44b3e03f0a3b7a2c2aaefe984d3df0f552811cda",
+      "native-format/root-cause-reviewed.json": "37c3720b3e4c21e6153c65844fe1ab903b36f2d65ecb899f97c5276fa437faac",
+      "native-gate/player-pili_audio_lead.h.after": "a848a100bdc1a419652ef0b92e13cc5b70861f98516f2461ffc1c0c4dd590d5a",
+      "native-gate/player-pili_audio_lead_log.h.after": "2343803c23051ad0c6367cc74a4031225a000a781cfd506fdaaaaa4b2bb72ad8",
+      "native-gate/native-build-01.json": "706644f73070d08bec82f530554d593e8b4f44c55a9cfd3a53bb65df13a4f57a",
+      "native-gate/gate-trace.patch": "be65cc594f2a99ef6f7b9e2d07e8fb0db1e69182cb92db0ba16e205a150e88cc",
+      "native-pts/player-pili_audio_lead_log.h.before": "2343803c23051ad0c6367cc74a4031225a000a781cfd506fdaaaaa4b2bb72ad8",
+      "native-pts/player-pili_audio_lead_log.h.after": "322aa38bb6bf0d3f41f7dbb85a8671bede11443d96fa3130d4ae208281dd73c6",
+      "native-pts/native-build-01.json": "8577fbb15e2137872c4c7ae515b01830feff6003f9b20141948ceed837d29207",
+      "native-pts/selected-pts.patch": "152d717432d884362f3216f839dc9f33c9c81f0661442228f59246a14fa8b9a3",
+      "native-fair/player-audio.c.before": "7c6bc5e54d86d132a4eee48c364988be6f90fa11e3a2a3989aead10248297bec",
+      "native-fair/player-audio.c.after": "476a649c36b38663afc90554e7bd536a92ba0763b256428df6f2ff319e0da13b",
+      "native-fair/player-pili_audio_lead.h.before": "a848a100bdc1a419652ef0b92e13cc5b70861f98516f2461ffc1c0c4dd590d5a",
+      "native-fair/player-pili_audio_lead.h.after": "859ff04194a7ced14043c76926cabc276c0bdcb1bb2b47c594ab56a098ea97cc",
+      "native-fair/player-pili_audio_lead_log.h.before": "322aa38bb6bf0d3f41f7dbb85a8671bede11443d96fa3130d4ae208281dd73c6",
+      "native-fair/player-pili_audio_lead_log.h.after": "55d11578641bc3b3cae9dd0f1aa95e273a0f00f13af131b0be858a366eb7322a",
+      "native-fair/native-build-03.json": "aaeb0d8ebf274ff7350fa4391f93178c97d33bef252cf2379105fbc08d1bce34",
+      "native-fair/fair-priming.patch": "f453324538e4cb7d77bc643bc7cb214bc0da9f53fe02865a82932de40fd67886",
+      "native-decode-only/demux-demux.h": "6f9b89cde4f398a87c00075727126b64b67f6854b056b5d03700bd41a31c8abd",
+      "native-decode-only/demux-packet.h": "d4aaf2bf9cbf38e072edad616ae100e26183652704774c553e5e0b1f192181ad",
+      "native-decode-only/demux-stheader.h": "44286b4627f67ac5b70fe0af6603ebcd94cf5f192e140a8bdd25480dfc32e26e",
+      "native-decode-only/ffmpeg-libavcodec-mediacodecdec.c.after": "3d60d5eb3745b1b4129d3ae8bbb3d694cd49f34c0b4066ffc8245e6900f3f9d8",
+      "native-decode-only/ffmpeg-libavcodec-mediacodecdec.c.before": "f3cea4356e5e45fdbdb5027d65d4844a4470eb1426e542473a22ed53bd3de3df",
+      "native-decode-only/ffmpeg-libavcodec-mediacodecdec_common.c.after": "d51bca87d3933a0096cf669cef4e813d788ae04eb99abdd1bc8ccea9f0fb2ac3",
+      "native-decode-only/ffmpeg-libavcodec-mediacodecdec_common.c.before": "e63dccbe153f9e1467b4976f5bc0c33fbc779152d0eac0400f33ba9c2eadb540",
+      "native-decode-only/ffmpeg-libavcodec-mediacodecdec_common.h.after": "c60a7c62e29a9aaa95d65c774a80b8c578d259fd0232dcca1d0fbc2267277761",
+      "native-decode-only/ffmpeg-libavcodec-mediacodecdec_common.h.before": "c3c345b54a698866ff3c978360133bf044e12a8d8f5254a31931629f162cea85",
+      "native-decode-only/filters-f_decoder_wrapper.h": "bdd63ee8457ab528567d8fe8012cb927bea88de92897c662ce7dab6d6e7eb358",
+      "native-decode-only/mpv-filters-f_decoder_wrapper.c.after": "a8eed44458a3c388616899c5cbd227de181e6fb56cc860c156793a862a71c1ba",
+      "native-decode-only/mpv-filters-f_decoder_wrapper.c.before": "f924dc0a0c60a466503666850cecf8ea5afa2eeec9c4e50baa23408a834ae5c9",
+      "native-decode-only/mpv-filters-f_decoder_wrapper.h.after": "9823c38a0393fe64bd639f7b92ac5d5fadae0119ac72dda7a12146f2f0e98615",
+      "native-decode-only/mpv-filters-f_decoder_wrapper.h.before": "bdd63ee8457ab528567d8fe8012cb927bea88de92897c662ce7dab6d6e7eb358",
+      "native-decode-only/mpv-player-playloop.c.after": "1c7e7e82dd10f20ba5590f4cb6d718f142484d824f838d90d23e1ff27f9582b2",
+      "native-decode-only/mpv-player-playloop.c.before": "be39e5bd1da744fee447a88e6fe36e3cf2fa23ff399224f9c4bd1eae8bf242ea",
+      "native-decode-only/mpv-video-decode-vd_lavc.c.after": "f8ccd6860c077a5c27235f17bcf6986b051552852b099b4317144ae0adf00e88",
+      "native-decode-only/mpv-video-decode-vd_lavc.c.before": "692ea60fb4a4ff2fea8ab797e278b5ae91930c8c7b4ce57e7247a11431585ea7",
+      "native-decode-only/pili_decode_only_trace.h": "5576da6bccbe14a4016d01f305237211b2aca471b7a0934c8af9b023fc67673d",
+      "native-decode-only/source-provenance.json": "dec054d9212b9d02ad4bd12c73f9a57cc61b79a6751af690729535d3fd0bc219",
+      "native-decode-only/native-build-01.json": "1d3019ba7835a1b6eea20355c183cb3358ddbb8a508db880841e9f6b3573fdd7",
+      "native-decode-only/decode-only.patch": "02725bba6c5eb434052b5a20cb320262ae1feab7307a49e1fb8248df92fbd77b",
+      "lib/plugin/pl_player/playback/startup_audio_decode_queue.dart": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1",
+      "native-codec-callback/ffmpeg-libavcodec-mediacodec_wrapper.c.after": "9d185c902553d458979b38c3f0960433e0824690a64a0cd8dfcc5efb136f2b98",
+      "native-codec-callback/ffmpeg-libavcodec-mediacodec_wrapper.c.before": "289286fd8f949314ff653af6c8b669f5246cba946948346a09459d3e44aae302",
+      "native-codec-callback/pili_codec_callbacks_dex.h": "23a2df99310c40cc02af3409ec9bc324914b2bc392b387cc5a2aecd85b523607",
+      "native-codec-callback/pili_codec_callbacks_jni.h": "b9910133154d73af5659bb308e244151953b94624d80a647dcf513f2a39c8569",
+      "native-codec-callback/source-provenance.json": "f1dfd93dbf2f68bb173f28b785b7756d6c5af17bef3891fd808ae3a196ba1920",
+      "native-codec-callback/native-build-01.json": "bbcd87a90fa7058907cf6155289e561f7af86e6204e441267f48839e5326f275",
+      "native-codec-callback/codec-callbacks.patch": "a60796681fe955b5715e6532a4e0f82734521b2b1d1e5d84c98ccfa2e04b9306",
+      "native-codec-callback/PiliCodecCallbacks.embedded.java": "a7401099eae11939a5ad980520204875be74af4662e3e3c3e8bf71083dbc2ec6",
+      "native-codec-callback/embedded-helper.json": "c2206745e24e5bf78cbe94dbd98badbf6284dcbb7bfeacfe28efbeba02ff9561"
+    },
+    "releaseSpeedComparable": false,
+    "repackedFromApk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261030\\parallel-audio\\r69-audio-bound-candidate.apk",
+    "repackedFromSha256": "abb854458d01ab8209b7fcf238f237bd9180d4de5ba9bb91eb2ec944ce00104e",
+    "nativeGateDiagnostic": true,
+    "nativeActualFormatFix": true,
+    "nativeSelectedPtsDiagnostic": true,
+    "dartOnlyRefresh": {
+      "baseApk": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261030\\parallel-audio\\decode-only-candidate.apk",
+      "compileSeconds": 109.54999390000012,
+      "sourceChanges": [
+        {
+          "path": "lib/plugin/pl_player/controller.dart",
+          "before": "04c3437e7e0f30cbca759705e6e72c26dec5ea4b8131ac39341749ce31542f85",
+          "after": "96bd9aa4c595eb98bcee4c06b53ff0a2a2bb5074ef81973ecd710e474afd0b8f"
+        },
+        {
+          "path": "lib/plugin/pl_player/playback/startup_audio_decode_queue.dart",
+          "before": null,
+          "after": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1"
+        }
+      ],
+      "payloadDifferences": [
+        "lib/x86_64/libapp.so"
+      ],
+      "assetsIdentical": true,
+      "sameCertificate": true,
+      "sameNativeAndEngine": true,
+      "alignment16KiB": true
+    }
+  },
+  "video": {
+    "bvid": "BV15BJX6dEoR",
+    "cid": 42790290231,
+    "title": "营销噱头还是黑科技?Roadster 2造车门槛是什么？专利、商业解读",
+    "duration": 744
+  },
+  "requestedStartProgressMs": 61500,
+  "historyResumeRequested": false,
+  "pid": "14445",
+  "appForceStoppedBeforeSearch": true,
+  "mediaPreloadEnabled": true,
+  "mediaPreloaded": false,
+  "entry": "in-app search submit of verified video URI",
+  "tap": [
+    990,
+    135
+  ],
+  "adbFailures": [
+    {
+      "command": [
+        "adb",
+        "-s",
+        "emulator-5572",
+        "shell",
+        "cat",
+        "/proc/pressure/memory"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "cat: /proc/pressure/memory: Permission denied\r\n"
+    },
+    {
+      "command": [
+        "adb",
+        "-s",
+        "emulator-5572",
+        "shell",
+        "cat",
+        "/proc/pressure/memory"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "cat: /proc/pressure/memory: Permission denied\r\n"
+    }
+  ],
+  "inputTarget": {
+    "window": "3c323cf com.personal.piliplus/com.personal.piliplus.MainActivity",
+    "displayId": 0,
+    "tap": [
+      990,
+      135
+    ],
+    "rectangles": [
+      [
+        0,
+        0,
+        1080,
+        2400
+      ]
+    ],
+    "eligibleWindowsVisited": [
+      "b7d4a8a Taskbar",
+      "46bf6d7 StatusBar",
+      "afde47b InputMethod",
+      "3c323cf com.personal.piliplus/com.personal.piliplus.MainActivity"
+    ]
+  },
+  "measuredInputCommand": {
+    "command": [
+      "adb",
+      "-s",
+      "emulator-5572",
+      "shell",
+      "input",
+      "touchscreen",
+      "tap",
+      "990",
+      "135"
+    ],
+    "returncode": 0,
+    "hostBeginNs": 25588946822500,
+    "hostEndNs": 25589009492200,
+    "stdout": "",
+    "stderr": ""
+  },
+  "backSentAfterSeconds": 21.012382699998852,
+  "traceFiles": [
+    "flutter-14445-1793464849694566.jsonl",
+    "native-14445-1793464849661.jsonl"
+  ],
+  "traceSelection": "Exact current-process announcements; existence verified by successful pulls, without directory enumeration",
+  "summary": {
+    "expectedCid": 42790290231,
+    "parseErrors": [],
+    "traceFiles": [
+      "flutter-14445-1793464849694566.jsonl",
+      "native-14445-1793464849661.jsonl"
+    ],
+    "afterNativeSequence": null,
+    "physicalDisplayTimeMs": null,
+    "boundary": "Input dispatch, API delivery and Flutter-consumed texture metadata; not image recognition or physical display",
+    "nativeRecords": 113,
+    "dartRecords": 1804,
+    "validSource": true,
+    "validInput": true,
+    "inputDispatchMonoNs": 3147860850200,
+    "inputEventUptimeMs": 3147860,
+    "sourceOpenNativeMarkAfterInputMs": 242.3562,
+    "input": {
+      "x": 990,
+      "y": 135
+    },
+    "textureSamples": 42,
+    "validTextureObservation": true,
+    "firstChangedTextureConsumedAfterInputMs": 1675.1437,
+    "firstChangedTextureTimestampNs": 61500000000,
+    "lastTextureConsumedAfterInputMs": 20703.536,
+    "observedTextureFrames": 993,
+    "changedTextureTimestamps": 527,
+    "maxTextureCallbackGapMs": 603.8219,
+    "sourceIdentity": {
+      "cid": 42790290231,
+      "requestId": 1,
+      "sourceRevision": 1,
+      "textureId": 0,
+      "playerId": 170674686
+    },
+    "dartToNativeClockUncertaintyMs": 0.643,
+    "milestones": [
+      {
+        "event": "query.primary.begin",
+        "afterInputMs": 18.64810000038147
+      },
+      {
+        "event": "query.primary.end",
+        "afterInputMs": 180.11610000038146
+      },
+      {
+        "event": "source.open.begin",
+        "afterInputMs": 211.22310000038146
+      },
+      {
+        "event": "media.playing",
+        "afterInputMs": 238.18410000038148
+      },
+      {
+        "event": "media.buffering",
+        "afterInputMs": 239.64410000038146
+      },
+      {
+        "event": "source.open.accepted",
+        "afterInputMs": 243.82510000038147
+      },
+      {
+        "event": "media.buffering",
+        "afterInputMs": 243.92610000038147
+      },
+      {
+        "event": "source.open.return",
+        "afterInputMs": 353.8591000003815
+      },
+      {
+        "event": "command.play",
+        "afterInputMs": 354.3141000003815
+      },
+      {
+        "event": "media.playing",
+        "afterInputMs": 365.11010000038146
+      },
+      {
+        "event": "media.buffering",
+        "afterInputMs": 617.1071000003815
+      },
+      {
+        "event": "ui.frameReady.after",
+        "afterInputMs": 1777.6191000003814
+      },
+      {
+        "event": "media.buffering",
+        "afterInputMs": 5041.560100000382
+      },
+      {
+        "event": "media.buffering",
+        "afterInputMs": 5359.455100000381
+      },
+      {
+        "event": "media.playing",
+        "afterInputMs": 21111.96910000038
+      }
+    ],
+    "apiRequests": [
+      {
+        "http.begin": 63.09410000038147,
+        "host": "api.bilibili.com",
+        "path": "/x/player/wbi/playurl",
+        "http.headers": 159.57610000038147,
+        "status": 200,
+        "http.firstChunk": 160.12710000038146,
+        "bytes": 6443,
+        "http.end": 163.13010000038147,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 272.2101000003815,
+        "host": "api.bilibili.com",
+        "path": "/x/web-interface/wbi/view",
+        "http.headers": 503.4391000003815,
+        "status": 200,
+        "http.firstChunk": 503.8181000003815,
+        "bytes": 16612,
+        "http.end": 661.9691000003814,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 474.7511000003815,
+        "host": "app.bilibili.com",
+        "path": "/bilibili.community.service.dm.v1.DM/DmSegMobile",
+        "http.headers": 904.4461000003814,
+        "status": 200,
+        "http.firstChunk": 904.6831000003815,
+        "bytes": 160719,
+        "http.end": 2534.4651000003814,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 1642.1881000003814,
+        "host": "api.bilibili.com",
+        "path": "/x/web-interface/archive/related",
+        "http.headers": 1887.2981000003815,
+        "status": 200,
+        "http.firstChunk": 1887.5351000003814,
+        "bytes": 16259,
+        "http.end": 1921.4651000003814,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 1740.0841000003816,
+        "host": "api.bilibili.com",
+        "path": "/x/web-interface/view/detail/tag",
+        "http.headers": 2189.4871000003814,
+        "status": 200,
+        "http.firstChunk": 2190.0111000003812,
+        "bytes": 396,
+        "http.end": 2205.2841000003814,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 1786.8801000003814,
+        "host": "api.bilibili.com",
+        "path": "/x/web-interface/card",
+        "http.headers": 2227.9641000003817,
+        "status": 200,
+        "http.firstChunk": 2228.5051000003814,
+        "bytes": 1327,
+        "http.end": 2234.6241000003815,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 1890.3751000003815,
+        "host": "api.bilibili.com",
+        "path": "/x/player/wbi/v2",
+        "http.headers": 2337.6331000003815,
+        "status": 200,
+        "http.firstChunk": 2338.1671000003817,
+        "bytes": 1132,
+        "http.end": 2343.1941000003817,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 2403.5791000003815,
+        "host": "app.bilibili.com",
+        "path": "/bilibili.community.service.dm.v1.DM/DmView",
+        "http.headers": 2541.3881000003817,
+        "status": 200,
+        "http.firstChunk": 2541.6711000003816,
+        "bytes": 2349,
+        "http.end": 2639.8671000003815,
+        "reason": "bodyEnd"
+      },
+      {
+        "http.begin": 4341.076100000381,
+        "host": "api.bilibili.com",
+        "path": "/x/player/videoshot",
+        "http.headers": 4490.473100000381,
+        "status": 200,
+        "http.firstChunk": 4491.061100000382,
+        "bytes": 443,
+        "http.end": 4492.521100000382,
+        "reason": "bodyEnd"
+      }
+    ],
+    "buffering": [
+      {
+        "afterInputMs": 239.64410000038146,
+        "value": false
+      },
+      {
+        "afterInputMs": 243.92610000038147,
+        "value": true
+      },
+      {
+        "afterInputMs": 617.1071000003815,
+        "value": false
+      },
+      {
+        "afterInputMs": 5041.560100000382,
+        "value": true
+      },
+      {
+        "afterInputMs": 5359.455100000381,
+        "value": false
+      }
+    ],
+    "pauses": [
+      21111.13410000038,
+      21111.606100000383,
+      21441.764100000382
+    ],
+    "flutterFrames": {
+      "count": 1080,
+      "maxBuildMs": 36.248,
+      "maxRasterMs": 142.567
+    },
+    "textureObserverErrors": [],
+    "nativeWindowFrames": {
+      "count": 34,
+      "maxTotalMs": 50.53714,
+      "reportedMissingMetrics": 0
+    },
+    "droppedNativeRecords": 0,
+    "traceEnded": false,
+    "dartDroppedRecords": 0
+  }
+}

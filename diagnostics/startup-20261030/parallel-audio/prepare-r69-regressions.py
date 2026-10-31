@@ -1,0 +1,21 @@
+from pathlib import Path
+BASE=Path(__file__).resolve().parent
+s=(BASE/'run-decode-only-cancel.py').read_text().replace('emulator-5554','emulator-5572').replace('decode-only-cancel-01','r69-audio-bound-cancel-01').replace('decode-only-candidate.apk','r69-audio-bound-candidate.apk')
+s=s.replace("'--verify-input-target','--resource-profile'","'--verify-input-target','--hide-ime-before-input','--resource-profile'")
+s=s.replace("any(e['event']=='clear' and e['count']>0 for e in lead) and not any(e['event']=='drain.begin' for e in lead)","not s['validTextureObservation'] and not any(e['event']=='drain.begin' for e in lead)")
+name='run-r69-audio-bound-cancel.py';compile(s,name,'exec');(BASE/name).write_text(s)
+s=(BASE/'review-audio-bound-fixed-cancel.py').read_text().replace('startup-audio-decode-bound-cancel-02','r69-audio-bound-cancel-01').replace("r['callbackClosedVerified']","r['decoderClosed']").replace("'callbackClosed':","'decoderClosed':")
+name='review-r69-audio-bound-cancel.py';compile(s,name,'exec');(BASE/name).write_text(s)
+s=(BASE/'run-async-input-seek.py').read_text().replace('emulator-5554','emulator-5572').replace('async-input-seek-01','r69-audio-bound-seek-01').replace('async-input-candidate.apk','r69-audio-bound-candidate.apk')
+s=s.replace("props=['debug.piliplus.codec_callbacks','debug.piliplus.callback_wait','debug.piliplus.async_input']","props=['debug.piliplus.decode_only']")
+s=s.replace("'0' if p.endswith('callback_wait') else '1'","'1'")
+name='run-r69-audio-bound-seek.py';compile(s,name,'exec');(BASE/name).write_text(s)
+s=(BASE/'review-audio-decode-bound-seek.py').read_text().replace('startup-audio-decode-bound-seek-01','r69-audio-bound-seek-01')
+s=s.replace("('[CODEC_CALLBACK] ',callbacks)","('[DECODE_ONLY] ',callbacks)")
+start=s.index("c=closed[0];assert")
+end=s.index('seeking=',start)
+s=s[:start]+"c=closed[0];assert c['enabled']==1 and c['applied']>0 and c['applied']==c['eligible']\n"+s[end:]
+s=s.replace("'callbackClose':c","'decodeOnlyClose':c").replace("'callbackClose']","'decodeOnlyClose']")
+s=s.replace('with one-frame video queue','on round69 plus bounded startup audio queue')
+name='review-r69-audio-bound-seek.py';compile(s,name,'exec');(BASE/name).write_text(s)
+print('Prepared round69 cancellation and seek listeners; no callback-only assertions on native69.')

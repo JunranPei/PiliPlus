@@ -1,0 +1,9 @@
+{
+  "initialCheck": "Mistook sparse emitted log spacing546.0968ms for actual texture change interval.",
+  "evidence": "PlaybackTextureProbe.kt aggregates healthy updates at500ms but tracks every positive timestamp change; gaps100ms or longer are emitted immediately.",
+  "actualFirstNewPositionGapMs": 410.1528,
+  "actualSteadyPositiveGapMs": 62.5096,
+  "actualMaxUnchangedAgeMs": 22.6661,
+  "newCaptureRequired": false,
+  "rawDataUnchanged": true
+}

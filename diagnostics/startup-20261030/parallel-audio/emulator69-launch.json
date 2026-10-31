@@ -1,0 +1,21 @@
+﻿{
+    "launcherPid":  78716,
+    "startTime":  "\/Date(1793347463171)\/",
+    "runtime":  "D:\\workplace\\antigravity\\PiliPlus\\tmp\\startup-test-emulator-37.2.12\\emulator",
+    "arguments":  [
+                      "-avd",
+                      "PiliPlusStartupIsolated_20261018",
+                      "-port",
+                      "5554",
+                      "-memory",
+                      "2048",
+                      "-no-window",
+                      "-no-snapshot",
+                      "-no-boot-anim",
+                      "-gpu",
+                      "host",
+                      "-feature",
+                      "-Vulkan",
+                      "-show-kernel"
+                  ]
+}

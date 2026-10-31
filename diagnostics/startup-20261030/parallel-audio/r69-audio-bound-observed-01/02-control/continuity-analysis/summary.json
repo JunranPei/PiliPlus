@@ -1,0 +1,66 @@
+{
+  "traceFiles": [
+    "flutter-6860-1793463532564849.jsonl",
+    "native-6860-1793463532533.jsonl"
+  ],
+  "sourceIdentity": {
+    "cid": 42790290231,
+    "requestId": 1,
+    "sourceRevision": 1,
+    "textureId": 0,
+    "playerId": 688350535
+  },
+  "observationStartAfterInputMs": 1770.0352,
+  "observationEndAfterInputMs": 17983.998,
+  "distinctPositiveTimestampChanges": 466,
+  "maxCompletedPositiveTimestampGapMs": 155.6302,
+  "maxObservedUnchangedTimestampAgeMs": 128.3682,
+  "completedGapsOver100Ms": [
+    {
+      "startAfterInputMs": 5135.2966,
+      "endAfterInputMs": 5247.5008,
+      "gapMs": 112.2042,
+      "newProducerTimestampNs": 64900000000,
+      "operationNotes": []
+    },
+    {
+      "startAfterInputMs": 9895.0829,
+      "endAfterInputMs": 10039.9918,
+      "gapMs": 144.9089,
+      "newProducerTimestampNs": 69600000000,
+      "operationNotes": []
+    },
+    {
+      "startAfterInputMs": 10186.9223,
+      "endAfterInputMs": 10342.5525,
+      "gapMs": 155.6302,
+      "newProducerTimestampNs": 69866688000,
+      "operationNotes": []
+    }
+  ],
+  "buffering": [
+    {
+      "afterInputMs": 194.27769999980927,
+      "value": false
+    },
+    {
+      "afterInputMs": 196.04469999980927,
+      "value": true
+    },
+    {
+      "afterInputMs": 612.1386999998093,
+      "value": false
+    }
+  ],
+  "pauseCommandsAfterInputMs": [
+    18125.36969999981,
+    18126.01669999981,
+    18461.58069999981
+  ],
+  "backRequestedAfterSeconds": 18.01422250000178,
+  "nativeRecords": 106,
+  "droppedNativeRecords": 0,
+  "physicalDisplayTimeMs": null,
+  "partialRecovery": false,
+  "boundary": "Time between distinct positive producer timestamps consumed by Flutter. Includes intentional pause/seek and source cadence; not physical display or an automatic dropped-frame classification."
+}

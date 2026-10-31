@@ -19,6 +19,8 @@ SPECS = [
  (86, '起播音频解码队列临时缩至0.08秒，首帧后恢复', 'startup-audio-decode-bound-observed-01', '同72库及86修正后全部源码；callbacks1/wait0/decode0/videoqueue1，FAILOVER开启/PROGRESS关闭；仅STARTUP_AUDIO_DECODE_QUEUE_BOUNDED关 / 开，QA145完整BAAB', '保留候选继续叠加和复核；暂不改默认或手机包', '原生跟踪确认首视频帧前音频189→99帧，过滤FIFO仍93帧；实际首帧/取消均恢复2秒。本轮中位快166ms，其中receive到drain快176ms，首次receive中位仅差2.7ms；每组仅2条且相邻对方向不同，稳定性仍待验证。精确首消费位置2/4，偏后样本保留'),
  (87, '在86音频限量上叠加异步视频送包', 'async-input-observed-01', '同一native87及同一APK；callbacks1/wait0/decode0/videoqueue1与音频0.08秒限量均相同，仅debug.piliplus.async_input0 / 1；新Android运行周期种子排除后完整BAAB', '保留默认关闭候选继续查剩余等待；未改手机包', '候选1668.9571/1664.3367ms，对照1847.8953/1602.663ms；中位快58.6323ms，首次receive反而晚40.8111ms，receive到drain快66.6839ms。相邻对+178.9382/-61.6737ms，N2每组，稳定归因未确立。实际首帧前取消、拖动后持续15秒、全部返回与双线程回收通过；精确首消费2/4'),
  (89, '异步送包与音频限量之上启用回调等待', 'async-wait-stacked-observed-01', '同87轻监听APK/native，callbacks1/async1/decode0/videoqueue1/audioBound1，FAILOVER开启/PROGRESS关闭；仅callback_wait0 / 1，5572同一Android运行周期完整BAAB', '关闭此等待叠加；保留实现及全部负收益样本', '控制1756.7305/1662.0060ms，候选1908.6403/3353.7166ms；中位净收益-921.8102ms，两对均变慢。第二候选连续帧最大间隔1066.9763ms，精确首消费1/4，返回4/4。慢样本视频正文2.612秒仅收到342236字节，而全段回调等待合计109.1343ms，不能把全部减慢归因于等待；网络交付也是明确混杂因素'),
+ (90, '第69轮基线上仅叠加音频解码队列临时限量', 'r69-audio-bound-observed-01', '精确69原生/应用源码加86限量及恢复；两包源码相同，decode_only1，仅STARTUP_AUDIO_DECODE_QUEUE_BOUNDED关 / 开；5572同一Android运行周期8条BAABABBA', '保留此叠加，继续在该组合上验证下一项；手机包未改', '每组4条：控制中位1812.4413ms，候选1622.3782ms，净快190.0631ms（10.4866%），四对均快103.077/212.0693/440.0227/161.665ms；首次receive仅提前8.8083ms，receive到drain提前187.8739ms。候选最低1470.3236ms；原生起点8/8，精确首消费6/8，连续播放与返回8/8。实际首帧前取消及原值恢复通过；小样本与网络调度影响仍保留，不能承诺手机同速或0.8秒达成'),
+ (91, '第69轮与音频限量之上叠加回调通知', 'r69-audio-bound-callback-observed-01', '第90轮应用源码/音频限量保持一致；改用从69原生构建的70回调库，同一APK/native，decode_only1与音频限量均开，仅callbacks0 / 1；8条BAABABBA', '保留为可叠加候选；两对快两对慢，最终采用仍待组合对照', '控制中位1602.0736ms，候选1567.36205ms，净快34.71155ms，封面只快4.2783ms。候选最低1314.2205ms，另有2466.2538ms慢样本完整计入；相邻对+39.6057/+267.0026/-817.8638/-14.1377ms。首次receive中位晚108.763ms，receive到drain快89.7613ms，不将不同阶段中位数直接相加。原生起点/连续播放/返回8/8，精确首消费7/8；实际首帧前取消、恢复和拖动后15秒播放通过'),
 ]
 
 def digest(path):
@@ -29,9 +31,9 @@ for num, title, cohort, baseline, decision, caveat in SPECS:
     path = BASE/cohort/'completed-samples.json'
     raw = json.loads(path.read_text(encoding='utf-8-sig'))
     samples = [r for r in raw if not r.get('warmup') and not r['label'].startswith('00-')]
-    assert len(samples) == 4 and len({r['pid'] for r in samples}) == 4
+    assert len(samples) >= 4 and len(samples) % 2 == 0 and len({r['pid'] for r in samples}) == len(samples)
     groups = {v: [r for r in samples if r['variant'] == v] for v in ['control', 'candidate']}
-    assert all(len(g) == 2 for g in groups.values())
+    assert all(len(g) == len(samples)//2 for g in groups.values())
     stats = {}
     for metric in ['textureMs', 'coverMs', 'openMs', 'firstReceiveMs']:
         if not all(metric in r for r in samples): continue
@@ -39,6 +41,7 @@ for num, title, cohort, baseline, decision, caveat in SPECS:
         stats[metric] = {'controlMedianMs': a, 'candidateMedianMs': b, 'netGainMs': a-b, 'netGainPercent': 100*(a-b)/a}
     rows.append({'round': num, 'change': title, 'baseline': baseline, 'cohort': cohort,
         'source': str(path.relative_to(BASE)), 'sourceSha256': digest(path),
+        'sampleCount': len(samples), 'samplesPerVariant': len(samples)//2,
         'stats': stats, 'decision': decision, 'attributionLimit': caveat,
         'stableAttributableGainEstablished': False,
         'samples': [{k:r.get(k) for k in ['label','variant','pid','textureMs','coverMs','openMs','firstReceiveMs','firstTexturePtsNs','strictStable','functionalCleanup','exactFirstPts','nativeSelectedPtsVerified']} for r in samples]})
@@ -57,7 +60,7 @@ pending = [
  {'round':'86b','change':'返回取消时先恢复音频解码队列，再递增源代次','netGainMs':None,'reason':'初版实际取消PID6563误报ownerChanged而跳过恢复；调整cancelSource顺序后PID7671实际在同代次恢复0.08→2，零输出/无drain、返回及线程回收通过。36项测试通过；第86轮正式两组均含此正确性修复，没有独立速度对照，旧失败记录保留'},
 ]
 report = {'metric':'实际输入事件到首个正PTS纹理消费完成；封面消失单列，均非物理显示完成证明',
- 'protocol':'各轮同一Android运行周期，每条新应用进程第一次61.5秒续播；BAAB，排除种子，保留全部正式慢样本。仅轮内比较，不跨轮相加。',
+ 'protocol':'各轮同一Android运行周期，每条新应用进程第一次61.5秒续播；主表包含4条BAAB和8条BAABABBA，数量与顺序见各轮基线，排除种子，保留全部正式慢样本。仅轮内比较，不跨轮相加。',
  'signConvention':'净收益=控制中位数-候选中位数；正值加快，负值变慢；无对照为null。',
  'scope':'回填第66轮起现有完整同条件队列；重点覆盖最快第69轮之后；更早轮次仍保留原实验记录，尚未迁入本表。',
  'rows':rows, 'unmeasured':pending}
@@ -72,7 +75,7 @@ lines = ['# 每轮修改净收益', '', report['metric']+'。', '', report['prot
 for r in rows:
     s=r['stats']['textureMs']; c=r['stats']['coverMs']
     exact=sum(x['firstTexturePtsNs']==61500000000 for x in r['samples'])
-    lines.append(f"|{r['round']}|{r['change']}|{s['controlMedianMs']/1000:.3f} → {s['candidateMedianMs']/1000:.3f}|{s['netGainMs']:+.1f} / {s['netGainPercent']:+.1f}%|{c['netGainMs']:+.1f}|{exact}/4|{r['decision']}|")
+    lines.append(f"|{r['round']}|{r['change']}|{s['controlMedianMs']/1000:.3f} → {s['candidateMedianMs']/1000:.3f}|{s['netGainMs']:+.1f} / {s['netGainPercent']:+.1f}%|{c['netGainMs']:+.1f}|{exact}/{r['sampleCount']}|{r['decision']}|")
 if factorial:
     lines += ['', '## 第78轮：同一安装包的四组合对照', '', factorial['protocol'], '',
       '|改动|控制→候选中位数（秒）|净收益（毫秒 / %）|封面净收益（毫秒）|',

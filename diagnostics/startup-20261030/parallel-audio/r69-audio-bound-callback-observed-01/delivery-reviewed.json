@@ -1,0 +1,1090 @@
+[
+  {
+    "label": "01-candidate",
+    "textureMs": 1583.3184,
+    "firstReceiveMs": 901.0629,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 3286,
+        "afterInputMs": 232.0237000002861
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 5011,
+        "afterInputMs": 236.1537000002861
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 5132,
+        "afterInputMs": 236.53070000028612
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 13008,
+        "afterInputMs": 252.1827000002861
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 18341,
+        "afterInputMs": 252.3887000002861
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 195591,
+        "afterInputMs": 446.2127000002861
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 195974,
+        "afterInputMs": 446.6817000002861
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 196105,
+        "afterInputMs": 447.1627000002861
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 196253,
+        "afterInputMs": 447.4877000002861
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 710264,
+        "afterInputMs": 985.584700000286
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 710799,
+        "afterInputMs": 985.9517000002861
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 219357,
+        "workerElapsedUs": 712457,
+        "afterInputMs": 986.4947000002861
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 713056,
+        "afterInputMs": 987.1737000002861
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 713194,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 987.6047000002861
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 816071,
+        "receivedBytes": 284893,
+        "deliveredBytesBeforeChunk": 284891,
+        "afterInputMs": 1067.299700000286
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 919390,
+        "receivedBytes": 407772,
+        "deliveredBytesBeforeChunk": 399581,
+        "afterInputMs": 1129.653700000286
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1023092,
+        "receivedBytes": 538844,
+        "deliveredBytesBeforeChunk": 530653,
+        "afterInputMs": 1243.9367000002862
+      }
+    ]
+  },
+  {
+    "label": "02-control",
+    "textureMs": 1622.9241,
+    "firstReceiveMs": 688.1998,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 1029,
+        "afterInputMs": 282.3155
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 1600,
+        "afterInputMs": 291.03249999999997
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 1923,
+        "afterInputMs": 291.72249999999997
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 9312,
+        "afterInputMs": 310.3245
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 9375,
+        "afterInputMs": 310.94849999999997
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 208606,
+        "afterInputMs": 516.6324999999999
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 214680,
+        "afterInputMs": 518.1345
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 220057,
+        "afterInputMs": 521.0195
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 220184,
+        "afterInputMs": 521.6115
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 439650,
+        "afterInputMs": 772.6645
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 439818,
+        "afterInputMs": 772.7955
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 83210,
+        "workerElapsedUs": 439979,
+        "afterInputMs": 772.9065
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 440060,
+        "afterInputMs": 773.0525
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 440417,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 773.1485
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 540444,
+        "receivedBytes": 268509,
+        "deliveredBytesBeforeChunk": 268507,
+        "afterInputMs": 927.9825
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 683133,
+        "receivedBytes": 293084,
+        "deliveredBytesBeforeChunk": 284893,
+        "afterInputMs": 999.4625
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 794595,
+        "receivedBytes": 350427,
+        "deliveredBytesBeforeChunk": 342236,
+        "afterInputMs": 1106.8874999999998
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 896027,
+        "receivedBytes": 432347,
+        "deliveredBytesBeforeChunk": 424156,
+        "afterInputMs": 1189.2585
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 999704,
+        "receivedBytes": 538844,
+        "deliveredBytesBeforeChunk": 530653,
+        "afterInputMs": 1318.5194999999999
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1101816,
+        "receivedBytes": 678109,
+        "deliveredBytesBeforeChunk": 678107,
+        "afterInputMs": 1388.3135000000002
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1210471,
+        "receivedBytes": 800988,
+        "deliveredBytesBeforeChunk": 792797,
+        "afterInputMs": 1493.1405
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1311396,
+        "receivedBytes": 1038557,
+        "deliveredBytesBeforeChunk": 1038555,
+        "afterInputMs": 1598.4144999999999
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1412196,
+        "receivedBytes": 1318036,
+        "deliveredBytesBeforeChunk": 1309845,
+        "afterInputMs": 1706.8564999999999
+      }
+    ]
+  },
+  {
+    "label": "03-control",
+    "textureMs": 1581.2231,
+    "firstReceiveMs": 622.1473,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 809,
+        "afterInputMs": 221.75210000038146
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 868,
+        "afterInputMs": 222.44810000038146
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 963,
+        "afterInputMs": 225.86410000038146
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 3337,
+        "afterInputMs": 252.47010000038148
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 3418,
+        "afterInputMs": 253.07310000038146
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 131592,
+        "afterInputMs": 346.3331000003815
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 134939,
+        "afterInputMs": 416.2201000003815
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 135398,
+        "afterInputMs": 416.5441000003815
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 135598,
+        "afterInputMs": 416.91610000038145
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 447112,
+        "afterInputMs": 669.8651000003815
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 447253,
+        "afterInputMs": 670.2751000003815
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 121053,
+        "workerElapsedUs": 447352,
+        "afterInputMs": 670.5651000003814
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 447414,
+        "afterInputMs": 670.7481000003814
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 447494,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 670.8881000003814
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 552434,
+        "receivedBytes": 162012,
+        "deliveredBytesBeforeChunk": 153821,
+        "afterInputMs": 900.6711000003814
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 653858,
+        "receivedBytes": 235741,
+        "deliveredBytesBeforeChunk": 235739,
+        "afterInputMs": 953.7221000003815
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 761309,
+        "receivedBytes": 284891,
+        "deliveredBytesBeforeChunk": 276700,
+        "afterInputMs": 984.6651000003815
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 867846,
+        "receivedBytes": 424156,
+        "deliveredBytesBeforeChunk": 415965,
+        "afterInputMs": 1103.5011000003815
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 989260,
+        "receivedBytes": 645339,
+        "deliveredBytesBeforeChunk": 637148,
+        "afterInputMs": 1206.7271000003816
+      }
+    ]
+  },
+  {
+    "label": "04-candidate",
+    "textureMs": 1314.2205,
+    "firstReceiveMs": 573.1001,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 1134,
+        "afterInputMs": 243.519
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 1756,
+        "afterInputMs": 244.853
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 3927,
+        "afterInputMs": 245.376
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 7544,
+        "afterInputMs": 269.477
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 8027,
+        "afterInputMs": 269.941
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 139051,
+        "afterInputMs": 409.95
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 139791,
+        "afterInputMs": 410.206
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 140295,
+        "afterInputMs": 424.381
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 140351,
+        "afterInputMs": 424.831
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 370079,
+        "afterInputMs": 595.363
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 370895,
+        "afterInputMs": 595.643
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 61973,
+        "workerElapsedUs": 371129,
+        "afterInputMs": 596.072
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 371495,
+        "afterInputMs": 596.802
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 371860,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 597.97
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 473528,
+        "receivedBytes": 170205,
+        "deliveredBytesBeforeChunk": 170203,
+        "afterInputMs": 697.173
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 579510,
+        "receivedBytes": 301277,
+        "deliveredBytesBeforeChunk": 301275,
+        "afterInputMs": 805.7950000000001
+      }
+    ]
+  },
+  {
+    "label": "05-control",
+    "textureMs": 1648.39,
+    "firstReceiveMs": 634.1636,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 2443,
+        "afterInputMs": 184.95559999990462
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 2695,
+        "afterInputMs": 195.44459999990463
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 3463,
+        "afterInputMs": 197.08859999990463
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy36x250x117x154xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 8536,
+        "afterInputMs": 208.38159999990464
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy36x250x117x154xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 8810,
+        "afterInputMs": 212.28359999990462
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy36x250x117x154xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 200996,
+        "afterInputMs": 394.63159999990467
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy36x250x117x154xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 201630,
+        "afterInputMs": 397.5765999999046
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 203942,
+        "afterInputMs": 435.34359999990465
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 206660,
+        "afterInputMs": 435.82259999990464
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 502290,
+        "afterInputMs": 684.4465999999047
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 508330,
+        "afterInputMs": 684.7805999999046
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 83210,
+        "workerElapsedUs": 508680,
+        "afterInputMs": 692.0235999999047
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 510530,
+        "afterInputMs": 692.2835999999047
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 511725,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 692.5185999999046
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 612101,
+        "receivedBytes": 112860,
+        "deliveredBytesBeforeChunk": 104669,
+        "afterInputMs": 778.6645999999046
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 739953,
+        "receivedBytes": 170203,
+        "deliveredBytesBeforeChunk": 162012,
+        "afterInputMs": 910.5435999999047
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 856138,
+        "receivedBytes": 260316,
+        "deliveredBytesBeforeChunk": 252125,
+        "afterInputMs": 1021.3325999999047
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 961528,
+        "receivedBytes": 358620,
+        "deliveredBytesBeforeChunk": 350429,
+        "afterInputMs": 1127.5385999999046
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1063000,
+        "receivedBytes": 456924,
+        "deliveredBytesBeforeChunk": 448733,
+        "afterInputMs": 1231.6915999999046
+      }
+    ]
+  },
+  {
+    "label": "06-candidate",
+    "textureMs": 2466.2538,
+    "firstReceiveMs": 1154.424,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 1730,
+        "afterInputMs": 216.36440000009537
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 1786,
+        "afterInputMs": 216.9094000000954
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 1838,
+        "afterInputMs": 218.14540000009538
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy115x231x41x24xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 7633,
+        "afterInputMs": 226.32340000009538
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy115x231x41x24xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 7741,
+        "afterInputMs": 226.39540000009538
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy115x231x41x24xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 207010,
+        "afterInputMs": 457.30040000009535
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy115x231x41x24xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 208093,
+        "afterInputMs": 457.52840000009536
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 209601,
+        "afterInputMs": 462.48740000009536
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 210824,
+        "afterInputMs": 468.9234000000954
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 1012372,
+        "afterInputMs": 1267.3934000000954
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 1012813,
+        "afterInputMs": 1267.8794000000953
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 211164,
+        "workerElapsedUs": 1021902,
+        "afterInputMs": 1268.1424000000954
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 1022048,
+        "afterInputMs": 1274.7274000000955
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1022165,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 1274.9174000000953
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1131418,
+        "receivedBytes": 235741,
+        "deliveredBytesBeforeChunk": 235739,
+        "afterInputMs": 1464.7874000000954
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1234763,
+        "receivedBytes": 317661,
+        "deliveredBytesBeforeChunk": 317659,
+        "afterInputMs": 1468.0514000000953
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1337855,
+        "receivedBytes": 440540,
+        "deliveredBytesBeforeChunk": 432349,
+        "afterInputMs": 1545.5474000000954
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1541295,
+        "receivedBytes": 653532,
+        "deliveredBytesBeforeChunk": 645341,
+        "afterInputMs": 1750.7924000000953
+      }
+    ]
+  },
+  {
+    "label": "07-candidate",
+    "textureMs": 1551.4057,
+    "firstReceiveMs": 551.4696,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 1982,
+        "afterInputMs": 177.82600000000002
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 2242,
+        "afterInputMs": 178.687
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 2392,
+        "afterInputMs": 180.014
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy223x247x68x187xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 9044,
+        "afterInputMs": 188.19400000000002
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy223x247x68x187xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 9121,
+        "afterInputMs": 188.35
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy223x247x68x187xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 172014,
+        "afterInputMs": 361.313
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy223x247x68x187xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 173349,
+        "afterInputMs": 361.59900000000005
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 173795,
+        "afterInputMs": 361.93899999999996
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 174063,
+        "afterInputMs": 362.249
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 396210,
+        "afterInputMs": 821.017
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 396506,
+        "afterInputMs": 821.3030000000001
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 162012,
+        "workerElapsedUs": 396678,
+        "afterInputMs": 821.597
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 396890,
+        "afterInputMs": 822.115
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 398465,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 822.2740000000001
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 506120,
+        "receivedBytes": 227548,
+        "deliveredBytesBeforeChunk": 219357,
+        "afterInputMs": 843.5619999999999
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 638969,
+        "receivedBytes": 334043,
+        "deliveredBytesBeforeChunk": 325852,
+        "afterInputMs": 899.8240000000001
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 805300,
+        "receivedBytes": 383195,
+        "deliveredBytesBeforeChunk": 375004,
+        "afterInputMs": 1038.026
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 908815,
+        "receivedBytes": 415965,
+        "deliveredBytesBeforeChunk": 415963,
+        "afterInputMs": 1272.847
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1086022,
+        "receivedBytes": 448733,
+        "deliveredBytesBeforeChunk": 448731,
+        "afterInputMs": 1320.469
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1186480,
+        "receivedBytes": 489692,
+        "deliveredBytesBeforeChunk": 481501,
+        "afterInputMs": 1420.454
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1299588,
+        "receivedBytes": 530653,
+        "deliveredBytesBeforeChunk": 530651,
+        "afterInputMs": 1492.002
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 1413090,
+        "receivedBytes": 604380,
+        "deliveredBytesBeforeChunk": 596189,
+        "afterInputMs": 1649.429
+      }
+    ]
+  },
+  {
+    "label": "08-control",
+    "textureMs": 1537.268,
+    "firstReceiveMs": 622.4734,
+    "events": [
+      {
+        "event": "isolated.video.resume.indexHint",
+        "bytes": 2971,
+        "workerElapsedUs": 759,
+        "afterInputMs": 176.42269999980928
+      },
+      {
+        "event": "isolated.video.resume.plan",
+        "requestedUs": 61500000,
+        "presentationTimePrediction": true,
+        "predictionTargetUs": 61500000,
+        "segmentStartUs": 60000000,
+        "offset": 6300522,
+        "segmentBytes": 579738,
+        "bodyWarmupLimit": 262144,
+        "workerElapsedUs": 931,
+        "afterInputMs": 176.73069999980927
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 1161,
+        "afterInputMs": 176.99069999980927
+      },
+      {
+        "event": "isolated.video.resume.hedge",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 8909,
+        "afterInputMs": 186.97969999980927
+      },
+      {
+        "event": "isolated.video.resume.begin",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 9127,
+        "afterInputMs": 187.12369999980928
+      },
+      {
+        "event": "isolated.video.resume.headers",
+        "status": 206,
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "workerElapsedUs": 186240,
+        "afterInputMs": 371.75269999980924
+      },
+      {
+        "event": "isolated.video.resume.selected",
+        "host": "xy58x19x174x148xy.mcdn.bilivideo.cn",
+        "backup": true,
+        "workerElapsedUs": 187815,
+        "afterInputMs": 372.0096999998093
+      },
+      {
+        "event": "isolated.video.resume.cancelled",
+        "reason": "hedge-loser",
+        "host": "upos-sz-estgoss.bilivideo.com",
+        "workerElapsedUs": 188281,
+        "afterInputMs": 372.27169999980924
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 189081,
+        "afterInputMs": 372.4646999998093
+      },
+      {
+        "event": "isolated.video.resume.claim",
+        "start": 6300522,
+        "predictedStart": 6300522,
+        "workerElapsedUs": 520474,
+        "afterInputMs": 740.0816999998093
+      },
+      {
+        "event": "isolated.video.resume.delivery.begin",
+        "workerElapsedUs": 522541,
+        "afterInputMs": 741.5056999998093
+      },
+      {
+        "event": "isolated.video.resume.bodyWarmup.claim",
+        "prefetchedBytes": 137435,
+        "workerElapsedUs": 522894,
+        "afterInputMs": 742.2776999998093
+      },
+      {
+        "event": "isolated.video.resume.firstChunk",
+        "bytes": 949,
+        "workerElapsedUs": 524253,
+        "afterInputMs": 744.1816999998093
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 524858,
+        "receivedBytes": 949,
+        "deliveredBytesBeforeChunk": 0,
+        "afterInputMs": 744.6156999998093
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 626133,
+        "receivedBytes": 178396,
+        "deliveredBytesBeforeChunk": 170205,
+        "afterInputMs": 831.3206999998092
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 746235,
+        "receivedBytes": 268509,
+        "deliveredBytesBeforeChunk": 268507,
+        "afterInputMs": 957.8336999998093
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 846628,
+        "receivedBytes": 375004,
+        "deliveredBytesBeforeChunk": 366813,
+        "afterInputMs": 1019.6246999998093
+      },
+      {
+        "event": "isolated.video.resume.body.progress",
+        "workerElapsedUs": 949075,
+        "receivedBytes": 506076,
+        "deliveredBytesBeforeChunk": 497885,
+        "afterInputMs": 1113.7526999998092
+      }
+    ]
+  }
+]

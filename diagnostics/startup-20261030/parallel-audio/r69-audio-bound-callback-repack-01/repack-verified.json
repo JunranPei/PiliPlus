@@ -1,0 +1,13 @@
+{
+  "apkSha256": "726fe2fe519ce3371dd8ce8aea108a7dfa70d1f9252db31c12b4703ce810ce68",
+  "nativeSha256": "22dddc4ca67b0671ba809a4129c996e3706eedf89059646a4742387f06b81369",
+  "sameSigningCertificate": true,
+  "sameNonSignatureEntries": 707,
+  "payloadDifferences": [
+    "lib/x86_64/libmpv.so"
+  ],
+  "alignmentVerified": true,
+  "flutterAndDartUnchanged": true,
+  "sourceArchiveSha256": "0b7178a080eae90c6cfd85317f263e876c4c296bff4124306f97e59579babe8e",
+  "newBehavior": "API26+ callback-backed buffers on same selected HEVC Surface decoder. Embedded reviewed Java DEX; same binary debug.piliplus.codec_callbacks switch, default off. Round69 decode-only1 and round90 audioBound1 kept on in both arms; no queue worker or changes to timestamps, confidence checks, audio priming."
+}

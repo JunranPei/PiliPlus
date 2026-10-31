@@ -1,0 +1,38 @@
+00:00 +0: loading D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart
+00:00 +0: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: old loaded and restart events cannot open a new gate
+00:00 +1: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: current source frame restores exact original value once
+00:00 +2: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: current source frame restores exact original value once
+00:00 +3: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: the previous entry ending does not fail the new load
+00:00 +4: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: cancel restores before frame and stale completion leaves next limit alone
+00:00 +5: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: a loaded different resource cannot reveal the requested video
+00:00 +6: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: explicit cancel restores before ownership is invalidated
+00:00 +7: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: the restart must still refer to the loaded resource
+00:00 +8: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: a newer start invalidates the previous loaded event
+00:00 +9: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: deadline restores when no source frame arrives
+00:00 +10: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: native failure finishes the gate and cannot later become ready
+00:00 +11: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: failed frame observer restores without an unhandled future error
+00:00 +12: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: a stopped load finishes rather than waiting forever
+00:00 +13: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: changed player ownership prevents a stale setting write
+00:00 +14: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: redirect requires a fresh start and matching resource
+00:00 +15: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: explicit capacity change during startup is preserved
+00:00 +16: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: explicit capacity change during startup is preserved
+00:00 +17: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: already smaller capacity is not increased
+00:00 +18: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: already smaller capacity is not increased
+00:00 +19: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: null VO restart never proves that a video frame is visible
+00:00 +20: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: zero means unlimited and is restored as zero
+00:00 +21: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: a delayed old restart is invalidated by later VO reconfiguration
+00:00 +22: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: write throwing after mutation restores original capacity
+00:00 +23: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: configuration without a subsequent restart does not reveal video
+00:00 +24: D:/workplace/antigravity/PiliPlus/test/startup_audio_decode_queue_test.dart: unsupported property leaves playback untouched
+00:00 +25: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: an in-progress seek requires a new restart
+00:00 +26: D:/workplace/antigravity/PiliPlus/test/mpv_frame_gate_test.dart: unavailable output cannot pass the frame gate
+00:00 +27: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: replacement cancels an event wait but still waits for cleanup
+00:00 +28: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: replacement cancels an event wait but still waits for cleanup
+00:00 +29: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: replacement cancels an event wait but still waits for cleanup
+00:00 +30: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: repeated clicks before execution run only the latest intent
+00:00 +31: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: a newer queued request replaces an intermediate route
+00:00 +32: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: another route cannot cancel the active owner
+00:00 +33: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: cancelAll releases active waits and skips queued source work
+00:00 +34: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: source failure reaches its caller without poisoning the queue
+00:00 +35: D:/workplace/antigravity/PiliPlus/test/playback_source_queue_test.dart: completed identity is retained until replacement
+00:00 +36: All tests passed!

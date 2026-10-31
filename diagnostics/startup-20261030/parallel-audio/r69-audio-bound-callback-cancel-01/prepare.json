@@ -1,0 +1,11 @@
+[
+  {
+    "command": [
+      "shell",
+      "am",
+      "force-stop",
+      "com.personal.piliplus"
+    ],
+    "exitCode": 0
+  }
+]

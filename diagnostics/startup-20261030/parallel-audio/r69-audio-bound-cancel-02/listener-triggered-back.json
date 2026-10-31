@@ -1,0 +1,16 @@
+{
+  "hostBeginNs": 24694819749500,
+  "hostEndNs": 24694953965300,
+  "triggerEvent": {
+    "event": "receive.first",
+    "instance": "0x736105888200",
+    "monoNs": 2253671457100,
+    "tid": 10245,
+    "enabled": 1,
+    "receiveStarted": 1,
+    "skipped": 0,
+    "ordinal": 0
+  },
+  "pid": "10190",
+  "afterMeasuredInputCommandSeconds": 0.4985395
+}

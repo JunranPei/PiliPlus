@@ -1,6 +1,6 @@
 {
   "metric": "实际输入事件到首个正PTS纹理消费完成；封面消失单列，均非物理显示完成证明",
-  "protocol": "各轮同一Android运行周期，每条新应用进程第一次61.5秒续播；BAAB，排除种子，保留全部正式慢样本。仅轮内比较，不跨轮相加。",
+  "protocol": "各轮同一Android运行周期，每条新应用进程第一次61.5秒续播；主表包含4条BAAB和8条BAABABBA，数量与顺序见各轮基线，排除种子，保留全部正式慢样本。仅轮内比较，不跨轮相加。",
   "signConvention": "净收益=控制中位数-候选中位数；正值加快，负值变慢；无对照为null。",
   "scope": "回填第66轮起现有完整同条件队列；重点覆盖最快第69轮之后；更早轮次仍保留原实验记录，尚未迁入本表。",
   "rows": [
@@ -11,6 +11,8 @@
       "cohort": "filtered-audio-format-observed-01",
       "source": "filtered-audio-format-observed-01\\completed-samples.json",
       "sourceSha256": "9e5640635167443187abc42d4cc1f20354a07319025a36ce7c65de94dba45c1e",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 2196.2171,
@@ -106,6 +108,8 @@
       "cohort": "audio-lead-fair-observed-01",
       "source": "audio-lead-fair-observed-01\\completed-samples.json",
       "sourceSha256": "f103a716ba01c10a12ffb2a1abf00bc2935f123ca0bfd0f79f57ac7078825c4c",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1932.04025,
@@ -201,6 +205,8 @@
       "cohort": "decode-only-observed-02",
       "source": "decode-only-observed-02\\completed-samples.json",
       "sourceSha256": "f3b14e060839ccc2950011ee13f8a92b877f37b95234d62bdc4756f77642d430",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1786.3355999999999,
@@ -296,6 +302,8 @@
       "cohort": "codec-callback-observed-02",
       "source": "codec-callback-observed-02\\completed-samples.json",
       "sourceSha256": "df99d3fb5b405c6829485bb915d7eed76cc5d5cbf46e409b83c81da7b29399eb",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 2185.50025,
@@ -391,6 +399,8 @@
       "cohort": "codec-callback-stack-observed-01",
       "source": "codec-callback-stack-observed-01\\completed-samples.json",
       "sourceSha256": "fe71a6a7650d29be5b9583b2a1b8087789c0d8f4c193979c857af127f38ca1f1",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1809.73505,
@@ -486,6 +496,8 @@
       "cohort": "callback-wait-observed-01",
       "source": "callback-wait-observed-01\\completed-samples.json",
       "sourceSha256": "57ee4d91886306245b19de971e56cb9364bff9f582e3aad304f95d4ca951e641",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1907.84015,
@@ -581,6 +593,8 @@
       "cohort": "video-thread-observed-01",
       "source": "video-thread-observed-01\\completed-samples.json",
       "sourceSha256": "6228902330682e891f7b1dc0e02fccf98ea5acdff8df1024d70291118be7513f",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1775.38025,
@@ -676,6 +690,8 @@
       "cohort": "initial-body-hedge-observed-01",
       "source": "initial-body-hedge-observed-01\\completed-samples.json",
       "sourceSha256": "5baffab64b2620540493d929edbc1c62024b7324cfcbb13ebea700a1fe52c8a3",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1654.6559,
@@ -771,6 +787,8 @@
       "cohort": "resume-body-alignment-observed-01",
       "source": "resume-body-alignment-observed-01\\completed-samples.json",
       "sourceSha256": "0b75d301f7075a00c9c1cf6721837eddc8d4993f3706dee830ed259bd3e5caa1",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1780.34575,
@@ -866,6 +884,8 @@
       "cohort": "video-thread-no-wait-observed-01",
       "source": "video-thread-no-wait-observed-01\\completed-samples.json",
       "sourceSha256": "53b91598ef095e81df841bd39d9c3c6f60f8793a74b6db6b45d4cde72de41ca4",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 3461.0197,
@@ -961,6 +981,8 @@
       "cohort": "resume-body-failover-observed-01",
       "source": "resume-body-failover-observed-01\\completed-samples.json",
       "sourceSha256": "d4321cf82e823093eafd916ecf6c88ed2266230ecc86d1f740df43737322c431",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1941.7134500000002,
@@ -1056,6 +1078,8 @@
       "cohort": "resume-body-progress-observed-02",
       "source": "resume-body-progress-observed-02\\completed-samples.json",
       "sourceSha256": "8aeb87eeee46b0a29a84e7394a0b63c405cd1d49ce4aedd57d2430db8a943719",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1829.648,
@@ -1151,6 +1175,8 @@
       "cohort": "startup-audio-decode-bound-observed-01",
       "source": "startup-audio-decode-bound-observed-01\\completed-samples.json",
       "sourceSha256": "6158bcf6fbaa204006fc8a2b447f920e4c8030f2e82836b7c84ee961545bbfc8",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1975.58445,
@@ -1246,6 +1272,8 @@
       "cohort": "async-input-observed-01",
       "source": "async-input-observed-01\\completed-samples.json",
       "sourceSha256": "822e6facff2b1a0e19f6cca367a6c66acb6bf6da704ee32f9a3e6da2b7d495e4",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1725.2791499999998,
@@ -1341,6 +1369,8 @@
       "cohort": "async-wait-stacked-observed-01",
       "source": "async-wait-stacked-observed-01\\completed-samples.json",
       "sourceSha256": "b08f135114ab8a455fa10979fa36bb6b1529cc6455ededcd3c45633a7dc2e97e",
+      "sampleCount": 4,
+      "samplesPerVariant": 2,
       "stats": {
         "textureMs": {
           "controlMedianMs": 1709.36825,
@@ -1421,6 +1451,312 @@
           "coverMs": 3499.8642999999524,
           "openMs": 347.42629999995233,
           "firstReceiveMs": 817.0172,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 90,
+      "change": "第69轮基线上仅叠加音频解码队列临时限量",
+      "baseline": "精确69原生/应用源码加86限量及恢复；两包源码相同，decode_only1，仅STARTUP_AUDIO_DECODE_QUEUE_BOUNDED关 / 开；5572同一Android运行周期8条BAABABBA",
+      "cohort": "r69-audio-bound-observed-01",
+      "source": "r69-audio-bound-observed-01\\completed-samples.json",
+      "sourceSha256": "1196b9dbf926f74dcaa918147aca95126deabadac7a61c70394ad45fba119d3b",
+      "sampleCount": 8,
+      "samplesPerVariant": 4,
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1812.4413,
+          "candidateMedianMs": 1622.3782,
+          "netGainMs": 190.06309999999985,
+          "netGainPercent": 10.486579620537219
+        },
+        "coverMs": {
+          "controlMedianMs": 1958.2765499999523,
+          "candidateMedianMs": 1772.8107000000477,
+          "netGainMs": 185.46584999990455,
+          "netGainPercent": 9.470871210703567
+        },
+        "openMs": {
+          "controlMedianMs": 251.43720000004768,
+          "candidateMedianMs": 215.53405000007152,
+          "netGainMs": 35.903149999976165,
+          "netGainPercent": 14.279171896588634
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 569.7743,
+          "candidateMedianMs": 560.966,
+          "netGainMs": 8.808300000000031,
+          "netGainPercent": 1.545927922687989
+        }
+      },
+      "decision": "保留此叠加，继续在该组合上验证下一项；手机包未改",
+      "attributionLimit": "每组4条：控制中位1812.4413ms，候选1622.3782ms，净快190.0631ms（10.4866%），四对均快103.077/212.0693/440.0227/161.665ms；首次receive仅提前8.8083ms，receive到drain提前187.8739ms。候选最低1470.3236ms；原生起点8/8，精确首消费6/8，连续播放与返回8/8。实际首帧前取消及原值恢复通过；小样本与网络调度影响仍保留，不能承诺手机同速或0.8秒达成",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "6409",
+          "textureMs": 1666.9582,
+          "coverMs": 1791.915,
+          "openMs": 233.287,
+          "firstReceiveMs": 657.531,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "6860",
+          "textureMs": 1770.0352,
+          "coverMs": 1934.7446999998092,
+          "openMs": 171.55369999980925,
+          "firstReceiveMs": 578.4189,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "7236",
+          "textureMs": 1789.8675,
+          "coverMs": 1887.867600000143,
+          "openMs": 293.69260000014305,
+          "firstReceiveMs": 761.5568,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "7707",
+          "textureMs": 1577.7982,
+          "coverMs": 1753.7064000000953,
+          "openMs": 223.60640000009536,
+          "firstReceiveMs": 485.7829,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "05-control",
+          "variant": "control",
+          "pid": "8122",
+          "textureMs": 1910.3463,
+          "coverMs": 1996.799,
+          "openMs": 288.736,
+          "firstReceiveMs": 561.1297,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "06-candidate",
+          "variant": "candidate",
+          "pid": "8530",
+          "textureMs": 1470.3236,
+          "coverMs": 1590.1902000000478,
+          "openMs": 199.72220000004768,
+          "firstReceiveMs": 514.9288,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "07-candidate",
+          "variant": "candidate",
+          "pid": "8908",
+          "textureMs": 1673.3501,
+          "coverMs": 1793.5387000000476,
+          "openMs": 207.46170000004767,
+          "firstReceiveMs": 607.0032,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "08-control",
+          "variant": "control",
+          "pid": "9335",
+          "textureMs": 1835.0151,
+          "coverMs": 1981.8084000000954,
+          "openMs": 214.13840000009537,
+          "firstReceiveMs": 535.871,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 91,
+      "change": "第69轮与音频限量之上叠加回调通知",
+      "baseline": "第90轮应用源码/音频限量保持一致；改用从69原生构建的70回调库，同一APK/native，decode_only1与音频限量均开，仅callbacks0 / 1；8条BAABABBA",
+      "cohort": "r69-audio-bound-callback-observed-01",
+      "source": "r69-audio-bound-callback-observed-01\\completed-samples.json",
+      "sourceSha256": "7c31df64a7354f9ed3ad9186bbe25f725501bd7660ff70f90807b245bbe876d9",
+      "sampleCount": 8,
+      "samplesPerVariant": 4,
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1602.0736,
+          "candidateMedianMs": 1567.3620500000002,
+          "netGainMs": 34.71154999999976,
+          "netGainPercent": 2.1666638786133023
+        },
+        "coverMs": {
+          "controlMedianMs": 1729.902649999857,
+          "candidateMedianMs": 1725.6243500001428,
+          "netGainMs": 4.278299999714136,
+          "netGainPercent": 0.2473144948193755
+        },
+        "openMs": {
+          "controlMedianMs": 220.31135000014305,
+          "candidateMedianMs": 237.91655000019074,
+          "netGainMs": -17.605200000047688,
+          "netGainPercent": -7.991054478144798
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 628.3185,
+          "candidateMedianMs": 737.0815,
+          "netGainMs": -108.76300000000003,
+          "netGainPercent": -17.310169921783306
+        }
+      },
+      "decision": "保留为可叠加候选；两对快两对慢，最终采用仍待组合对照",
+      "attributionLimit": "控制中位1602.0736ms，候选1567.36205ms，净快34.71155ms，封面只快4.2783ms。候选最低1314.2205ms，另有2466.2538ms慢样本完整计入；相邻对+39.6057/+267.0026/-817.8638/-14.1377ms。首次receive中位晚108.763ms，receive到drain快89.7613ms，不将不同阶段中位数直接相加。原生起点/连续播放/返回8/8，精确首消费7/8；实际首帧前取消、恢复和拖动后15秒播放通过",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "11103",
+          "textureMs": 1583.3184,
+          "coverMs": 1727.302700000286,
+          "openMs": 249.9387000002861,
+          "firstReceiveMs": 901.0629,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "11484",
+          "textureMs": 1622.9241,
+          "coverMs": 1819.0935,
+          "openMs": 298.1255,
+          "firstReceiveMs": 688.1998,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "11854",
+          "textureMs": 1581.2231,
+          "coverMs": 1647.0071000003816,
+          "openMs": 235.99710000038147,
+          "firstReceiveMs": 622.1473,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "12239",
+          "textureMs": 1314.2205,
+          "coverMs": 1425.172,
+          "openMs": 261.012,
+          "firstReceiveMs": 573.1001,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "05-control",
+          "variant": "control",
+          "pid": "12593",
+          "textureMs": 1648.39,
+          "coverMs": 1808.9775999999047,
+          "openMs": 204.62559999990464,
+          "firstReceiveMs": 634.1636,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "06-candidate",
+          "variant": "candidate",
+          "pid": "12938",
+          "textureMs": 2466.2538,
+          "coverMs": 2575.847400000095,
+          "openMs": 225.89440000009537,
+          "firstReceiveMs": 1154.424,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "07-candidate",
+          "variant": "candidate",
+          "pid": "13295",
+          "textureMs": 1551.4057,
+          "coverMs": 1723.946,
+          "openMs": 187.055,
+          "firstReceiveMs": 551.4696,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "08-control",
+          "variant": "control",
+          "pid": "13657",
+          "textureMs": 1537.268,
+          "coverMs": 1650.8276999998093,
+          "openMs": 185.21269999980927,
+          "firstReceiveMs": 622.4734,
           "firstTexturePtsNs": 61500000000,
           "strictStable": true,
           "functionalCleanup": true,

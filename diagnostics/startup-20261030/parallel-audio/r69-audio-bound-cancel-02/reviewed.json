@@ -1,0 +1,91 @@
+{
+  "captureExit": 1,
+  "pid": "10190",
+  "inputValid": true,
+  "back": {
+    "hostBeginNs": 24694819749500,
+    "hostEndNs": 24694953965300,
+    "triggerEvent": {
+      "event": "receive.first",
+      "instance": "0x736105888200",
+      "monoNs": 2253671457100,
+      "tid": 10245,
+      "enabled": 1,
+      "receiveStarted": 1,
+      "skipped": 0,
+      "ordinal": 0
+    },
+    "pid": "10190",
+    "afterMeasuredInputCommandSeconds": 0.4985395
+  },
+  "leadEvents": [
+    {
+      "event": "prime.first",
+      "monoNs": 2253977996300,
+      "tid": 10245,
+      "instance": "0x7361c58d63f0",
+      "count": 1,
+      "bytes": 8288,
+      "seconds": 0.021333,
+      "pushed": 1,
+      "popped": 0,
+      "videoPtsKnown": 0,
+      "videoPts": 0.0,
+      "audioStartKnown": 0,
+      "audioStartPts": 0.0,
+      "yieldedCycles": 0,
+      "maxCycleFrames": 1,
+      "afterInputMs": 804.9884
+    },
+    {
+      "event": "clear",
+      "monoNs": 2254519733600,
+      "tid": 10245,
+      "instance": "0x7361c58d63f0",
+      "count": 64,
+      "bytes": 530432,
+      "seconds": 1.365333,
+      "pushed": 64,
+      "popped": 0,
+      "videoPtsKnown": 0,
+      "videoPts": 0.0,
+      "audioStartKnown": 0,
+      "audioStartPts": 0.0,
+      "yieldedCycles": 16,
+      "maxCycleFrames": 4,
+      "afterInputMs": 1346.7257
+    }
+  ],
+  "hasPositiveTexture": false,
+  "returnCleanupPassed": true,
+  "cancelBeforeDrainVerified": true,
+  "boundary": "Actual native receive.first triggered external return request; cancellation phase determined by native drain/clear events, not intended command time. No positive texture expected for cancellation before target.",
+  "decodeOnlyEvents": [
+    {
+      "event": "queue.first",
+      "instance": "0x736105893200",
+      "monoNs": 2254177801100,
+      "sdk": 36,
+      "enabled": 1,
+      "ptsUs": 61066688,
+      "flags": 32,
+      "eligible": 1,
+      "applied": 1,
+      "afterInputMs": 1004.7932
+    },
+    {
+      "event": "close",
+      "instance": "0x736105893200",
+      "monoNs": 2254499487800,
+      "sdk": 36,
+      "enabled": 1,
+      "ptsUs": 0,
+      "flags": 0,
+      "eligible": 14,
+      "applied": 14,
+      "afterInputMs": 1326.4799
+    }
+  ],
+  "decodeOnlyWasApplied": true,
+  "decoderClosed": true
+}

@@ -1,0 +1,21 @@
+{
+  "pid": 5256,
+  "createTime": 1793461709.4812665,
+  "command": [
+    "D:\\workplace\\antigravity\\PiliPlus\\tmp\\startup-test-emulator-37.2.12\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe",
+    "-avd",
+    "PiliPlusStartupIsolated_20261018",
+    "-port",
+    "5572",
+    "-memory",
+    "2560",
+    "-no-window",
+    "-no-snapshot",
+    "-no-boot-anim",
+    "-gpu",
+    "host",
+    "-feature",
+    "-Vulkan",
+    "-show-kernel"
+  ]
+}
