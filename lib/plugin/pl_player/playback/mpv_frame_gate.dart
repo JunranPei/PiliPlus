@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:ffi';
 
+import 'package:PiliPlus/plugin/pl_player/playback/mpv_async_property_reader.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_wait_trace.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:media_kit/generated/libmpv/bindings.dart' as mpv;
@@ -34,6 +36,9 @@ class MpvFrameGate {
       if (_client == nullptr) {
         throw const MpvFrameGateException('Could not create frame observer');
       }
+      if (StartupWaitTrace.enabled) {
+        _traceClientId = NativePlayer.mpv.mpv_client_id(_client);
+      }
       // Subscription changes apply only to this weak client, never the player.
       for (var id = 0; id <= mpv.mpv_event_id.MPV_EVENT_HOOK; id++) {
         NativePlayer.mpv.mpv_request_event(_client, id, 0);
@@ -47,6 +52,9 @@ class MpvFrameGate {
         }
       }
       _drainBeforeLoad();
+      if (const bool.fromEnvironment('ASYNC_SOURCE_FRAME_GATE')) {
+        _propertyReader = MpvAsyncPropertyReader.native(_player);
+      }
       _trace('armed');
       _pollTimer = Timer.periodic(
         const Duration(milliseconds: 16),
@@ -72,6 +80,9 @@ class MpvFrameGate {
   Pointer<mpv.mpv_handle> _client = nullptr;
   Timer? _pollTimer;
   Timer? _timeoutTimer;
+  MpvAsyncPropertyReader? _propertyReader;
+  bool _pollBusy = false;
+  int? _traceClientId;
 
   static int _nextId = 0;
   static const _maxEventsPerPoll = 64;
@@ -88,6 +99,40 @@ class MpvFrameGate {
 
   Future<void> get ready => _completion.future;
 
+  Future<String> _readProperty(String name) async {
+    if (_completion.isCompleted) throw const MpvFrameGateCancelled();
+    if (_propertyReader case final reader?) {
+      final clock = Stopwatch()..start();
+      final pending = reader.read(name);
+      final submitUs = clock.elapsedMicroseconds;
+      final value = await pending;
+      if (_completion.isCompleted) throw const MpvFrameGateCancelled();
+      if (const bool.fromEnvironment('RESUME_STAGE_TIMING')) {
+        PlaybackDiagnostics.event('mpv.property.read.async', {
+          'gateId': _id,
+          'property': name,
+          'submitUs': submitUs,
+          'awaitUs': clock.elapsedMicroseconds,
+        });
+      }
+      return value;
+    }
+    if (!PlaybackDiagnostics.enabled ||
+        !const bool.fromEnvironment('RESUME_STAGE_TIMING')) {
+      return _player.getProperty(name);
+    }
+    final clock = Stopwatch()..start();
+    try {
+      return _player.getProperty(name);
+    } finally {
+      PlaybackDiagnostics.event('mpv.property.read', {
+        'gateId': _id,
+        'property': name,
+        'blockingUs': clock.elapsedMicroseconds,
+      });
+    }
+  }
+
   void _drainBeforeLoad() {
     for (var count = 0; count < _maxEventsPerPoll; count++) {
       final event = NativePlayer.mpv.mpv_wait_event(_client, 0).ref;
@@ -100,17 +145,33 @@ class MpvFrameGate {
     throw const MpvFrameGateException('Could not clear old frame events');
   }
 
-  void _poll() {
-    if (_completion.isCompleted) return;
+  Future<void> _poll() async {
+    if (StartupWaitTrace.active && !_completion.isCompleted) {
+      PlaybackDiagnostics.event('mpv.gate.poll', {
+        'gateId': _id,
+        'clientId': _traceClientId,
+        'busy': _pollBusy,
+      });
+    }
+    if (_completion.isCompleted || _pollBusy) return;
+    _pollBusy = true;
     try {
       _player.throwIfDisposed();
       for (var count = 0; count < _maxEventsPerPoll; count++) {
         var event = NativePlayer.mpv.mpv_wait_event(_client, 0).ref;
         if (event.event_id == mpv.mpv_event_id.MPV_EVENT_NONE) {
           if (!_protocol.hasRestartCandidate) return;
-          final path = _player.getProperty('path');
-          final vo = _player.getProperty('current-vo');
-          final seeking = _player.getProperty('seeking') == 'yes';
+          // Independent read-only requests may complete in either order. Drain
+          // source events after the entire group, so a SEEK/RECONFIG during any
+          // read still invalidates the candidate before accepting the snapshot.
+          final properties = await Future.wait([
+            _readProperty('path'),
+            _readProperty('current-vo'),
+            _readProperty('seeking'),
+          ]);
+          final path = properties[0];
+          final vo = properties[1];
+          final seeking = properties[2] == 'yes';
           // Property reads synchronize with mpv's core. A VO change during
           // those reads may have queued RECONFIG/SEEK after the old restart.
           // Drain those events before accepting the candidate.
@@ -129,6 +190,14 @@ class MpvFrameGate {
             return;
           }
         }
+        if (StartupWaitTrace.active) {
+          PlaybackDiagnostics.event('mpv.gate.event', {
+            'gateId': _id,
+            'clientId': _traceClientId,
+            'nativeEventId': event.event_id,
+            'error': event.error,
+          });
+        }
         switch (event.event_id) {
           case mpv.mpv_event_id.MPV_EVENT_START_FILE:
             final entry = event.data
@@ -138,12 +207,16 @@ class MpvFrameGate {
             _protocol.onStartFile(entry);
             _trace('start entry=$entry');
           case mpv.mpv_event_id.MPV_EVENT_FILE_LOADED:
-            _protocol.onFileLoaded(_player.getProperty('path'));
+            _protocol.onFileLoaded(await _readProperty('path'));
             _trace('loaded matched=${_protocol.hasMatchingFile}');
           case mpv.mpv_event_id.MPV_EVENT_PLAYBACK_RESTART:
-            final vo = _player.getProperty('current-vo');
+            final properties = await Future.wait([
+              _readProperty('current-vo'),
+              _readProperty('path'),
+            ]);
+            final vo = properties[0];
             _protocol.onPlaybackRestart(
-              _player.getProperty('path'),
+              properties[1],
               currentVo: vo,
             );
             _trace('restart vo=$vo candidate=${_protocol.hasRestartCandidate}');
@@ -178,6 +251,8 @@ class MpvFrameGate {
       }
     } catch (error, stack) {
       _fail(error, stack);
+    } finally {
+      _pollBusy = false;
     }
   }
 
@@ -189,7 +264,14 @@ class MpvFrameGate {
   }
 
   void _trace(String event) {
-    PlaybackDiagnostics.event('mpv.gate', {'gateId': _id, 'detail': event});
+    PlaybackDiagnostics.event('mpv.gate', {
+      'gateId': _id,
+      'detail': event,
+      if (StartupWaitTrace.enabled) ...{
+        'clientId': _traceClientId,
+        'propertyClientId': _propertyReader?.traceClientId,
+      },
+    });
     if (kDebugMode) debugPrint('[PLAYBACK_FRAME] gate=$_id $event');
   }
 
@@ -198,6 +280,8 @@ class MpvFrameGate {
     _timeoutTimer?.cancel();
     _pollTimer = null;
     _timeoutTimer = null;
+    _propertyReader?.dispose(const MpvFrameGateCancelled());
+    _propertyReader = null;
     final client = _client;
     _client = nullptr;
     if (client != nullptr) NativePlayer.mpv.mpv_destroy(client);

@@ -2,16 +2,16 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:PiliPlus/grpc/bilibili/rpc.pb.dart';
+import 'package:PiliPlus/grpc/grpc_decode.dart';
 import 'package:PiliPlus/http/constants.dart';
 import 'package:PiliPlus/http/init.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:archive/archive.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, compute;
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:protobuf/protobuf.dart' show GeneratedMessage;
 
 abstract final class GrpcReq {
-  static const _isolateSize = 256 * 1024;
   static const _gzipMinLength = 64;
 
   static final options = Options(
@@ -31,25 +31,7 @@ abstract final class GrpcReq {
   }
 
   static Uint8List decompressProtobuf(Uint8List data) {
-    final length = ByteData.sublistView(data, 1, 5).getInt32(0, Endian.big);
-
-    if (data[0] == 1) {
-      return const GZipDecoder().decodeBytes(
-        Uint8List.sublistView(data, 5, length + 5),
-      );
-    } else {
-      return Uint8List.sublistView(data, 5, length + 5);
-    }
-  }
-
-  static LoadingState<T> _parse<T>((Uint8List, T Function(Uint8List)) args) {
-    try {
-      final data = decompressProtobuf(args.$1);
-      final grpcResponse = args.$2(data);
-      return Success(grpcResponse);
-    } catch (e) {
-      return Error(e.toString());
-    }
+    return GrpcDecode.decompress(data);
   }
 
   static Future<LoadingState<T>> request<T extends GeneratedMessage>(
@@ -57,6 +39,8 @@ abstract final class GrpcReq {
     GeneratedMessage request,
     T Function(Uint8List) grpcParser, {
     bool isolate = false,
+    int isolateThresholdBytes = GrpcDecode.defaultThreshold,
+    void Function(Map<String, Object?>)? onParseTiming,
   }) async {
     final response = await Request().post<Uint8List>(
       HttpString.appBaseUrl + url,
@@ -71,9 +55,13 @@ abstract final class GrpcReq {
     if (response.headers.value('Grpc-Status') == '0') {
       final data = response.data;
       if (data is Uint8List) {
-        return isolate && data.length > _isolateSize
-            ? compute(_parse, (data, grpcParser))
-            : _parse((data, grpcParser));
+        return GrpcDecode.decode(
+          data,
+          grpcParser,
+          isolate: isolate,
+          thresholdBytes: isolateThresholdBytes,
+          onTiming: onParseTiming,
+        );
       } else {
         return Error('grpc: ${data.runtimeType} is not Uint8List');
       }

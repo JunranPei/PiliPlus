@@ -1,0 +1,1935 @@
+{
+  "metric": "实际输入事件到首个正PTS纹理消费完成；封面消失单列，均非物理显示完成证明",
+  "protocol": "各轮同一Android运行周期，每条新应用进程第一次61.5秒续播；BAAB，排除种子，保留全部正式慢样本。仅轮内比较，不跨轮相加。",
+  "signConvention": "净收益=控制中位数-候选中位数；正值加快，负值变慢；无对照为null。",
+  "scope": "回填第66轮起现有完整同条件队列；重点覆盖最快第69轮之后；更早轮次仍保留原实验记录，尚未迁入本表。",
+  "rows": [
+    {
+      "round": 66,
+      "change": "修正普通音频被误判直通，提前处理音频",
+      "baseline": "同原生版本，关闭/开启 filtered-audio-lead",
+      "cohort": "filtered-audio-format-observed-01",
+      "source": "filtered-audio-format-observed-01\\completed-samples.json",
+      "sourceSha256": "9e5640635167443187abc42d4cc1f20354a07319025a36ce7c65de94dba45c1e",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 2196.2171,
+          "candidateMedianMs": 2133.82285,
+          "netGainMs": 62.39424999999983,
+          "netGainPercent": 2.8409873504764094
+        },
+        "coverMs": {
+          "controlMedianMs": 2467.583400000036,
+          "candidateMedianMs": 2285.3347999999523,
+          "netGainMs": 182.24860000008357,
+          "netGainPercent": 7.385711866925386
+        },
+        "openMs": {
+          "controlMedianMs": 385.4904000000357,
+          "candidateMedianMs": 283.48879999995233,
+          "netGainMs": 102.00160000008339,
+          "netGainPercent": 26.460217945783846
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 811.80685,
+          "candidateMedianMs": 727.55235,
+          "netGainMs": 84.25450000000001,
+          "netGainPercent": 10.378638711905424
+        }
+      },
+      "decision": "保留正确性修复；总收益待复核",
+      "attributionLimit": "音频尾段缩短，但样本少且首消费位置不全通过",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "4986",
+          "textureMs": 1948.7654,
+          "coverMs": 2074.7911999999283,
+          "openMs": 262.6251999999285,
+          "firstReceiveMs": 613.6348,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": null
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "5402",
+          "textureMs": 2013.8261,
+          "coverMs": 2285.765600000024,
+          "openMs": 229.44560000002383,
+          "firstReceiveMs": 685.5478,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": null
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "5768",
+          "textureMs": 2378.6081,
+          "coverMs": 2649.4012000000475,
+          "openMs": 541.5352000000477,
+          "firstReceiveMs": 938.0659,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": null
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "6178",
+          "textureMs": 2318.8803,
+          "coverMs": 2495.878399999976,
+          "openMs": 304.35239999997617,
+          "firstReceiveMs": 841.4699,
+          "firstTexturePtsNs": 61633313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": null
+        }
+      ]
+    },
+    {
+      "round": 68,
+      "change": "音频预处理每轮最多4帧",
+      "baseline": "66/67无限量预处理 / 有界4帧",
+      "cohort": "audio-lead-fair-observed-01",
+      "source": "audio-lead-fair-observed-01\\completed-samples.json",
+      "sourceSha256": "f103a716ba01c10a12ffb2a1abf00bc2935f123ca0bfd0f79f57ac7078825c4c",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1932.04025,
+          "candidateMedianMs": 2001.3044,
+          "netGainMs": -69.26414999999997,
+          "netGainPercent": -3.5850262436302747
+        },
+        "coverMs": {
+          "controlMedianMs": 2038.5671500000058,
+          "candidateMedianMs": 2061.251599999994,
+          "netGainMs": -22.684449999988374,
+          "netGainPercent": -1.1127644237761953
+        },
+        "openMs": {
+          "controlMedianMs": 322.71365000000594,
+          "candidateMedianMs": 273.92859999999405,
+          "netGainMs": 48.78505000001189,
+          "netGainPercent": 15.117132479525111
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 776.67305,
+          "candidateMedianMs": 790.0678,
+          "netGainMs": -13.394750000000045,
+          "netGainPercent": -1.7246317481982985
+        }
+      },
+      "decision": "保留公平调度和取消修复；不记为起播加速",
+      "attributionLimit": "取消时实际清理88个待处理帧；本轮整体更慢",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "3844",
+          "textureMs": 2135.9596,
+          "coverMs": 2211.73,
+          "openMs": 292.064,
+          "firstReceiveMs": 918.2504,
+          "firstTexturePtsNs": 61633313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "4321",
+          "textureMs": 2070.707,
+          "coverMs": 2198.453400000006,
+          "openMs": 426.71640000000593,
+          "firstReceiveMs": 922.2356,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "4724",
+          "textureMs": 1793.3735,
+          "coverMs": 1878.680900000006,
+          "openMs": 218.71090000000595,
+          "firstReceiveMs": 631.1105,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5157",
+          "textureMs": 1866.6492,
+          "coverMs": 1910.773199999988,
+          "openMs": 255.79319999998808,
+          "firstReceiveMs": 661.8852,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 69,
+      "change": "参考帧只解码、不输出",
+      "baseline": "同69库 decode_only=0 / 1",
+      "cohort": "decode-only-observed-02",
+      "source": "decode-only-observed-02\\completed-samples.json",
+      "sourceSha256": "f3b14e060839ccc2950011ee13f8a92b877f37b95234d62bdc4756f77642d430",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1786.3355999999999,
+          "candidateMedianMs": 1683.9909,
+          "netGainMs": 102.34469999999988,
+          "netGainPercent": 5.729309766876945
+        },
+        "coverMs": {
+          "controlMedianMs": 1879.473150000006,
+          "candidateMedianMs": 1810.0235000000148,
+          "netGainMs": 69.44964999999115,
+          "netGainPercent": 3.6951658500676605
+        },
+        "openMs": {
+          "controlMedianMs": 224.68915000000595,
+          "candidateMedianMs": 187.64550000001492,
+          "netGainMs": 37.04364999999103,
+          "netGainPercent": 16.486621628142725
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 716.3169,
+          "candidateMedianMs": 578.9693500000001,
+          "netGainMs": 137.34754999999996,
+          "netGainPercent": 19.174132286980797
+        }
+      },
+      "decision": "保留实验；最快历史样本配置用于用户指定打包",
+      "attributionLimit": "首次receive已提前137ms；不能把总差102ms全归本改动",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "3858",
+          "textureMs": 1560.7618,
+          "coverMs": 1699.1569000000059,
+          "openMs": 189.62290000000596,
+          "firstReceiveMs": 525.3528,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "4479",
+          "textureMs": 1691.1846,
+          "coverMs": 1833.5811000000238,
+          "openMs": 232.06710000002383,
+          "firstReceiveMs": 676.9612,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "4866",
+          "textureMs": 1881.4866,
+          "coverMs": 1925.3651999999881,
+          "openMs": 217.31119999998808,
+          "firstReceiveMs": 755.6726,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5212",
+          "textureMs": 1807.22,
+          "coverMs": 1920.890100000024,
+          "openMs": 185.66810000002386,
+          "firstReceiveMs": 632.5859,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 70,
+      "change": "解码缓冲区可用时回调通知",
+      "baseline": "同70库 callbacks=0 / 1，decode_only两组关闭",
+      "cohort": "codec-callback-observed-02",
+      "source": "codec-callback-observed-02\\completed-samples.json",
+      "sourceSha256": "df99d3fb5b405c6829485bb915d7eed76cc5d5cbf46e409b83c81da7b29399eb",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 2185.50025,
+          "candidateMedianMs": 1814.41455,
+          "netGainMs": 371.0857000000001,
+          "netGainPercent": 16.979439833054244
+        },
+        "coverMs": {
+          "controlMedianMs": 2326.2625,
+          "candidateMedianMs": 1961.211400000006,
+          "netGainMs": 365.05109999999377,
+          "netGainPercent": 15.692601329385388
+        },
+        "openMs": {
+          "controlMedianMs": 200.00549999999998,
+          "candidateMedianMs": 235.45440000000596,
+          "netGainMs": -35.44890000000598,
+          "netGainPercent": -17.723962591031736
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 801.91845,
+          "candidateMedianMs": 660.0716,
+          "netGainMs": 141.84685000000002,
+          "netGainPercent": 17.688438269502342
+        }
+      },
+      "decision": "保留有希望的实验，待共同基线复核",
+      "attributionLimit": "首次receive提前142ms，receive到目标帧缩短186ms；网络/调度仍混杂",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "4747",
+          "textureMs": 1935.523,
+          "coverMs": 2094.5242000000476,
+          "openMs": 252.7132000000477,
+          "firstReceiveMs": 773.7821,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "5108",
+          "textureMs": 2201.4444,
+          "coverMs": 2382.937800000012,
+          "openMs": 207.5368000000119,
+          "firstReceiveMs": 548.0962,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "5518",
+          "textureMs": 2169.5561,
+          "coverMs": 2269.587199999988,
+          "openMs": 192.4741999999881,
+          "firstReceiveMs": 1055.7407,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5883",
+          "textureMs": 1693.3061,
+          "coverMs": 1827.8985999999643,
+          "openMs": 218.19559999996423,
+          "firstReceiveMs": 546.3611,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 71,
+      "change": "回调之上叠加只解码标志",
+      "baseline": "70回调开启；decode_only=0 / 1",
+      "cohort": "codec-callback-stack-observed-01",
+      "source": "codec-callback-stack-observed-01\\completed-samples.json",
+      "sourceSha256": "fe71a6a7650d29be5b9583b2a1b8087789c0d8f4c193979c857af127f38ca1f1",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1809.73505,
+          "candidateMedianMs": 1928.88665,
+          "netGainMs": -119.15159999999992,
+          "netGainPercent": -6.583925088923924
+        },
+        "coverMs": {
+          "controlMedianMs": 1910.92975,
+          "candidateMedianMs": 2086.2269500000475,
+          "netGainMs": -175.2972000000475,
+          "netGainPercent": -9.173398446491687
+        },
+        "openMs": {
+          "controlMedianMs": 216.26024999999998,
+          "candidateMedianMs": 211.6124500000477,
+          "netGainMs": 4.647799999952298,
+          "netGainPercent": 2.149169808114204
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 671.6052999999999,
+          "candidateMedianMs": 725.7863500000001,
+          "netGainMs": -54.18105000000014,
+          "netGainPercent": -8.067394643848127
+        }
+      },
+      "decision": "不采用此叠加为提速组合，保留两项实现",
+      "attributionLimit": "整体变慢；不能直接与69差值相加",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "7968",
+          "textureMs": 1732.6843,
+          "coverMs": 1823.2477000000476,
+          "openMs": 208.5447000000477,
+          "firstReceiveMs": 551.19,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "8353",
+          "textureMs": 1832.8627,
+          "coverMs": 1938.0000999999047,
+          "openMs": 187.33909999990462,
+          "firstReceiveMs": 652.9833,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "8712",
+          "textureMs": 1786.6074,
+          "coverMs": 1883.8594000000953,
+          "openMs": 245.18140000009538,
+          "firstReceiveMs": 690.2273,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "9081",
+          "textureMs": 2125.089,
+          "coverMs": 2349.206200000048,
+          "openMs": 214.68020000004768,
+          "firstReceiveMs": 900.3827,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 72,
+      "change": "初始空队列最多等待8ms通知",
+      "baseline": "72库回调开启；callback_wait=0 / 1",
+      "cohort": "callback-wait-observed-01",
+      "source": "callback-wait-observed-01\\completed-samples.json",
+      "sourceSha256": "57ee4d91886306245b19de971e56cb9364bff9f582e3aad304f95d4ca951e641",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1907.84015,
+          "candidateMedianMs": 2588.7504,
+          "netGainMs": -680.9102499999999,
+          "netGainPercent": -35.6901100964879
+        },
+        "coverMs": {
+          "controlMedianMs": 2034.833800000012,
+          "candidateMedianMs": 2689.390200000018,
+          "netGainMs": -654.5564000000061,
+          "netGainPercent": -32.167560810126226
+        },
+        "openMs": {
+          "controlMedianMs": 221.05530000001193,
+          "candidateMedianMs": 248.4242000000179,
+          "netGainMs": -27.368900000005965,
+          "netGainPercent": -12.381019591027444
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 769.9292499999999,
+          "candidateMedianMs": 865.85925,
+          "netGainMs": -95.93000000000006,
+          "netGainPercent": -12.459586384073612
+        }
+      },
+      "decision": "起播加速配置关闭；保留省CPU实验",
+      "attributionLimit": "独立解码测试CPU减少约32ms，应用整体反而更慢；CDN不同，非纯等待成本",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "3877",
+          "textureMs": 2496.977,
+          "coverMs": 2591.671800000012,
+          "openMs": 318.0148000000119,
+          "firstReceiveMs": 1105.7017,
+          "firstTexturePtsNs": 61633313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "4326",
+          "textureMs": 1813.5127,
+          "coverMs": 1982.3075,
+          "openMs": 229.8145,
+          "firstReceiveMs": 719.4073,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "4751",
+          "textureMs": 2002.1676,
+          "coverMs": 2087.360100000024,
+          "openMs": 212.29610000002384,
+          "firstReceiveMs": 820.4512,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5152",
+          "textureMs": 2680.5238,
+          "coverMs": 2787.1086000000237,
+          "openMs": 178.83360000002384,
+          "firstReceiveMs": 626.0168,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 74,
+      "change": "视频解码移入单帧队列",
+      "baseline": "同72库及等待配置；视频队列关 / 开",
+      "cohort": "video-thread-observed-01",
+      "source": "video-thread-observed-01\\completed-samples.json",
+      "sourceSha256": "6228902330682e891f7b1dc0e02fccf98ea5acdff8df1024d70291118be7513f",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1775.38025,
+          "candidateMedianMs": 1941.399,
+          "netGainMs": -166.01874999999995,
+          "netGainPercent": -9.351165757307482
+        },
+        "coverMs": {
+          "controlMedianMs": 1901.9750000002384,
+          "candidateMedianMs": 1994.4277000000477,
+          "netGainMs": -92.45269999980928,
+          "netGainPercent": -4.860878823317746
+        },
+        "openMs": {
+          "controlMedianMs": 205.17700000023842,
+          "candidateMedianMs": 236.89120000004766,
+          "netGainMs": -31.71419999980924,
+          "netGainPercent": -15.45699566704474
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 632.5552,
+          "candidateMedianMs": 877.11385,
+          "netGainMs": -244.55864999999994,
+          "netGainPercent": -38.66202506911649
+        }
+      },
+      "decision": "起播加速配置关闭；保留局部重叠机制",
+      "attributionLimit": "诊断中83ms音频初始化与视频送包重叠；整轮起播仍慢166ms",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "8531",
+          "textureMs": 1881.8865,
+          "coverMs": 1954.2384000000955,
+          "openMs": 207.75240000009538,
+          "firstReceiveMs": 992.1269,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "8953",
+          "textureMs": 1719.9875,
+          "coverMs": 1824.6476000003815,
+          "openMs": 208.55460000038147,
+          "firstReceiveMs": 636.9516,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "9311",
+          "textureMs": 1830.773,
+          "coverMs": 1979.3024000000953,
+          "openMs": 201.79940000009537,
+          "firstReceiveMs": 628.1588,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "9721",
+          "textureMs": 2000.9115,
+          "coverMs": 2034.617,
+          "openMs": 266.03,
+          "firstReceiveMs": 762.1008,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 76,
+      "change": "初始请求等待小段正文后选源",
+      "baseline": "同74队列+75初始64KiB；HEDGE_INITIAL_BODY关 / 开",
+      "cohort": "initial-body-hedge-observed-01",
+      "source": "initial-body-hedge-observed-01\\completed-samples.json",
+      "sourceSha256": "5baffab64b2620540493d929edbc1c62024b7324cfcbb13ebea700a1fe52c8a3",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1654.6559,
+          "candidateMedianMs": 1668.6023500000001,
+          "netGainMs": -13.94645000000014,
+          "netGainPercent": -0.84286104440205
+        },
+        "coverMs": {
+          "controlMedianMs": 1765.5127499999999,
+          "candidateMedianMs": 1773.2470999999941,
+          "netGainMs": -7.734349999994265,
+          "netGainPercent": -0.4380795324187982
+        },
+        "openMs": {
+          "controlMedianMs": 262.98924999999997,
+          "candidateMedianMs": 203.92259999999402,
+          "netGainMs": 59.06665000000595,
+          "netGainPercent": 22.459720311764055
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 718.4748,
+          "candidateMedianMs": 653.34785,
+          "netGainMs": 65.12694999999997,
+          "netGainPercent": 9.064611591109385
+        }
+      },
+      "decision": "保留防慢正文机制，默认关闭；无正常起播收益",
+      "attributionLimit": "本地故障场景修复有效；实际正常组更慢14ms",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "4044",
+          "textureMs": 1689.5946,
+          "coverMs": 1771.5282999999524,
+          "openMs": 202.51229999995232,
+          "firstReceiveMs": 644.9653,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "4520",
+          "textureMs": 1732.4158,
+          "coverMs": 1852.0548999999762,
+          "openMs": 263.68089999997613,
+          "firstReceiveMs": 776.3402,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "4897",
+          "textureMs": 1576.896,
+          "coverMs": 1678.9706000000238,
+          "openMs": 262.29760000002386,
+          "firstReceiveMs": 660.6094,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5343",
+          "textureMs": 1647.6101,
+          "coverMs": 1774.9659000000358,
+          "openMs": 205.33290000003575,
+          "firstReceiveMs": 661.7304,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 77,
+      "change": "续播目标请求等256KiB正文后选源",
+      "baseline": "两组均含音频初始化顺序修复；HEDGE_RESUME_BODY关 / 开",
+      "cohort": "resume-body-alignment-observed-01",
+      "source": "resume-body-alignment-observed-01\\completed-samples.json",
+      "sourceSha256": "0b75d301f7075a00c9c1cf6721837eddc8d4993f3706dee830ed259bd3e5caa1",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1780.34575,
+          "candidateMedianMs": 2121.89435,
+          "netGainMs": -341.5486000000001,
+          "netGainPercent": -19.184397188018117
+        },
+        "coverMs": {
+          "controlMedianMs": 1894.5151999999284,
+          "candidateMedianMs": 2223.063100000024,
+          "netGainMs": -328.5479000000955,
+          "netGainPercent": -17.342056690815042
+        },
+        "openMs": {
+          "controlMedianMs": 277.84619999992844,
+          "candidateMedianMs": 240.84510000002385,
+          "netGainMs": 37.001099999904596,
+          "netGainPercent": 13.317115728022959
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 786.5681,
+          "candidateMedianMs": 815.81275,
+          "netGainMs": -29.244650000000092,
+          "netGainPercent": -3.7180061077991966
+        }
+      },
+      "decision": "关闭256KiB等待，保留音频初始化修复",
+      "attributionLimit": "候选开始交付前增加等待；整轮净差342ms不能全等同纯等待指令成本",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "8361",
+          "textureMs": 2238.9463,
+          "coverMs": 2340.8597000000477,
+          "openMs": 233.0377000000477,
+          "firstReceiveMs": 864.3182,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "8794",
+          "textureMs": 1903.3247,
+          "coverMs": 2037.0955999999046,
+          "openMs": 233.25059999990464,
+          "firstReceiveMs": 815.0731,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "9154",
+          "textureMs": 1657.3668,
+          "coverMs": 1751.9347999999522,
+          "openMs": 322.4417999999523,
+          "firstReceiveMs": 758.0631,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "9637",
+          "textureMs": 2004.8424,
+          "coverMs": 2105.2665,
+          "openMs": 248.6525,
+          "firstReceiveMs": 767.3073,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 80,
+      "change": "关闭中间等待后重新加入视频单帧队列",
+      "baseline": "同72库，callbacks1/wait0/decode0；视频队列关 / 开",
+      "cohort": "video-thread-no-wait-observed-01",
+      "source": "video-thread-no-wait-observed-01\\completed-samples.json",
+      "sourceSha256": "53b91598ef095e81df841bd39d9c3c6f60f8793a74b6db6b45d4cde72de41ca4",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 3461.0197,
+          "candidateMedianMs": 3182.66195,
+          "netGainMs": 278.35774999999967,
+          "netGainPercent": 8.04265141859781
+        },
+        "coverMs": {
+          "controlMedianMs": 3559.5606499999762,
+          "candidateMedianMs": 3465.9956999999285,
+          "netGainMs": 93.5649500000477,
+          "netGainPercent": 2.628553330031006
+        },
+        "openMs": {
+          "controlMedianMs": 277.3641499999762,
+          "candidateMedianMs": 568.8881999999285,
+          "netGainMs": -291.5240499999523,
+          "netGainPercent": -105.1051658983244
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 1242.80985,
+          "candidateMedianMs": 1476.0778500000001,
+          "netGainMs": -233.26800000000003,
+          "netGainPercent": -18.769403863350455
+        }
+      },
+      "decision": "保留候选继续复核；尚不改变默认/手机包",
+      "attributionLimit": "相邻两对方向均为加快；首两条普遍>4s，后两条约2s，同期另有实际构建，不能宣称稳定因果收益",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "7618",
+          "textureMs": 4337.8999,
+          "coverMs": 4735.868099999904,
+          "openMs": 888.2310999999046,
+          "firstReceiveMs": 2152.956,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "8115",
+          "textureMs": 4650.5071,
+          "coverMs": 4690.416399999857,
+          "openMs": 278.35039999985696,
+          "firstReceiveMs": 1823.0794,
+          "firstTexturePtsNs": 61866688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "8484",
+          "textureMs": 2271.5323,
+          "coverMs": 2428.704900000095,
+          "openMs": 276.3779000000954,
+          "firstReceiveMs": 662.5403,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "8933",
+          "textureMs": 2027.424,
+          "coverMs": 2196.1232999999525,
+          "openMs": 249.5452999999523,
+          "firstReceiveMs": 799.1997,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 81,
+      "change": "正文停顿后验证重叠字节再续接",
+      "baseline": "同72库、callbacks1/wait0/decode0/videoqueue1及同源码；RESUME_BODY_FAILOVER关 / 开；所有前置正文等待关闭",
+      "cohort": "resume-body-failover-observed-01",
+      "source": "resume-body-failover-observed-01\\completed-samples.json",
+      "sourceSha256": "d4321cf82e823093eafd916ecf6c88ed2266230ecc86d1f740df43737322c431",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1941.7134500000002,
+          "candidateMedianMs": 1691.1625,
+          "netGainMs": 250.55095000000028,
+          "netGainPercent": 12.90360068320072
+        },
+        "coverMs": {
+          "controlMedianMs": 2051.09475,
+          "candidateMedianMs": 1852.5523000001908,
+          "netGainMs": 198.54244999980938,
+          "netGainPercent": 9.679828296562574
+        },
+        "openMs": {
+          "controlMedianMs": 255.86425000000003,
+          "candidateMedianMs": 243.1388000001907,
+          "netGainMs": 12.725449999809314,
+          "netGainPercent": 4.97351622972311
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 828.6528,
+          "candidateMedianMs": 709.82845,
+          "netGainMs": 118.82434999999998,
+          "netGainPercent": 14.339461593564879
+        }
+      },
+      "decision": "保留默认关闭实验；已通过实际取消/拖动/返回，切换收益仍待实际触发",
+      "attributionLimit": "候选1674/1709ms、对照1833/2051ms；无起播前重试或切换，正常组差251ms不能归因于续接；其中119ms已出现在首次receive之前",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "10531",
+          "textureMs": 1673.5524,
+          "coverMs": 1813.0708000001907,
+          "openMs": 218.75180000019074,
+          "firstReceiveMs": 623.9656,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "10963",
+          "textureMs": 1832.6436,
+          "coverMs": 1868.0645,
+          "openMs": 212.6955,
+          "firstReceiveMs": 739.4889,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "11333",
+          "textureMs": 2050.7833,
+          "coverMs": 2234.125,
+          "openMs": 299.033,
+          "firstReceiveMs": 917.8167,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "11766",
+          "textureMs": 1708.7726,
+          "coverMs": 1892.0338000001907,
+          "openMs": 267.5258000001907,
+          "firstReceiveMs": 795.6913,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 85,
+      "change": "慢速连续正文触发备用连接追赶",
+      "baseline": "同72库及85全部源码；FAILOVER两组开启，仅PROGRESS_RACE关 / 开；QA145排除种子后BAAB，不混入中断的QA144",
+      "cohort": "resume-body-progress-observed-02",
+      "source": "resume-body-progress-observed-02\\completed-samples.json",
+      "sourceSha256": "8aeb87eeee46b0a29a84e7394a0b63c405cd1d49ce4aedd57d2430db8a943719",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1829.648,
+          "candidateMedianMs": 1636.2640999999999,
+          "netGainMs": 193.38390000000004,
+          "netGainPercent": 10.569459262109435
+        },
+        "coverMs": {
+          "controlMedianMs": 1874.709150000006,
+          "candidateMedianMs": 1723.7020499999971,
+          "netGainMs": 151.0071000000089,
+          "netGainPercent": 8.0549614856261
+        },
+        "openMs": {
+          "controlMedianMs": 220.57465000000596,
+          "candidateMedianMs": 233.030049999997,
+          "netGainMs": -12.455399999991045,
+          "netGainPercent": -5.646795767324445
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 614.7574500000001,
+          "candidateMedianMs": 634.85815,
+          "netGainMs": -20.10069999999996,
+          "netGainPercent": -3.2696960402838484
+        }
+      },
+      "decision": "保留默认关闭实验和59项控制测试；正常路径收益未确立",
+      "attributionLimit": "候选1612/1661ms、对照1816/1843ms；中位差+193ms，但无慢速进度重试或实际切换，不能归因于追赶。实际取消/拖动/返回通过，拖动恢复1597ms仍慢。旧队列3条有效和第4条模拟器崩溃失败全部保留",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "4225",
+          "textureMs": 1611.672,
+          "coverMs": 1683.6332999999822,
+          "openMs": 226.98729999998213,
+          "firstReceiveMs": 604.95,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "4692",
+          "textureMs": 1816.397,
+          "coverMs": 1863.1750999999642,
+          "openMs": 222.99509999996422,
+          "firstReceiveMs": 591.5787,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "5084",
+          "textureMs": 1842.899,
+          "coverMs": 1886.2432000000476,
+          "openMs": 218.1542000000477,
+          "firstReceiveMs": 637.9362,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5625",
+          "textureMs": 1660.8562,
+          "coverMs": 1763.7708000000118,
+          "openMs": 239.0728000000119,
+          "firstReceiveMs": 664.7663,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 86,
+      "change": "起播音频解码队列临时缩至0.08秒，首帧后恢复",
+      "baseline": "同72库及86修正后全部源码；callbacks1/wait0/decode0/videoqueue1，FAILOVER开启/PROGRESS关闭；仅STARTUP_AUDIO_DECODE_QUEUE_BOUNDED关 / 开，QA145完整BAAB",
+      "cohort": "startup-audio-decode-bound-observed-01",
+      "source": "startup-audio-decode-bound-observed-01\\completed-samples.json",
+      "sourceSha256": "6158bcf6fbaa204006fc8a2b447f920e4c8030f2e82836b7c84ee961545bbfc8",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1975.58445,
+          "candidateMedianMs": 1809.7896999999998,
+          "netGainMs": 165.79475000000025,
+          "netGainPercent": 8.392187435976236
+        },
+        "coverMs": {
+          "controlMedianMs": 2111.380599999905,
+          "candidateMedianMs": 1936.3214500000477,
+          "netGainMs": 175.05914999985725,
+          "netGainPercent": 8.291217130623684
+        },
+        "openMs": {
+          "controlMedianMs": 216.51059999990463,
+          "candidateMedianMs": 248.41095000004768,
+          "netGainMs": -31.90035000014305,
+          "netGainPercent": -14.733851368088722
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 780.9844,
+          "candidateMedianMs": 783.6723999999999,
+          "netGainMs": -2.6879999999998745,
+          "netGainPercent": -0.3441810105297717
+        }
+      },
+      "decision": "保留候选继续叠加和复核；暂不改默认或手机包",
+      "attributionLimit": "原生跟踪确认首视频帧前音频189→99帧，过滤FIFO仍93帧；实际首帧/取消均恢复2秒。本轮中位快166ms，其中receive到drain快176ms，首次receive中位仅差2.7ms；每组仅2条且相邻对方向不同，稳定性仍待验证。精确首消费位置2/4，偏后样本保留",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "8625",
+          "textureMs": 1936.8264,
+          "coverMs": 2072.7725,
+          "openMs": 277.4095,
+          "firstReceiveMs": 824.9495,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "9162",
+          "textureMs": 1834.725,
+          "coverMs": 1988.5492999999524,
+          "openMs": 220.1402999999523,
+          "firstReceiveMs": 734.9284,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "9554",
+          "textureMs": 2116.4439,
+          "coverMs": 2234.211899999857,
+          "openMs": 212.88089999985695,
+          "firstReceiveMs": 827.0404,
+          "firstTexturePtsNs": 61566688000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "10078",
+          "textureMs": 1682.753,
+          "coverMs": 1799.8704000000953,
+          "openMs": 219.41240000009537,
+          "firstReceiveMs": 742.3953,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 87,
+      "change": "在86音频限量上叠加异步视频送包",
+      "baseline": "同一native87及同一APK；callbacks1/wait0/decode0/videoqueue1与音频0.08秒限量均相同，仅debug.piliplus.async_input0 / 1；新Android运行周期种子排除后完整BAAB",
+      "cohort": "async-input-observed-01",
+      "source": "async-input-observed-01\\completed-samples.json",
+      "sourceSha256": "822e6facff2b1a0e19f6cca367a6c66acb6bf6da704ee32f9a3e6da2b7d495e4",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1725.2791499999998,
+          "candidateMedianMs": 1666.6469000000002,
+          "netGainMs": 58.63224999999966,
+          "netGainPercent": 3.3984210613105517
+        },
+        "coverMs": {
+          "controlMedianMs": 1845.603800000012,
+          "candidateMedianMs": 1752.131050000012,
+          "netGainMs": 93.4727499999999,
+          "netGainPercent": 5.064616251873739
+        },
+        "openMs": {
+          "controlMedianMs": 241.98480000001194,
+          "candidateMedianMs": 220.1980500000119,
+          "netGainMs": 21.78675000000004,
+          "netGainPercent": 9.003354756166074
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 631.5751,
+          "candidateMedianMs": 672.38615,
+          "netGainMs": -40.81105000000002,
+          "netGainPercent": -6.461788946397669
+        }
+      },
+      "decision": "保留默认关闭候选继续查剩余等待；未改手机包",
+      "attributionLimit": "候选1668.9571/1664.3367ms，对照1847.8953/1602.663ms；中位快58.6323ms，首次receive反而晚40.8111ms，receive到drain快66.6839ms。相邻对+178.9382/-61.6737ms，N2每组，稳定归因未确立。实际首帧前取消、拖动后持续15秒、全部返回与双线程回收通过；精确首消费2/4",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "4974",
+          "textureMs": 1668.9571,
+          "coverMs": 1787.6811999999882,
+          "openMs": 237.64019999998808,
+          "firstReceiveMs": 773.6058,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "5394",
+          "textureMs": 1847.8953,
+          "coverMs": 1936.1165,
+          "openMs": 263.7225,
+          "firstReceiveMs": 674.2078,
+          "firstTexturePtsNs": 61600000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "5780",
+          "textureMs": 1602.663,
+          "coverMs": 1755.0911000000237,
+          "openMs": 220.24710000002383,
+          "firstReceiveMs": 588.9424,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "6177",
+          "textureMs": 1664.3367,
+          "coverMs": 1716.5809000000359,
+          "openMs": 202.75590000003575,
+          "firstReceiveMs": 571.1665,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    },
+    {
+      "round": 89,
+      "change": "异步送包与音频限量之上启用回调等待",
+      "baseline": "同87轻监听APK/native，callbacks1/async1/decode0/videoqueue1/audioBound1，FAILOVER开启/PROGRESS关闭；仅callback_wait0 / 1，5572同一Android运行周期完整BAAB",
+      "cohort": "async-wait-stacked-observed-01",
+      "source": "async-wait-stacked-observed-01\\completed-samples.json",
+      "sourceSha256": "b08f135114ab8a455fa10979fa36bb6b1529cc6455ededcd3c45633a7dc2e97e",
+      "stats": {
+        "textureMs": {
+          "controlMedianMs": 1709.36825,
+          "candidateMedianMs": 2631.1784500000003,
+          "netGainMs": -921.8102000000003,
+          "netGainPercent": -53.92695225268167
+        },
+        "coverMs": {
+          "controlMedianMs": 1805.3272500000298,
+          "candidateMedianMs": 2909.6402499999704,
+          "netGainMs": -1104.3129999999405,
+          "netGainPercent": -61.169685440682414
+        },
+        "openMs": {
+          "controlMedianMs": 228.4992500000298,
+          "candidateMedianMs": 303.16974999997024,
+          "netGainMs": -74.67049999994043,
+          "netGainPercent": -32.67866305903879
+        },
+        "firstReceiveMs": {
+          "controlMedianMs": 603.1557,
+          "candidateMedianMs": 786.02415,
+          "netGainMs": -182.86844999999994,
+          "netGainPercent": -30.318614248360735
+        }
+      },
+      "decision": "关闭此等待叠加；保留实现及全部负收益样本",
+      "attributionLimit": "控制1756.7305/1662.0060ms，候选1908.6403/3353.7166ms；中位净收益-921.8102ms，两对均变慢。第二候选连续帧最大间隔1066.9763ms，精确首消费1/4，返回4/4。慢样本视频正文2.612秒仅收到342236字节，而全段回调等待合计109.1343ms，不能把全部减慢归因于等待；网络交付也是明确混杂因素",
+      "stableAttributableGainEstablished": false,
+      "samples": [
+        {
+          "label": "01-candidate",
+          "variant": "candidate",
+          "pid": "4151",
+          "textureMs": 1908.6403,
+          "coverMs": 2319.4161999999883,
+          "openMs": 258.9131999999881,
+          "firstReceiveMs": 755.0311,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "02-control",
+          "variant": "control",
+          "pid": "4605",
+          "textureMs": 1756.7305,
+          "coverMs": 1865.8397000000477,
+          "openMs": 251.45670000004768,
+          "firstReceiveMs": 713.8423,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "03-control",
+          "variant": "control",
+          "pid": "4996",
+          "textureMs": 1662.006,
+          "coverMs": 1744.814800000012,
+          "openMs": 205.54180000001193,
+          "firstReceiveMs": 492.4691,
+          "firstTexturePtsNs": 61533313000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": false,
+          "nativeSelectedPtsVerified": true
+        },
+        {
+          "label": "04-candidate",
+          "variant": "candidate",
+          "pid": "5391",
+          "textureMs": 3353.7166,
+          "coverMs": 3499.8642999999524,
+          "openMs": 347.42629999995233,
+          "firstReceiveMs": 817.0172,
+          "firstTexturePtsNs": 61500000000,
+          "strictStable": true,
+          "functionalCleanup": true,
+          "exactFirstPts": true,
+          "nativeSelectedPtsVerified": true
+        }
+      ]
+    }
+  ],
+  "unmeasured": [
+    {
+      "round": "88",
+      "change": "分解异步送包后解码线程内部各调用耗时",
+      "netGainMs": null,
+      "reason": "实际PID2840独占提交段810.232ms：输出获取515.556ms含睡眠219.325ms，输入槽查询151.525ms但无睡眠，buffer获取11.818ms、复制0.937ms、提交9.927ms。首个未呈现参考帧释放前756次零超时查询、9次输入。20MB跟踪无丢失，5935.557ms诊断耗时不混入轻监听。首次采集在点击前被另一测试切换到WeiDownloader，原XML保留，已把本QA从5554隔离至5572，随后实际播放/返回通过"
+    },
+    {
+      "round": "65",
+      "change": "提前处理音频的初版",
+      "netGainMs": null,
+      "reason": "实际被错误的直通判断拦住，未触发；第66轮修正，不能记作有效优化"
+    },
+    {
+      "round": "67",
+      "change": "补原生音视频起点监听",
+      "netGainMs": null,
+      "reason": "诊断变化，无匹配性能对照"
+    },
+    {
+      "round": "73",
+      "change": "补worker异常和原生阶段监听",
+      "netGainMs": null,
+      "reason": "诊断变化，无匹配性能对照"
+    },
+    {
+      "round": "75",
+      "change": "初始请求限制为新鲜64KiB",
+      "netGainMs": null,
+      "reason": "没有完成同条件A/B；10.398秒样本包含起播前拖动，不作正常起播成绩"
+    },
+    {
+      "round": "77b",
+      "change": "音频备选地址在第一次await之前赋值",
+      "netGainMs": null,
+      "reason": "失败/修复后43项测试证实修复；77正式A/B两组均包含，无法分离其独立速度收益"
+    },
+    {
+      "round": "79",
+      "change": "提前使用只解码标志，保留全部输入",
+      "netGainMs": null,
+      "reason": "独立480p解码夹具机制通过、旧/新中位648.51/626.63ms；局部观察+21.89ms，未改应用/未测应用净收益"
+    },
+    {
+      "round": "82",
+      "change": "当前组合增加原生调用与线程调度监听",
+      "netGainMs": null,
+      "reason": "纯诊断，实际样本2453ms不加入轻监听比较；同步输入调用570ms含425ms睡眠，调用外另529ms睡眠；下一步研究异步提交，不等同已取得提速"
+    },
+    {
+      "round": "83",
+      "change": "同回调解码器改为独立线程提交输入",
+      "netGainMs": null,
+      "reason": "真实Android解码器局部BAAB：控制297.5911/300.2483ms，候选262.7421/315.7528ms，中位净差+9.67225ms（+3.24%）；122个输出PTS、EOS、拖动、待提交输入取消及异步错误传回验证通过。整个片段调用占用减少409.94ms不能冒充起播收益；首次输出前CPU增加28.07ms。原生应用未修改，保留独立原型"
+    },
+    {
+      "round": "84",
+      "change": "83原型初始双空队列等待1ms通知",
+      "netGainMs": null,
+      "reason": "真实Android解码器局部BAAB：控制246.6732/254.4782ms，候选261.2370/250.0778ms，中位净差-5.0817ms（-2.03%）；PTS/EOS和关闭一致，首次输出前CPU减少41.66ms，但目标帧更慢。保留省CPU原型，未合入应用"
+    },
+    {
+      "round": "86b",
+      "change": "返回取消时先恢复音频解码队列，再递增源代次",
+      "netGainMs": null,
+      "reason": "初版实际取消PID6563误报ownerChanged而跳过恢复；调整cancelSource顺序后PID7671实际在同代次恢复0.08→2，零输出/无drain、返回及线程回收通过。36项测试通过；第86轮正式两组均含此正确性修复，没有独立速度对照，旧失败记录保留"
+    }
+  ],
+  "sameBaselineFactorial": {
+    "cohort": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261030\\parallel-audio\\common-baseline-observed-01",
+    "sourceSha256": "7f8d5d8e2f0bf0ddd1be1e443589c4ed08be57e019c406ecc430eaed8591d59b",
+    "protocol": "同一Android寿命/同一APK，排除seed；每次新进程首次61.5s续播；ABCDDCBA，每组2次。没有后续等待/视频队列/正文缓冲变化。",
+    "metric": "输入到首个正PTS消费纹理；封面单列，不证明物理显示完成。",
+    "medians": {
+      "A_fastest69": {
+        "textureMs": 1976.9087,
+        "coverMs": 2287.019449999988,
+        "openMs": 298.66194999998805,
+        "firstReceiveMs": 874.19255,
+        "firstEligibleMs": 1515.1375,
+        "audioDrainMs": 1930.3386500000001,
+        "receiveToEligibleMs": 640.9449500000001,
+        "eligibleToDrainMs": 415.20115,
+        "drainToTextureMs": 46.570049999999924
+      },
+      "B_callback_only": {
+        "textureMs": 1758.1946,
+        "coverMs": 1874.854749999985,
+        "openMs": 226.8652499999851,
+        "firstReceiveMs": 693.9783,
+        "firstEligibleMs": 1286.13375,
+        "audioDrainMs": 1660.4013,
+        "receiveToEligibleMs": 592.15545,
+        "eligibleToDrainMs": 374.26755,
+        "drainToTextureMs": 97.79330000000004
+      },
+      "C_combined": {
+        "textureMs": 1852.899,
+        "coverMs": 2005.379200000018,
+        "openMs": 214.66520000001788,
+        "firstReceiveMs": 585.6388999999999,
+        "firstEligibleMs": 1266.70575,
+        "audioDrainMs": 1751.7526,
+        "receiveToEligibleMs": 681.0668500000002,
+        "eligibleToDrainMs": 485.04684999999995,
+        "drainToTextureMs": 101.14639999999997
+      },
+      "D_neither": {
+        "textureMs": 1913.9648,
+        "coverMs": 1986.2812999999821,
+        "openMs": 250.21929999998213,
+        "firstReceiveMs": 786.4116,
+        "firstEligibleMs": 1383.21985,
+        "audioDrainMs": 1829.0895500000001,
+        "receiveToEligibleMs": 596.8082499999999,
+        "eligibleToDrainMs": 445.8697000000001,
+        "drainToTextureMs": 84.87524999999994
+      }
+    },
+    "comparisons": [
+      {
+        "change": "只解码参考帧",
+        "control": "D_neither",
+        "candidate": "A_fastest69",
+        "controlMedianMs": 1913.9648,
+        "candidateMedianMs": 1976.9087,
+        "netGainMs": -62.943899999999985,
+        "netGainPercent": -3.2886654968785205,
+        "coverNetGainMs": -300.7381500000058,
+        "stageNetGainsMs": {
+          "openMs": -48.442650000005926,
+          "firstReceiveMs": -87.78094999999996,
+          "firstEligibleMs": -131.9176500000001,
+          "audioDrainMs": -101.2491,
+          "receiveToEligibleMs": -44.13670000000013,
+          "eligibleToDrainMs": 30.668550000000096,
+          "drainToTextureMs": 38.30520000000001
+        },
+        "stableAttributableGainEstablished": false
+      },
+      {
+        "change": "回调通知",
+        "control": "D_neither",
+        "candidate": "B_callback_only",
+        "controlMedianMs": 1913.9648,
+        "candidateMedianMs": 1758.1946,
+        "netGainMs": 155.77019999999993,
+        "netGainPercent": 8.13861362549614,
+        "coverNetGainMs": 111.42654999999718,
+        "stageNetGainsMs": {
+          "openMs": 23.354049999997017,
+          "firstReceiveMs": 92.43330000000003,
+          "firstEligibleMs": 97.08609999999999,
+          "audioDrainMs": 168.68825000000015,
+          "receiveToEligibleMs": 4.6527999999999565,
+          "eligibleToDrainMs": 71.60215000000005,
+          "drainToTextureMs": -12.918050000000108
+        },
+        "stableAttributableGainEstablished": false
+      },
+      {
+        "change": "在最快历史配置之上加回调",
+        "control": "A_fastest69",
+        "candidate": "C_combined",
+        "controlMedianMs": 1976.9087,
+        "candidateMedianMs": 1852.899,
+        "netGainMs": 124.00970000000007,
+        "netGainPercent": 6.272909821278043,
+        "coverNetGainMs": 281.6402499999699,
+        "stageNetGainsMs": {
+          "openMs": 83.99674999997018,
+          "firstReceiveMs": 288.55365000000006,
+          "firstEligibleMs": 248.43174999999997,
+          "audioDrainMs": 178.5860500000001,
+          "receiveToEligibleMs": -40.121900000000096,
+          "eligibleToDrainMs": -69.84569999999997,
+          "drainToTextureMs": -54.57635000000005
+        },
+        "stableAttributableGainEstablished": false
+      },
+      {
+        "change": "在回调之上加只解码",
+        "control": "B_callback_only",
+        "candidate": "C_combined",
+        "controlMedianMs": 1758.1946,
+        "candidateMedianMs": 1852.899,
+        "netGainMs": -94.70439999999985,
+        "netGainPercent": -5.386457221515744,
+        "coverNetGainMs": -130.52445000003308,
+        "stageNetGainsMs": {
+          "openMs": 12.200049999967234,
+          "firstReceiveMs": 108.33940000000007,
+          "firstEligibleMs": 19.427999999999884,
+          "audioDrainMs": -91.35130000000004,
+          "receiveToEligibleMs": -88.91140000000019,
+          "eligibleToDrainMs": -110.77929999999992,
+          "drainToTextureMs": -3.3530999999999267
+        },
+        "stableAttributableGainEstablished": false
+      },
+      {
+        "change": "最快历史配置替换为回调单项",
+        "control": "A_fastest69",
+        "candidate": "B_callback_only",
+        "controlMedianMs": 1976.9087,
+        "candidateMedianMs": 1758.1946,
+        "netGainMs": 218.71409999999992,
+        "netGainPercent": 11.063439601434295,
+        "coverNetGainMs": 412.164700000003,
+        "stageNetGainsMs": {
+          "openMs": 71.79670000000294,
+          "firstReceiveMs": 180.21425,
+          "firstEligibleMs": 229.00375000000008,
+          "audioDrainMs": 269.93735000000015,
+          "receiveToEligibleMs": 48.78950000000009,
+          "eligibleToDrainMs": 40.933599999999956,
+          "drainToTextureMs": -51.22325000000012
+        },
+        "stableAttributableGainEstablished": false
+      }
+    ],
+    "validationCountsOf2": {
+      "A_fastest69": {
+        "strictStable": 2,
+        "functionalCleanup": 1,
+        "cacheMechanismVerified": 2,
+        "reservationMechanismVerified": 2,
+        "unusedFlushMechanismVerified": 2,
+        "fairPrimingMechanismVerified": 2,
+        "nativeSelectedPtsVerified": 2,
+        "filteredAudioLeadMechanismVerified": 2,
+        "decodeOnlyMechanismVerified": 2,
+        "callbackMechanismVerified": 2
+      },
+      "B_callback_only": {
+        "strictStable": 2,
+        "functionalCleanup": 2,
+        "cacheMechanismVerified": 2,
+        "reservationMechanismVerified": 2,
+        "unusedFlushMechanismVerified": 2,
+        "fairPrimingMechanismVerified": 2,
+        "nativeSelectedPtsVerified": 2,
+        "filteredAudioLeadMechanismVerified": 2,
+        "decodeOnlyMechanismVerified": 2,
+        "callbackMechanismVerified": 2
+      },
+      "C_combined": {
+        "strictStable": 2,
+        "functionalCleanup": 2,
+        "cacheMechanismVerified": 2,
+        "reservationMechanismVerified": 2,
+        "unusedFlushMechanismVerified": 2,
+        "fairPrimingMechanismVerified": 2,
+        "nativeSelectedPtsVerified": 2,
+        "filteredAudioLeadMechanismVerified": 2,
+        "decodeOnlyMechanismVerified": 2,
+        "callbackMechanismVerified": 2
+      },
+      "D_neither": {
+        "strictStable": 2,
+        "functionalCleanup": 2,
+        "cacheMechanismVerified": 2,
+        "reservationMechanismVerified": 2,
+        "unusedFlushMechanismVerified": 2,
+        "fairPrimingMechanismVerified": 2,
+        "nativeSelectedPtsVerified": 2,
+        "filteredAudioLeadMechanismVerified": 2,
+        "decodeOnlyMechanismVerified": 2,
+        "callbackMechanismVerified": 2
+      }
+    },
+    "exactConsumedPtsCountsOf2": {
+      "A_fastest69": 2,
+      "B_callback_only": 0,
+      "C_combined": 1,
+      "D_neither": 0
+    },
+    "interactionCostMs": 31.760499999999865,
+    "sampleCaution": "全部慢样本保留。两次/组不足以证明稳定净收益；不同CDN/调度波动仍需结合原始阶段分析。阶段不是独立CPU成本，不能直接称可省时间。",
+    "returnWindowFailures": [
+      "08-A_fastest69"
+    ],
+    "lateCleanupNote": "A8原采集窗口未收齐关闭事件；同PID后续日志证实约4.0秒后3资源关闭。保留原失败和播放中长帧间隔，不能称连续播放通过。",
+    "samples": [
+      {
+        "label": "01-A_fastest69",
+        "variant": "A_fastest69",
+        "pid": "3866",
+        "textureMs": 1809.2588,
+        "coverMs": 2121.456,
+        "openMs": 347.472,
+        "firstReceiveMs": 809.2408,
+        "firstEligibleMs": 1389.3157,
+        "audioDrainMs": 1778.2665,
+        "receiveToEligibleMs": 580.0749000000001,
+        "eligibleToDrainMs": 388.95079999999984,
+        "drainToTextureMs": 30.992300000000114,
+        "firstTexturePtsNs": 61500000000,
+        "maxPositiveGapMs": 261.9253,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "02-B_callback_only",
+        "variant": "B_callback_only",
+        "pid": "4359",
+        "textureMs": 1759.635,
+        "coverMs": 1873.664900000006,
+        "openMs": 208.14190000000596,
+        "firstReceiveMs": 749.4435,
+        "firstEligibleMs": 1303.0964,
+        "audioDrainMs": 1706.9505,
+        "receiveToEligibleMs": 553.6528999999999,
+        "eligibleToDrainMs": 403.8541,
+        "drainToTextureMs": 52.68450000000007,
+        "firstTexturePtsNs": 61533313000,
+        "maxPositiveGapMs": 138.5495,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "03-C_combined",
+        "variant": "C_combined",
+        "pid": "4797",
+        "textureMs": 2025.0706,
+        "coverMs": 2107.8625,
+        "openMs": 218.4025,
+        "firstReceiveMs": 541.0731,
+        "firstEligibleMs": 1270.151,
+        "audioDrainMs": 1864.6491,
+        "receiveToEligibleMs": 729.0779000000001,
+        "eligibleToDrainMs": 594.4981,
+        "drainToTextureMs": 160.42149999999992,
+        "firstTexturePtsNs": 61633313000,
+        "maxPositiveGapMs": 85.3713,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "04-D_neither",
+        "variant": "D_neither",
+        "pid": "5185",
+        "textureMs": 1894.7602,
+        "coverMs": 2004.0103999999762,
+        "openMs": 274.78539999997616,
+        "firstReceiveMs": 768.3669,
+        "firstEligibleMs": 1388.463,
+        "audioDrainMs": 1827.6503,
+        "receiveToEligibleMs": 620.0961,
+        "eligibleToDrainMs": 439.18730000000005,
+        "drainToTextureMs": 67.10989999999993,
+        "firstTexturePtsNs": 61533313000,
+        "maxPositiveGapMs": 140.5223,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "05-D_neither",
+        "variant": "D_neither",
+        "pid": "5572",
+        "textureMs": 1933.1694,
+        "coverMs": 1968.552199999988,
+        "openMs": 225.6531999999881,
+        "firstReceiveMs": 804.4563,
+        "firstEligibleMs": 1377.9767,
+        "audioDrainMs": 1830.5288,
+        "receiveToEligibleMs": 573.5203999999999,
+        "eligibleToDrainMs": 452.5521000000001,
+        "drainToTextureMs": 102.64059999999995,
+        "firstTexturePtsNs": 61566688000,
+        "maxPositiveGapMs": 98.9599,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "06-C_combined",
+        "variant": "C_combined",
+        "pid": "5949",
+        "textureMs": 1680.7274,
+        "coverMs": 1902.8959000000357,
+        "openMs": 210.92790000003578,
+        "firstReceiveMs": 630.2047,
+        "firstEligibleMs": 1263.2605,
+        "audioDrainMs": 1638.8561,
+        "receiveToEligibleMs": 633.0558000000001,
+        "eligibleToDrainMs": 375.5955999999999,
+        "drainToTextureMs": 41.87130000000002,
+        "firstTexturePtsNs": 61500000000,
+        "maxPositiveGapMs": 157.6856,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "07-B_callback_only",
+        "variant": "B_callback_only",
+        "pid": "6350",
+        "textureMs": 1756.7542,
+        "coverMs": 1876.0445999999642,
+        "openMs": 245.58859999996423,
+        "firstReceiveMs": 638.5131,
+        "firstEligibleMs": 1269.1711,
+        "audioDrainMs": 1613.8521,
+        "receiveToEligibleMs": 630.658,
+        "eligibleToDrainMs": 344.68100000000004,
+        "drainToTextureMs": 142.90210000000002,
+        "firstTexturePtsNs": 61600000000,
+        "maxPositiveGapMs": 128.0943,
+        "continuousPlaybackConcern": null,
+        "strictStable": true,
+        "functionalCleanup": true,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      },
+      {
+        "label": "08-A_fastest69",
+        "variant": "A_fastest69",
+        "pid": "6766",
+        "textureMs": 2144.5586,
+        "coverMs": 2452.5828999999762,
+        "openMs": 249.85189999997615,
+        "firstReceiveMs": 939.1443,
+        "firstEligibleMs": 1640.9593,
+        "audioDrainMs": 2082.4108,
+        "receiveToEligibleMs": 701.8149999999999,
+        "eligibleToDrainMs": 441.4515000000001,
+        "drainToTextureMs": 62.147799999999734,
+        "firstTexturePtsNs": 61500000000,
+        "maxPositiveGapMs": 2644.5248,
+        "continuousPlaybackConcern": true,
+        "strictStable": true,
+        "functionalCleanup": false,
+        "cacheMechanismVerified": true,
+        "reservationMechanismVerified": true,
+        "unusedFlushMechanismVerified": true,
+        "fairPrimingMechanismVerified": true,
+        "nativeSelectedPtsVerified": true,
+        "filteredAudioLeadMechanismVerified": true,
+        "decodeOnlyMechanismVerified": true,
+        "callbackMechanismVerified": true
+      }
+    ]
+  }
+}

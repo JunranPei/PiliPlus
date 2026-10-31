@@ -1,5 +1,5 @@
 import 'dart:async' show Completer, StreamSubscription, Timer, unawaited;
-import 'dart:convert' show ascii, utf8;
+import 'dart:convert' show ascii;
 import 'dart:io' show Platform;
 import 'dart:math' show max, min;
 import 'dart:ui' as ui;
@@ -21,11 +21,20 @@ import 'package:PiliPlus/pages/setting/models/play_settings.dart'
     show kMaxVolume;
 import 'package:PiliPlus/pages/sponsor_block/block_mixin.dart';
 import 'package:PiliPlus/plugin/pl_player/android_pip_controller.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/isolated_media_sources.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/selected_media_warmup.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/selected_codec_reservation.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/prepared_media_engine.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/prepared_resource.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/parallel_audio_source.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_start.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/source_preparation.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/startup_probe.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/stable_output_gate.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_audio_decode_queue.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_status.dart';
 import 'package:PiliPlus/plugin/pl_player/models/double_tap_type.dart';
@@ -75,10 +84,55 @@ import 'package:window_manager/window_manager.dart';
 typedef PlayCallback = Future<void>? Function();
 typedef PlayOwner = ({String tag, Type type});
 
+class _WarmupAudioNormalization with AudioNormalizationMixin {}
+
 class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   Player? _videoPlayerController;
   VideoController? _videoController;
   final _sourceQueue = PlaybackSourceQueue();
+  PlaybackSourceRequest? _loadedSourceRequest;
+  MpvFrameGate? _sourceFrameGate;
+  bool _sourceFrameReady = false;
+  bool get _requiresSourceFrame =>
+      const bool.fromEnvironment('SOURCE_FRAME_READY_GATE') &&
+      !isLive &&
+      !onlyPlayAudio.value;
+  ParallelAudioSource? _parallelAudioSource;
+  IsolatedMediaSources? _isolatedMediaSources;
+  Timer? _startupReadAheadTimer;
+  int? _startupReadAheadRevision;
+  StartupAudioDecodeQueue? _startupAudioDecodeQueue;
+
+  void _restoreStartupReadAhead(int revision, String reason) {
+    if (_startupReadAheadRevision != revision) return;
+    _startupReadAheadTimer?.cancel();
+    _startupReadAheadTimer = null;
+    _startupReadAheadRevision = null;
+    if (_sourceRevision != revision || _videoPlayerController == null) return;
+    final player = _videoPlayerController!;
+    try {
+      final before = player.getProperty('cache-secs');
+      player
+        ..setProperty('cache-secs', buffer['cache-secs']!)
+        ..setProperty(
+          'demuxer-hysteresis-secs',
+          buffer['demuxer-hysteresis-secs']!,
+        );
+      PlaybackDiagnostics.event('startup.readAhead.restored', {
+        'sourceRevision': revision,
+        'reason': reason,
+        'beforeSeconds': before,
+        'afterSeconds': player.getProperty('cache-secs'),
+        'hysteresisSeconds': player.getProperty('demuxer-hysteresis-secs'),
+      });
+    } catch (error) {
+      PlaybackDiagnostics.event('startup.readAhead.restoreError', {
+        'sourceRevision': revision,
+        'type': error.runtimeType.toString(),
+      });
+    }
+  }
+
   Object? _readySourceOwner;
   Object? _sourceOwner;
   int _sourceRevision = 0;
@@ -150,6 +204,8 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   void cancelSource(Object owner) {
     _sourceQueue.cancel(owner);
     if (_sourceOwner == owner) {
+      _startupAudioDecodeQueue?.restore('source-cancelled');
+      _startupAudioDecodeQueue = null;
       _sourceRevision++;
       _pendingFrameReady = null;
     }
@@ -830,7 +886,29 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   }) async {
     await _sourceQueue.run(owner ?? this, (request) async {
       try {
+        _startupAudioDecodeQueue?.restore('source-replaced');
+        _startupAudioDecodeQueue = null;
+        _loadedSourceRequest = request;
         _diagnosticRequest = request.id;
+        if (SelectedCodecReservation.enabled &&
+            dataSource is NetworkSource &&
+            !isLive &&
+            autoplay &&
+            seekTo != null &&
+            seekTo > Duration.zero &&
+            hwdec != null &&
+            hwdec != 'no' &&
+            !onlyPlayAudio.value &&
+            !const bool.fromEnvironment('STARTUP_NDK_CODEC')) {
+          final reservation = SelectedCodecReservation.begin(
+            codec: dataSource.videoCodec,
+            requestId: request.id,
+            cid: cid,
+          );
+          if (reservation != null) {
+            unawaited(request.cancelled.then((_) => reservation.cancel()));
+          }
+        }
         if (PlaybackDiagnostics.enabled) {
           PlaybackDiagnostics.event('source.prepare.begin', {
             'requestId': request.id,
@@ -842,6 +920,9 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         _readySourceOwner = null;
         _sourceOwner = owner ?? this;
         _sourceRevision++;
+        _startupReadAheadTimer?.cancel();
+        _startupReadAheadTimer = null;
+        _startupReadAheadRevision = null;
         // The first mpv output only proves that the source can render.  The
         // Android surface may still receive its final video parameters when
         // play() starts.  Keep the presentation callback pending until that
@@ -1011,6 +1092,107 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
   static Future<({Player player, VideoController video})>? _standbyEngine;
   static String? _standbySettings;
+  static Object? _visiblePreparedToken;
+
+  /// A single paused real source, with no playback owner, history or audio focus.
+  static void prepareVisibleMedia(
+    MediaWarmupLease lease, {
+    required Volume? volume,
+    required int cid,
+  }) {
+    if (!const bool.fromEnvironment('VISIBLE_NATIVE_PRELOAD') ||
+        !Platform.isAndroid ||
+        _instance != null ||
+        _visiblePreparedToken != null ||
+        Pref.superResolutionType != SuperResolutionType.disable ||
+        const bool.fromEnvironment('STARTUP_READ_AHEAD') ||
+        const bool.fromEnvironment('STARTUP_TCP_NODELAY')) {
+      return;
+    }
+    final token = _visiblePreparedToken = Object();
+    final settings = _engineSettings();
+    final extras = Pref.initBuffer(Pref.playSpeedDefault);
+    _WarmupAudioNormalization().audioFilterExtras(volume, map: extras);
+    final pending = _standbyEngine;
+    final standbyMatches = _standbySettings == settings;
+    _standbyEngine = null;
+    PlaybackDiagnostics.event('startup.nativePreload.begin', {
+      'cid': cid,
+      'startMs': lease.start.inMilliseconds,
+    });
+    lease.preparedEngine = PreparedResource(
+      load: () async {
+        ({Player player, VideoController video})? engine;
+        MpvFrameGate? frameGate;
+        try {
+          if (pending != null) {
+            engine = await pending;
+            if (!standbyMatches) {
+              await engine.player.dispose();
+              engine = null;
+            }
+          }
+          engine ??= await _createEngine(
+            hwdec: Pref.enableHA ? Pref.hardwareDecoding : null,
+            desktopVolume: 1.0,
+            warmOutput: true,
+          );
+          final urls = await lease.urls;
+          final media = dashMediaUri(
+            urls.video,
+            urls.audio,
+            uncut: const bool.fromEnvironment('UNCUT_DASH_TRACKS'),
+          );
+          if (_engineSettings() != settings) {
+            throw StateError('Preload settings changed');
+          }
+          if (const bool.fromEnvironment('SOURCE_FRAME_READY_GATE')) {
+            frameGate = MpvFrameGate(engine.player, source: media);
+          }
+          await engine.player.open(
+            Media(media, start: lease.start, extras: extras),
+            play: false,
+          );
+          PlaybackDiagnostics.event('startup.nativePreload.openAccepted', {
+            'cid': cid,
+            'requestedStartMs': lease.start.inMilliseconds,
+            'playerId': identityHashCode(engine.player),
+            'playing': engine.player.state.playing,
+            'positionMs': engine.player.state.position.inMilliseconds,
+            'textureId': engine.video.id.value,
+            'cacheSeconds': extras['cache-secs'],
+            'cacheMaxBytes': extras['demuxer-max-bytes'],
+          });
+          return PreparedMediaEngine(
+            player: engine.player,
+            video: engine.video,
+            media: media,
+            settings: settings,
+            start: lease.start,
+            frameGate: frameGate,
+            extras: extras,
+          );
+        } catch (error) {
+          frameGate?.dispose();
+          await engine?.player.dispose();
+          PlaybackDiagnostics.event('startup.nativePreload.failed', {
+            'cid': cid,
+            'errorType': error.runtimeType.toString(),
+          });
+          rethrow;
+        }
+      },
+      dispose: (engine) async {
+        await engine.dispose();
+        PlaybackDiagnostics.event('startup.nativePreload.closed', {'cid': cid});
+      },
+      onReleased: () {
+        if (identical(_visiblePreparedToken, token)) {
+          _visiblePreparedToken = null;
+        }
+      },
+    );
+  }
 
   static String _engineSettings() => [
     Pref.videoSync,
@@ -1019,6 +1201,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     Pref.enableHA,
     Pref.hardwareDecoding,
     Pref.autosync,
+    Pref.superResolutionType,
   ].join('|');
 
   static void _standbyMark(
@@ -1071,6 +1254,24 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     if (ao == 'opensles,aaudio,audiotrack') {
       ao = 'audiotrack,aaudio,opensles';
     }
+    if (Platform.isAndroid &&
+        const bool.fromEnvironment('STARTUP_AAUDIO_FIRST')) {
+      ao = 'aaudio,audiotrack,opensles';
+    }
+    const codecOperatingRate = int.fromEnvironment(
+      'STARTUP_CODEC_OPERATING_RATE',
+    );
+    // Experimental: keep decoder waits off the playback thread without a
+    // multi-frame hardware buffer backlog. Remains off in ordinary builds.
+    final videoDecodeQueue =
+        Platform.isAndroid &&
+        const bool.fromEnvironment('STARTUP_VIDEO_DECODE_QUEUE');
+    final decoderOptions = <String>[
+      if (const bool.fromEnvironment('STARTUP_NDK_CODEC')) 'ndk_codec=1',
+      if (const bool.fromEnvironment('SKIP_UNUSED_CODEC_FLUSH'))
+        'skip_unused_flush=1',
+      if (codecOperatingRate > 0) 'operating_rate=$codecOperatingRate',
+    ];
     final opt = {
       'video-sync': Pref.videoSync,
       if (Platform.isAndroid) 'ao': ao,
@@ -1081,15 +1282,49 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       if (hwdec != null && hwdec != 'no')
         'hwdec': Platform.isAndroid ? 'mediacodec' : hwdec,
       if (Platform.isAndroid) 'profile': 'fast',
+      if (videoDecodeQueue) ...{
+        'vd-queue-enable': 'yes',
+        'vd-queue-max-samples': '1',
+        'vd-queue-max-bytes': '16777216',
+        'vd-queue-max-secs': '0.05',
+      },
+      // Decode a bounded audio lead while video is seeking. The existing audio
+      // output path still clips to the actual video PTS before starting sound.
+      if (Platform.isAndroid &&
+          const bool.fromEnvironment('STARTUP_AUDIO_DECODE_QUEUE')) ...{
+        'ad-queue-enable': 'yes',
+        'ad-queue-max-secs': '2',
+        'ad-queue-max-bytes': '1048576',
+        'ad-queue-max-samples': '192000',
+      },
+      if (Platform.isAndroid &&
+          const bool.fromEnvironment('STARTUP_FILTERED_AUDIO_LEAD'))
+        'pili-filtered-audio-lead': 'yes',
       if (Platform.isWindows) 'gpu-api': 'd3d11',
       'vd-lavc-fast': 'yes',
       'vd-lavc-dr': 'yes',
       'vd-lavc-threads': '0',
+      if (Platform.isAndroid && decoderOptions.isNotEmpty)
+        'vd-lavc-o': decoderOptions.join(','),
     };
-    final autosync = Pref.autosync;
-    if (autosync != '0') {
+    final configuredAutosync = Pref.autosync;
+    final autosync =
+        Platform.isAndroid &&
+            const bool.fromEnvironment('STARTUP_AUTOSYNC_ZERO')
+        ? '0'
+        : configuredAutosync;
+    if (autosync != '0' ||
+        (Platform.isAndroid &&
+            const bool.fromEnvironment('STARTUP_AUTOSYNC_ZERO'))) {
       opt['autosync'] = autosync;
     }
+    PlaybackDiagnostics.event('startup.sync.options', {
+      'configuredAutosync': configuredAutosync,
+      'effectiveAutosync': autosync,
+      'videoSync': opt['video-sync'],
+      'audioOutput': ao,
+      'videoDecodeQueueFrames': videoDecodeQueue ? 1 : 0,
+    });
 
     final player = await Player.create(
       configuration: PlayerConfiguration(
@@ -1105,6 +1340,17 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     );
 
     if (PlaybackDiagnostics.enabled) {
+      PlaybackDiagnostics.event('startup.sync.applied', {
+        'autosync': player.getProperty('options/autosync'),
+        'videoSync': player.getProperty('options/video-sync'),
+      });
+      PlaybackDiagnostics.event('startup.decoder.options', {
+        'ndkRequested':
+            Platform.isAndroid &&
+            const bool.fromEnvironment('STARTUP_NDK_CODEC'),
+        'operatingRateRequested': Platform.isAndroid ? codecOperatingRate : 0,
+        'decoderOptions': player.getProperty('options/vd-lavc-o'),
+      });
       player.onLoadHooks.add(() {
         PlaybackDiagnostics.event('startup.surfaceHook.begin');
       });
@@ -1161,8 +1407,14 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
   }
 
-  Future<Player> _initPlayer() async {
+  Future<Player> _initPlayer({PreparedMediaEngine? prepared}) async {
     assert(_videoPlayerController == null);
+    if (prepared != null) {
+      _videoController = prepared.video;
+      _installPlaybackTrace();
+      _startListeners(prepared.player);
+      return prepared.player;
+    }
     final pending = _standbyEngine;
     final matches = _standbySettings == _engineSettings();
     _standbyEngine = null;
@@ -1213,10 +1465,74 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     danmakuController?.clear();
 
     var player = _videoPlayerController;
+    MediaWarmupLease? earlyWarm;
+    PreparedMediaEngine? prepared;
+
+    if (const bool.fromEnvironment('VISIBLE_NATIVE_PRELOAD') &&
+        player == null &&
+        !waitForFrame &&
+        !isLive &&
+        !onlyPlayAudio.value &&
+        !StartupProbe.enabled &&
+        dataSource is NetworkSource &&
+        (seekTo == null ||
+            seekTo == Duration.zero ||
+            const bool.fromEnvironment('VISIBLE_RESUME_PRELOAD')) &&
+        dataSource.audioSource?.isNotEmpty == true) {
+      try {
+        earlyWarm = await SelectedMediaWarmup.instance.take(
+          scope: Accounts.video,
+          video: dataSource.videoSource,
+          audio: dataSource.audioSource!,
+          start: seekTo ?? Duration.zero,
+          headers: {'User-Agent': BrowserUa.pc, 'Referer': HttpString.baseUrl},
+          onEvent: (event, data) => PlaybackDiagnostics.event(event, {
+            ...data,
+            'requestId': request.id,
+            'cid': cid,
+          }),
+        );
+        if (earlyWarm?.preparedEngine != null) {
+          prepared = await earlyWarm!.preparedEngine!.take();
+          final urls = await earlyWarm.urls;
+          final expectedExtras = Map<String, String>.of(buffer);
+          audioFilterExtras(volume, map: expectedExtras);
+          final expectedMedia = dashMediaUri(
+            urls.video,
+            urls.audio,
+            uncut: const bool.fromEnvironment('UNCUT_DASH_TRACKS'),
+          );
+          final match = prepared?.matchReport(
+            expectedMedia,
+            _engineSettings(),
+            expectedExtras,
+            start: seekTo ?? Duration.zero,
+          );
+          if (match == null || !match.values.every((value) => value)) {
+            await prepared?.dispose();
+            prepared = null;
+            earlyWarm.close();
+            earlyWarm = null;
+            PlaybackDiagnostics.event('startup.nativePreload.miss', {
+              'cid': cid,
+              'match': match,
+            });
+          }
+        }
+        request.checkCurrent();
+      } catch (_) {
+        await prepared?.dispose();
+        prepared = null;
+        earlyWarm?.close();
+        earlyWarm = null;
+        request.checkCurrent();
+      }
+    }
 
     if (player == null) {
-      player = await _initPlayer();
+      player = await _initPlayer(prepared: prepared);
       if (_playerCount == 0) {
+        earlyWarm?.close();
         _removeListeners();
         player.dispose();
         player = null;
@@ -1224,6 +1540,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         return;
       }
       _videoPlayerController = player;
+      if (earlyWarm != null) _isolatedMediaSources = earlyWarm.transport;
       if (isAnim && superResolutionType.value != .disable) {
         await setShader();
       }
@@ -1241,6 +1558,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     request.checkCurrent();
 
     final Map<String, String> extras = {};
+    if (const bool.fromEnvironment('STARTUP_TCP_NODELAY') &&
+        dataSource is NetworkSource &&
+        !isLive) {
+      extras['stream-lavf-o'] = 'tcp_nodelay=1';
+    }
 
     if (dataSource is FileSource) {
       extras['cache'] = 'no';
@@ -1255,35 +1577,292 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     final source = StartupProbe.enabled
         ? await StartupProbe.resolve(dataSource, cid)
         : (video: dataSource.videoSource, audio: dataSource.audioSource);
+    _parallelAudioSource?.close();
+    _parallelAudioSource = null;
+    if (_isolatedMediaSources != earlyWarm?.transport) {
+      _isolatedMediaSources?.close();
+    }
+    _isolatedMediaSources = null;
+    if (SelectedMediaWarmup.enabled &&
+        (onlyPlayAudio.value ||
+            isLive ||
+            StartupProbe.enabled ||
+            dataSource is! NetworkSource ||
+            (seekTo != null &&
+                seekTo != Duration.zero &&
+                !const bool.fromEnvironment('VISIBLE_RESUME_PRELOAD')) ||
+            source.audio == null ||
+            source.audio!.isEmpty)) {
+      SelectedMediaWarmup.instance.clear();
+    }
     String video = source.video;
-    if (source.audio case final audio? when (audio.isNotEmpty)) {
+    if (source.audio case var audio? when (audio.isNotEmpty)) {
       if (onlyPlayAudio.value) {
         video = audio;
       } else {
-        // dely_open need provide length
-        video =
-            ('edl://'
-            '!no_chapters;'
-            // '!delay_open,media_type=video;'
-            '%${isFileSource ? utf8.encode(video).length : video.length}%$video;'
-            '!new_stream;!no_chapters;'
-            // '!delay_open,media_type=audio;'
-            '%${isFileSource ? utf8.encode(audio).length : audio.length}%$audio');
+        if ((ParallelAudioSource.enabled ||
+                const bool.fromEnvironment('ISOLATED_MEDIA_SOURCES')) &&
+            dataSource is NetworkSource &&
+            !isLive &&
+            !StartupProbe.enabled &&
+            (seekTo == null ||
+                seekTo == Duration.zero ||
+                const bool.fromEnvironment('PARALLEL_RESUME_MEDIA'))) {
+          // Resume still passes its exact Media.start below. The transport
+          // warms initialization and optionally a predicted resume range.
+          // Other seeks redirect to origin with the Range header. A zero-start
+          // prepared decoder is never adopted for a nonzero resume.
+          final headers = {
+            'User-Agent': BrowserUa.pc,
+            'Referer': HttpString.baseUrl,
+          };
+          void onEvent(String event, Map<String, Object?> data) {
+            PlaybackDiagnostics.event(event, {
+              ...data,
+              'requestId': request.id,
+              'cid': cid,
+            });
+          }
+
+          if (const bool.fromEnvironment('ISOLATED_MEDIA_SOURCES')) {
+            MediaWarmupLease? warm = earlyWarm;
+            if (SelectedMediaWarmup.enabled && warm == null) {
+              try {
+                warm = await SelectedMediaWarmup.instance.take(
+                  scope: Accounts.video,
+                  video: video,
+                  audio: audio,
+                  headers: headers,
+                  start: seekTo ?? Duration.zero,
+                  onEvent: onEvent,
+                );
+              } catch (_) {
+                // Failed speculation leaves ordinary transport setup available.
+              }
+              try {
+                request.checkCurrent();
+              } catch (_) {
+                warm?.transport.close();
+                rethrow;
+              }
+            }
+            if (warm?.preparedEngine != null && prepared == null) {
+              // Existing/paused playback cannot adopt the speculative engine.
+              // Its transport may already be consumed, so close both and open
+              // an ordinary source instead of leaving a second player alive.
+              warm!.close();
+              warm = null;
+            }
+            final transport =
+                warm?.transport ??
+                IsolatedMediaSources(headers: headers, onEvent: onEvent);
+            _isolatedMediaSources = transport;
+            try {
+              if (warm != null) {
+                PlaybackDiagnostics.event('startup.mediaPrefetch.claim', {
+                  'cid': cid,
+                  'requestId': request.id,
+                });
+              }
+              final urls =
+                  await (warm?.urls ??
+                      transport.start(
+                        video,
+                        audio,
+                        videoAlternatives: dataSource.videoAlternatives,
+                        audioAlternatives: dataSource.audioAlternatives,
+                        resumePosition:
+                            const bool.fromEnvironment('PREFETCH_RESUME_RANGE')
+                            ? seekTo ?? Duration.zero
+                            : Duration.zero,
+                      ));
+              request.checkCurrent();
+              video = urls.video;
+              audio = urls.audio;
+            } catch (_) {
+              transport.close();
+              _isolatedMediaSources = null;
+              request.checkCurrent();
+              // Setup failure leaves both original URLs intact.
+            }
+          } else {
+            final transport = ParallelAudioSource(
+              headers: headers,
+              onEvent: onEvent,
+            );
+            _parallelAudioSource = transport;
+            try {
+              final url = await transport.start(audio);
+              request.checkCurrent();
+              audio = url;
+            } catch (_) {
+              transport.close();
+              _parallelAudioSource = null;
+              request.checkCurrent();
+            }
+          }
+        }
+        // Each network DASH track here is one complete resource, with no EDL
+        // trims or offsets. mpv's normal timeline marks its first packet as a
+        // new segment and resets the decoder; no_clip avoids that boundary.
+        // Keep regular timeline semantics for local files and nested EDLs.
+        final uncutTracks =
+            const bool.fromEnvironment('UNCUT_DASH_TRACKS') &&
+            dataSource is NetworkSource &&
+            !isLive &&
+            const ['http', 'https'].contains(Uri.tryParse(video)?.scheme) &&
+            const ['http', 'https'].contains(Uri.tryParse(audio)?.scheme);
+        if (const bool.fromEnvironment('UNCUT_DASH_TRACKS')) {
+          PlaybackDiagnostics.event('source.timeline', {
+            'uncutTracks': uncutTracks,
+          });
+        }
+        // delay_open needs an explicit length.
+        video = dashMediaUri(
+          video,
+          audio,
+          uncut: uncutTracks,
+          fileSource: isFileSource,
+        );
       }
       audioFilterExtras(volume, map: extras);
     }
 
     assert(!isLive || seekTo == null);
-    final gate = waitForFrame ? MpvFrameGate(player, source: video) : null;
+    if (const bool.fromEnvironment('STARTUP_READ_AHEAD') &&
+        dataSource is NetworkSource &&
+        !isLive &&
+        !onlyPlayAudio.value &&
+        !waitForFrame &&
+        (seekTo == null || seekTo == Duration.zero) &&
+        double.parse(buffer['cache-secs']!) > 1) {
+      // Limit initial demux work competing with decoder initialization. Restore
+      // the user's normal buffer after presentation, or after a bounded delay
+      // when there is no presentation callback. Never disable underrun recovery.
+      extras['cache-secs'] = '1';
+      extras['demuxer-hysteresis-secs'] = '0';
+      final revision = _sourceRevision;
+      _startupReadAheadRevision = revision;
+      _startupReadAheadTimer = Timer(const Duration(seconds: 5), () {
+        _restoreStartupReadAhead(revision, 'deadline');
+      });
+      PlaybackDiagnostics.event('startup.readAhead.limited', {
+        'sourceRevision': revision,
+        'seconds': 1,
+        'restoreSeconds': buffer['cache-secs'],
+      });
+    }
+    if (prepared != null && prepared.media != video) {
+      PlaybackDiagnostics.event('startup.nativePreload.changedBeforeOpen', {
+        'cid': cid,
+      });
+      prepared = null;
+    }
+    final limitStartupAudioDecode =
+        Platform.isAndroid &&
+        const bool.fromEnvironment('STARTUP_AUDIO_DECODE_QUEUE_BOUNDED') &&
+        const bool.fromEnvironment('STARTUP_AUDIO_DECODE_QUEUE') &&
+        prepared == null &&
+        !isLive &&
+        !onlyPlayAudio.value &&
+        seekTo != null &&
+        seekTo > Duration.zero;
+    final gate =
+        prepared?.frameGate ??
+        ((waitForFrame || _requiresSourceFrame || limitStartupAudioDecode)
+            ? MpvFrameGate(player, source: video)
+            : null);
+    _sourceFrameGate?.dispose();
+    _sourceFrameGate = (_requiresSourceFrame || limitStartupAudioDecode)
+        ? gate
+        : null;
+    _sourceFrameReady = false;
+    if (limitStartupAudioDecode && gate != null) {
+      final revision = _sourceRevision;
+      final currentPlayer = player;
+      _startupAudioDecodeQueue = StartupAudioDecodeQueue(
+        readSeconds: () => currentPlayer.getProperty('ad-queue-max-secs'),
+        writeSeconds: (value) =>
+            currentPlayer.setProperty('ad-queue-max-secs', value),
+        ownsPlayer: () =>
+            _sourceRevision == revision &&
+            identical(_videoPlayerController, currentPlayer),
+        frameReady: gate.ready,
+        cancelled: request.cancelled,
+        onEvent: (event, data) => PlaybackDiagnostics.event(
+          'startup.audioDecodeQueue.$event',
+          {...playbackTraceState(), ...data},
+        ),
+      );
+      if (!_requiresSourceFrame) {
+        unawaited(request.cancelled.then((_) => gate.dispose()));
+      }
+    }
+    if (_requiresSourceFrame && gate != null) {
+      unawaited(
+        gate.ready.then(
+          (_) {
+            if (request.isCurrent && identical(_sourceFrameGate, gate)) {
+              _sourceFrameReady = true;
+              PlaybackDiagnostics.event(
+                'output.sourceFrameReady',
+                playbackTraceState(),
+              );
+            }
+          },
+          onError: (Object error) {
+            if (request.isCurrent && identical(_sourceFrameGate, gate)) {
+              PlaybackDiagnostics.event('output.sourceFrameFailed', {
+                ...playbackTraceState(),
+                'errorType': error.runtimeType.toString(),
+              });
+            }
+          },
+        ),
+      );
+      unawaited(request.cancelled.then((_) => gate.dispose()));
+    }
     _diagnosticSource = PlaybackDiagnostics.sourceId(video);
     if (PlaybackDiagnostics.enabled) {
-      PlaybackDiagnostics.event('source.open.begin', playbackTraceState());
+      PlaybackDiagnostics.event('source.open.begin', {
+        ...playbackTraceState(),
+        'operation': prepared == null ? 'open' : 'adopt-paused-preload',
+      });
     }
     try {
       StartupProbe.beginSource();
       Future<void> openPaused() async {
+        if (prepared != null) {
+          // The exact native source is already loaded. Reopening would discard
+          // the decoder and its paused frame. Ownership begins at this marker.
+          PlaybackDiagnostics.event('startup.nativePreload.claim', {
+            ...playbackTraceState(),
+            'mediaMatches': prepared.media == video,
+          });
+          return;
+        }
+        // mpv treats an explicit start=0 as an initial seek, after creating the
+        // decoder. A new network load already starts at its beginning; keep
+        // nonzero resume/skip positions exactly as requested.
+        final omitZeroStart =
+            const bool.fromEnvironment('OMIT_ZERO_MEDIA_START') &&
+            dataSource is NetworkSource &&
+            !isLive &&
+            seekTo == Duration.zero;
+        final nativeStart = omitZeroStart ? null : seekTo;
+        if (PlaybackDiagnostics.enabled) {
+          PlaybackDiagnostics.event('source.startPosition', {
+            'requestedMs': seekTo?.inMilliseconds,
+            'nativeStartMs': nativeStart?.inMilliseconds,
+            'omittedZero': omitZeroStart,
+          });
+        }
         await player!.open(
-          Media(video, start: seekTo, extras: extras.isEmpty ? null : extras),
+          Media(
+            video,
+            start: nativeStart,
+            extras: extras.isEmpty ? null : extras,
+          ),
           play: false,
         );
         if (PlaybackDiagnostics.enabled) {
@@ -1307,7 +1886,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         PlaybackDiagnostics.event('source.open.return', playbackTraceState());
       }
       request.checkCurrent();
-      if (gate != null) {
+      if (waitForFrame && gate != null) {
         await Future.any<void>([
           gate.ready,
           request.cancelled.then<void>(
@@ -1317,8 +1896,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         request.checkCurrent();
         await _waitForVideoOutput(request);
       }
-    } finally {
+    } catch (_) {
       gate?.dispose();
+      rethrow;
+    } finally {
+      if (!_requiresSourceFrame) gate?.dispose();
     }
   }
 
@@ -1370,7 +1952,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   /// causes the old texture geometry to flash before the final one replaces
   /// it.  Three equal samples across frame boundaries make the handoff atomic
   /// from the UI's point of view while retaining the same texture.
-  Future<void> _waitForStableVideoOutput({
+  Future<bool> _waitForStableVideoOutput({
     required int sourceRevision,
     // Autoplay starts before Android has attached the decoded surface. On the
     // emulator that handoff can take a few seconds; a short fallback reveals
@@ -1378,11 +1960,23 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     Duration timeout = const Duration(seconds: 5),
   }) async {
     final controller = _videoController;
-    if (controller == null) return;
+    final request = _loadedSourceRequest;
+    if (controller == null || request == null || !request.isCurrent) {
+      return false;
+    }
+    if (const bool.fromEnvironment('EVENT_DRIVEN_OUTPUT_GATE') ||
+        const bool.fromEnvironment('EVENT_DRIVEN_OUTPUT_DWELL')) {
+      return _waitForOutputFrames(controller, request, sourceRevision, timeout);
+    }
     final started = Stopwatch()..start();
     String? previous;
     var stableSamples = 0;
     while (started.elapsed < timeout) {
+      if (!request.isCurrent ||
+          sourceRevision != _sourceRevision ||
+          _videoController != controller) {
+        return false;
+      }
       // PiP owns the transition surface once Android marks the entry as
       // pending.  Waiting for the normal-page geometry here leaves Flutter
       // covered while SystemUI captures the transition, which can produce an
@@ -1398,15 +1992,15 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
             'elapsedMs': started.elapsedMilliseconds,
           });
         }
-        return;
-      }
-      if (sourceRevision != _sourceRevision || _videoController != controller) {
-        return;
+        return true;
       }
       final rect = controller.rect.value;
       final state = controller.player.state;
       final id = controller.id.value;
       final valid =
+          (!_requiresSourceFrame || _sourceFrameReady) &&
+          (!const bool.fromEnvironment('SOURCE_BUFFER_READY_GATE') ||
+              !state.buffering) &&
           id != null &&
           rect != null &&
           rect.width > 1 &&
@@ -1437,9 +2031,15 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
               'samples': stableSamples,
               'elapsedMs': started.elapsedMilliseconds,
               'signature': signature,
+              'requiresSourceBufferReady': const bool.fromEnvironment(
+                'SOURCE_BUFFER_READY_GATE',
+              ),
+              'sourceBuffering': state.buffering,
+              'requiresSourceFrame': _requiresSourceFrame,
+              'sourceFrameReady': _sourceFrameReady,
             });
           }
-          return;
+          return true;
         }
       } else {
         previous = null;
@@ -1453,13 +2053,125 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         'sourceRevision': sourceRevision,
         'elapsedMs': started.elapsedMilliseconds,
         'lastSignature': previous,
+        'sourceBuffering': controller.player.state.buffering,
+        'requiresSourceFrame': _requiresSourceFrame,
+        'sourceFrameReady': _sourceFrameReady,
+        'legacyDeadlineFallback': true,
       });
+    }
+    return request.isCurrent &&
+        sourceRevision == _sourceRevision &&
+        _videoController == controller;
+  }
+
+  Future<bool> _waitForOutputFrames(
+    VideoController controller,
+    PlaybackSourceRequest request,
+    int revision,
+    Duration timeout,
+  ) async {
+    final started = Stopwatch()..start();
+    final pip = Platform.isAndroid ? AndroidPipController.instance : null;
+    bool current() =>
+        request.isCurrent &&
+        revision == _sourceRevision &&
+        _videoController == controller;
+    final gate = StableOutputGate(
+      isSourceReady: () =>
+          (!_requiresSourceFrame || _sourceFrameReady) &&
+          (!const bool.fromEnvironment('SOURCE_BUFFER_READY_GATE') ||
+              !controller.player.state.buffering),
+      readSignature: () {
+        final rect = controller.rect.value;
+        final state = controller.player.state;
+        final id = controller.id.value;
+        if (id == null ||
+            rect == null ||
+            rect.width <= 1 ||
+            rect.height <= 1 ||
+            state.width <= 0 ||
+            state.height <= 0) {
+          return null;
+        }
+        return '$id|${rect.left.toStringAsFixed(3)},'
+            '${rect.top.toStringAsFixed(3)},'
+            '${rect.width.toStringAsFixed(3)},'
+            '${rect.height.toStringAsFixed(3)}|'
+            '${state.width}x${state.height}';
+      },
+      nextFrame: () => WidgetsBinding.instance.endOfFrame,
+      isCurrent: current,
+      shouldBypass: () => pip?.protectsPlayback ?? false,
+      cancelled: request.cancelled,
+      stableDwell: const bool.fromEnvironment('EVENT_DRIVEN_OUTPUT_DWELL')
+          ? const Duration(milliseconds: 32)
+          : null,
+      timeout: timeout,
+    );
+    controller.rect.addListener(gate.notifyChanged);
+    controller.id.addListener(gate.notifyChanged);
+    pip?.addListener(gate.notifyChanged);
+    final subscription = controller.player.stream.size.listen(
+      (_) => gate.notifyChanged(),
+    );
+    final bufferingSubscription =
+        const bool.fromEnvironment('SOURCE_BUFFER_READY_GATE')
+        ? controller.player.stream.buffering.listen((_) => gate.notifyChanged())
+        : null;
+    if (_requiresSourceFrame) {
+      unawaited(
+        _sourceFrameGate?.ready.then(
+          (_) => gate.notifyChanged(),
+          onError: (Object _) {},
+        ),
+      );
+    }
+    try {
+      gate.notifyChanged();
+      final result = await gate.ready;
+      if (PlaybackDiagnostics.enabled) {
+        PlaybackDiagnostics.event(
+          switch (result) {
+            StableOutputResult.stable => 'output.stable',
+            StableOutputResult.bypass => 'output.stable.pip-bypass',
+            StableOutputResult.timeout => 'output.stable.timeout',
+            StableOutputResult.cancelled => 'output.stable.cancelled',
+          },
+          {
+            ...playbackTraceState(),
+            'sourceRevision': revision,
+            'eventDriven': true,
+            'stabilityMode':
+                const bool.fromEnvironment('EVENT_DRIVEN_OUTPUT_DWELL')
+                ? 'unchanged-32ms'
+                : 'three-frame-observations',
+            'samples': gate.samples,
+            'elapsedMs': started.elapsedMilliseconds,
+            'signature': gate.signature,
+            'requiresSourceBufferReady': const bool.fromEnvironment(
+              'SOURCE_BUFFER_READY_GATE',
+            ),
+            'sourceBuffering': controller.player.state.buffering,
+            'requiresSourceFrame': _requiresSourceFrame,
+            'sourceFrameReady': _sourceFrameReady,
+          },
+        );
+      }
+      return result != StableOutputResult.cancelled && current();
+    } finally {
+      gate.dispose();
+      controller.rect.removeListener(gate.notifyChanged);
+      controller.id.removeListener(gate.notifyChanged);
+      pip?.removeListener(gate.notifyChanged);
+      await subscription.cancel();
+      await bufferingSubscription?.cancel();
     }
   }
 
   Future<void> _presentPendingFrameIfNeeded() async {
     final callback = _pendingFrameReady;
     if (callback == null) return;
+    final request = _loadedSourceRequest;
     final revision = _pendingFrameReadyRevision;
     _pendingFrameReady = null;
     if (PlaybackDiagnostics.enabled) {
@@ -1468,16 +2180,21 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         'sourceRevision': revision,
       });
     }
-    await _waitForStableVideoOutput(sourceRevision: revision);
-    if (revision != _sourceRevision) return;
+    if (!await _waitForStableVideoOutput(sourceRevision: revision)) return;
+    if (revision != _sourceRevision ||
+        request != _loadedSourceRequest ||
+        request?.isCurrent != true) {
+      return;
+    }
     await callback();
+    _restoreStartupReadAhead(revision, 'presentation-ready');
   }
 
   /// Public counterpart used when a source is already loaded but its Flutter
   /// presentation is still covered (for example, after returning to a video
   /// route).  It intentionally does not reveal anything by itself; the owner
   /// changes its frame-ready flag only after this future completes.
-  Future<void> waitForStableVideoOutput() =>
+  Future<bool> waitForStableVideoOutput() =>
       _waitForStableVideoOutput(sourceRevision: _sourceRevision);
 
   Future<void>? refreshPlayer() {
@@ -1490,6 +2207,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       final media = ctr.current.last;
       return _sourceQueue
           .run(_sourceOwner ?? this, (request) async {
+            _loadedSourceRequest = request;
             await ctr.open(media, play: false);
             request.checkCurrent();
             await play();
@@ -1553,6 +2271,9 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   void _startListeners(NativePlayer player) {
     assert(_subscriptions == null);
     final stream = player.stream;
+    var timingRevision = -1;
+    Stopwatch? timingClock;
+    var lastTimingUs = -100000;
     _subscriptions = [
       if (StartupProbe.verbose) stream.log.listen(StartupProbe.onLog),
       if (PlaybackDiagnostics.enabled) ...[
@@ -1631,6 +2352,31 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
       /// position
       stream.position.listen((Duration position) {
+        if (PlaybackDiagnostics.enabled &&
+            const bool.fromEnvironment('STARTUP_TRANSFER_TRACE') &&
+            _sourceRevision > 0) {
+          if (timingRevision != _sourceRevision) {
+            timingRevision = _sourceRevision;
+            timingClock = Stopwatch()..start();
+            lastTimingUs = -100000;
+          }
+          final elapsed = timingClock!.elapsedMicroseconds;
+          if (elapsed <= 8000000 && elapsed - lastTimingUs >= 100000) {
+            lastTimingUs = elapsed;
+            PlaybackDiagnostics.event('startup.timing.position', {
+              ...playbackTraceState(),
+              'positionEventMs': position.inMilliseconds,
+              'currentAo': player.getProperty('current-ao'),
+              'audioPts': double.tryParse(player.getProperty('audio-pts')),
+              'avsync': double.tryParse(player.getProperty('avsync')),
+              'cacheDuration': double.tryParse(
+                player.getProperty('demuxer-cache-duration'),
+              ),
+              'timing':
+                  'position stream delivery and property read; not display',
+            });
+          }
+        }
         final posInSeconds = position.inSeconds;
 
         if (posInSeconds != this.position.value) {
@@ -1694,6 +2440,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         }
         if (event.startsWith("Failed to open https://") ||
             event.startsWith("Can not open external file https://") ||
+            ((_parallelAudioSource != null || _isolatedMediaSources != null) &&
+                (event.startsWith('Failed to open http://127.0.0.1:') ||
+                    event.startsWith(
+                      'Can not open external file http://127.0.0.1:',
+                    ))) ||
             //tcp: ffurl_read returned 0xdfb9b0bb
             //tcp: ffurl_read returned 0xffffff99
             event.startsWith('tcp: ffurl_read returned ')) {
@@ -1739,6 +2490,11 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
   /// 移除事件监听
   void _removeListeners() {
+    _startupAudioDecodeQueue?.restore('listeners-removed');
+    _startupAudioDecodeQueue = null;
+    _sourceFrameGate?.dispose();
+    _sourceFrameGate = null;
+    _sourceFrameReady = false;
     if (PlaybackDiagnostics.enabled) {
       final controller = _traceVideoController;
       if (controller != null) {
@@ -1826,24 +2582,36 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     if (PlaybackDiagnostics.enabled) {
       PlaybackDiagnostics.event('command.play', playbackTraceState());
     }
-    if (_playerCount == 0) return;
+    final player = _videoPlayerController;
+    final request = _loadedSourceRequest;
+    final revision = _sourceRevision;
+    final output = _videoController;
+    if (_playerCount == 0 || player == null || request?.isCurrent != true) {
+      return;
+    }
+    bool current() =>
+        _playerCount > 0 &&
+        _videoPlayerController == player &&
+        _videoController == output &&
+        _loadedSourceRequest == request &&
+        _sourceRevision == revision &&
+        request!.isCurrent;
     // 播放时自动隐藏控制条
     controls = !hideControls;
     // repeat为true，将从头播放
     if (repeat) {
       await seekTo(Duration.zero, isSeek: false);
     }
-
-    await _videoPlayerController?.play();
-
-    // Do not reveal the Flutter presentation until the post-play surface
-    // handoff has converged.  This is a no-op for ordinary play commands
-    // without a pending source callback.
-    await _presentPendingFrameIfNeeded();
-
-    audioSessionHandler?.setActive(true);
-
-    playerStatus = .playing;
+    await PlaybackStart.run(
+      isCurrent: current,
+      isPlaying: () => player.state.playing,
+      start: player.play,
+      present: _presentPendingFrameIfNeeded,
+      activate: () {
+        audioSessionHandler?.setActive(true);
+        playerStatus = .playing;
+      },
+    );
   }
 
   /// 暂停播放
@@ -2257,7 +3025,16 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
 
     _playerCount = 0;
+    _startupAudioDecodeQueue?.restore('dispose');
+    _startupAudioDecodeQueue = null;
+    _startupReadAheadTimer?.cancel();
+    _startupReadAheadTimer = null;
+    _startupReadAheadRevision = null;
     _sourceQueue.cancelAll();
+    _parallelAudioSource?.close();
+    _parallelAudioSource = null;
+    _isolatedMediaSources?.close();
+    _isolatedMediaSources = null;
     _readySourceOwner = null;
     _sourceOwner = null;
     _reloadSource = null;

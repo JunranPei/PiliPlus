@@ -1,0 +1,1908 @@
+[
+  {
+    "label": "01-candidate",
+    "variant": "candidate",
+    "warmup": false,
+    "pid": "4986",
+    "textureMs": 1948.7654,
+    "coverMs": 2074.7911999999283,
+    "openMs": 262.6251999999285,
+    "functionalCleanup": true,
+    "strictStable": true,
+    "firstTexturePtsNs": 61500000000,
+    "exactFirstPts": true,
+    "functionalPassed": true,
+    "maxPositiveGapMs": 251.4555,
+    "indexLookups": [
+      {
+        "video": true,
+        "audio": true,
+        "videoOrigin": "disk",
+        "audioOrigin": "disk"
+      }
+    ],
+    "persistedIndexes": [
+      {
+        "kind": "video",
+        "cached": true,
+        "bytes": 2971
+      },
+      {
+        "kind": "audio",
+        "cached": true,
+        "bytes": 2665
+      }
+    ],
+    "hintedPlans": {
+      "video": true,
+      "audio": true
+    },
+    "cacheMechanismVerified": true,
+    "reservationDartEvents": [
+      {
+        "event": "startup.codecReservation.scheduled",
+        "seq": 454,
+        "elapsedUs": 8273384,
+        "utcUs": 1793425221305880,
+        "source": {
+          "owner": 16064145,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "2bada9d1",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "mime": "video/hevc"
+      },
+      {
+        "event": "startup.codecReservation.finished",
+        "seq": 534,
+        "elapsedUs": 8643106,
+        "utcUs": 1793425221675600,
+        "source": {
+          "owner": 16064145,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "2bada9d1",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "result": 1
+      }
+    ],
+    "reservationNativeEvents": [
+      {
+        "event": "create.begin",
+        "monoNs": 585566101700,
+        "tid": 5067,
+        "codec": "",
+        "value": 0,
+        "afterInputMs": 211.8895
+      },
+      {
+        "event": "ready",
+        "monoNs": 585713770100,
+        "tid": 5067,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 5000,
+        "afterInputMs": 359.5579
+      },
+      {
+        "event": "taken",
+        "monoNs": 585910302500,
+        "tid": 5037,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 0,
+        "afterInputMs": 556.0903
+      }
+    ],
+    "reservationMechanismVerified": true,
+    "reservationCreateMs": 147.6684,
+    "reservationReadyBeforeTakeMs": 196.5324,
+    "sharedPendingCreation": false,
+    "initialUpstreamClosure": {
+      "video": [
+        {
+          "event": "isolated.video.delivery.upstreamClosed",
+          "seq": 596,
+          "elapsedUs": 9020545,
+          "utcUs": 1793425222053092,
+          "source": {
+            "owner": 16064145,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "2bada9d1",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 334064,
+          "deliveredBytes": 334064,
+          "workerElapsedUs": 729626,
+          "workerUtcUs": 1793425222040646,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "audio": [
+        {
+          "event": "isolated.audio.delivery.upstreamClosed",
+          "seq": 634,
+          "elapsedUs": 9181199,
+          "utcUs": 1793425222213747,
+          "source": {
+            "owner": 16064145,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "2bada9d1",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 497902,
+          "deliveredBytes": 497902,
+          "workerElapsedUs": 797204,
+          "workerUtcUs": 1793425222108216,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ]
+    },
+    "closedDeliveryMechanismVerified": true,
+    "flushNativeEvents": [
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411889ad80",
+        "monoNs": 585966904500,
+        "tid": 5037,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 612.6923
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411889ad80",
+        "monoNs": 585967013500,
+        "tid": 5037,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 612.8013
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411889ad80",
+        "monoNs": 585967042100,
+        "tid": 5037,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 612.8299
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411889ad80",
+        "monoNs": 585967062500,
+        "tid": 5037,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 612.8503
+      },
+      {
+        "event": "receive.first",
+        "instance": "0x7a411889ad80",
+        "monoNs": 585967847000,
+        "tid": 5037,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 0,
+        "afterInputMs": 613.6348
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411889ad80",
+        "monoNs": 603931258700,
+        "tid": 4986,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18577.0465
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411889ad80",
+        "monoNs": 603939968500,
+        "tid": 4986,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18585.7563
+      }
+    ],
+    "unusedFlushMechanismVerified": true,
+    "firstReceiveMs": 613.6348,
+    "pristineFlushTotalMs": 0.12940000000000002,
+    "usedFlushCount": 1,
+    "audioLeadGates": [
+      {
+        "monoNs": 585967372500,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "ordinal": 1,
+        "mask": 2562,
+        "enabled": 1,
+        "queue": 0,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 0,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 613.1603
+      },
+      {
+        "monoNs": 586589395600,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "ordinal": 2,
+        "mask": 2048,
+        "enabled": 1,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 1235.1834
+      },
+      {
+        "monoNs": 587271795500,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "ordinal": 3,
+        "mask": 1063168,
+        "enabled": 1,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 1,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 1,
+        "stopped": 1,
+        "count": 93,
+        "seekPts": 61.5,
+        "afterInputMs": 1917.5833
+      }
+    ],
+    "filteredAudioLeadEvents": [
+      {
+        "event": "prime.first",
+        "monoNs": 586589745600,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "count": 1,
+        "bytes": 8288,
+        "seconds": 0.021333,
+        "pushed": 1,
+        "popped": 0,
+        "afterInputMs": 1235.5334
+      },
+      {
+        "event": "drain.begin",
+        "monoNs": 587271952700,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "count": 93,
+        "bytes": 770784,
+        "seconds": 1.984,
+        "pushed": 93,
+        "popped": 0,
+        "afterInputMs": 1917.7405
+      },
+      {
+        "event": "drain.empty",
+        "monoNs": 587464704600,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "count": 0,
+        "bytes": 0,
+        "seconds": 0.0,
+        "pushed": 93,
+        "popped": 93,
+        "afterInputMs": 2110.4924
+      },
+      {
+        "event": "clear",
+        "monoNs": 603975310400,
+        "tid": 5037,
+        "instance": "0x7a3f488d7510",
+        "count": 0,
+        "bytes": 0,
+        "seconds": 0.0,
+        "pushed": 93,
+        "popped": 93,
+        "afterInputMs": 18621.0982
+      }
+    ],
+    "filteredAudioLeadMechanismVerified": true,
+    "resourceProfile": {
+      "name": "lean-monitored",
+      "startCommitGiB": 7,
+      "startPhysicalGiB": 5,
+      "abortCommitGiB": 3,
+      "abortPhysicalGiB": 2
+    },
+    "minPhysicalGiB": 4.903,
+    "minCommitHeadroomGiB": 5.322,
+    "guestVmstatDelta": {
+      "pswpin": 221,
+      "pswpout": 10552,
+      "pgmajfault": 1060,
+      "pgsteal_direct": 0,
+      "pgscan_kswapd": 22196,
+      "pgscan_direct": 0,
+      "pgscan_direct_throttle": 0
+    },
+    "textureAfterOpenMs": 1686.1402000000714
+  },
+  {
+    "label": "02-control",
+    "variant": "control",
+    "warmup": false,
+    "pid": "5402",
+    "textureMs": 2013.8261,
+    "coverMs": 2285.765600000024,
+    "openMs": 229.44560000002383,
+    "functionalCleanup": true,
+    "strictStable": true,
+    "firstTexturePtsNs": 61500000000,
+    "exactFirstPts": true,
+    "functionalPassed": true,
+    "maxPositiveGapMs": 194.5138,
+    "indexLookups": [
+      {
+        "video": true,
+        "audio": true,
+        "videoOrigin": "disk",
+        "audioOrigin": "disk"
+      }
+    ],
+    "persistedIndexes": [
+      {
+        "kind": "video",
+        "cached": true,
+        "bytes": 2971
+      },
+      {
+        "kind": "audio",
+        "cached": true,
+        "bytes": 2665
+      }
+    ],
+    "hintedPlans": {
+      "video": true,
+      "audio": true
+    },
+    "cacheMechanismVerified": true,
+    "reservationDartEvents": [
+      {
+        "event": "startup.codecReservation.scheduled",
+        "seq": 533,
+        "elapsedUs": 10234908,
+        "utcUs": 1793425271603465,
+        "source": {
+          "owner": 107233853,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "1dc1580e",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "mime": "video/hevc"
+      },
+      {
+        "event": "startup.codecReservation.finished",
+        "seq": 606,
+        "elapsedUs": 10676718,
+        "utcUs": 1793425272045276,
+        "source": {
+          "owner": 107233853,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "1dc1580e",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "result": 1
+      }
+    ],
+    "reservationNativeEvents": [
+      {
+        "event": "create.begin",
+        "monoNs": 635864922900,
+        "tid": 5613,
+        "codec": "",
+        "value": 0,
+        "afterInputMs": 199.6245
+      },
+      {
+        "event": "ready",
+        "monoNs": 636213046500,
+        "tid": 5613,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 5000,
+        "afterInputMs": 547.7481
+      },
+      {
+        "event": "taken",
+        "monoNs": 636262689700,
+        "tid": 5452,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 0,
+        "afterInputMs": 597.3913
+      }
+    ],
+    "reservationMechanismVerified": true,
+    "reservationCreateMs": 348.1236,
+    "reservationReadyBeforeTakeMs": 49.6432,
+    "sharedPendingCreation": false,
+    "initialUpstreamClosure": {
+      "video": [
+        {
+          "event": "isolated.video.delivery.upstreamClosed",
+          "seq": 636,
+          "elapsedUs": 10868725,
+          "utcUs": 1793425272245041,
+          "source": {
+            "owner": 107233853,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "1dc1580e",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 211183,
+          "deliveredBytes": 211183,
+          "workerElapsedUs": 547206,
+          "workerUtcUs": 1793425272155641,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "audio": [
+        {
+          "event": "isolated.audio.delivery.upstreamClosed",
+          "seq": 644,
+          "elapsedUs": 10905574,
+          "utcUs": 1793425272274137,
+          "source": {
+            "owner": 107233853,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "1dc1580e",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 104688,
+          "deliveredBytes": 104688,
+          "workerElapsedUs": 593505,
+          "workerUtcUs": 1793425272201953,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ]
+    },
+    "closedDeliveryMechanismVerified": true,
+    "flushNativeEvents": [
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411887b800",
+        "monoNs": 636342324400,
+        "tid": 5452,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 677.026
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411887b800",
+        "monoNs": 636347421100,
+        "tid": 5452,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 682.1227
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411887b800",
+        "monoNs": 636347698000,
+        "tid": 5452,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 682.3996
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411887b800",
+        "monoNs": 636347738800,
+        "tid": 5452,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 682.4404
+      },
+      {
+        "event": "receive.first",
+        "instance": "0x7a411887b800",
+        "monoNs": 636350846200,
+        "tid": 5452,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 0,
+        "afterInputMs": 685.5478
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411887b800",
+        "monoNs": 654301703300,
+        "tid": 5402,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18636.4049
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411887b800",
+        "monoNs": 654307581600,
+        "tid": 5402,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18642.2832
+      }
+    ],
+    "unusedFlushMechanismVerified": true,
+    "firstReceiveMs": 685.5478,
+    "pristineFlushTotalMs": 5.1375,
+    "usedFlushCount": 1,
+    "audioLeadGates": [
+      {
+        "monoNs": 636348362400,
+        "tid": 5452,
+        "instance": "0x7a3f488db690",
+        "ordinal": 1,
+        "mask": 2563,
+        "enabled": 0,
+        "queue": 0,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 0,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 683.064
+      },
+      {
+        "monoNs": 636818096200,
+        "tid": 5452,
+        "instance": "0x7a3f488db690",
+        "ordinal": 2,
+        "mask": 2049,
+        "enabled": 0,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 1152.7978
+      },
+      {
+        "monoNs": 637619133900,
+        "tid": 5452,
+        "instance": "0x7a3f488db690",
+        "ordinal": 3,
+        "mask": 1054977,
+        "enabled": 0,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 1,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 1,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 1953.8355
+      }
+    ],
+    "filteredAudioLeadEvents": [],
+    "filteredAudioLeadMechanismVerified": true,
+    "resourceProfile": {
+      "name": "lean-monitored",
+      "startCommitGiB": 7,
+      "startPhysicalGiB": 5,
+      "abortCommitGiB": 3,
+      "abortPhysicalGiB": 2
+    },
+    "minPhysicalGiB": 4.145,
+    "minCommitHeadroomGiB": 4.384,
+    "guestVmstatDelta": {
+      "pswpin": 105,
+      "pswpout": 10101,
+      "pgmajfault": 957,
+      "pgsteal_direct": 0,
+      "pgscan_kswapd": 18339,
+      "pgscan_direct": 0,
+      "pgscan_direct_throttle": 0
+    },
+    "textureAfterOpenMs": 1784.380499999976
+  },
+  {
+    "label": "03-control",
+    "variant": "control",
+    "warmup": false,
+    "pid": "5768",
+    "textureMs": 2378.6081,
+    "coverMs": 2649.4012000000475,
+    "openMs": 541.5352000000477,
+    "functionalCleanup": true,
+    "strictStable": true,
+    "firstTexturePtsNs": 61500000000,
+    "exactFirstPts": true,
+    "functionalPassed": true,
+    "maxPositiveGapMs": 262.3471,
+    "indexLookups": [
+      {
+        "video": true,
+        "audio": true,
+        "videoOrigin": "disk",
+        "audioOrigin": "disk"
+      }
+    ],
+    "persistedIndexes": [
+      {
+        "kind": "video",
+        "cached": true,
+        "bytes": 2971
+      },
+      {
+        "kind": "audio",
+        "cached": true,
+        "bytes": 2665
+      }
+    ],
+    "hintedPlans": {
+      "video": true,
+      "audio": true
+    },
+    "cacheMechanismVerified": true,
+    "reservationDartEvents": [
+      {
+        "event": "startup.codecReservation.scheduled",
+        "seq": 523,
+        "elapsedUs": 10394269,
+        "utcUs": 1793425325943057,
+        "source": {
+          "owner": 792572304,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "3b1ccaab",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "mime": "video/hevc"
+      },
+      {
+        "event": "startup.codecReservation.finished",
+        "seq": 602,
+        "elapsedUs": 10799864,
+        "utcUs": 1793425326348674,
+        "source": {
+          "owner": 792572304,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "3b1ccaab",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "result": 1
+      }
+    ],
+    "reservationNativeEvents": [
+      {
+        "event": "create.begin",
+        "monoNs": 690204545900,
+        "tid": 5843,
+        "codec": "",
+        "value": 0,
+        "afterInputMs": 436.1349
+      },
+      {
+        "event": "ready",
+        "monoNs": 690527727800,
+        "tid": 5843,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 5000,
+        "afterInputMs": 759.3168
+      },
+      {
+        "event": "taken",
+        "monoNs": 690587348700,
+        "tid": 5818,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 0,
+        "afterInputMs": 818.9377
+      }
+    ],
+    "reservationMechanismVerified": true,
+    "reservationCreateMs": 323.1819,
+    "reservationReadyBeforeTakeMs": 59.6209,
+    "sharedPendingCreation": false,
+    "initialUpstreamClosure": {
+      "video": [
+        {
+          "event": "isolated.video.delivery.upstreamClosed",
+          "seq": 638,
+          "elapsedUs": 11027899,
+          "utcUs": 1793425326576697,
+          "source": {
+            "owner": 792572304,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "3b1ccaab",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 137454,
+          "deliveredBytes": 137454,
+          "workerElapsedUs": 574267,
+          "workerUtcUs": 1793425326522306,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "audio": [
+        {
+          "event": "isolated.audio.delivery.upstreamClosed",
+          "seq": 645,
+          "elapsedUs": 11038885,
+          "utcUs": 1793425326587675,
+          "source": {
+            "owner": 792572304,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "3b1ccaab",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 129263,
+          "deliveredBytes": 129263,
+          "workerElapsedUs": 607978,
+          "workerUtcUs": 1793425326556032,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ]
+    },
+    "closedDeliveryMechanismVerified": true,
+    "flushNativeEvents": [
+      {
+        "event": "flush.begin",
+        "instance": "0x7a4118892a40",
+        "monoNs": 690696151200,
+        "tid": 5818,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 927.7402
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a4118892a40",
+        "monoNs": 690699328200,
+        "tid": 5818,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 930.9172
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a4118892a40",
+        "monoNs": 690699372200,
+        "tid": 5818,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 930.9612
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a4118892a40",
+        "monoNs": 690699397900,
+        "tid": 5818,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 930.9869
+      },
+      {
+        "event": "receive.first",
+        "instance": "0x7a4118892a40",
+        "monoNs": 690706476900,
+        "tid": 5818,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 0,
+        "afterInputMs": 938.0659
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a4118892a40",
+        "monoNs": 708315383600,
+        "tid": 5768,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18546.9726
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a4118892a40",
+        "monoNs": 708322349100,
+        "tid": 5768,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18553.9381
+      }
+    ],
+    "unusedFlushMechanismVerified": true,
+    "firstReceiveMs": 938.0659,
+    "pristineFlushTotalMs": 3.2027,
+    "usedFlushCount": 1,
+    "audioLeadGates": [
+      {
+        "monoNs": 690702039200,
+        "tid": 5818,
+        "instance": "0x7a3f488d9e00",
+        "ordinal": 1,
+        "mask": 2563,
+        "enabled": 0,
+        "queue": 0,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 0,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 933.6282
+      },
+      {
+        "monoNs": 691377403500,
+        "tid": 5818,
+        "instance": "0x7a3f488d9e00",
+        "ordinal": 2,
+        "mask": 2049,
+        "enabled": 0,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 1608.9925
+      },
+      {
+        "monoNs": 692120680300,
+        "tid": 5818,
+        "instance": "0x7a3f488d9e00",
+        "ordinal": 3,
+        "mask": 1054977,
+        "enabled": 0,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 1,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 1,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 2352.2693
+      }
+    ],
+    "filteredAudioLeadEvents": [],
+    "filteredAudioLeadMechanismVerified": true,
+    "resourceProfile": {
+      "name": "lean-monitored",
+      "startCommitGiB": 7,
+      "startPhysicalGiB": 5,
+      "abortCommitGiB": 3,
+      "abortPhysicalGiB": 2
+    },
+    "minPhysicalGiB": 2.793,
+    "minCommitHeadroomGiB": 3.079,
+    "guestVmstatDelta": {
+      "pswpin": 49,
+      "pswpout": 31,
+      "pgmajfault": 93,
+      "pgsteal_direct": 0,
+      "pgscan_kswapd": 11427,
+      "pgscan_direct": 0,
+      "pgscan_direct_throttle": 0
+    },
+    "textureAfterOpenMs": 1837.0728999999524
+  },
+  {
+    "label": "04-candidate",
+    "variant": "candidate",
+    "warmup": false,
+    "pid": "6178",
+    "textureMs": 2318.8803,
+    "coverMs": 2495.878399999976,
+    "openMs": 304.35239999997617,
+    "functionalCleanup": true,
+    "strictStable": true,
+    "firstTexturePtsNs": 61633313000,
+    "exactFirstPts": false,
+    "functionalPassed": false,
+    "maxPositiveGapMs": 174.2817,
+    "indexLookups": [
+      {
+        "video": true,
+        "audio": true,
+        "videoOrigin": "disk",
+        "audioOrigin": "disk"
+      }
+    ],
+    "persistedIndexes": [
+      {
+        "kind": "video",
+        "cached": true,
+        "bytes": 2971
+      },
+      {
+        "kind": "audio",
+        "cached": true,
+        "bytes": 2665
+      }
+    ],
+    "hintedPlans": {
+      "video": true,
+      "audio": true
+    },
+    "cacheMechanismVerified": true,
+    "reservationDartEvents": [
+      {
+        "event": "startup.codecReservation.scheduled",
+        "seq": 503,
+        "elapsedUs": 8591456,
+        "utcUs": 1793425372898935,
+        "source": {
+          "owner": 400814264,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "25f6eae4",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "mime": "video/hevc"
+      },
+      {
+        "event": "startup.codecReservation.finished",
+        "seq": 622,
+        "elapsedUs": 9092891,
+        "utcUs": 1793425373400389,
+        "source": {
+          "owner": 400814264,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "25f6eae4",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "requestId": 1,
+        "cid": 42790290231,
+        "result": 1
+      }
+    ],
+    "reservationNativeEvents": [
+      {
+        "event": "create.begin",
+        "monoNs": 737159112300,
+        "tid": 6272,
+        "codec": "",
+        "value": 0,
+        "afterInputMs": 234.6471
+      },
+      {
+        "event": "ready",
+        "monoNs": 737436759800,
+        "tid": 6272,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 5000,
+        "afterInputMs": 512.2946
+      },
+      {
+        "event": "taken",
+        "monoNs": 737571888200,
+        "tid": 6236,
+        "codec": "c2.goldfish.hevc.decoder",
+        "value": 0,
+        "afterInputMs": 647.423
+      }
+    ],
+    "reservationMechanismVerified": true,
+    "reservationCreateMs": 277.6475,
+    "reservationReadyBeforeTakeMs": 135.1284,
+    "sharedPendingCreation": false,
+    "initialUpstreamClosure": {
+      "video": [
+        {
+          "event": "isolated.video.delivery.upstreamClosed",
+          "seq": 657,
+          "elapsedUs": 9522203,
+          "utcUs": 1793425373829686,
+          "source": {
+            "owner": 400814264,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "25f6eae4",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 219374,
+          "deliveredBytes": 219374,
+          "workerElapsedUs": 853374,
+          "workerUtcUs": 1793425373754975,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "audio": [
+        {
+          "event": "isolated.audio.delivery.upstreamClosed",
+          "seq": 667,
+          "elapsedUs": 9547826,
+          "utcUs": 1793425373855311,
+          "source": {
+            "owner": 400814264,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "25f6eae4",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "rangeComplete": false,
+          "receivedBytes": 153838,
+          "deliveredBytes": 153838,
+          "workerElapsedUs": 946042,
+          "workerUtcUs": 1793425373847642,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ]
+    },
+    "closedDeliveryMechanismVerified": true,
+    "flushNativeEvents": [
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411888df00",
+        "monoNs": 737749366000,
+        "tid": 6236,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 824.9008
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411888df00",
+        "monoNs": 737749955200,
+        "tid": 6236,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 1,
+        "afterInputMs": 825.49
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411888df00",
+        "monoNs": 737750013400,
+        "tid": 6236,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 825.5482
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411888df00",
+        "monoNs": 737750179300,
+        "tid": 6236,
+        "enabled": 1,
+        "receiveStarted": 0,
+        "skipped": 1,
+        "ordinal": 2,
+        "afterInputMs": 825.7141
+      },
+      {
+        "event": "receive.first",
+        "instance": "0x7a411888df00",
+        "monoNs": 737765935100,
+        "tid": 6236,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 0,
+        "afterInputMs": 841.4699
+      },
+      {
+        "event": "flush.begin",
+        "instance": "0x7a411888df00",
+        "monoNs": 755434195300,
+        "tid": 6178,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18509.7301
+      },
+      {
+        "event": "flush.end",
+        "instance": "0x7a411888df00",
+        "monoNs": 755438961500,
+        "tid": 6178,
+        "enabled": 1,
+        "receiveStarted": 1,
+        "skipped": 0,
+        "ordinal": 3,
+        "afterInputMs": 18514.4963
+      }
+    ],
+    "unusedFlushMechanismVerified": true,
+    "firstReceiveMs": 841.4699,
+    "pristineFlushTotalMs": 0.7550999999999999,
+    "usedFlushCount": 1,
+    "audioLeadGates": [
+      {
+        "monoNs": 737759144400,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "ordinal": 1,
+        "mask": 2562,
+        "enabled": 1,
+        "queue": 0,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 0,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 834.6792
+      },
+      {
+        "monoNs": 738487144900,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "ordinal": 2,
+        "mask": 2048,
+        "enabled": 1,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 0,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 0,
+        "stopped": 0,
+        "count": 0,
+        "seekPts": 61.5,
+        "afterInputMs": 1562.6797
+      },
+      {
+        "monoNs": 739081470000,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "ordinal": 3,
+        "mask": 1063168,
+        "enabled": 1,
+        "queue": 1,
+        "hrseek": 1,
+        "lastframe": 0,
+        "backstep": 0,
+        "playDir": 1,
+        "vo": 1,
+        "sparse": 0,
+        "videoStatus": 1,
+        "audioStatus": 0,
+        "ao": 1,
+        "aoPlaying": 0,
+        "spdif": 1,
+        "startKnown": 1,
+        "stopped": 1,
+        "count": 93,
+        "seekPts": 61.5,
+        "afterInputMs": 2157.0048
+      }
+    ],
+    "filteredAudioLeadEvents": [
+      {
+        "event": "prime.first",
+        "monoNs": 738487281500,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "count": 1,
+        "bytes": 8288,
+        "seconds": 0.021333,
+        "pushed": 1,
+        "popped": 0,
+        "afterInputMs": 1562.8163
+      },
+      {
+        "event": "drain.begin",
+        "monoNs": 739081527000,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "count": 93,
+        "bytes": 770784,
+        "seconds": 1.984,
+        "pushed": 93,
+        "popped": 0,
+        "afterInputMs": 2157.0618
+      },
+      {
+        "event": "drain.empty",
+        "monoNs": 739263388600,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "count": 0,
+        "bytes": 0,
+        "seconds": 0.0,
+        "pushed": 93,
+        "popped": 93,
+        "afterInputMs": 2338.9234
+      },
+      {
+        "event": "clear",
+        "monoNs": 755469298400,
+        "tid": 6236,
+        "instance": "0x7a3f488df810",
+        "count": 0,
+        "bytes": 0,
+        "seconds": 0.0,
+        "pushed": 93,
+        "popped": 93,
+        "afterInputMs": 18544.8332
+      }
+    ],
+    "filteredAudioLeadMechanismVerified": true,
+    "resourceProfile": {
+      "name": "lean-monitored",
+      "startCommitGiB": 7,
+      "startPhysicalGiB": 5,
+      "abortCommitGiB": 3,
+      "abortPhysicalGiB": 2
+    },
+    "minPhysicalGiB": 2.574,
+    "minCommitHeadroomGiB": 2.899,
+    "guestVmstatDelta": {
+      "pswpin": 4609,
+      "pswpout": 10707,
+      "pgmajfault": 5621,
+      "pgsteal_direct": 0,
+      "pgscan_kswapd": 38679,
+      "pgscan_direct": 0,
+      "pgscan_direct_throttle": 0
+    },
+    "textureAfterOpenMs": 2014.5279000000237
+  }
+]

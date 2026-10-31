@@ -1,0 +1,34 @@
+{
+  "pid": "3546",
+  "passed": true,
+  "nativeEarlyCancel": true,
+  "callbackClosed": true,
+  "returnCleanup": true,
+  "queueEvents": [
+    {
+      "event": "startup.audioDecodeQueue.limited",
+      "seq": 829,
+      "elapsedUs": 17317221,
+      "requestId": 1,
+      "sourceRevision": 1,
+      "cid": 42790290231,
+      "playerId": 1072941359,
+      "previousSeconds": "2.000000",
+      "actualSeconds": "0.080000"
+    },
+    {
+      "event": "startup.audioDecodeQueue.restored",
+      "seq": 1005,
+      "elapsedUs": 18528135,
+      "requestId": 1,
+      "sourceRevision": 1,
+      "cid": 42790290231,
+      "playerId": 1072941359,
+      "reason": "source-cancelled",
+      "previousSeconds": "0.080000",
+      "actualSeconds": "2.000000"
+    }
+  ],
+  "priorFailure": "../startup-audio-decode-bound-cancel-01/audio-queue-cancel-events.json",
+  "fix": "Restore before owner sourceRevision increments; late request.cancelled callback cannot skip or repeat restoration."
+}

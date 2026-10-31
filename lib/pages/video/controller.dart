@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/startup_stream_readiness.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/source_preparation.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_auxiliary_gate.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
 
 import 'package:PiliPlus/common/style.dart';
@@ -127,6 +128,54 @@ class VideoDetailController extends GetxController
   bool _playWhenPrepared = false;
   Future<bool> Function()? waitForPlaybackRoute;
 
+  final _startupAuxiliaryGate = StartupAuxiliaryGate();
+  final _primaryUrlSettled = false.obs;
+  bool _permanentlyLeaving = false;
+
+  Future<bool> waitForAuxiliaryRequest(
+    String operation, {
+    bool afterPrimaryUrl = false,
+  }) async {
+    if (isClosed || _permanentlyLeaving) return false;
+    if (!autoPlay ||
+        isFileSource ||
+        !isUgc ||
+        cid.value <= 0 ||
+        frameReady.value) {
+      return true;
+    }
+    if (afterPrimaryUrl && _primaryUrlSettled.value) return true;
+    final requestedCid = cid.value;
+    final requestedBvid = bvid;
+    PlaybackDiagnostics.event('startup.auxiliary.wait', {
+      'operation': operation,
+      'cid': requestedCid,
+      'phase': afterPrimaryUrl ? 'primary-url' : 'frame',
+    });
+    final reason = await _startupAuxiliaryGate.wait(
+      readiness: afterPrimaryUrl
+          ? _primaryUrlSettled.stream
+          : frameReady.stream,
+      isReady: () =>
+          afterPrimaryUrl ? _primaryUrlSettled.value : frameReady.value,
+      deadline: Duration(milliseconds: afterPrimaryUrl ? 500 : 1500),
+    );
+    final current =
+        reason != 'cancelled' &&
+        !isClosed &&
+        !_permanentlyLeaving &&
+        cid.value == requestedCid &&
+        bvid == requestedBvid;
+    PlaybackDiagnostics.event('startup.auxiliary.release', {
+      'operation': operation,
+      'cid': requestedCid,
+      'phase': afterPrimaryUrl ? 'primary-url' : 'frame',
+      'reason': reason,
+      'current': current,
+    });
+    return current;
+  }
+
   Map<String, Object?> playbackTraceState() => {
     'owner': identityHashCode(this),
     'cid': cid.value,
@@ -141,11 +190,15 @@ class VideoDetailController extends GetxController
     'player': plPlayerController.playbackTraceState(),
   };
 
-  void leavePlaybackRoute() {
+  void leavePlaybackRoute({bool permanently = false}) {
     if (PlaybackDiagnostics.enabled) {
       PlaybackDiagnostics.event('route.leave', playbackTraceState());
     }
     playbackRouteActive = false;
+    if (permanently) {
+      _permanentlyLeaving = true;
+      _startupAuxiliaryGate.cancel();
+    }
     _playbackRevision++;
     plPlayerController.cancelSource(this);
     // Preserve the outgoing picture until the next route has covered it.
@@ -209,7 +262,8 @@ class VideoDetailController extends GetxController
         repeat: plPlayerController.playerStatus.isCompleted,
       );
       if (revealAfterPlay) {
-        await plPlayerController.waitForStableVideoOutput();
+        if (!await plPlayerController.waitForStableVideoOutput()) return;
+        if (!plPlayerController.hasSourceFor(this, cid.value)) return;
         if (!playbackRouteActive || isClosed || revision != _playbackRevision) {
           return;
         }
@@ -831,6 +885,23 @@ class VideoDetailController extends GetxController
     return null;
   }
 
+  List<String> _selectedAudioAlternatives() {
+    if (!const bool.fromEnvironment('HEDGE_AUDIO_SOURCE') ||
+        VideoUtils.cdnService.host != null ||
+        audioUrl == null ||
+        audioUrl!.isEmpty) {
+      return const [];
+    }
+    // Match the actual selected URL, including manual/quality changes. Never
+    // replace it with another audio quality merely to obtain a faster endpoint.
+    for (final track in data.dash?.audio ?? const <AudioItem>[]) {
+      if (audioUrl == VideoUtils.getCdnUrl(track.playUrls, isAudio: true)) {
+        return track.playUrls.toList();
+      }
+    }
+    return const [];
+  }
+
   Future<void> playerInit({
     bool? autoplay,
     bool autoFullScreenFlag = false,
@@ -879,6 +950,21 @@ class VideoDetailController extends GetxController
             : NetworkSource(
                 videoSource: videoUrl!,
                 audioSource: audioUrl,
+                videoCodec:
+                    data.dash != null &&
+                        videoUrl == VideoUtils.getCdnUrl(firstVideo.playUrls)
+                    ? firstVideo.codecs
+                    : null,
+                audioAlternatives: _selectedAudioAlternatives(),
+                // Only alternatives for the exact selected DASH track. Keep
+                // explicitly selected CDN hosts and hand-edited URLs intact.
+                videoAlternatives:
+                    const bool.fromEnvironment('HEDGE_MEDIA_SOURCE') &&
+                        data.dash != null &&
+                        VideoUtils.cdnService.host == null &&
+                        videoUrl == VideoUtils.getCdnUrl(firstVideo.playUrls)
+                    ? firstVideo.playUrls.toList()
+                    : const [],
               ),
         seekTo: seek,
         duration: data.timeLength == null
@@ -1092,6 +1178,9 @@ class VideoDetailController extends GetxController
     }
     isQuerying = true;
     final queryRevision = ++_queryRevision;
+    if (const bool.fromEnvironment('PRIORITIZE_PLAY_URL')) {
+      _primaryUrlSettled.value = false;
+    }
     _qualitySupplementReady = null;
     final queryCid = cid.value;
     try {
@@ -1138,11 +1227,17 @@ class VideoDetailController extends GetxController
     late LoadingState<PlayUrlModel> result;
     Future<void> fetchPrimary() async {
       PlaybackDiagnostics.event('query.primary.begin', {'cid': queryCid});
-      result = await _getVideoUrl(
-        VideoQuality.hdrVivid.code,
-        requestedCid: queryCid,
-      );
-      PlaybackDiagnostics.event('query.primary.end', {'cid': queryCid});
+      try {
+        result = await _getVideoUrl(
+          VideoQuality.hdrVivid.code,
+          requestedCid: queryCid,
+        );
+        PlaybackDiagnostics.event('query.primary.end', {'cid': queryCid});
+      } finally {
+        if (const bool.fromEnvironment('PRIORITIZE_PLAY_URL') && isCurrent()) {
+          _primaryUrlSettled.value = true;
+        }
+      }
     }
 
     // The request uses the same quality ceiling on every network. Preferences
@@ -1205,6 +1300,13 @@ class VideoDetailController extends GetxController
         } else {
           defaultST = Duration(milliseconds: data.lastPlayTime);
         }
+        PlaybackDiagnostics.event('source.resume.selected', {
+          'cid': queryCid,
+          'origin': progress != null ? 'entry-override' : 'server-history',
+          'entryProgressMs': progress,
+          'historyProgressMs': data.lastPlayTime,
+          'selectedProgressMs': defaultST?.inMilliseconds,
+        });
       }
 
       if (!isUgc && !fromReset && plPlayerController.enablePgcSkip) {
@@ -1577,6 +1679,8 @@ class VideoDetailController extends GetxController
 
   @override
   void onClose() {
+    _startupAuxiliaryGate.cancel();
+    _primaryUrlSettled.close();
     leavePlaybackRoute();
     waitForPlaybackRoute = null;
     cid.close();
@@ -1596,6 +1700,10 @@ class VideoDetailController extends GetxController
   }
 
   void onReset({bool isStein = false}) {
+    _startupAuxiliaryGate.cancel();
+    if (const bool.fromEnvironment('PRIORITIZE_PLAY_URL')) {
+      _primaryUrlSettled.value = false;
+    }
     _playbackRevision++;
     _queryRevision++;
     isQuerying = false;

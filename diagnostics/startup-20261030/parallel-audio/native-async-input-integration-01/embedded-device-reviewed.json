@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "modes": [
+    {
+      "asyncInput": false,
+      "loadedFromEmbeddedDex": true,
+      "initialEosFrames": 122,
+      "afterEosSeekFrames": 111,
+      "partialBeforeFlush": 1,
+      "afterPartialSeekFrames": 111,
+      "closedState": [
+        373,
+        352,
+        4,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "repeatClosePassed": true,
+      "blockedOwnerCancelled": true,
+      "passed": true
+    },
+    {
+      "asyncInput": true,
+      "loadedFromEmbeddedDex": true,
+      "initialEosFrames": 122,
+      "afterEosSeekFrames": 111,
+      "partialBeforeFlush": 1,
+      "afterPartialSeekFrames": 111,
+      "closedState": [
+        372,
+        350,
+        4,
+        0,
+        0,
+        1,
+        0,
+        1,
+        363,
+        362,
+        1,
+        0,
+        0,
+        0,
+        1232167800
+      ],
+      "repeatClosePassed": true,
+      "blockedOwnerCancelled": true,
+      "passed": true
+    }
+  ],
+  "helper": {
+    "javaSha256": "b7b62148e06922698889fcb2c0f5648e8c8c42d5ef0ad8df89250cc9e7904870",
+    "dexSha256": "a39a4872d94a062ccc74c8b8ac897d9b9ba2323cb7ca8422a46134032e69bddf",
+    "dexBytes": 11084,
+    "headerSha256": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07",
+    "minApi": 26
+  },
+  "scope": "Actual embedded loader both modes with full PTS EOS/seek/partial flush/repeated close/blocked-owner wake. Pending submissions and both worker exits checked. Application timing pending."
+}

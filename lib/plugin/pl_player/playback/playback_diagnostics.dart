@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' show FramePhase;
+
 import 'package:PiliPlus/plugin/pl_player/playback/runtime_profile.dart';
 
 import 'package:flutter/foundation.dart';
@@ -14,6 +15,19 @@ import 'package:flutter/widgets.dart';
 /// FrameTiming describes Flutter raster work, not decoded video presentation.
 abstract final class PlaybackDiagnostics {
   static const enabled = bool.fromEnvironment('PLAYBACK_TRACE');
+  static const geometryEnabled = bool.fromEnvironment(
+    'PLAYBACK_TRACE_GEOMETRY',
+    defaultValue: true,
+  );
+  static const framesEnabled = bool.fromEnvironment('PLAYBACK_TRACE_FRAMES');
+  static const textureEnabled = bool.fromEnvironment('PLAYBACK_TRACE_TEXTURE');
+  static const continuityEnabled = bool.fromEnvironment(
+    'PLAYBACK_TRACE_CONTINUITY',
+  );
+  static const defaultDurationMs = int.fromEnvironment(
+    'PLAYBACK_TRACE_DURATION_MS',
+    defaultValue: 20000,
+  );
   static const _channel = MethodChannel('piliplus/playback_diagnostics');
   static final _clock = Stopwatch()..start();
   static final _probes = <String, Map<String, Object?> Function()>{};
@@ -34,12 +48,27 @@ abstract final class PlaybackDiagnostics {
 
   static bool get active => enabled && _clock.elapsedMicroseconds < _untilUs;
 
-  static void arm(String reason, Map<String, Object?> source) {
+  /// Configure sparse input/clock capture before the measured tap, so opening
+  /// the diagnostic file and channel is outside that tap's critical path.
+  static void prepareSparseCapture() {
+    if (enabled && !geometryEnabled) {
+      arm('input.prepare', const {}, durationMs: 60000);
+    }
+  }
+
+  static void arm(
+    String reason,
+    Map<String, Object?> source, {
+    int durationMs = defaultDurationMs,
+  }) {
     if (!enabled || !Platform.isAndroid) return;
     try {
       final now = _clock.elapsedMicroseconds;
       if (!active) _burstStartUs = now;
-      _untilUs = (now + 20000000).clamp(0, _burstStartUs + 120000000);
+      _untilUs = (now + durationMs.clamp(1000, 120000) * 1000).clamp(
+        0,
+        _burstStartUs + 120000000,
+      );
       _source = Map.of(source);
       _install();
       event('trace.arm', {
@@ -74,7 +103,10 @@ abstract final class PlaybackDiagnostics {
     try {
       await _channel.invokeMethod<void>('arm', {
         'reason': reason,
-        'durationMs': 20000,
+        'durationMs': ((_untilUs - _clock.elapsedMicroseconds) ~/ 1000).clamp(
+          1000,
+          120000,
+        ),
         'source': source,
       });
     } catch (_) {
@@ -88,6 +120,12 @@ abstract final class PlaybackDiagnostics {
       final sent = _clock.elapsedMicroseconds;
       final config = await _channel.invokeMapMethod<String, dynamic>(
         'configure',
+        {
+          'geometry': geometryEnabled,
+          'frames': framesEnabled,
+          'texture': textureEnabled,
+          'continuity': continuityEnabled,
+        },
       );
       final received = _clock.elapsedMicroseconds;
       if (config?['directory'] is! String) {
@@ -168,7 +206,9 @@ abstract final class PlaybackDiagnostics {
   static void event(String name, [Map<String, Object?> data = const {}]) {
     if (!active) return;
     _write(name, data);
-    if (name == 'media.textureId' || name == 'media.controller.created') {
+    if (name == 'media.textureId' ||
+        name == 'media.controller.created' ||
+        name == 'source.open.begin') {
       // Shorten native observer discovery latency; never wait on playback.
       unawaited(_markNative(name, data));
     }
@@ -212,52 +252,58 @@ abstract final class PlaybackDiagnostics {
   static void _install() {
     if (_installed) return;
     _installed = true;
-    SchedulerBinding.instance.addPersistentFrameCallback((timestamp) {
-      if (!active) return;
-      event('frame.afterDrawFrame', {'schedulerUs': timestamp.inMicroseconds});
-      SchedulerBinding.instance.addPostFrameCallback((timestamp) {
+    if (geometryEnabled) {
+      SchedulerBinding.instance.addPersistentFrameCallback((timestamp) {
         if (!active) return;
-        event('frame.postFrame', {'schedulerUs': timestamp.inMicroseconds});
-        final started = _clock.elapsedMicroseconds;
-        for (final probe in _probes.entries.toList()) {
-          try {
-            event('geometry', {
-              'probe': probe.key,
-              'schedulerUs': timestamp.inMicroseconds,
-              ...probe.value(),
-            });
-          } catch (error) {
-            event('probe.error', {
-              'probe': probe.key,
-              'type': error.runtimeType.toString(),
-            });
+        event('frame.afterDrawFrame', {
+          'schedulerUs': timestamp.inMicroseconds,
+        });
+        SchedulerBinding.instance.addPostFrameCallback((timestamp) {
+          if (!active) return;
+          event('frame.postFrame', {'schedulerUs': timestamp.inMicroseconds});
+          final started = _clock.elapsedMicroseconds;
+          for (final probe in _probes.entries.toList()) {
+            try {
+              event('geometry', {
+                'probe': probe.key,
+                'schedulerUs': timestamp.inMicroseconds,
+                ...probe.value(),
+              });
+            } catch (error) {
+              event('probe.error', {
+                'probe': probe.key,
+                'type': error.runtimeType.toString(),
+              });
+            }
           }
-        }
-        event('probe.collection', {
-          'collectionUs': _clock.elapsedMicroseconds - started,
-          'probeCount': _probes.length,
+          event('probe.collection', {
+            'collectionUs': _clock.elapsedMicroseconds - started,
+            'probeCount': _probes.length,
+          });
         });
       });
-    });
-    SchedulerBinding.instance.addTimingsCallback((timings) {
-      if (!active) return;
-      for (final timing in timings) {
-        event('frame.raster', {
-          'number': timing.frameNumber,
-          'buildUs': timing.buildDuration.inMicroseconds,
-          'rasterUs': timing.rasterDuration.inMicroseconds,
-          'totalUs': timing.totalSpan.inMicroseconds,
-          'timestamps': {
-            for (final phase in FramePhase.values)
-              phase.name: timing.timestampInMicroseconds(phase),
-          },
-        });
-      }
-    });
+    }
+    if (geometryEnabled || framesEnabled) {
+      SchedulerBinding.instance.addTimingsCallback((timings) {
+        if (!active) return;
+        for (final timing in timings) {
+          event('frame.raster', {
+            'number': timing.frameNumber,
+            'buildUs': timing.buildDuration.inMicroseconds,
+            'rasterUs': timing.rasterDuration.inMicroseconds,
+            'totalUs': timing.totalSpan.inMicroseconds,
+            'timestamps': {
+              for (final phase in FramePhase.values)
+                phase.name: timing.timestampInMicroseconds(phase),
+            },
+          });
+        }
+      });
+    }
   }
 
   static void register(String name, Map<String, Object?> Function() probe) {
-    if (enabled) _probes[name] = probe;
+    if (enabled && geometryEnabled) _probes[name] = probe;
   }
 
   static void unregister(String name) {
@@ -308,7 +354,9 @@ class RenderPlaybackTraceRegion extends RenderProxyBox {
   double pixelRatio;
   @visibleForTesting
   final bool Function()? isRecording;
-  bool get _recording => isRecording?.call() ?? PlaybackDiagnostics.active;
+  bool get _recording =>
+      isRecording?.call() ??
+      (PlaybackDiagnostics.active && PlaybackDiagnostics.geometryEnabled);
   late final _probeName = '$name#${identityHashCode(this)}';
   int _paintCount = 0;
 

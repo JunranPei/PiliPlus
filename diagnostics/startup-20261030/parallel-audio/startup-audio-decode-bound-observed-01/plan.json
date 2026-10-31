@@ -1,0 +1,45 @@
+{
+  "round": 86,
+  "baseline": "85control/native72,callbacks1/wait0/decode0/videoqueue1, bodyFAILOVER=true,progressrace=false, allbodygatesfalse; only STARTUP_AUDIO_DECODE_QUEUE_BOUNDED differs withidenticalsourcefiles.",
+  "measuredCauseEvidence": "audio-decode-ahead-evidence-86.json:189 audio frames reaching64s beforevideo61.5; filteredFIFO93 ends61.952, additionaldecoderqueue canwait instead of predecoding92extra frames.",
+  "change": "Only forfirstresume beforeopen, ad-queue-max-secs2\u21920.08, restore original oncurrent-source frameReady/cancel/replacement/dispose/error or5s fallback. Keep completefilteredFIFO,necessarypreroll,exactclip,AO buffer,passthrough,normalplayback. Do notclaimzero-framegate isphysicaldisplay.",
+  "tests": "36 tests passed after explicit-cancel ownership-order case; prior35tests andfailedfakeclocklogs retained. Actualfixedcancel/seek/formalBAAB stillpending.",
+  "protocol": "Same retainedQA145, freshprocess61.5s BAAB25s/back18, read-only hostprocess-state listener. Separateactualcancel/seek andnativeworkloadtrace. Noformal timing whilebuilding/tracing.",
+  "sources": [
+    {
+      "path": "lib\\plugin\\pl_player\\controller.dart",
+      "sha256": "9132713d8cf5a23c6b207c306258bd1aa501b8a4fa1d2f7bdefe7d33b486cae7"
+    },
+    {
+      "path": "lib\\plugin\\pl_player\\playback\\startup_audio_decode_queue.dart",
+      "sha256": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1"
+    },
+    {
+      "path": "test\\startup_audio_decode_queue_test.dart",
+      "sha256": "95c56a74a50786de1e095bb3c528ef5257e967704778d0d045eaca284fc8b53a"
+    }
+  ],
+  "references": [
+    "https://raw.githubusercontent.com/mpv-player/mpv/master/filters/f_decoder_wrapper.c",
+    "https://raw.githubusercontent.com/mpv-player/mpv/master/DOCS/man/options.rst"
+  ],
+  "netGainMs": null,
+  "nativeWorkReductionVerified": true,
+  "initialCancelFailure": "PID6563 actual earlyreturn/nativeclosure passed but newqueue restoreSkipped(ownerChanged=true) after cancelSource advanced sourceRevision1\u21922. Originalevents retained; not a full newfeature cancel pass.",
+  "cancelOrderFix": "Restore limit synchronously in cancelSource for matchingowner before incrementing sourceRevision; retain identity guard and all existing cancellation ordering. Actual firstframe trace7041 previously verified189\u219299decodedframes and unchanged93filteredframes; cleanup-onlyfix doesnotchangequeuecap.",
+  "actualNativeWorkReduction": "startup-audio-decode-bound-spans-01/workload-reviewed.json;189\u219299beforevideo61.5; nativefirstframe restores0.08\u21922; noapp netgainfrominstrumentedtimes.",
+  "fixedSources": [
+    {
+      "path": "lib\\plugin\\pl_player\\controller.dart",
+      "sha256": "d18b17d3baeb7aa44bad6b445d51a6749a959b8c931a9f5244ea74f8092139ba"
+    },
+    {
+      "path": "lib\\plugin\\pl_player\\playback\\startup_audio_decode_queue.dart",
+      "sha256": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1"
+    },
+    {
+      "path": "test\\startup_audio_decode_queue_test.dart",
+      "sha256": "bb4d7037c4d456a9ca0bf7596300ab9f11d761bb3f4e05b59428c8963e3d6bac"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "round": 80,
+  "sourceSha256": "53b91598ef095e81df841bd39d9c3c6f60f8793a74b6db6b45d4cde72de41ca4",
+  "medians": {
+    "control": {
+      "textureMs": 3461.0197,
+      "coverMs": 3559.5606499999762,
+      "openMs": 277.3641499999762,
+      "firstReceiveMs": 1242.80985,
+      "receiveToDrainMs": 1982.8125,
+      "drainToTextureMs": 235.39734999999973
+    },
+    "candidate": {
+      "textureMs": 3182.66195,
+      "coverMs": 3465.9956999999285,
+      "openMs": 568.8881999999285,
+      "firstReceiveMs": 1476.0778500000001,
+      "receiveToDrainMs": 1580.4277999999997,
+      "drainToTextureMs": 126.15630000000033
+    }
+  },
+  "netGainsMs": {
+    "textureMs": 278.35774999999967,
+    "coverMs": 93.5649500000477,
+    "openMs": -291.5240499999523,
+    "firstReceiveMs": -233.26800000000003,
+    "receiveToDrainMs": 402.3847000000003,
+    "drainToTextureMs": 109.2410499999994
+  },
+  "neighborPairGainsMs": [
+    312.60719999999947,
+    244.10829999999987
+  ],
+  "allMechanisms": true,
+  "returnPassedCount": 4,
+  "exactConsumedPtsCount": 0,
+  "continuousPlaybackConcerns": [
+    "02-control",
+    "04-candidate"
+  ],
+  "scope": "Same retainedQA144 and same native72; callbacks1/wait0/decode0, only videoqueue differs. New25s/18sBACK capture in both arms. No cross-round timing pooling.",
+  "limit": "Two runs per arm. Both first samples >4s and second samples ~2s; unrelated live Pixel Gallery Gradle build observed. Broad front/decode slowdown not solely attributed to queue. Keep all slow samples. No stable attributable278ms claim.",
+  "decision": "Retain one-frame videoqueue candidate for callback-only wait-off baseline; verify again before any default or phone delivery. Old74negative remains in ledger.",
+  "samples": [
+    {
+      "label": "01-candidate",
+      "pid": "7618",
+      "textureMs": 4337.8999,
+      "coverMs": 4735.868099999904,
+      "openMs": 888.2310999999046,
+      "firstReceiveMs": 2152.956,
+      "audioDrainMs": 4179.6172,
+      "receiveToDrainMs": 2026.6611999999996,
+      "maxPositiveGapMs": 431.8119,
+      "functionalCleanup": true,
+      "firstTexturePtsNs": 61600000000,
+      "continuousPlaybackConcern": false
+    },
+    {
+      "label": "02-control",
+      "pid": "8115",
+      "textureMs": 4650.5071,
+      "coverMs": 4690.416399999857,
+      "openMs": 278.35039999985696,
+      "firstReceiveMs": 1823.0794,
+      "audioDrainMs": 4228.314,
+      "receiveToDrainMs": 2405.2346000000002,
+      "maxPositiveGapMs": 614.532,
+      "functionalCleanup": true,
+      "firstTexturePtsNs": 61866688000,
+      "continuousPlaybackConcern": true
+    },
+    {
+      "label": "03-control",
+      "pid": "8484",
+      "textureMs": 2271.5323,
+      "coverMs": 2428.704900000095,
+      "openMs": 276.3779000000954,
+      "firstReceiveMs": 662.5403,
+      "audioDrainMs": 2222.9307,
+      "receiveToDrainMs": 1560.3903999999998,
+      "maxPositiveGapMs": 402.6536,
+      "functionalCleanup": true,
+      "firstTexturePtsNs": 61533313000,
+      "continuousPlaybackConcern": false
+    },
+    {
+      "label": "04-candidate",
+      "pid": "8933",
+      "textureMs": 2027.424,
+      "coverMs": 2196.1232999999525,
+      "openMs": 249.5452999999523,
+      "firstReceiveMs": 799.1997,
+      "audioDrainMs": 1933.3941,
+      "receiveToDrainMs": 1134.1943999999999,
+      "maxPositiveGapMs": 609.5443,
+      "functionalCleanup": true,
+      "firstTexturePtsNs": 61533313000,
+      "continuousPlaybackConcern": true
+    }
+  ]
+}

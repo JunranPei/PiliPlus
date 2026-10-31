@@ -1,0 +1,38 @@
+{
+  "plan": [
+    [
+      "00-seed",
+      "control"
+    ],
+    [
+      "01-candidate",
+      "candidate"
+    ],
+    [
+      "02-control",
+      "control"
+    ],
+    [
+      "03-control",
+      "control"
+    ],
+    [
+      "04-candidate",
+      "candidate"
+    ]
+  ],
+  "firstWarmupExcluded": true,
+  "seedFrom": "audio-lead-fair-observed-01/00-seed",
+  "newObservedCohort": true,
+  "seedStartProgressMs": 0,
+  "seedPurpose": "New Android lifetime QA140: excluded zero-start control seed, then force-stop before each formal61.5s resume",
+  "resourceSettlingMaximumSeconds": 0,
+  "postAppPreInputSettlingSeconds": 0,
+  "pairedWith": "Round68 new QA140, excluded control zero-start then B/A/A/B, fresh-App61.5s on the same Android. Both prime audio and log selected native PTS. Only candidate limits priming to4 frames per core cycle.",
+  "acceptanceFailuresRecordedWithoutAbortingIndependentNextFreshAppSample": true,
+  "appRestartEverySample": true,
+  "reuseSearchProcess": false,
+  "startProgressMs": 61500,
+  "resourceProfile": "lean-monitored observation only: no host resource veto or waiting; retain metrics as context; compare only this new B/A/A/B cohort",
+  "boundary": "Same live Android instance; each app PID is new and first click resumes 61.5s. Distinct from prior full-system cold captures. No Perfetto; matched Dart wait and 100ms transfer listeners. Both use independent audio decode queue."
+}

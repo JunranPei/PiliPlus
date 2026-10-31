@@ -1,0 +1,154 @@
+{
+  "round": 81,
+  "sourceSha256": "d4321cf82e823093eafd916ecf6c88ed2266230ecc86d1f740df43737322c431",
+  "apkSha256": {
+    "control": "cd5f31ec490b150aca9b81f3e84e4319ce7af7647b18b8f366ff542c52c91b67",
+    "candidate": "70dc44e824236f97e14c14d338ca044fe17bf8b86ae0f986e118fcc449d09550"
+  },
+  "nativeSha256": "b07a6e3cdad94bc0fe8576f55abea584781733cb3500f68af8be4f9bd1b6fca4",
+  "medians": {
+    "control": {
+      "textureMs": 1941.7134500000002,
+      "coverMs": 2051.09475,
+      "openMs": 255.86425000000003,
+      "firstReceiveMs": 828.6528,
+      "receiveToDrainMs": 1015.2764500000001,
+      "drainToTextureMs": 97.78420000000017
+    },
+    "candidate": {
+      "textureMs": 1691.1625,
+      "coverMs": 1852.5523000001908,
+      "openMs": 243.1388000001907,
+      "firstReceiveMs": 709.82845,
+      "receiveToDrainMs": 957.56985,
+      "drainToTextureMs": 23.764200000000073
+    }
+  },
+  "netGainsMs": {
+    "textureMs": 250.55095000000028,
+    "coverMs": 198.54244999980938,
+    "openMs": 12.725449999809314,
+    "firstReceiveMs": 118.82434999999998,
+    "receiveToDrainMs": 57.706600000000094,
+    "drainToTextureMs": 74.0200000000001
+  },
+  "netGainPercent": 12.90360068320072,
+  "retryCount": 1,
+  "switchCount": 0,
+  "mechanismVerified": true,
+  "nativeSelectedPtsCount": 4,
+  "exactConsumedPtsCount": 2,
+  "returnPassedCount": 4,
+  "continuousConcerns": [
+    "02-control"
+  ],
+  "workerFaults": [],
+  "scope": "Same QA144/native72; callbacks1/wait0/decode0/videoqueue1, initial/resume winner gates off. Only RESUME_BODY_FAILOVER differs. Freshprocess61.5s BAAB,25s/back18. Allsamples retained. Not physicaldisplay or exact consumedPTS proof.",
+  "attributionLimit": "N2 per arm; ordinary-network difference cannot establish stall-recovery gain when no validated switch occurred. Controlled HTTP stall evidence is separate. Never add this difference to prior80.",
+  "samples": [
+    {
+      "label": "01-candidate",
+      "pid": "10531",
+      "textureMs": 1673.5524,
+      "coverMs": 1813.0708000001907,
+      "firstTexturePtsNs": 61500000000,
+      "maxPositiveGapMs": 112.1685,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    },
+    {
+      "label": "02-control",
+      "pid": "10963",
+      "textureMs": 1832.6436,
+      "coverMs": 1868.0645,
+      "firstTexturePtsNs": 61600000000,
+      "maxPositiveGapMs": 633.1204,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    },
+    {
+      "label": "03-control",
+      "pid": "11333",
+      "textureMs": 2050.7833,
+      "coverMs": 2234.125,
+      "firstTexturePtsNs": 61533313000,
+      "maxPositiveGapMs": 129.4821,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    },
+    {
+      "label": "04-candidate",
+      "pid": "11766",
+      "textureMs": 1708.7726,
+      "coverMs": 1892.0338000001907,
+      "firstTexturePtsNs": 61500000000,
+      "maxPositiveGapMs": 167.9171,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [
+        {
+          "event": "isolated.video.resume.bodyRecovery.begin",
+          "seq": 818,
+          "elapsedUs": 11956372,
+          "utcUs": 1793446342212861,
+          "source": {
+            "owner": 1001408408,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "2d5bafa2",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "receivedBytes": 678109,
+          "overlapBytes": 65536,
+          "rangeStart": 6913095,
+          "stallMs": 350,
+          "workerElapsedUs": 1850145,
+          "workerUtcUs": 1793446342108640,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    }
+  ]
+}

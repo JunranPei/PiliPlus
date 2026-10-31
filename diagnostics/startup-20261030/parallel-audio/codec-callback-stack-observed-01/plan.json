@@ -1,0 +1,34 @@
+{
+  "plan": [
+    [
+      "01-candidate",
+      "candidate"
+    ],
+    [
+      "02-control",
+      "control"
+    ],
+    [
+      "03-control",
+      "control"
+    ],
+    [
+      "04-candidate",
+      "candidate"
+    ]
+  ],
+  "firstWarmupExcluded": false,
+  "seedFrom": "codec-callback-observed-02/00-seed",
+  "newObservedCohort": true,
+  "seedStartProgressMs": 0,
+  "seedPurpose": "Existing verified QA142 indexes reused; no extra seed playback, fresh app and disk index verification for every formal61.5s resume",
+  "resourceSettlingMaximumSeconds": 0,
+  "postAppPreInputSettlingSeconds": 0,
+  "pairedWith": "Round71 same QA142, stacked-vs-callback-only B/A/A/B, fresh-App61.5s on the same Android. Same APK/native binary and bounded listeners. Both retain4-frame audio priming; callback is1 in both arms; candidate adds decode_only1 while control keepsdecode_only0.",
+  "acceptanceFailuresRecordedWithoutAbortingIndependentNextFreshAppSample": true,
+  "appRestartEverySample": true,
+  "reuseSearchProcess": false,
+  "startProgressMs": 61500,
+  "resourceProfile": "lean-monitored observation only: no host resource veto or waiting; retain metrics as context; compare only this new B/A/A/B cohort",
+  "boundary": "Same live Android instance; each app PID is new and first click resumes 61.5s. Distinct from prior full-system cold captures. No Perfetto; matched Dart wait and 100ms transfer listeners. Both use independent audio decode queue and bounded priming. Callback buffer availability preserves original timestamp confidence, clipping and source quality; no independent queue worker."
+}

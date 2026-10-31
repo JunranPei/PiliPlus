@@ -3,6 +3,7 @@ import 'dart:async' show unawaited;
 
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/runtime_profile.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 
 import 'package:PiliPlus/build_config.dart';
 import 'package:PiliPlus/common/constants.dart';
@@ -42,6 +43,9 @@ import 'package:collection/collection.dart';
 import 'package:dynamic_color/dynamic_color.dart' show DynamicColorPlugin;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/orientation_service_warmup.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/codec_registry_warmup.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/isolated_media_sources.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -98,6 +102,7 @@ Future<void> _initAppPath() async {
 void main() async {
   RuntimeProfile.initialize();
   ScaledWidgetsFlutterBinding.ensureInitialized();
+  PlaybackDiagnostics.prepareSparseCapture();
   MediaKit.ensureInitialized();
   await _initAppPath();
   try {
@@ -108,6 +113,9 @@ void main() async {
     DeviceUtils.exitApp();
   }
   ScaledWidgetsFlutterBinding.instance.scaleFactor = Pref.uiScale;
+  if (Platform.isAndroid && const bool.fromEnvironment('PERSIST_RESUME_INDEX')) {
+    IsolatedMediaSources.preparePersistedIndexHints(GStorage.localCache);
+  }
   await Future.wait([
     _initDownPath(),
     _initTmpPath(),
@@ -220,9 +228,20 @@ void main() async {
   } else {
     runApp(const MyApp());
   }
+  if (Platform.isAndroid &&
+      const bool.fromEnvironment('WARM_ORIENTATION_SERVICE')) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(OrientationServiceWarmup.prepare());
+    });
+  }
   if (Platform.isAndroid && const bool.fromEnvironment('PLAYER_STANDBY')) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       unawaited(PlPlayerController.prepareStandby());
+    });
+  }
+  if (Platform.isAndroid && const bool.fromEnvironment('WARM_CODEC_REGISTRY')) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(CodecRegistryWarmup.prepare());
     });
   }
 }

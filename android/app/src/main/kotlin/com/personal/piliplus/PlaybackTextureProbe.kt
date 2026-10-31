@@ -29,9 +29,13 @@ class PlaybackTextureProbe(
     private val consumedSequence = AtomicLong()
     @Volatile private var active = false
     @Volatile private var requestContext: Map<String, Any?> = emptyMap()
+    @Volatile private var detailed = true
+    @Volatile private var continuity = false
 
     /** Main thread only; caller owns the bounded diagnostic interval. */
-    fun start() {
+    fun start(detailed: Boolean = true, continuity: Boolean = false) {
+        this.detailed = detailed
+        this.continuity = continuity
         active = true
         refresh()
     }
@@ -145,6 +149,18 @@ class PlaybackTextureProbe(
         private val widField = field(output, "wid")
         private val texture = entry.surfaceTexture()
         private var previousTimestamp: Long? = null
+        private var previousCallbackNs = 0L
+        private var previousContext: Map<String, Any?>? = null
+        private var observedFrames = 0L
+        private var changedFrames = 0L
+        private var sameFrames = 0L
+        private var maxGapNs = 0L
+        private var lastEmittedNs = 0L
+        private var lastPositiveChangeNs = 0L
+        private var positiveChanges = 0L
+        private var maxPositiveChangeGapNs = 0L
+        private var positiveGapsOver100Ms = 0L
+        private var reportedUnchanged = false
 
         /** Raster thread: copy metadata only; the owner asynchronously writes it. */
         fun consumed() {
@@ -152,20 +168,81 @@ class PlaybackTextureProbe(
                 val callbackNs = System.nanoTime()
                 val elapsedNs = SystemClock.elapsedRealtimeNanos()
                 val timestamp = texture.timestamp
-                val matrix = FloatArray(16)
-                texture.getTransformMatrix(matrix)
-                val surface = surfaceField.get(output) as Surface?
-                val wid = widField.getLong(output)
+                val context = requestContext
+                if (previousContext != context) {
+                    previousContext = context
+                    observedFrames = 0L
+                    changedFrames = 0L
+                    sameFrames = 0L
+                    maxGapNs = 0L
+                    previousCallbackNs = 0L
+                    lastEmittedNs = 0L
+                    lastPositiveChangeNs = 0L
+                    positiveChanges = 0L
+                    maxPositiveChangeGapNs = 0L
+                    positiveGapsOver100Ms = 0L
+                    reportedUnchanged = false
+                    // Keep the previous timestamp: a reused old buffer at a
+                    // source boundary must not become a new-media first frame.
+                }
+                val gapNs = if (previousCallbackNs == 0L) 0L else callbackNs - previousCallbackNs
+                previousCallbackNs = callbackNs
+                maxGapNs = maxOf(maxGapNs, gapNs)
+                observedFrames++
                 val previousTime = previousTimestamp
                 previousTimestamp = timestamp
+                if (previousTime == timestamp) sameFrames++ else changedFrames++
+                // A callback can consume the same old image repeatedly. Only
+                // a distinct positive producer timestamp advances this clock.
+                // This remains consumption metadata, not display presentation.
+                var positiveChangeGapNs = 0L
+                var unchangedAgeNs = 0L
+                var continuityAttention = false
+                if (continuity) {
+                    if (timestamp > 0L && previousTime != timestamp) {
+                        continuityAttention = lastPositiveChangeNs == 0L
+                        if (lastPositiveChangeNs != 0L) {
+                            positiveChangeGapNs = callbackNs - lastPositiveChangeNs
+                            maxPositiveChangeGapNs = maxOf(maxPositiveChangeGapNs, positiveChangeGapNs)
+                            if (positiveChangeGapNs >= 100_000_000L) {
+                                positiveGapsOver100Ms++
+                                continuityAttention = true
+                            }
+                        }
+                        lastPositiveChangeNs = callbackNs
+                        positiveChanges++
+                        reportedUnchanged = false
+                    } else if (lastPositiveChangeNs != 0L) {
+                        unchangedAgeNs = callbackNs - lastPositiveChangeNs
+                        if (unchangedAgeNs >= 100_000_000L && !reportedUnchanged) {
+                            reportedUnchanged = true
+                            continuityAttention = true
+                        }
+                    }
+                }
+                val sequence = consumedSequence.incrementAndGet()
+                // Capture initial transitions exactly; thereafter aggregate
+                // without reflection, matrix allocation, JSON or channel calls
+                // on every raster callback. A gap is emitted immediately.
+                if (!detailed && observedFrames > 4 &&
+                    callbackNs - lastEmittedNs < 500_000_000L && gapNs < 100_000_000L &&
+                    !continuityAttention) return
+                lastEmittedNs = callbackNs
+                val matrix = if (detailed) FloatArray(16).also { texture.getTransformMatrix(it) }.toList() else null
+                val surface = surfaceField.get(output) as Surface?
+                val wid = widField.getLong(output)
                 safeEmit("texture.consumed", mapOf(
-                    "consumedSequence" to consumedSequence.incrementAndGet(),
+                    "consumedSequence" to sequence,
                     "callbackMonoNs" to callbackNs,
                     "callbackElapsedNs" to elapsedNs,
                     "textureTimestampNs" to timestamp,
                     "timestampDeltaNs" to previousTime?.let { timestamp - it },
                     "sameTimestampAsPrevious" to (previousTime == timestamp),
-                    "textureTransform" to matrix.toList(),
+                    "textureTransform" to matrix,
+                    "aggregated" to !detailed,
+                    "observedFrames" to observedFrames, "changedTimestampFrames" to changedFrames,
+                    "repeatedTimestampFrames" to sameFrames, "maxCallbackGapNs" to maxGapNs,
+                    "callbackGapNs" to gapNs,
                     "handle" to handle,
                     "textureId" to entry.id(),
                     "textureIdentity" to System.identityHashCode(texture),
@@ -176,8 +253,17 @@ class PlaybackTextureProbe(
                     "actualBufferSize" to null,
                     "presentationFence" to false,
                     "threadId" to Thread.currentThread().id,
-                    "requestContext" to requestContext,
-                ))
+                    "requestContext" to context,
+                ).let { data ->
+                    if (continuity) data + mapOf(
+                        "continuityObserved" to true,
+                        "positiveTimestampChanges" to positiveChanges,
+                        "positiveTimestampGapNs" to positiveChangeGapNs,
+                        "maxPositiveTimestampGapNs" to maxPositiveChangeGapNs,
+                        "positiveTimestampGapsOver100Ms" to positiveGapsOver100Ms,
+                        "unchangedPositiveTimestampAgeNs" to unchangedAgeNs,
+                    ) else data
+                })
             } catch (error: Exception) {
                 // No diagnostic failure may interrupt the render thread.
                 safeEmit("texture.readError", mapOf("type" to error.javaClass.name))

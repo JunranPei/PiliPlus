@@ -1,0 +1,207 @@
+{
+  "passed": true,
+  "pid": "4114",
+  "gestureReleaseAfterInputMs": 4786.7583,
+  "firstNewPositionAfterGestureMs": 962.735,
+  "firstPostSeekPtsSeconds": 90.633313,
+  "lastPostSeekPtsSeconds": 105.9,
+  "postSeekObservedPoints": 32,
+  "postSeekMonotonicPts": true,
+  "actualSeekFlushes": [
+    14.2375,
+    8.7235
+  ],
+  "callbackClose": {
+    "event": "close",
+    "monoNs": 183462690200,
+    "codec": "0x76e9e34a51c0",
+    "inputCallbacks": 618,
+    "outputCallbacks": 598,
+    "flushes": 3,
+    "pendingInput": 0,
+    "pendingOutput": 0,
+    "closed": 1,
+    "threadAlive": 0,
+    "error": 0,
+    "asyncInput": 1,
+    "inputPosted": 606,
+    "inputCompleted": 606,
+    "inputCancelled": 0,
+    "pendingSubmissions": 0,
+    "inputThreadAlive": 0,
+    "inputFailure": 0,
+    "inputWorkNs": 7519766300,
+    "waitEnabled": 0,
+    "emptyPolls": 2889,
+    "waitCalls": 0,
+    "waitNs": 0
+  },
+  "returnCleanup": {
+    "passed": true,
+    "sourceIdentity": {
+      "cid": 42790290231,
+      "requestId": 1,
+      "sourceRevision": 1,
+      "textureId": 0,
+      "playerId": 3863624
+    },
+    "sourceOpenSequence": 547,
+    "firstRouteLeaveSequence": 1829,
+    "closure": [
+      {
+        "event": "isolated.video.closed",
+        "seq": 1889,
+        "elapsedUs": 31919292,
+        "utcUs": 1793452089902862,
+        "source": {
+          "owner": 1036756636,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "1ec428c0",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "receivedBytes": 153840,
+        "deliveredBytes": 153840,
+        "workerElapsedUs": 21258652,
+        "workerUtcUs": 1793452089828882,
+        "requestId": 1,
+        "cid": 42790290231
+      },
+      {
+        "event": "isolated.audio.closed",
+        "seq": 1891,
+        "elapsedUs": 31921187,
+        "utcUs": 1793452089904771,
+        "source": {
+          "owner": 1036756636,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "1ec428c0",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "receivedBytes": 171032,
+        "deliveredBytes": 171032,
+        "workerElapsedUs": 21260786,
+        "workerUtcUs": 1793452089831014,
+        "requestId": 1,
+        "cid": 42790290231
+      },
+      {
+        "event": "isolated.closed",
+        "seq": 1892,
+        "elapsedUs": 31921726,
+        "utcUs": 1793452089905290,
+        "source": {
+          "owner": 1036756636,
+          "cid": 42790290231,
+          "revision": 1,
+          "routeActive": true,
+          "videoState": false,
+          "frameReady": false,
+          "preparing": false,
+          "autoPlay": true,
+          "coverSourceId": "1",
+          "mediaSourceId": "1ec428c0",
+          "player": {
+            "requestId": null,
+            "sourceRevision": 0,
+            "owner": null,
+            "readyOwner": null,
+            "cid": null,
+            "mediaSourceId": null,
+            "playerId": null,
+            "videoControllerId": null,
+            "textureId": null,
+            "textureRect": null,
+            "decodedDisplaySize": null,
+            "positionMs": null,
+            "playing": null,
+            "buffering": null,
+            "requestedSize": [
+              null,
+              null
+            ],
+            "fit": "contain",
+            "flipX": false,
+            "flipY": false,
+            "onlyAudio": false,
+            "isLive": false
+          }
+        },
+        "expected": true,
+        "requestId": 1,
+        "cid": 42790290231
+      }
+    ],
+    "activeAudioTrackCounts": [
+      0
+    ],
+    "closeAfterLeaveMs": [
+      410.895,
+      412.79,
+      413.329
+    ],
+    "reviewerSha256": "8f52f537208305029bd502c6403499bf7bdf8efc2e589949d107ab134443a04a"
+  },
+  "boundary": "Listener-based actual horizontal seek with one-frame video queue, then>10s observed progress and return; no pixel-content equivalence claim. Not included in startup performance cohort."
+}

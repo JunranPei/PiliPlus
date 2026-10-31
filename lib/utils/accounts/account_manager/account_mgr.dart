@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:PiliPlus/http/api.dart';
 import 'package:PiliPlus/http/constants.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_wait_trace.dart';
 import 'package:PiliPlus/models/common/account_type.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
@@ -112,9 +113,10 @@ class AccountManager extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (_boundRequestAccount(response.requestOptions) case final account?) {
-      final future = _saveCookies(
-        account,
-        response,
+      final future = StartupWaitTrace.wait(
+        'http.response.cookies',
+        () => _saveCookies(account, response),
+        StartupWaitTrace.request(response.requestOptions),
       ).whenComplete(() => handler.next(response));
       assert(() {
         future.catchError(
@@ -198,7 +200,11 @@ class AccountManager extends Interceptor {
     final isRedirectRequest = statusCode >= 300 && statusCode < 400;
     final originalUri = response.requestOptions.uri;
     final realUri = originalUri.resolveUri(response.realUri);
-    await account.cookieJar.saveFromResponse(realUri, cookies);
+    await StartupWaitTrace.wait(
+      'http.cookies.save',
+      () => account.cookieJar.saveFromResponse(realUri, cookies),
+      StartupWaitTrace.request(response.requestOptions),
+    );
     if (isRedirectRequest && locations.isNotEmpty) {
       final originalUri = response.realUri;
       await Future.wait(
@@ -211,7 +217,11 @@ class AccountManager extends Interceptor {
         ),
       );
     }
-    await account.onChange();
+    await StartupWaitTrace.wait(
+      'http.account.onChange',
+      () => account.onChange() ?? Future<void>.value(),
+      StartupWaitTrace.request(response.requestOptions),
+    );
   }
 
   static bool _skipCookie(String path) {

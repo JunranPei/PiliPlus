@@ -1,0 +1,26 @@
+{
+  "plan": [
+    [
+      "01-candidate",
+      "candidate"
+    ],
+    [
+      "02-control",
+      "control"
+    ],
+    [
+      "03-control",
+      "control"
+    ],
+    [
+      "04-candidate",
+      "candidate"
+    ]
+  ],
+  "sameEmulator": true,
+  "appRestartEverySample": true,
+  "startProgressMs": 61500,
+  "seedFrom": "Existing persistent disk SIDX, verified per sample; same current Android boot for all four",
+  "comparison": "Only HEDGE_INITIAL_BODY differs; same sources/native72/engine/assets/bounded64KiB/videoqueue1/callback1/wait1/decodeonly0. No heavy traces.",
+  "acceptance": "Exact first consumed PTS separate from native selection; retain failures. No previous boot performance pooling."
+}

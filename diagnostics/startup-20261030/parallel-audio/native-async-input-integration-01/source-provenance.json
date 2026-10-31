@@ -1,0 +1,15 @@
+{
+  "before": {},
+  "after": {},
+  "added": {},
+  "replaced": {
+    "ffmpeg/libavcodec/pili_codec_callbacks_jni.h": {
+      "before": "38552a1038e64cc051f10ff552f8370d37baa1592b3bfa9423c5041723a15421",
+      "after": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+    },
+    "ffmpeg/libavcodec/pili_codec_callbacks_dex.h": {
+      "before": "65c1f5468ee409173dc23aad2f894d40952bd20e0520d842397644636e162c9c",
+      "after": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07"
+    }
+  }
+}

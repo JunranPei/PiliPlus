@@ -147,6 +147,10 @@ abstract class CommonIntroController extends GetxController
   }
 
   Future<void> queryVideoTags() async {
+    if (const bool.fromEnvironment('DEFER_VIDEO_AUXILIARY') &&
+        (!await videoDetailCtr.waitForAuxiliaryRequest('tags') || isClosed)) {
+      return;
+    }
     final result = await UserHttp.videoTags(bvid: bvid, cid: cid.value);
     videoTags.value = result.dataOrNull;
   }

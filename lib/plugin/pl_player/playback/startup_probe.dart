@@ -128,6 +128,10 @@ abstract final class StartupProbe {
       }
     }
     for (final entry in const <String, String>{
+      'seek to': 'seek.request',
+      'hr-seek dropped': 'seek.frame.dropped',
+      'hr-seek': 'seek.precise',
+      'seek done': 'seek.demux.done',
       'opening segment': 'edl.segment.open',
       'starting connection attempt': 'connect.begin',
       'successfully connected': 'connect.end',

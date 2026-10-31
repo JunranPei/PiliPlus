@@ -1,0 +1,305 @@
+{
+  "round": 86,
+  "netGainMs": 165.79475000000025,
+  "netGainPercent": 8.392187435976236,
+  "neighborControlMinusCandidateMs": [
+    -102.10140000000001,
+    433.6909000000003
+  ],
+  "nativeWorkload": {
+    "oldRound82": {
+      "pid": "12200",
+      "decodedBeforeTargetCount": 189,
+      "decodedFirstPts": 59.989333,
+      "decodedLastPts": 64.0,
+      "filteredFifoCount": 93,
+      "filteredFifoLastPts": 61.952,
+      "queueEvents": [],
+      "diagnosticInputToTextureMs": 2453.0566
+    },
+    "newRound86": {
+      "pid": "7041",
+      "decodedBeforeTargetCount": 99,
+      "decodedFirstPts": 59.989333,
+      "decodedLastPts": 62.08,
+      "filteredFifoCount": 93,
+      "filteredFifoLastPts": 61.952,
+      "queueEvents": [
+        {
+          "event": "startup.audioDecodeQueue.limited",
+          "elapsedUs": 10388385,
+          "requestId": 1,
+          "sourceRevision": 1,
+          "previousSeconds": "2.000000",
+          "actualSeconds": "0.080000"
+        },
+        {
+          "event": "startup.audioDecodeQueue.restored",
+          "elapsedUs": 12361110,
+          "requestId": 1,
+          "sourceRevision": 1,
+          "reason": "source-frame",
+          "previousSeconds": "0.080000",
+          "actualSeconds": "2.000000"
+        }
+      ],
+      "diagnosticInputToTextureMs": 2112.9253
+    },
+    "fewerDecodedBeforeTarget": 90,
+    "mechanismWorkReduction": true,
+    "scope": "Actual native audio-decoded PTS before first native video render/release. Prior82 versus86 diagnostic samples on different Android boots/conditions; compare workload only, not startup speed. Fullsame-sourceBAAB remainsrequired.86trace taken during control build, never in formal latency cohort.",
+    "appNetGainMs": null
+  },
+  "actualCancel": {
+    "pid": "7671",
+    "passed": true,
+    "nativeEarlyCancel": true,
+    "callbackClosed": true,
+    "returnCleanup": true,
+    "queueEvents": [
+      {
+        "event": "startup.audioDecodeQueue.limited",
+        "seq": 669,
+        "elapsedUs": 13654018,
+        "requestId": 1,
+        "sourceRevision": 1,
+        "cid": 42790290231,
+        "playerId": 129953766,
+        "previousSeconds": "2.000000",
+        "actualSeconds": "0.080000"
+      },
+      {
+        "event": "startup.audioDecodeQueue.restored",
+        "seq": 841,
+        "elapsedUs": 14864065,
+        "requestId": 1,
+        "sourceRevision": 1,
+        "cid": 42790290231,
+        "playerId": 129953766,
+        "reason": "source-cancelled",
+        "previousSeconds": "0.080000",
+        "actualSeconds": "2.000000"
+      }
+    ],
+    "priorFailure": "../startup-audio-decode-bound-cancel-01/audio-queue-cancel-events.json",
+    "fix": "Restore before owner sourceRevision increments; late request.cancelled callback cannot skip or repeat restoration."
+  },
+  "actualSeek": {
+    "passed": true,
+    "pid": "8119",
+    "gestureReleaseAfterInputMs": 4660.6583,
+    "firstNewPositionAfterGestureMs": 1617.0613,
+    "firstPostSeekPtsSeconds": 89.7,
+    "lastPostSeekPtsSeconds": 104.0,
+    "postSeekObservedPoints": 32,
+    "postSeekMonotonicPts": true,
+    "actualSeekFlushes": [
+      13.1568,
+      9.9482
+    ],
+    "callbackClose": {
+      "event": "close",
+      "monoNs": 1744713058600,
+      "codec": "0x7d7b212889c0",
+      "inputCallbacks": 647,
+      "outputCallbacks": 631,
+      "flushes": 3,
+      "pendingInput": 0,
+      "pendingOutput": 0,
+      "closed": 1,
+      "threadAlive": 0,
+      "error": 0,
+      "waitEnabled": 0,
+      "emptyPolls": 1661,
+      "waitCalls": 0,
+      "waitNs": 0
+    },
+    "returnCleanup": {
+      "passed": true,
+      "sourceIdentity": {
+        "cid": 42790290231,
+        "requestId": 1,
+        "sourceRevision": 1,
+        "textureId": 0,
+        "playerId": 106359890
+      },
+      "sourceOpenSequence": 575,
+      "firstRouteLeaveSequence": 1878,
+      "closure": [
+        {
+          "event": "isolated.video.closed",
+          "seq": 1888,
+          "elapsedUs": 31565550,
+          "utcUs": 1793450944004470,
+          "source": {
+            "owner": 26019042,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "3fd55f8e",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "receivedBytes": 97461,
+          "deliveredBytes": 97461,
+          "workerElapsedUs": 21270008,
+          "workerUtcUs": 1793450943989362,
+          "requestId": 1,
+          "cid": 42790290231
+        },
+        {
+          "event": "isolated.audio.closed",
+          "seq": 1890,
+          "elapsedUs": 31566022,
+          "utcUs": 1793450944004940,
+          "source": {
+            "owner": 26019042,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "3fd55f8e",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "receivedBytes": 89270,
+          "deliveredBytes": 89270,
+          "workerElapsedUs": 21270442,
+          "workerUtcUs": 1793450943989843,
+          "requestId": 1,
+          "cid": 42790290231
+        },
+        {
+          "event": "isolated.closed",
+          "seq": 1891,
+          "elapsedUs": 31566247,
+          "utcUs": 1793450944005165,
+          "source": {
+            "owner": 26019042,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "3fd55f8e",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "expected": true,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "activeAudioTrackCounts": [
+        0
+      ],
+      "closeAfterLeaveMs": [
+        349.495,
+        349.967,
+        350.192
+      ],
+      "reviewerSha256": "8f52f537208305029bd502c6403499bf7bdf8efc2e589949d107ab134443a04a"
+    },
+    "boundary": "Listener-based actual horizontal seek with one-frame video queue, then>10s observed progress and return; no pixel-content equivalence claim. Not included in startup performance cohort."
+  },
+  "hostProcessStates": [
+    {
+      "hostTime": 1793450986.2065773,
+      "hostPerfNs": 11714931987000,
+      "status": "running"
+    }
+  ],
+  "sourceAndNativeEqualityVerifiedByRunner": true,
+  "exactFirstConsumedPtsCount": 2,
+  "newNativeSelectedPtsCount": 4,
+  "continuousMaxGapsMs": [
+    122.4481,
+    101.7183,
+    109.8071,
+    138.1244
+  ],
+  "decision": "Retain this default-off candidate for stacking and repeatability checks: actualworkreduction, samebootnormalstartup median improvement andcancel/seek/returnpassed. N2 each andoppositeneighborpairs do notprove stable generalgain. No newphonepackage. Original86cancellationrestorationfailure preserved,2linefixincludedbothformalbuilds.",
+  "goalComplete": false,
+  "remaining": "0.8s unachieved; firstconsumedPTS canstillbe61.566688; startupmosttime remainsreceive-to-drain ~964.5ms. Next evaluate proven83asyncinputworker inactualmpv pipeline, keeping86candidate anditsbaseline separately."
+}

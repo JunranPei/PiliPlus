@@ -1,0 +1,4 @@
+tool/startup_orientation_timing/SensorOrientationListener.java:52: trailing whitespace.
++    
+tool/startup_orientation_timing/SensorOrientationListener.java:64: trailing whitespace.
++    

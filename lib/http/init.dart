@@ -8,6 +8,7 @@ import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/http/retry_interceptor.dart';
 import 'package:PiliPlus/http/user.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/runtime_profile.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_wait_trace.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
 import 'package:PiliPlus/utils/accounts/account_manager/account_mgr.dart';
@@ -185,16 +186,16 @@ class Request {
     try {
       final (h11, connectionManager) = _createPool();
       if (connectionManager != null) {
-        (dio.httpClientAdapter as Http2Adapter)
+        (RuntimeProfileAdapter.unwrap(dio.httpClientAdapter) as Http2Adapter)
           ..connectionManager.close(force: true)
           ..connectionManager = connectionManager
           ..fallbackAdapter.close(force: true)
           ..fallbackAdapter = h11;
-        _http11Dio?.httpClientAdapter = h11;
+        _http11Dio?.httpClientAdapter = RuntimeProfileAdapter.wrap(h11);
       } else {
         dio
           ..httpClientAdapter.close(force: true)
-          ..httpClientAdapter = h11;
+          ..httpClientAdapter = RuntimeProfileAdapter.wrap(h11);
       }
     } catch (_) {}
   }
@@ -249,7 +250,7 @@ class Request {
     }
 
     dio
-      ..transformer = BackgroundTransformer()
+      ..transformer = StartupWaitTransformer.wrap(BackgroundTransformer())
       ..options.validateStatus = (int? status) {
         return status != null && status >= 200 && status < 300;
       };
@@ -359,8 +360,20 @@ class Request {
     List<int> responseBytes,
     RequestOptions options,
     ResponseBody responseBody,
-  ) => utf8.decode(
-    responseBytesDecoder(responseBytes, responseBody.headers),
-    allowMalformed: true,
-  );
+  ) {
+    final bytes = StartupWaitTrace.sync(
+      'http.content.decode',
+      () => responseBytesDecoder(responseBytes, responseBody.headers),
+      {
+        ...StartupWaitTrace.request(options),
+        'encoding': responseBody.headers['content-encoding']?.firstOrNull,
+        'bytes': responseBytes.length,
+      },
+    );
+    return StartupWaitTrace.sync(
+      'http.utf8.decode',
+      () => utf8.decode(bytes, allowMalformed: true),
+      {...StartupWaitTrace.request(options), 'bytes': bytes.length},
+    );
+  }
 }

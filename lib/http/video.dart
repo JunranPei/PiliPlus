@@ -1,6 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_wait_trace.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/one_shot_prefetch.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/selected_media_warmup.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/visible_media_prefetch.dart';
+import 'package:PiliPlus/models/common/video/video_quality.dart';
 
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/grpc/bilibili/main/community/reply/v1.pb.dart'
@@ -48,6 +55,148 @@ import 'package:protobuf/protobuf.dart';
 
 /// view层根据 status 判断渲染逻辑
 abstract final class VideoHttp {
+  static const visibleUrlPrefetch = bool.fromEnvironment(
+    'VISIBLE_URL_PREFETCH',
+  );
+  static const retainCompletedPlayUrl = bool.fromEnvironment(
+    'RETAIN_COMPLETED_PLAY_URL',
+  );
+  static int _prefetchGeneration = 0;
+  static final _urlPrefetch = OneShotPrefetch<Object, String>(
+    lifetime: const Duration(seconds: 10),
+  );
+
+  static Object _urlPrefetchKey({
+    int? avid,
+    String? bvid,
+    required int cid,
+    required int qn,
+    Object? epid,
+    Object? seasonId,
+    required bool tryLook,
+    required VideoType videoType,
+    String? language,
+    bool voiceBalance = false,
+  }) => (
+    account: Accounts.video,
+    avid: avid,
+    bvid: bvid,
+    cid: cid,
+    qn: qn,
+    epid: epid,
+    seasonId: seasonId,
+    tryLook: tryLook,
+    videoType: videoType,
+    language: language,
+    voiceBalance: voiceBalance,
+  );
+
+  /// Caller owns visibility/network eligibility. Media preparation, when enabled,
+  /// has its own bounded lease; this cache retains only the raw URL response.
+  static bool prefetchVideoUrl({required String bvid, required int cid}) {
+    if (!visibleUrlPrefetch) return false;
+    final tryLook = !Accounts.video.isLogin && Pref.p1080;
+    final voiceBalance = Platform.isAndroid && Pref.audioNormalization != '0';
+    final quality = VideoQuality.hdrVivid.code;
+    final key = _urlPrefetchKey(
+      bvid: bvid,
+      cid: cid,
+      qn: quality,
+      tryLook: tryLook,
+      videoType: .ugc,
+      voiceBalance: voiceBalance,
+    );
+    final generation = ++_prefetchGeneration;
+    final ready = retainCompletedPlayUrl ? _urlPrefetch.peekReady(key) : null;
+    if (ready != null) {
+      // Run after the caller announces the newly visible card. A subsequent
+      // scroll, lifecycle cancellation or playback claim invalidates this work.
+      scheduleMicrotask(() {
+        if (generation != _prefetchGeneration ||
+            _urlPrefetch.peekReady(key) != ready) {
+          return;
+        }
+        try {
+          prefetchVisibleMedia(PlayUrlModel.fromJson(jsonDecode(ready)), cid);
+          PlaybackDiagnostics.event('startup.urlPrefetch.ready', {
+            'bvid': bvid,
+            'cid': cid,
+            'reusedCompleted': true,
+          });
+        } catch (_) {
+          _urlPrefetch.clearIf(key);
+        }
+      });
+      return true;
+    }
+    final token = CancelToken();
+    Timer? deadline;
+    var claimed = false;
+    return _urlPrefetch.start(
+      key,
+      () async {
+        PlaybackDiagnostics.event('startup.urlPrefetch.begin', {
+          'bvid': bvid,
+          'cid': cid,
+        });
+        deadline = Timer(
+          const Duration(seconds: 4),
+          () => token.cancel('prefetch deadline'),
+        );
+        try {
+          String? raw;
+          final result = await _requestVideoUrl(
+            bvid: bvid,
+            cid: cid,
+            qn: quality,
+            tryLook: tryLook,
+            videoType: .ugc,
+            voiceBalance: voiceBalance,
+            cancelToken: token,
+            onRawUgc: (data) => raw = jsonEncode(data),
+          );
+          if (result is! Success<PlayUrlModel> ||
+              raw == null ||
+              utf8.encode(raw!).length > 512 * 1024) {
+            throw StateError('No bounded successful UGC response');
+          }
+          if (!claimed && !token.isCancelled) {
+            prefetchVisibleMedia(result.response, cid);
+          }
+          PlaybackDiagnostics.event('startup.urlPrefetch.ready', {
+            'bvid': bvid,
+            'cid': cid,
+          });
+          return raw!;
+        } finally {
+          deadline?.cancel();
+        }
+      },
+      cancel: () {
+        deadline?.cancel();
+        token.cancel('prefetch no longer selected');
+        if (SelectedMediaWarmup.enabled) SelectedMediaWarmup.instance.clear();
+      },
+      onClaim: () {
+        claimed = true;
+        deadline?.cancel();
+      },
+    );
+  }
+
+  static void cancelVideoUrlPrefetch({bool retainCompleted = false}) {
+    _prefetchGeneration++;
+    if (retainCompletedPlayUrl && retainCompleted) {
+      final retained = _urlPrefetch.clearPendingKeepReady();
+      PlaybackDiagnostics.event('startup.urlPrefetch.scrollCancel', {
+        'completedResponseRetained': retained,
+      });
+    } else {
+      _urlPrefetch.clear();
+    }
+    if (SelectedMediaWarmup.enabled) SelectedMediaWarmup.instance.clear();
+  }
+
   static RegExp zoneRegExp = RegExp(Pref.banWordForZone, caseSensitive: false);
   static bool enableFilter = zoneRegExp.pattern.isNotEmpty;
 
@@ -227,6 +376,69 @@ abstract final class VideoHttp {
     String? language,
     bool voiceBalance = false,
   }) async {
+    if (visibleUrlPrefetch && videoType == VideoType.ugc) {
+      final prefetched = _urlPrefetch.take(
+        _urlPrefetchKey(
+          avid: avid,
+          bvid: bvid,
+          cid: cid,
+          qn: qn,
+          epid: epid,
+          seasonId: seasonId,
+          tryLook: tryLook,
+          videoType: videoType,
+          language: language,
+          voiceBalance: voiceBalance,
+        ),
+      );
+      if (prefetched != null) {
+        PlaybackDiagnostics.event('startup.urlPrefetch.claim', {
+          'bvid': bvid,
+          'cid': cid,
+        });
+        try {
+          // The normal controller mutates tracks when supplementing qualities.
+          // Decode a fresh object, never share that mutable model with prefetch.
+          return Success(
+            PlayUrlModel.fromJson(
+              jsonDecode(await prefetched) as Map<String, dynamic>,
+            ),
+          );
+        } catch (_) {
+          PlaybackDiagnostics.event('startup.urlPrefetch.fallback', {
+            'cid': cid,
+          });
+        }
+      }
+    }
+    return _requestVideoUrl(
+      avid: avid,
+      bvid: bvid,
+      cid: cid,
+      qn: qn,
+      epid: epid,
+      seasonId: seasonId,
+      tryLook: tryLook,
+      videoType: videoType,
+      language: language,
+      voiceBalance: voiceBalance,
+    );
+  }
+
+  static Future<LoadingState<PlayUrlModel>> _requestVideoUrl({
+    int? avid,
+    String? bvid,
+    required int cid,
+    required int qn,
+    dynamic epid,
+    dynamic seasonId,
+    required bool tryLook,
+    required VideoType videoType,
+    String? language,
+    bool voiceBalance = false,
+    CancelToken? cancelToken,
+    void Function(Map<String, dynamic>)? onRawUgc,
+  }) async {
     PlaybackDiagnostics.event('source.url.begin', {'cid': cid, 'quality': qn});
     final dmImgStr = Utils.base64EncodeRandomString(16, 64);
     final dmCoverImgStr = Utils.base64EncodeRandomString(32, 128);
@@ -259,7 +471,11 @@ abstract final class VideoHttp {
         'cid': cid,
         'quality': qn,
       });
-      final res = await Request().get(videoType.api, queryParameters: params);
+      final res = await Request().get(
+        videoType.api,
+        queryParameters: params,
+        cancelToken: cancelToken,
+      );
       PlaybackDiagnostics.event('source.url.response', {
         'cid': cid,
         'quality': qn,
@@ -268,24 +484,45 @@ abstract final class VideoHttp {
       });
 
       if (res.data['code'] == 0) {
-        late PlayUrlModel data;
-        switch (videoType) {
-          case .ugc:
-            data = PlayUrlModel.fromJson(res.data['data']);
+        final parsed = StartupWaitTrace.sync('source.url.model', () {
+          late PlayUrlModel data;
+          switch (videoType) {
+            case .ugc:
+              var raw = res.data['data'] as Map<String, dynamic>;
+              // Explicit isolated QA fixture: test real network/decoder behavior
+              // with a known position by overriding only the local response.
+              // Ordinary playback history behavior is retained.
+              // Ordinary and user-testing builds omit this define entirely.
+              const fixtureMs = int.fromEnvironment('STARTUP_TEST_RESUME_MS');
+              if (PlaybackDiagnostics.enabled &&
+                  fixtureMs > 0 &&
+                  (raw['timelength'] as num? ?? 0) > fixtureMs + 1000) {
+                PlaybackDiagnostics.event('startup.resumeFixture', {
+                  'cid': cid,
+                  'originalMs': raw['last_play_time'],
+                  'fixtureMs': fixtureMs,
+                  'fixtureWritesRemoteHistory': false,
+                });
+                raw = {...raw, 'last_play_time': fixtureMs};
+              }
+              onRawUgc?.call(raw);
+              data = PlayUrlModel.fromJson(raw);
 
-          case .pgc:
-            final result = res.data['result'];
-            data = PlayUrlModel.fromJson(result['video_info'])
-              ..lastPlayTime =
-                  result['play_view_business_info']?['user_status']?['watch_progress']?['current_watch_progress'];
+            case .pgc:
+              final result = res.data['result'];
+              data = PlayUrlModel.fromJson(result['video_info'])
+                ..lastPlayTime =
+                    result['play_view_business_info']?['user_status']?['watch_progress']?['current_watch_progress'];
 
-          case .pugv:
-            final result = res.data['data'];
-            data = PlayUrlModel.fromJson(result)
-              ..lastPlayTime =
-                  result['play_view_business_info']?['user_status']?['watch_progress']?['current_watch_progress'];
-        }
-        return Success(data);
+            case .pugv:
+              final result = res.data['data'];
+              data = PlayUrlModel.fromJson(result)
+                ..lastPlayTime =
+                    result['play_view_business_info']?['user_status']?['watch_progress']?['current_watch_progress'];
+          }
+          return data;
+        }, {'cid': cid, 'quality': qn});
+        return Success(parsed);
       } else if (epid != null && videoType == .ugc) {
         return await videoUrl(
           avid: avid,

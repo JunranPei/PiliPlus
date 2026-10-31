@@ -1,0 +1,122 @@
+{
+  "matched": {
+    "ffmpeg/libavcodec/pili_codec_callbacks_dex.h": {
+      "archiveEntry": "native-async-input/pili_codec_callbacks_dex.h",
+      "sha256": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07"
+    },
+    "ffmpeg/libavcodec/pili_codec_callbacks_jni.h": {
+      "archiveEntry": "native-async-input/pili_codec_callbacks_jni.h",
+      "sha256": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+    },
+    "mpv/player/pili_audio_lead.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-audio-lead-fair-01/pili_audio_lead.h",
+      "sha256": "859ff04194a7ced14043c76926cabc276c0bdcb1bb2b47c594ab56a098ea97cc"
+    },
+    "mpv/player/audio.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-audio-lead-fair-01/player-audio.c.after",
+      "sha256": "476a649c36b38663afc90554e7bd536a92ba0763b256428df6f2ff319e0da13b"
+    },
+    "mpv/player/pili_audio_lead_log.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-audio-lead-fair-01/player-pili_audio_lead_log.h.after",
+      "sha256": "55d11578641bc3b3cae9dd0f1aa95e273a0f00f13af131b0be858a366eb7322a"
+    },
+    "ffmpeg/libavcodec/mediacodecdec.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-callback-wait-01/ffmpeg-libavcodec-mediacodecdec.c.after",
+      "sha256": "2df5ebdc37f4ba0a9ee355b6a73a7e94c19003c09e4e4e5e34e33fe3a234c12b"
+    },
+    "ffmpeg/libavcodec/mediacodec_wrapper.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-callback-wait-01/ffmpeg-libavcodec-mediacodec_wrapper.c.after",
+      "sha256": "9ba765e3400724f386e8c09a0d220fc616c4ecabb057872cda217ed340dd542e"
+    },
+    "ffmpeg/libavcodec/pili_codec_callback_wait.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-callback-wait-01/pili_codec_callback_wait.h",
+      "sha256": "72e0de84d2a4787bc2d8440bcb78e969de4bd8ec7ac41772077dc3c67ec8c635"
+    },
+    "ffmpeg/libavcodec/Makefile": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-codec-reservation-01/ffmpeg-libavcodec-Makefile.after",
+      "sha256": "d4ce5203cc99d3a2afae4895dbcd30c4279f2f77cdab8e6a22b08a8df307e878"
+    },
+    "mpv/include/mpv/client.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-codec-reservation-01/mpv-include-mpv-client.h.after",
+      "sha256": "33b024cd0e32c4ec1413f700cd4dee27cc9c00aa714b7ffeabf66406e1b0aa1f"
+    },
+    "mpv/player/client.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-codec-reservation-01/mpv-player-client.c.after",
+      "sha256": "f3451ccfe75d3ffe41317ae0b1d6088669c8356472cdddc94c2569e12a622299"
+    },
+    "ffmpeg/libavcodec/mediacodecdec_common.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-codec-stages-01/ffmpeg-libavcodec-mediacodecdec_common.c.before",
+      "sha256": "d51bca87d3933a0096cf669cef4e813d788ae04eb99abdd1bc8ccea9f0fb2ac3"
+    },
+    "ffmpeg/libavcodec/mediacodecdec_common.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-decode-only-01/ffmpeg-libavcodec-mediacodecdec_common.h.after",
+      "sha256": "c60a7c62e29a9aaa95d65c774a80b8c578d259fd0232dcca1d0fbc2267277761"
+    },
+    "mpv/filters/f_decoder_wrapper.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-decode-only-01/mpv-filters-f_decoder_wrapper.c.after",
+      "sha256": "a8eed44458a3c388616899c5cbd227de181e6fb56cc860c156793a862a71c1ba"
+    },
+    "mpv/filters/f_decoder_wrapper.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-decode-only-01/mpv-filters-f_decoder_wrapper.h.after",
+      "sha256": "9823c38a0393fe64bd639f7b92ac5d5fadae0119ac72dda7a12146f2f0e98615"
+    },
+    "mpv/player/playloop.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-decode-only-01/mpv-player-playloop.c.after",
+      "sha256": "1c7e7e82dd10f20ba5590f4cb6d718f142484d824f838d90d23e1ff27f9582b2"
+    },
+    "mpv/video/decode/vd_lavc.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-decode-only-01/mpv-video-decode-vd_lavc.c.after",
+      "sha256": "f8ccd6860c077a5c27235f17bcf6986b051552852b099b4317144ae0adf00e88"
+    },
+    "ffmpeg/libavcodec/pili_decode_only_trace.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-decode-only-01/pili_decode_only_trace.h",
+      "sha256": "5576da6bccbe14a4016d01f305237211b2aca471b7a0934c8af9b023fc67673d"
+    },
+    "mpv/options/options.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-filtered-audio-01/options-options.c.after",
+      "sha256": "51b3df080449c72de88b571a9a4fdbbb44360bf9858bf01bbd9c1bd2263089e8"
+    },
+    "mpv/options/options.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-filtered-audio-01/options-options.h.after",
+      "sha256": "c12a5e6ab1398c5dc8bf7c2c0fab32f3540f933c3a11b1b0df53531df3b52297"
+    },
+    "mpv/player/core.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-filtered-audio-01/player-core.h.after",
+      "sha256": "eef10b1e0faa454d559364a706a30ca32e4180fc2630f8ec9a29cbae95df900f"
+    },
+    "mpv/audio/decode/ad_lavc.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/audio-decode-ad_lavc.c.after",
+      "sha256": "6a1334775dd92c4d4c90ff02097a2a69b7bfda4c8b6b125f1d6e67e4d19b00ac"
+    },
+    "mpv/audio/out/ao.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/audio-out-ao.c.baseline",
+      "sha256": "5fd091c800dbeb0d6f2c236ce9b1d88852266994c652f0c5317346ddc1d344e3"
+    },
+    "mpv/audio/out/buffer.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/audio-out-buffer.c.baseline",
+      "sha256": "e053296cdfe58a07b6bd2aa5554774ff5c54ca57c622a56636fb6fe8f0fed105"
+    },
+    "mpv/filters/filter.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/filters-filter.c.after",
+      "sha256": "33d94c700f229c6f82c573c27990adc8fd13897b0982203713ec161126dcc540"
+    },
+    "mpv/filters/f_output_chain.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/filters-f_output_chain.c.baseline",
+      "sha256": "e24bc67cd49ce05b59d05089518accb68c641555606f2b08e859b02467a67ea6"
+    },
+    "mpv/filters/f_swresample.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/filters-f_swresample.c.baseline",
+      "sha256": "4957706ffb199b15049c7ae91712a25a966057359b840a6429b8e553fd4950b4"
+    },
+    "mpv/player/video.c": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-loop-trace-01/player-video.c.after",
+      "sha256": "ddc9761e699bdb7f65de08b51006ee6a4683870585fc598c288827984cc2c880"
+    },
+    "ffmpeg/libavcodec/pili_codec_flush_trace.h": {
+      "localSource": "diagnostics/startup-20261030/parallel-audio/native-unused-flush-01/pili_codec_flush_trace.h",
+      "sha256": "f26606726c0505d31591737079ee7e0ff7d92fea830c56ff9833dea8ac773784"
+    }
+  },
+  "notEmbeddedInArchive": {},
+  "buildVolumeRemainsUnmodified": true
+}

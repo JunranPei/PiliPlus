@@ -1,0 +1,224 @@
+package com.personal.piliplus;
+
+import android.media.MediaCodec;
+import android.media.MediaFormat;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import java.util.ArrayDeque;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
+/** Callback-backed buffer availability for the existing FFmpeg JNI decoder.
+ * Owns only its callback thread and queues; the native wrapper owns the codec.
+ */
+public final class PiliCodecCallbacks extends MediaCodec.Callback {
+    private static final class Output {
+        final int index;
+        final MediaCodec.BufferInfo info;
+        final MediaFormat format;
+        Output(int index, MediaCodec.BufferInfo original) {
+            this.index = index; this.format = null;
+            info = new MediaCodec.BufferInfo();
+            info.set(original.offset, original.size, original.presentationTimeUs, original.flags);
+        }
+        Output(MediaFormat format) {
+            index = MediaCodec.INFO_OUTPUT_FORMAT_CHANGED;
+            this.format = format; info = null;
+        }
+    }
+
+    private final Object lock = new Object();
+    private final MediaCodec codec;
+    private final HandlerThread thread;
+    private final Handler handler;
+    private final ArrayDeque<Integer> inputs = new ArrayDeque<>();
+    private final ArrayDeque<Output> outputs = new ArrayDeque<>();
+    private RuntimeException failure;
+    private MediaFormat currentFormat, lastSeenFormat, restoreFormat;
+    private boolean closed, flushing, inputEos;
+    private long inputCallbacks, outputCallbacks, flushes;
+
+    /** Must run before the native owner calls configure/start. */
+    public PiliCodecCallbacks(MediaCodec codec) {
+        this.codec = codec;
+        thread = new HandlerThread("PiliCodecCallback");
+        thread.start(); handler = new Handler(thread.getLooper());
+        try { codec.setCallback(this, handler); }
+        catch (RuntimeException error) { close(); throw error; }
+    }
+
+    private void check() {
+        if (failure != null) throw failure;
+        if (closed) throw new IllegalStateException("Codec callback bridge closed");
+    }
+
+    private static long deadline(long timeoutUs) {
+        return timeoutUs < 0 ? Long.MAX_VALUE
+            : System.nanoTime() + Math.min(timeoutUs, 3600000000L) * 1000;
+    }
+
+    private boolean await(long end) {
+        long ns = end - System.nanoTime();
+        if (ns <= 0) return false;
+        try { lock.wait(ns / 1000000, (int)(ns % 1000000)); }
+        catch (InterruptedException error) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted codec callback wait", error);
+        }
+        return true;
+    }
+
+    public int dequeueInputBuffer(long timeoutUs) {
+        synchronized (lock) {
+            long end = deadline(timeoutUs);
+            for (;;) {
+                check();
+                if (flushing) return MediaCodec.INFO_TRY_AGAIN_LATER;
+                if (!inputs.isEmpty()) return inputs.removeFirst();
+                if (timeoutUs == 0 || !await(end)) return MediaCodec.INFO_TRY_AGAIN_LATER;
+            }
+        }
+    }
+
+    public int dequeueOutputBuffer(MediaCodec.BufferInfo info, long timeoutUs) {
+        synchronized (lock) {
+            long end = deadline(timeoutUs);
+            for (;;) {
+                check();
+                if (flushing) return MediaCodec.INFO_TRY_AGAIN_LATER;
+                if (!outputs.isEmpty()) {
+                    Output output = outputs.removeFirst();
+                    if (output.format != null) currentFormat = output.format;
+                    else info.set(output.info.offset, output.info.size, output.info.presentationTimeUs, output.info.flags);
+                    return output.index;
+                }
+                // FFmpeg retries its input port after EAGAIN. Wake that retry
+                // immediately when an input callback arrives, unless draining.
+                if ((!inputEos && !inputs.isEmpty()) || timeoutUs == 0 || !await(end))
+                    return MediaCodec.INFO_TRY_AGAIN_LATER;
+            }
+        }
+    }
+
+    /** Called only after FFmpeg observed EAGAIN on both ports. Unlike its
+     * normal zero-timeout polls, this yields until either callback can help. */
+    public void awaitActivity(long timeoutUs) {
+        synchronized (lock) {
+            long end = deadline(timeoutUs);
+            for (;;) {
+                check();
+                if (flushing || !inputs.isEmpty() || !outputs.isEmpty()) return;
+                if (timeoutUs == 0 || !await(end)) return;
+            }
+        }
+    }
+
+    public MediaFormat getOutputFormat() {
+        MediaFormat ready;
+        synchronized (lock) {
+            check();
+            ready = currentFormat;
+        }
+        // FFmpeg also asks immediately after start, before a format callback.
+        return ready != null ? ready : codec.getOutputFormat();
+    }
+
+    public void queueInputBuffer(int index, int offset, int size, long pts, int flags) {
+        synchronized (lock) {
+            check();
+            if (flushing) throw new IllegalStateException("Queue during codec flush");
+            if ((flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) inputEos = true;
+        }
+        // Codec service calls must not hold the callback monitor.
+        codec.queueInputBuffer(index, offset, size, pts, flags);
+    }
+
+    /** Drain callbacks queued before flush, then restart asynchronous input. */
+    public void flush() {
+        if (Looper.myLooper() == thread.getLooper())
+            throw new IllegalStateException("Flush must run on the decoder owner thread");
+        synchronized (lock) {
+            check();
+            if (flushing) throw new IllegalStateException("Concurrent codec flush");
+            flushing = true; inputs.clear(); outputs.clear(); lock.notifyAll();
+        }
+        try { codec.flush(); }
+        catch (RuntimeException error) {
+            synchronized (lock) { failure = error; flushing = false; lock.notifyAll(); }
+            throw error;
+        }
+        CountDownLatch done = new CountDownLatch(1);
+        AtomicReference<RuntimeException> error = new AtomicReference<>();
+        if (!handler.post(() -> {
+            try {
+                synchronized (lock) {
+                    check();
+                    inputs.clear(); outputs.clear(); inputEos = false;
+                    restoreFormat = lastSeenFormat;
+                    flushing = false; flushes++;
+                }
+                // start posts future buffer callbacks behind this handler item.
+                codec.start();
+            } catch (RuntimeException problem) {
+                error.set(problem);
+                synchronized (lock) { failure = problem; flushing = false; }
+            } finally {
+                synchronized (lock) { lock.notifyAll(); }
+                done.countDown();
+            }
+        })) {
+            throw new IllegalStateException("Codec callback handler stopped during flush");
+        }
+        try {
+            if (!done.await(10, TimeUnit.SECONDS)) throw new IllegalStateException("Codec callback flush did not finish");
+        } catch (InterruptedException problem) {
+            Thread.currentThread().interrupt(); throw new IllegalStateException(problem);
+        }
+        if (error.get() != null) throw error.get();
+    }
+
+    /** Idempotent; native stop/delete calls this before stopping the codec. */
+    public void close() {
+        synchronized (lock) {
+            if (closed) return;
+            closed = true; flushing = false; inputs.clear(); outputs.clear(); lock.notifyAll();
+        }
+        thread.quitSafely();
+        if (Thread.currentThread() != thread) {
+            try { thread.join(10000); }
+            catch (InterruptedException error) { Thread.currentThread().interrupt(); throw new IllegalStateException(error); }
+            if (thread.isAlive()) throw new IllegalStateException("Codec callback thread did not stop");
+        }
+    }
+
+    public long[] snapshot() {
+        synchronized (lock) {
+            return new long[]{inputCallbacks, outputCallbacks, flushes, inputs.size(), outputs.size(), closed ? 1 : 0, thread.isAlive() ? 1 : 0};
+        }
+    }
+
+    @Override public void onInputBufferAvailable(MediaCodec source, int index) {
+        synchronized (lock) {
+            if (closed || flushing) return;
+            inputs.addLast(index); inputCallbacks++; lock.notifyAll();
+        }
+    }
+    @Override public void onOutputBufferAvailable(MediaCodec source, int index, MediaCodec.BufferInfo info) {
+        synchronized (lock) {
+            if (closed || flushing) return;
+            if (restoreFormat != null) { outputs.addLast(new Output(restoreFormat)); restoreFormat = null; }
+            outputs.addLast(new Output(index, info)); outputCallbacks++; lock.notifyAll();
+        }
+    }
+    @Override public void onOutputFormatChanged(MediaCodec source, MediaFormat format) {
+        synchronized (lock) {
+            if (closed || flushing) return;
+            outputs.addLast(new Output(format)); lastSeenFormat = format; restoreFormat = null; lock.notifyAll();
+        }
+    }
+    @Override public void onError(MediaCodec source, MediaCodec.CodecException error) {
+        synchronized (lock) { if (!closed) failure = error; lock.notifyAll(); }
+    }
+}

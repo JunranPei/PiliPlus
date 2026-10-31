@@ -75,6 +75,7 @@ import 'package:PiliPlus/utils/theme_utils.dart';
 import 'package:extended_nested_scroll_view/extended_nested_scroll_view.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, clampDouble;
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_text_inventory.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -182,6 +183,9 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     videoDetailController.waitForPlaybackRoute = _waitForPlaybackRoute;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && StartupTextInventory.enabled) {
+        StartupTextInventory.capture(context, 'video.firstLayout');
+      }
       if (!_initialPlaybackLayout.isCompleted) {
         _initialPlaybackLayout.complete(mounted);
       }
@@ -583,7 +587,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   void didPop() {
     super.didPop();
     isShowing = false;
-    videoDetailController.leavePlaybackRoute();
+    videoDetailController.leavePlaybackRoute(permanently: true);
     _cancelPlaybackRouteWaits();
     plPlayerController
       ?..removeStatusLister(playerListener)

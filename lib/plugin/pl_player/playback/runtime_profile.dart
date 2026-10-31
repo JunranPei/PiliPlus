@@ -5,6 +5,8 @@ import 'dart:developer' as dev;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/startup_wait_trace.dart';
 
 /// Opt-in diagnostic build. Samples and timeline events are not display proof.
 abstract final class RuntimeProfile {
@@ -106,9 +108,13 @@ abstract final class RuntimeProfile {
 final class RuntimeProfileAdapter implements HttpClientAdapter {
   RuntimeProfileAdapter(this.inner);
   final HttpClientAdapter inner;
+  static const networkTrace = bool.fromEnvironment('PLAYBACK_NETWORK_TRACE');
+  static int _requestSequence = 0;
 
   static HttpClientAdapter wrap(HttpClientAdapter adapter) =>
-      RuntimeProfile.enabled ? RuntimeProfileAdapter(adapter) : adapter;
+      RuntimeProfile.enabled || networkTrace
+      ? RuntimeProfileAdapter(adapter)
+      : adapter;
 
   static HttpClientAdapter unwrap(HttpClientAdapter adapter) =>
       adapter is RuntimeProfileAdapter ? adapter.inner : adapter;
@@ -124,15 +130,46 @@ final class RuntimeProfileAdapter implements HttpClientAdapter {
       'method': options.method,
       'path': options.uri.path,
     });
-    if (id == null) return inner.fetch(options, requestStream, cancelFuture);
+    final sparse = networkTrace && PlaybackDiagnostics.active;
+    if (id == null && !sparse) {
+      return inner.fetch(options, requestStream, cancelFuture);
+    }
+    final requestId = ++_requestSequence;
+    if (StartupWaitTrace.enabled) {
+      options.extra['startupWaitRequestId'] = requestId;
+    }
+    void record(String event, Map<String, Object?> data) {
+      if (sparse) {
+        PlaybackDiagnostics.event(event, {
+          'httpRequestId': requestId,
+          ...data,
+        });
+      }
+    }
+
+    record('http.begin', {
+      'method': options.method,
+      'host': options.uri.host,
+      'path': options.uri.path,
+      'scope': 'API adapter delivery; not DNS/TLS or native mpv media I/O',
+    });
+    var ended = false;
+    var bytes = 0;
+    void finish(String reason) {
+      if (ended) return;
+      ended = true;
+      RuntimeProfile.end(id, {'endReason': reason, 'bytes': bytes});
+      record('http.end', {'reason': reason, 'bytes': bytes});
+    }
+
     if (cancelFuture != null) {
       unawaited(
         cancelFuture.then<void>(
           (_) {
-            RuntimeProfile.end(id, {'endReason': 'cancelled'});
+            finish('cancelled');
           },
           onError: (Object _, StackTrace _) {
-            RuntimeProfile.end(id, {'endReason': 'cancelFutureError'});
+            finish('cancelFutureError');
           },
         ),
       );
@@ -143,8 +180,8 @@ final class RuntimeProfileAdapter implements HttpClientAdapter {
         'requestId': id,
         'status': response.statusCode,
       });
+      record('http.headers', {'status': response.statusCode});
       var first = true;
-      var bytes = 0;
       response.stream = response.stream.transform(
         StreamTransformer<Uint8List, Uint8List>.fromHandlers(
           handleData: (chunk, sink) {
@@ -155,25 +192,23 @@ final class RuntimeProfileAdapter implements HttpClientAdapter {
                 'requestId': id,
                 'bytes': chunk.length,
               });
+              record('http.firstChunk', {'bytes': chunk.length});
             }
             sink.add(chunk);
           },
           handleError: (Object error, StackTrace stack, sink) {
-            RuntimeProfile.end(id, {
-              'endReason': 'streamError',
-              'bytes': bytes,
-            });
+            finish('streamError');
             sink.addError(error, stack);
           },
           handleDone: (sink) {
-            RuntimeProfile.end(id, {'endReason': 'bodyEnd', 'bytes': bytes});
+            finish('bodyEnd');
             sink.close();
           },
         ),
       );
       return response;
     } catch (_) {
-      RuntimeProfile.end(id, {'endReason': 'fetchError'});
+      finish('fetchError');
       rethrow;
     }
   }

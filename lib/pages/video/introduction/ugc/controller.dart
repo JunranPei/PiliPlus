@@ -86,6 +86,14 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
   // 获取视频简介&分p
   @override
   Future<void> queryVideoIntro() async {
+    if (const bool.fromEnvironment('PRIORITIZE_PLAY_URL') &&
+        (!await videoDetailCtr.waitForAuxiliaryRequest(
+              'intro',
+              afterPrimaryUrl: true,
+            ) ||
+            isClosed)) {
+      return;
+    }
     queryVideoTags();
     final res = await VideoHttp.videoIntro(bvid: bvid);
     if (res case Success(:final response)) {
@@ -144,6 +152,10 @@ class UgcIntroController extends CommonIntroController with ReloadMixin {
 
   // 获取up主粉丝数
   Future<void> queryUserStat(List<Staff>? staff) async {
+    if (const bool.fromEnvironment('DEFER_VIDEO_AUXILIARY') &&
+        (!await videoDetailCtr.waitForAuxiliaryRequest('author') || isClosed)) {
+      return;
+    }
     if (staff != null && staff.isNotEmpty) {
       final res = await Request().get(
         Api.relations,

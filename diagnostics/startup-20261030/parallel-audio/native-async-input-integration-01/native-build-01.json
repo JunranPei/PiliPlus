@@ -1,0 +1,51 @@
+{
+  "pid": 572,
+  "architecture": "x86_64",
+  "baselineNativeSha256": "b07a6e3cdad94bc0fe8576f55abea584781733cb3500f68af8be4f9bd1b6fca4",
+  "sourceHashes": {},
+  "addedSourceHashes": {},
+  "replacedSourceHashes": {
+    "ffmpeg/libavcodec/pili_codec_callbacks_jni.h": {
+      "before": "38552a1038e64cc051f10ff552f8370d37baa1592b3bfa9423c5041723a15421",
+      "after": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+    },
+    "ffmpeg/libavcodec/pili_codec_callbacks_dex.h": {
+      "before": "65c1f5468ee409173dc23aad2f894d40952bd20e0520d842397644636e162c9c",
+      "after": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07"
+    }
+  },
+  "effectiveSourceHashes": {
+    "mpv/player/playloop.c": "1c7e7e82dd10f20ba5590f4cb6d718f142484d824f838d90d23e1ff27f9582b2",
+    "mpv/player/audio.c": "476a649c36b38663afc90554e7bd536a92ba0763b256428df6f2ff319e0da13b",
+    "mpv/player/video.c": "ddc9761e699bdb7f65de08b51006ee6a4683870585fc598c288827984cc2c880",
+    "mpv/audio/decode/ad_lavc.c": "6a1334775dd92c4d4c90ff02097a2a69b7bfda4c8b6b125f1d6e67e4d19b00ac",
+    "mpv/filters/f_decoder_wrapper.c": "a8eed44458a3c388616899c5cbd227de181e6fb56cc860c156793a862a71c1ba",
+    "mpv/filters/f_swresample.c": "4957706ffb199b15049c7ae91712a25a966057359b840a6429b8e553fd4950b4",
+    "mpv/filters/filter.c": "33d94c700f229c6f82c573c27990adc8fd13897b0982203713ec161126dcc540",
+    "mpv/filters/f_output_chain.c": "e24bc67cd49ce05b59d05089518accb68c641555606f2b08e859b02467a67ea6",
+    "mpv/audio/out/ao.c": "5fd091c800dbeb0d6f2c236ce9b1d88852266994c652f0c5317346ddc1d344e3",
+    "mpv/audio/out/buffer.c": "e053296cdfe58a07b6bd2aa5554774ff5c54ca57c622a56636fb6fe8f0fed105",
+    "mpv/player/core.h": "eef10b1e0faa454d559364a706a30ca32e4180fc2630f8ec9a29cbae95df900f",
+    "mpv/options/options.h": "c12a5e6ab1398c5dc8bf7c2c0fab32f3540f933c3a11b1b0df53531df3b52297",
+    "mpv/options/options.c": "51b3df080449c72de88b571a9a4fdbbb44360bf9858bf01bbd9c1bd2263089e8",
+    "mpv/player/pili_audio_lead.h": "859ff04194a7ced14043c76926cabc276c0bdcb1bb2b47c594ab56a098ea97cc",
+    "mpv/player/pili_audio_lead_log.h": "55d11578641bc3b3cae9dd0f1aa95e273a0f00f13af131b0be858a366eb7322a",
+    "ffmpeg/libavcodec/mediacodec_wrapper.c": "9ba765e3400724f386e8c09a0d220fc616c4ecabb057872cda217ed340dd542e",
+    "ffmpeg/libavcodec/Makefile": "d4ce5203cc99d3a2afae4895dbcd30c4279f2f77cdab8e6a22b08a8df307e878",
+    "mpv/include/mpv/client.h": "33b024cd0e32c4ec1413f700cd4dee27cc9c00aa714b7ffeabf66406e1b0aa1f",
+    "mpv/player/client.c": "f3451ccfe75d3ffe41317ae0b1d6088669c8356472cdddc94c2569e12a622299",
+    "ffmpeg/libavcodec/mediacodecdec.c": "2df5ebdc37f4ba0a9ee355b6a73a7e94c19003c09e4e4e5e34e33fe3a234c12b",
+    "ffmpeg/libavcodec/pili_codec_flush_trace.h": "f26606726c0505d31591737079ee7e0ff7d92fea830c56ff9833dea8ac773784",
+    "mpv/filters/f_decoder_wrapper.h": "9823c38a0393fe64bd639f7b92ac5d5fadae0119ac72dda7a12146f2f0e98615",
+    "mpv/video/decode/vd_lavc.c": "f8ccd6860c077a5c27235f17bcf6986b051552852b099b4317144ae0adf00e88",
+    "ffmpeg/libavcodec/mediacodecdec_common.c": "d51bca87d3933a0096cf669cef4e813d788ae04eb99abdd1bc8ccea9f0fb2ac3",
+    "ffmpeg/libavcodec/mediacodecdec_common.h": "c60a7c62e29a9aaa95d65c774a80b8c578d259fd0232dcca1d0fbc2267277761",
+    "ffmpeg/libavcodec/pili_decode_only_trace.h": "5576da6bccbe14a4016d01f305237211b2aca471b7a0934c8af9b023fc67673d",
+    "ffmpeg/libavcodec/pili_codec_callbacks_jni.h": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51",
+    "ffmpeg/libavcodec/pili_codec_callbacks_dex.h": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07",
+    "ffmpeg/libavcodec/pili_codec_callback_wait.h": "72e0de84d2a4787bc2d8440bcb78e969de4bd8ec7ac41772077dc3c67ec8c635"
+  },
+  "librarySha256": "aad63c77a16a4a2d876fb62157bdac3bc25f48830d5db21249223191e42684a2",
+  "buildPassed": true,
+  "unmounted": true
+}

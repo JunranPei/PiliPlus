@@ -6,6 +6,7 @@ import 'package:PiliPlus/grpc/dm.dart';
 import 'package:PiliPlus/http/loading_state.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/models/data_source.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/danmaku_utils.dart';
 import 'package:PiliPlus/utils/path_utils.dart';
@@ -52,7 +53,17 @@ class PlDanmakuController {
       if (response.state == 1) {
         _plPlayerController.dmState.add(_cid);
       }
+      final timer = PlaybackDiagnostics.enabled ? (Stopwatch()..start()) : null;
       handleDanmaku(response.elems);
+      if (timer != null) {
+        PlaybackDiagnostics.event('dm.filter.end', {
+          ..._plPlayerController.playbackTraceState(),
+          'cid': _cid,
+          'segmentIndex': segmentIndex + 1,
+          'elements': response.elems.length,
+          'filterUs': timer.elapsedMicroseconds,
+        });
+      }
     } else {
       _requestedSeg.remove(segmentIndex);
     }

@@ -1,0 +1,25 @@
+{
+  "round": 80,
+  "sameAndroid": "retained QA144",
+  "plan": [
+    [
+      "01-candidate",
+      "candidate"
+    ],
+    [
+      "02-control",
+      "control"
+    ],
+    [
+      "03-control",
+      "control"
+    ],
+    [
+      "04-candidate",
+      "candidate"
+    ]
+  ],
+  "comparison": "Same two original74 APKs/native72; only STARTUP_VIDEO_DECODE_QUEUE differs. Both callbacks1/wait0/decode-only0. No bounded init/body gates. Test formerly local audio-init overlap after removing the intervening slower callback wait.",
+  "protocol": "New process each sample, first61.5s resume, verified diskSIDX; no new seed or emulator restart. 25s capture/18s BACK both arms, allowing7s cleanup observation; startup timer unchanged. No timing pooled with oldcohort.",
+  "returnPolicy": "Keep failed return/continuity outcome and all startup data; do not replay success or hide failed samples."
+}

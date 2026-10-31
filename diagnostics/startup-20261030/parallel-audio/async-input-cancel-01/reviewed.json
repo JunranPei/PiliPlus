@@ -1,0 +1,130 @@
+{
+  "captureExit": 1,
+  "pid": "3546",
+  "inputValid": true,
+  "back": {
+    "hostBeginNs": 12731569316500,
+    "hostEndNs": 12732073519300,
+    "triggerEvent": {
+      "event": "receive.first",
+      "instance": "0x76e8b34880c0",
+      "monoNs": 95863362800,
+      "tid": 3927,
+      "enabled": 1,
+      "receiveStarted": 1,
+      "skipped": 0,
+      "ordinal": 0
+    },
+    "pid": "3546",
+    "afterMeasuredInputCommandSeconds": 0.9364287,
+    "triggerDetectedHostNs": 12731569315800,
+    "imeHiddenBeforeMeasuredInput": true
+  },
+  "leadEvents": [
+    {
+      "event": "prime.first",
+      "monoNs": 96121985600,
+      "tid": 3608,
+      "instance": "0x76e8334d8630",
+      "count": 1,
+      "bytes": 8288,
+      "seconds": 0.021333,
+      "pushed": 1,
+      "popped": 0,
+      "videoPtsKnown": 0,
+      "videoPts": 0.0,
+      "audioStartKnown": 0,
+      "audioStartPts": 0.0,
+      "yieldedCycles": 0,
+      "maxCycleFrames": 1,
+      "afterInputMs": 1126.0298
+    },
+    {
+      "event": "clear",
+      "monoNs": 97017721100,
+      "tid": 3608,
+      "instance": "0x76e8334d8630",
+      "count": 93,
+      "bytes": 770784,
+      "seconds": 1.984,
+      "pushed": 93,
+      "popped": 0,
+      "videoPtsKnown": 0,
+      "videoPts": 0.0,
+      "audioStartKnown": 0,
+      "audioStartPts": 0.0,
+      "yieldedCycles": 22,
+      "maxCycleFrames": 4,
+      "afterInputMs": 2021.7653
+    }
+  ],
+  "hasPositiveTexture": false,
+  "returnCleanupPassed": true,
+  "cancelBeforeDrainVerified": true,
+  "boundary": "Actual current-source decoder receive.first triggered return; phase determined by route.leave, positive texture and native drain events. No positive texture expected for cancellation before target.",
+  "callbackEvents": [
+    {
+      "event": "configure",
+      "monoNs": 95646522700,
+      "codec": "0x76e9e349c200",
+      "requested": 1,
+      "eligible": 1,
+      "active": 1,
+      "asyncInputRequested": 1,
+      "setupNs": 33764000,
+      "error": 0,
+      "afterInputMs": 650.5669
+    },
+    {
+      "event": "close",
+      "monoNs": 96983612100,
+      "codec": "0x76e9e349c200",
+      "inputCallbacks": 41,
+      "outputCallbacks": 29,
+      "flushes": 1,
+      "pendingInput": 0,
+      "pendingOutput": 0,
+      "closed": 1,
+      "threadAlive": 0,
+      "error": 0,
+      "asyncInput": 1,
+      "inputPosted": 35,
+      "inputCompleted": 35,
+      "inputCancelled": 0,
+      "pendingSubmissions": 0,
+      "inputThreadAlive": 0,
+      "inputFailure": 0,
+      "inputWorkNs": 530076000,
+      "waitEnabled": 0,
+      "emptyPolls": 1395,
+      "waitCalls": 0,
+      "waitNs": 0,
+      "afterInputMs": 1987.6563
+    }
+  ],
+  "callbackClosedVerified": true,
+  "reservationEvents": [
+    {
+      "event": "create.begin",
+      "monoNs": 95203735500,
+      "tid": 3633,
+      "codec": "",
+      "value": 0
+    },
+    {
+      "event": "ready",
+      "monoNs": 95464355800,
+      "tid": 3633,
+      "codec": "c2.goldfish.hevc.decoder",
+      "value": 5000
+    },
+    {
+      "event": "taken",
+      "monoNs": 95612479500,
+      "tid": 3608,
+      "codec": "c2.goldfish.hevc.decoder",
+      "value": 0
+    }
+  ],
+  "unclaimedReservationReleased": false
+}

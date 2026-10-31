@@ -1,0 +1,2652 @@
+{
+  "parentHead": "f9357d8be618badbcafc996150a98cf7b3267ef5",
+  "branch": "codex/mpv-old-output-standby",
+  "purpose": "User requested a commit before adding later positive-gain changes to round69.",
+  "goalComplete": false,
+  "next": "Use round69 as common baseline; measure each later candidate and its interactions. Do not sum historical gains.",
+  "artifactsRetainedLocally": [
+    {
+      "path": "output/releases/PiliPlus-fastest-resume-r69-arm64-release-20261031.apk",
+      "bytes": 25527634,
+      "sha256": "8c6284a2aa7a95bc9fb4a7f51760e24a32d7232904a9bc388c653c75373198d5",
+      "retainedLocally": true
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-candidate.apk",
+      "bytes": 42424447,
+      "sha256": "f61c8fdbe6537a5c68356d3320fae9bcc01aef24dd86441c937d015865e6b06f",
+      "retainedLocally": true
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-candidate.sources.zip",
+      "bytes": 316467,
+      "sha256": "cb27e56eed3c47c254219a2c9185157bd17d13c680c2005622e5bec1955a605a",
+      "retainedLocally": true
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/libmpv-async-input-x86_64.so",
+      "bytes": 17992280,
+      "sha256": "aad63c77a16a4a2d876fb62157bdac3bc25f48830d5db21249223191e42684a2",
+      "retainedLocally": true
+    }
+  ],
+  "rawEvidenceRetainedLocally": [
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/01-candidate/capture.json",
+      "bytes": 35622,
+      "sha256": "9fc58a8c6f5c9b6f42d628f38ccb4218dd53328aee55402049c25502b328abfd"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/01-candidate/logcat.txt",
+      "bytes": 9898,
+      "sha256": "5023cdd706976517bb5fd0aae239c13fdf44bcab52ebef61a2372d44d8d805bc"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "c36921cda08b8d0df9a4381df54d8ca19d89233832340470b0066b2d9ceddab7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 3213,
+      "sha256": "6944f1b65bc889cb8debc7fcb3a0e32d99b687cdaae8258fa166afc6a0b1f1a4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/02-control/capture.json",
+      "bytes": 35566,
+      "sha256": "5dfb791471fd1be5ca2926d353251c3f7dc9937405ca27caf9faaf71d1f4091e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/02-control/logcat.txt",
+      "bytes": 9040,
+      "sha256": "b46dfff2e5a70c62af46faf7ac7bb51fda743d4d6ac03baab7cdafc98685d022"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "fdfcbaac91ff0a0aeb015575400bae1082bd16234c33b13170d4baadf3e8c8b1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 3023,
+      "sha256": "f9224bcb9f61562c7f6a7f680b217a99ed6a05dbfa54b36eb142d59e79ab045a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/03-control/capture.json",
+      "bytes": 35571,
+      "sha256": "0e11571858cd0ddc105f6a644bb801832ddbd8404c0f5172cecbd4c1d67a4e2c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/03-control/logcat.txt",
+      "bytes": 9040,
+      "sha256": "febda970acb2b274e6f61076b4772d165b3e5b557d64365e8c7c1c60b18d5f78"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "5474c26022dd315e60d761f455d7ab0d465033df9d43eeaeb5997c203596ace9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1873,
+      "sha256": "361cc020e8e5ef5ff9bead65d5699382d528d123c2aa06e7de757b249540567d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/04-candidate/capture.json",
+      "bytes": 35615,
+      "sha256": "f5a5c3b56908c28b68828c1c234b04a1a5d2b2781cd801904580adcde9d9a9d9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/04-candidate/logcat.txt",
+      "bytes": 9899,
+      "sha256": "84d119cdce256ac3845a8e3b04b7cdca9dccd1fb6bba8fad7fc27479f9dcf583"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "ff3c0fc57620bb2b180dee11629518e9b2eb076801cc7f929df9634bde602e17"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1666,
+      "sha256": "2f244c82bf503d6e87a4e61081c9bef0698ea99e3f92d09deb7608e9fbb774ee"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/01-candidate/capture.json",
+      "bytes": 36749,
+      "sha256": "c891c0f68baa53c0895f312b8cec1dcd6a083a62761f654ac4171a37e8e7ecf6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/01-candidate/logcat.txt",
+      "bytes": 10577,
+      "sha256": "ba58466d1ad072a2806d44aa91a26626bdbbda235da9a0a0f7de4652722a1773"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4377,
+      "sha256": "e64455b71d8bfc20f4bdcd045c19c13d377ca00a01395771eee8a2a88166b0d7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1417,
+      "sha256": "33d7021a0b27e4e4ffdf26c620c03388ad2859c8839057d91474891f7d48ac42"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/02-control/capture.json",
+      "bytes": 36116,
+      "sha256": "43f00af21603356d40814aabe7ae80690d03a8315d4a0033a01d57ac63579a7d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/02-control/logcat.txt",
+      "bytes": 10427,
+      "sha256": "418f83401b9809346e5dccbbcefc5a9552df609d8bbc21218ef77a6dafda8312"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "e66153d2937f8bf6a621798cdd6e8ee57fea4db65ac7b67cd33d5df72c13e69e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1468,
+      "sha256": "e13303e4c9edb0b95dfe2924ea2fb03eb6d5a8e9203b67315d12e440a425b2e5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/03-control/capture.json",
+      "bytes": 36130,
+      "sha256": "173bd504f1ca34c72db8ffddf2af8ec38425d1803ba1d814058ec49b5f5261f5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/03-control/logcat.txt",
+      "bytes": 10424,
+      "sha256": "cd1489db2ca10e523124a944b87023c10e2e049b6e606f53a4c9e66f0c83a1f5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "c2f3c5d69749a5d09f96bcf8a6189ca8a674d1be2b2fc8bc31614c94c300cfd1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1476,
+      "sha256": "b9c72fec901a1aacec64d63260c8ceb374a220eeb61c7b81a324681ba4f1df7e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/04-candidate/capture.json",
+      "bytes": 37246,
+      "sha256": "56efc48a3e28069a3ec8c6c67ca12aef07f5107bbf0eddd4e3c947690085ff32"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/04-candidate/logcat.txt",
+      "bytes": 10579,
+      "sha256": "72d41795098ff62fe4943eee4a22349350a921b2aef691cf78b5463f593e70c6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4373,
+      "sha256": "79c9d56ba51fc82e4060b53d5855d50d134b6fd5a048f3f4c3622655db5aa9ad"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1670,
+      "sha256": "6dba7e5a0059b5315ab459e4583f62bb785c8700884bb4ded72df9558ec5bda6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/01-candidate/capture.json",
+      "bytes": 40571,
+      "sha256": "d67d0b0e1478240ea99d7d60c42dc244a2c8d6247a2c5251c2002e55e4aec27f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/01-candidate/logcat.txt",
+      "bytes": 11012,
+      "sha256": "621fff84201b44a44627d769bbf5195e99f3f3ac5c1213e991f80624ffd00f78"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "ad0abd9278b4b3554c43e4908ee618cad77dd121ea2959496dbd4f563bf0679b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1477,
+      "sha256": "fe93873c3f3c33d699a0b5ca5fc23a203424947a6bfe98698da409ea963a849a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/02-control/capture.json",
+      "bytes": 40570,
+      "sha256": "afa9be3aca26a921cde845f2b23ba10356ee95424f150a858166783da997df14"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/02-control/logcat.txt",
+      "bytes": 10998,
+      "sha256": "03125b4f102f8a9d3591c423d0ac90286d71c411d4a1805aa5c0dee4719105dc"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/02-control/return-cleanup-reviewed.json",
+      "bytes": 4366,
+      "sha256": "d0a98a68337749c7af0310a29b4aa3d33725071acee9327a2339502fb2ffaf03"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/02-control/continuity-analysis/summary.json",
+      "bytes": 1282,
+      "sha256": "0de008d200fae07945ae7b1e37bfbc3bc2ae3d13811e864edea7e3da6de3e4ef"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/03-control/capture.json",
+      "bytes": 40561,
+      "sha256": "90fa6ff078a7c75269b87ea20edbc24071cd10eb7d7401fde1440cc4b0a3f00b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/03-control/logcat.txt",
+      "bytes": 10998,
+      "sha256": "848897062d2a54e173a38c90d6db3f2b342a709253c5a0b25a8efb64411a2e3e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/03-control/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "ab0d7e9fa11f2fed8bc799be6edb2c70661d4fc7926666eaef3dca16a0643190"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/03-control/continuity-analysis/summary.json",
+      "bytes": 1666,
+      "sha256": "b689b9d1a67cddad90af1370d065d315375b19df16ea2977f66f7e61ced462f7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/04-candidate/capture.json",
+      "bytes": 40576,
+      "sha256": "22f6ee2f3ff4317c88e030a29c77e0e7f5bef9bb66d2455bb5de57e5831254d7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/04-candidate/logcat.txt",
+      "bytes": 10998,
+      "sha256": "0fc3e7f667b217b1ed668297d63c3d4acb6d1039434a783d8fd06a588681f9e2"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "286dd10799b1074f6ee4227e9b1c0757c9b866564664e27496e2a19ee38f1fdc"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/04-candidate/continuity-analysis/summary.json",
+      "bytes": 2072,
+      "sha256": "8a131166f629a2ad314dd5f1ddf90132e67a0d614a9a5f5d05652b2327e5c582"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/01-candidate/capture.json",
+      "bytes": 41390,
+      "sha256": "600c8ea119e8d936a12e984bbb5c0310e83a60a529d5082d4b4198f9f6f39993"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/01-candidate/logcat.txt",
+      "bytes": 11565,
+      "sha256": "5ee57f6574eded17057a4c639dcd8eec3a38d7fa562c75e3856a4d0622f202cd"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "2c2459c641336056f1b4eb6ef8c3e4db20caf817d00aebe4afcb4930d9c1a72b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/01-candidate/continuity-analysis/summary.json",
+      "bytes": 2057,
+      "sha256": "e918f28afd5864b3d5fadb0ac459cdd2b58a3830413cd71758357e049bd56f8e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/02-control/capture.json",
+      "bytes": 41371,
+      "sha256": "a4adec675be2c2f8cf7c7e034e2f382a3aaf2c5cfaf11c4d3cca50bae8942296"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/02-control/logcat.txt",
+      "bytes": 11204,
+      "sha256": "cb97058e2a07698cddb08a28f8e407287381787b5eab1d3d93617650e6f362d9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/02-control/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "adb4bcd9ce0d150f929bbf2eb84ca62131f409f51f1de27e8c46e10810153f86"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/02-control/continuity-analysis/summary.json",
+      "bytes": 1662,
+      "sha256": "67085249c7c469f6d0fe0a94071bb6aeae18970025b49243d1cd87d97e26e5f6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/03-control/capture.json",
+      "bytes": 41382,
+      "sha256": "7670c93eb21c1dcc91894b8bbfd6d8f8c6f41e3d7992c548fb87117a82f37c4c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/03-control/logcat.txt",
+      "bytes": 11207,
+      "sha256": "5318a7e46c587ecb17e0ab015df16e29eae0862c398261b4bafd8a1d39c6a51e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/03-control/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "56bc2c3052867d0ff781e3e398cd65a2528e6d4b466deac76591568fc1202c4d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/03-control/continuity-analysis/summary.json",
+      "bytes": 2050,
+      "sha256": "077de2e005444c2c79480709a302d505a054b8d28a0665d6e88124e4ab2b679d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/04-candidate/capture.json",
+      "bytes": 41398,
+      "sha256": "a06e705992532c63f47f2c803e14be68e2e281f0c0d870c178fbed0a68ba8dea"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/04-candidate/logcat.txt",
+      "bytes": 11570,
+      "sha256": "b4d98d266b54838fc6d0b569a872c9b7448aafb2a17b5004424aa16b667f2f05"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "49335a3e466d574f9e24bc9b8638102c8f13cff8d505cc3280418a8d99843793"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1477,
+      "sha256": "9d4b69b0bc8e107d30c0607782be917b73c0afc6d316f176d646e377f798ba3a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/01-candidate/capture.json",
+      "bytes": 41392,
+      "sha256": "1de5132114b2a1c76500145c2b285f2c6d08e9fe553fb4a8d45480f9991587c2"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/01-candidate/logcat.txt",
+      "bytes": 11602,
+      "sha256": "e79c5940364a00021f24151ad9ed04aac25055dd250349e1f97e7fda48ad7617"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4378,
+      "sha256": "29b37a4534be9690448e97c65cc38dd3ae494fc8d4d7a9cd66f1e126ebba3efe"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1282,
+      "sha256": "962cf232ba00ad764a90783f2d835c71550f2982c400a969993d40ed527da37d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/02-control/capture.json",
+      "bytes": 41399,
+      "sha256": "5366540f8d22f138dcf4f7ad8f10e154c60d528955f80b60b6df56bdcf7cd17b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/02-control/logcat.txt",
+      "bytes": 11594,
+      "sha256": "8ed810abf106a9d426ff9be34b5bba2cd17276d4f1e7a20d2e8b7f084207f44f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "e770da35e34a505f546a223c243ee48330d2e3ed7ad3ac6219c849eeed4f3134"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1883,
+      "sha256": "12cf23cf065939a18eabe70c4c168fdd16a8eed97f03e4cfee6432664437892e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/03-control/capture.json",
+      "bytes": 41407,
+      "sha256": "192b46a01f3989ea05ef0bf52f69ddcf8a9202a42d48d43afcc9a067ecd1fa8d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/03-control/logcat.txt",
+      "bytes": 11595,
+      "sha256": "15216e952f995db474132723d5ed2b3ce84896d720dec889ea2e8fe08938f547"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "de9fa59051c19f7ab7e5c6a19245f3382c6bac376e082dfb80672ec98ff1f9e6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1485,
+      "sha256": "c8419167f9e9a3f410c30e405f920561eb3442be820752dc2bb3739fa8427678"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/04-candidate/capture.json",
+      "bytes": 41388,
+      "sha256": "b6528c93ee014b14ee1bfe9440c1fcdef84b51c01279bbb79bf7636b9d74239f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/04-candidate/logcat.txt",
+      "bytes": 12034,
+      "sha256": "157e79f76c46e7b429e5a4501a0522cef95065bdd40285f4f73d0011f77ae4e4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4377,
+      "sha256": "e9998e3b185c817b554bf56f5197d8e7d8dfc4dbff755dd60f40e20874353a81"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 2065,
+      "sha256": "732ba9f3c4dd94050e730e50f74fa1be76b4f179f3b5b2d038673af119cc89ba"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/01-candidate/capture.json",
+      "bytes": 43046,
+      "sha256": "3f1d8989f3f5458f3afaf7e31c9373fe0298dcb019a9828701064508c1ef22b7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/01-candidate/logcat.txt",
+      "bytes": 11630,
+      "sha256": "2fbfb2d3154bcd889d79785a30991dd60e20013d7f54dd1b69bed13dc4078243"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "a804f4602a5653d586fa6972f956078087f406c76a8a1efdf018024525740076"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 3571,
+      "sha256": "fc21aea3842b7e1b3be8090b64e7423e39b510b21ae4dd174b8f7a10bac29f4a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/02-control/capture.json",
+      "bytes": 42601,
+      "sha256": "51a2525f571a0e8d3cc047335cd8e123ecec7baedb749ccb00c5b164ad7b0c3f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/02-control/logcat.txt",
+      "bytes": 11624,
+      "sha256": "5a40aa11d13f0c6474f1668bf902768a2c18f4bb4f88fdc44dfc5d8c2ef2c448"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "4bea22ad305a80cf18c134591833c6570355714c44ca44ca0c537f06c1ffac74"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1992,
+      "sha256": "1505337c0c811740c7b3872ed664f19d807362639bbcca3f87a1388645d9211a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/03-control/capture.json",
+      "bytes": 43074,
+      "sha256": "fcc9d803530f1e91ac6f7c1fed928d565aea514cb0f4a316f6fcd21a590049f4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/03-control/logcat.txt",
+      "bytes": 11622,
+      "sha256": "d00471607a710732f6de047cbf0c565e6c201b4fc168d38f02a058752451f19f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "6d3a6708f1493647d6aa8b6328f4774c26ece925786b3dca01b446a34ec2f96e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 2049,
+      "sha256": "bae43b85b2f52a484e62e961dc5fd430dac47cf5a2d760c6b6916eaa566b3939"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/04-candidate/capture.json",
+      "bytes": 43064,
+      "sha256": "3d8c7466bdd8d9f593e511e84ee724b3d8538cd3ab2b93855963f2f5e5e7e536"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/04-candidate/logcat.txt",
+      "bytes": 11629,
+      "sha256": "d218dd2d7036f1254031ddf3f0aa6bfa379de34189c42fc23faf279bc220dc3a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "b4c9e5b527dab8580e5a44bfad062ff0de4a1fe34f942aec502a190ff1fbd060"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1280,
+      "sha256": "e9500a9a7ef3600315c0196a1b110fe3f3c405c869b419b5cdae1f7eb5b26d46"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/01-candidate/capture.json",
+      "bytes": 35893,
+      "sha256": "786e9aeb56d3b22f6b1ab39038ae519fdfef5271ea635c2494be715e67023e69"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/01-candidate/logcat.txt",
+      "bytes": 11658,
+      "sha256": "11b5e407e3c98fe8dea87092e64cdba126b10864d9e17dc36f89fc1efacb77cb"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "b62d63b84f8c0af01e49c407a298cfd0a7f66f832e3017ffac83390b1f5abbc2"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1282,
+      "sha256": "837accd8ba06c5cd6943653ea42d8b03f989d4f0ec35d8495fb6920224430a44"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/02-control/capture.json",
+      "bytes": 35895,
+      "sha256": "2880c1898ad19c1d0813979e53e8e8b9b67c19c62a967067e12cd493d778bfdf"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/02-control/logcat.txt",
+      "bytes": 11662,
+      "sha256": "9225856213ccf1090cdd6aaf6af5bf89e4b249b60090c5260fbc269e9de8e82d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4373,
+      "sha256": "7a24734b29b3eef045b000be74014963b85068bfb86840d331c8e5e828ac4b12"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1874,
+      "sha256": "0a3cf135cac17c4805bcb457f85c13d42d15bb18e47c2164d5e942e3fc710ae6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/03-control/capture.json",
+      "bytes": 35881,
+      "sha256": "c9c1f2a503132ebbf4e22e6ab0e883a2c4ab715059939da309fccac91a94908a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/03-control/logcat.txt",
+      "bytes": 11655,
+      "sha256": "39c060eb886a74cadb070d68a8769ec05134bf07849787a6ff1bfde7308ee83c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4367,
+      "sha256": "1f98738934fb4a96fdfc4bdd8d12ed47d72d40bf1207823d4c135ed35ab095b3"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1675,
+      "sha256": "0867cc261edb5ec42698ea6c48b41f4d61ca1f8c5cf2a827ac35c76d3e02e623"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/04-candidate/capture.json",
+      "bytes": 35351,
+      "sha256": "e91ef872fa5d1566ca9e47e6bd18b6e5aef1543388ed8057da20d828cf81a4f8"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/04-candidate/logcat.txt",
+      "bytes": 11655,
+      "sha256": "810cf6bed94e5e59eb8a73fc2a0233bafa7d78296b16e079b8041532a7af01da"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4373,
+      "sha256": "92b37e8f8a07680d8c6a8105710a6006f858b944b4fb72c8d9e187aa90835fff"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1608,
+      "sha256": "e214774e9bb439cb46487a25a6de1057a69f737ef90bb86a396274b0d6ab8112"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/01-candidate/capture.json",
+      "bytes": 36213,
+      "sha256": "bcfb0b90c0488c2ad7bbc93c556d60de1cd30f7d37f722b5b0730ef25f78aa8f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/01-candidate/logcat.txt",
+      "bytes": 11626,
+      "sha256": "628bb1b7e5ec1e8781c54c03d081cf22a923ab27afbb7a10ccd3f0d39e2c4f6d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4369,
+      "sha256": "eae693bde7133a50d7d8768672f313c8d45e41f97dc521f750d1596f3703d496"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1475,
+      "sha256": "6992da5bc03dea5c3edf73f0d73974d95731ff2113a1dd4febcd0e3911e88512"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/02-control/capture.json",
+      "bytes": 35701,
+      "sha256": "e907f4fece8d114f2b0153f04f4498f12c5547a0feb8c44531370d67db3ef418"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/02-control/logcat.txt",
+      "bytes": 11631,
+      "sha256": "d41d3037a54020d0db531d8d3ba040c0b9b9e5166cbc4b51a242842d92f455e4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4369,
+      "sha256": "0829afdd7fd9d564c69e2813311c0ee60f83cce44f7c021fe45737d74049db05"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1280,
+      "sha256": "38f13b5b2d094035176a49086096dc8f1ccce1f77f1ac0e3afb91e46f1c77096"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/03-control/capture.json",
+      "bytes": 35694,
+      "sha256": "fb4b221319095df92319c52edb88ffbfbe955831c40f1ce1086f6537734a1765"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/03-control/logcat.txt",
+      "bytes": 11633,
+      "sha256": "9de013af829fdc1c4614f234c9b7acfa9f64c80f14a7b64dc4725c1bb692a7f6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4367,
+      "sha256": "c02b64fd131aa03162e3b070ad716bb323db8904c8c91b503d600d95e1c666cd"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1475,
+      "sha256": "ddb6a57cb357f6f14304da0ea3a8f533ff4d9a2be1ba220f181813108da2a965"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/04-candidate/capture.json",
+      "bytes": 36257,
+      "sha256": "f3c8fd8e98e8ddbeccb79db6f672b3081e30d4b00c6e2ee004a25b4354dcf981"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/04-candidate/logcat.txt",
+      "bytes": 11627,
+      "sha256": "658c6689df91bcf79b8ca3212cca415dcbe7cf52e82b1372597624ae5728cf52"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4369,
+      "sha256": "c607396d569db7bd187aca23049d8d98ba3f985f8c7f48c95d9ca39f10793ec3"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1875,
+      "sha256": "fee982adbe6ae7345875458dc42b140171ababc8dbdf4d3de0fe3115b7c3d74b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/01-candidate/capture.json",
+      "bytes": 36010,
+      "sha256": "28a44847ac38a456846456983220bbbe599594abf7abedd08d18d8e5e56dd48f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/01-candidate/logcat.txt",
+      "bytes": 11655,
+      "sha256": "bf33bd8f823a20a98a780418a44f5747976adecadfd4c9f1a8194cfbe0512788"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "f12b668b32f0648c17fe75a6a447e97f7b5b820aa1a62d6dd0c0964c6aa77b8c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 2048,
+      "sha256": "cdd0476d147a9a95404e27cb6da4b1a25b5908e1ec935842a0d0a4021b04201a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/02-control/capture.json",
+      "bytes": 35713,
+      "sha256": "3cd7727cbdc68d38b51e76bd8bf65075e0b98817973cda024516ee001e1a7bc5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/02-control/logcat.txt",
+      "bytes": 11662,
+      "sha256": "27c09333aa85fca3d2ef281ea4d0802d42120e6b5a35c2bc7c3f6c34f74fc683"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "265ff7167ec083599a729642f3fffcf9febaa81ad9035b96314ba0e5d35c348c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 2256,
+      "sha256": "c8ae1d022b507ec95ee79d9a37b114368680a469b99a7a57dcb02399fcc5c437"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/03-control/capture.json",
+      "bytes": 35722,
+      "sha256": "42a00706ce159225a0b2a3149e63ffe8fc8caa59812599109d95db16a05ad0f9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/03-control/logcat.txt",
+      "bytes": 11655,
+      "sha256": "5e118deb26449af3dbc19048c2d89c4ce10d693a86664d0bb1d1287b16300370"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "b0acf18391bba9c3515fe76faa6448dd108a2bb61e6bb3aca832b955a4c61a7d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1277,
+      "sha256": "5801ab682111e88c685f75bc79f13ef0830fed5b910ebc8dd2695b23aceda8a1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/04-candidate/capture.json",
+      "bytes": 35563,
+      "sha256": "01e2d713ff96f6ca9bbb35b26d919bb9f4820736d6a3f1ba7a81c915074ae78d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/04-candidate/logcat.txt",
+      "bytes": 11658,
+      "sha256": "0fadabcadade9b8d6eb50c9851beaf4f3eadab74d7b818c503506388332816ea"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4364,
+      "sha256": "e11f0fa776e840b54dcd43bc67bbeb6ee21a18d95a20ccd9ed0768fa344dc90c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1620,
+      "sha256": "c612166e37212ccbcf3457461629b95a2474216230acf152b1d8156f74b89381"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/01-candidate/capture.json",
+      "bytes": 36089,
+      "sha256": "4ad0718def1186b21c022950e0ebdc6b54199770e8ffa29edc7a549443417ece"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/01-candidate/logcat.txt",
+      "bytes": 11657,
+      "sha256": "01e68177d206a98bcd6ddb5e6f3c4a75fbbcc1ae0a22989f15dfacd628c265e5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "553043d5553e2c80f0d38d482e91eb4d0f1bdce156cd79b09aa43d381fd35d66"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 9332,
+      "sha256": "a6ce3b71f5d8b16ad79d8d2b9fb2697ee1bd7712ac899e8075f5c0b25b2f2906"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/02-control/capture.json",
+      "bytes": 36086,
+      "sha256": "9027bef4bd4f5f39111eb9b9fb3f87778fd1f51052153eee09d0dc376cb751d9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/02-control/logcat.txt",
+      "bytes": 11655,
+      "sha256": "4297f05ca38a79dcd5876e97e203fb3c3430b2f3949827c031203e5da307221d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "a5bb74a2741966aa3cf1b1f6f3dd40d9a2374efc08c9ee563838163f9aa1bb74"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 10000,
+      "sha256": "c0c713976865b32286f6423c5420cfd085128b0131244c7257d2ca1111ab2652"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/03-control/capture.json",
+      "bytes": 36098,
+      "sha256": "765b879c7f59f52112bd7bda3572f78f0aea89d6421a1ffef492f06f750cb465"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/03-control/logcat.txt",
+      "bytes": 11656,
+      "sha256": "d080a6fc25980158917aa216395ae2615e2242151c2f70af3c1a7e46741587ba"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4368,
+      "sha256": "9a98c511c148c41ddcfdeb9fd75b0f7cc5316d783f4449df9d9884bb687fa62d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 6932,
+      "sha256": "1c8145fd7d344b5a3c5df376933cbe437c6a5cb9ada31406f1b2d5721b8f015d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/04-candidate/capture.json",
+      "bytes": 36090,
+      "sha256": "5506b58d5dc19656797f663146042b98526cce6afa0c9a9d88da9f70364e082a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/04-candidate/logcat.txt",
+      "bytes": 11654,
+      "sha256": "558717c13251ffc2fe57259d60afbfd6df2ae39fc5b0135d057584d69ab83fd4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4369,
+      "sha256": "3d9cedea9072ab1d59949b1b4d9f914e31615a1d98fe0c4107756f09527c9866"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 2436,
+      "sha256": "95bb5baeb3be145722417aa6dbeff6014fdcdc665c190c1d6789bac44501bab6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/01-candidate/capture.json",
+      "bytes": 36618,
+      "sha256": "9378ccbeee4c8c799f26bd4d66c15fe23756ba120884f2adb7d227426e3c025c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/01-candidate/logcat.txt",
+      "bytes": 11671,
+      "sha256": "a7f999d012554d9bc89959d60986f4e96ef73aa07cf5c0bd1266eb45ac776994"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "edad1632f79e15c2dea9ce7e356905ad4aa8debc9081a084239fd556e49effdd"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1483,
+      "sha256": "ce7c00f2fcf94381c143bf1db68f96f71001df178dd6c0e1a0544cee6e33efc1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/02-control/capture.json",
+      "bytes": 35996,
+      "sha256": "d465604f35123a1f4c402141fde7325e50e79c68de2305ad068d5c2e0644fc36"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/02-control/logcat.txt",
+      "bytes": 11673,
+      "sha256": "eb5d08e52a63cfdc39a0bc1339827008df1fdb617859d3085b3da2e2b865d597"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "2ff5b5ae3c1ef1abf1ee1a0ff177393274669de8c708d2856c6abf8f863bacbf"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 2019,
+      "sha256": "b9556f725a5ee83091da4284aafcf154d814e5f5236711d927e47f3e39ffd29f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/03-control/capture.json",
+      "bytes": 35601,
+      "sha256": "a8cd7ec52ce9fbe3ebda9eca0ba97db12dfe83f65300c6f1a7723b66b411463c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/03-control/logcat.txt",
+      "bytes": 11674,
+      "sha256": "06602944af0240c6a6b19107f8851218f62b383235be112dc04c858566234204"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "80b19f861bafa1b04c675530c311be165df6c7353cff4ce694d522ecfaa18a48"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1417,
+      "sha256": "87987fc3375e9a3f681df84b39879e87486c40cec77fc743b3fa5775c198f2d5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/04-candidate/capture.json",
+      "bytes": 36638,
+      "sha256": "86e30282c6fcaa473df36f2f203b734c606315850b662f42603f911947f1a01b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/04-candidate/logcat.txt",
+      "bytes": 11673,
+      "sha256": "99dd82b31befa2a41d24896973fb7cf8fbdeda6dd738bad330865a74f0521c32"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4375,
+      "sha256": "b09c506835d498d4629b2da9d1853114e426ca9019ff64391770878ec82d542c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 2456,
+      "sha256": "2b4aa951b5b19162c45062519e1ca9039a7e7f20175711a832e7e228acebdb1e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/01-candidate/capture.json",
+      "bytes": 36766,
+      "sha256": "bfa3595ddd6c2c8bfbb5c4679505a2aa3a0cb3ce447c1e6ef7014c9f064d40d6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/01-candidate/logcat.txt",
+      "bytes": 11619,
+      "sha256": "c7ee8a262016c320ef3f2fc6253a30ca24a74a238eadc4a27a1d4a6231980f58"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4373,
+      "sha256": "5196c70fc7fc03f4c4535f979adda372ba0911a1bdb72e0345f90003988b0478"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/01-candidate/continuity-analysis/summary.json",
+      "bytes": 2448,
+      "sha256": "24e5c78c39b641d97856e75fde0a890736c2a221c8f15b6ba146ca31e7b6b61e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/02-control/capture.json",
+      "bytes": 36211,
+      "sha256": "b1bc881687b4f9ff916e5310f48bb8b1b950fc4de7c8c4012bc8d57a0ad7a03a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/02-control/logcat.txt",
+      "bytes": 11623,
+      "sha256": "4b34c38c0d75911547647892e30cfa840eb6873f2ff8301470a06ae942da09ba"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/02-control/return-cleanup-reviewed.json",
+      "bytes": 4377,
+      "sha256": "8911643098d36496249e028a6d3b6b0ce4253bf0f91084268a0de06424e2b8b5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/02-control/continuity-analysis/summary.json",
+      "bytes": 1866,
+      "sha256": "bad37aebc2686b7a2d9f9c7e053e2cb007794cfae33b525634d4398cff2890d8"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/03-control/capture.json",
+      "bytes": 36196,
+      "sha256": "4fd4819ae54079ce8d98c380e9be8c3a7806c26fb4e08270bb4f6e1bfa6371f3"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/03-control/logcat.txt",
+      "bytes": 11624,
+      "sha256": "2c02a1d77f040976eb9f1bdb01258900b55b7de86b928ddb9589b6de6c66aea0"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/03-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "63dd2a8a60e4981daa126e571b4fc5723758b8673cd26be446504744833f7062"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/03-control/continuity-analysis/summary.json",
+      "bytes": 2059,
+      "sha256": "79684be79e7606c907cd58be2e9310859afd51a37047b52a269555d7ad123c68"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/04-candidate/capture.json",
+      "bytes": 36752,
+      "sha256": "f8f5d68b93788444eb3a7f9615dca6dd6865527175b8a1af298b24c6be97f0ae"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/04-candidate/logcat.txt",
+      "bytes": 11625,
+      "sha256": "168f93c652da89c32673d11d6f2863d3b456021db4e6b41bccd02b95f27b3e8b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "9f70b2de3d4e8a1e2d5321ea9ffcb2864d5c2cc36235c7bb34164ea2a8da777a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1665,
+      "sha256": "375174d0797ca39b4e34f0011a6fb47d339d3afb77bf5105ce1783e021572257"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/01-candidate/capture.json",
+      "bytes": 36223,
+      "sha256": "43531cd457d83f72ff8f966e8a5c6babb5167d642f7b2ddf51c09ab2e8fca372"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/01-candidate/logcat.txt",
+      "bytes": 11655,
+      "sha256": "610cd2e61c5a4a5f711af959f0152bfc609f8a692906052c88fb33b6120f4dac"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "bac193629b3bb3da3c2f39c9415479e671d9a67ee254ba42f7f3cd9bccf4fe9d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 2003,
+      "sha256": "3ad16e9e31445be50d22a05a028bfd0bf9386f3cb134f35bc8a38ee95ec5183f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/02-control/capture.json",
+      "bytes": 36416,
+      "sha256": "bf3a57ae6273560f467b0cbad615af70d38ef92087d96747abcca7ee27ef0b98"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/02-control/logcat.txt",
+      "bytes": 11652,
+      "sha256": "18b5d050d4872b6a0939ca579779cdadec1a3150670c64d3c0ac2fd336feda4c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4371,
+      "sha256": "1a0979da32f64e95ef38cb8caaa236b4bf0713ea0646e7237192f4f76f2f9a58"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1476,
+      "sha256": "f13dabd022364b003e1db740da9b43c3d0d5577c107465a9249bbef5db8d948d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/03-control/capture.json",
+      "bytes": 36412,
+      "sha256": "ef8c1f898708fa097224fba8761fb4678fcea73f56e60dd3edccc32141b77524"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/03-control/logcat.txt",
+      "bytes": 11655,
+      "sha256": "e7eecb22c0736c54909938b9bc8e04476c416056bb5b2a5b127133b3eab85af7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "26ca27b1fb9ec8fd35c4dabba587c6ff36723a41d483d38e1dd20a16dfa7f1c4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1473,
+      "sha256": "c27f6181622c0c643c91093660e68fb878fdb16770bba2ff0cbcbda6ab121e23"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/04-candidate/capture.json",
+      "bytes": 36703,
+      "sha256": "db39a4536988533388e67db6fbfcec3bb05d8b1eeed7abe50747a0c5bacb8b38"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/04-candidate/logcat.txt",
+      "bytes": 11673,
+      "sha256": "0ef0f5768354be421ff4fa02c78af4fd70ce97d2c453a2b3894c94a32de700e9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4370,
+      "sha256": "89c41e12d3cf6209bbf72642b65fc196af52fec5ed04c6c079fe81802854562e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1857,
+      "sha256": "cedb9981db696393ea8ef4fbba1d8e2bcedc221606e760a2c17414bf5413985a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/01-candidate/capture.json",
+      "bytes": 40388,
+      "sha256": "cd8b223c844de2dd02c6dee63a7d4b4f9f24633bda2fa263b25e87e49fd921a5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/01-candidate/logcat.txt",
+      "bytes": 11806,
+      "sha256": "8a0c2a0b271b78dfe7c79802265db2c81760d4949440f34384e0a01e5130450a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "b689ce9539172846ec5f21737f784125a3b434f087370f8652ea21e72208232a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 1678,
+      "sha256": "acfd87326e530680a9a5dd9a5d519118812b1429f136d9cf0d46c2957d40598a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/02-control/capture.json",
+      "bytes": 39955,
+      "sha256": "314012130de0ec10674d52f979b1364ba18d69d9f3f6bf73f83379641c834e88"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/02-control/logcat.txt",
+      "bytes": 11794,
+      "sha256": "b6fe2e11c7b0db4ef1470d5e381af827cae742d9e6ca2639660b4cd8d209c038"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "8b92c0cde93ab329f6138632107c89070b2b3ab80e2a232594967229545e1710"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 1228,
+      "sha256": "217297c7e7f86d2fb0e7eec4085edfab9d1a93ddabd9702e41a7e72851427a3d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/03-control/capture.json",
+      "bytes": 40418,
+      "sha256": "d36f561d8869db39a39d06593f067c9e459004675264b98d5c7dbdaad539ecfa"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/03-control/logcat.txt",
+      "bytes": 11795,
+      "sha256": "953cec938fc52976c4ed5ce5b6252af5c6793e0148776b20903a9d8d0688ee02"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "528d8c10b171dbdbd869bc7a5b11171d9567e811a874037f7cc2e84ae58ced10"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1674,
+      "sha256": "9cf6503d753f1e22a8a513361ea9cd2b4c58f53267fa1d9b98982cb297b14c5f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/04-candidate/capture.json",
+      "bytes": 40436,
+      "sha256": "75251e9270c5e5e806fb890e6f7ee4475ad18b72aaf61303330c222972f5b04f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/04-candidate/logcat.txt",
+      "bytes": 11805,
+      "sha256": "dcfeacc6ee7a70a01c485a6e76c2898d3e20ea8c3105cb674dcdc28a26fcf887"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4374,
+      "sha256": "7f688024d2a13149726f75971c5f2a7d6e754f067c21ed8b1fefee2d3565afe2"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 1681,
+      "sha256": "33355afe3fc9d5e752fe87f58c39cae4d14a33f73c340fcc94f90de31c598e14"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/01-candidate/capture.json",
+      "bytes": 40403,
+      "sha256": "e7af416d2d73cf8a265f807347022731c839a1fcc7fde85fa92e2acafe1bc867"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/01-candidate/logcat.txt",
+      "bytes": 11813,
+      "sha256": "cad0fd49c45083a9317f3dec2c68695ef42c68ec930ca0eb7f995fe1485b8f29"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/01-candidate/return-cleanup-reviewed.json",
+      "bytes": 4373,
+      "sha256": "af3884ce16399cf4b86470ed240b8e94e27c9beefeb44099324307704e062957"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/01-candidate/continuity-analysis/summary.json",
+      "bytes": 4560,
+      "sha256": "bb409c4c368a047f7bc336a1eddd1e496cf41f03bd67944d1fd8be8f7b13ec46"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/02-control/capture.json",
+      "bytes": 40412,
+      "sha256": "3a5e9991ad29fbaafc206dcbdac4a7aaf062c45eef0135aa34279784b3bbf095"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/02-control/logcat.txt",
+      "bytes": 11810,
+      "sha256": "ac9e78d61de07fc1fefd55c6e12d3ba8a02c8abb4cd2a11c47e045ade137656e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/02-control/return-cleanup-reviewed.json",
+      "bytes": 4372,
+      "sha256": "77cb4b86f906c7ecfb0e8a4b03e2756e94d409b80d13c74abfe5cb9c597f4cba"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/02-control/continuity-analysis/summary.json",
+      "bytes": 2244,
+      "sha256": "3344604b35eec043d6fb0d82bcb96c2ecbbbb111d11b70dbd38b51d97b8ba0cc"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/03-control/capture.json",
+      "bytes": 40403,
+      "sha256": "222f9e1f16b66d62524f03c917829e643e5669a96ab23face1fa168027632157"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/03-control/logcat.txt",
+      "bytes": 11808,
+      "sha256": "b70714a90402dba6cfbfb997b0f0c41a288b4254c859f311d1b74097ed555566"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/03-control/return-cleanup-reviewed.json",
+      "bytes": 4367,
+      "sha256": "187ce42a3ed941b125dd8aca69ccd43307abc7ab0898a5d71ef528a8d1cf74b7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/03-control/continuity-analysis/summary.json",
+      "bytes": 1470,
+      "sha256": "bfa58e204b1008f78a0b1728de0a741da21578356473b7bb1476d0d94f215951"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/04-candidate/capture.json",
+      "bytes": 40784,
+      "sha256": "cdf8d139e3a2feff4cb99eb077c80d2e532bcfba1b41a7af29fe596bd7318e35"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/04-candidate/logcat.txt",
+      "bytes": 11817,
+      "sha256": "a04d64022c93f4c2441bb55f3035af8e16fc183a42c2c7404f38afb859048caa"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/04-candidate/return-cleanup-reviewed.json",
+      "bytes": 4376,
+      "sha256": "5c2228d49381cc5bfe38c5b9aafcf4b6ac41ab55b1aba529616480b7a80aa9ef"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/04-candidate/continuity-analysis/summary.json",
+      "bytes": 2523,
+      "sha256": "96db6823bf0b25db3eef531999051c909f68612fe6d37720aeaa30a05e5a843f"
+    }
+  ],
+  "files": [
+    {
+      "path": ".agents/AGENTS.md",
+      "bytes": 2785,
+      "sha256": "0f1d6b211563c98f29eb94d0604bfd45f1c207f159f491f531da9b9628dea0ab"
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/MainActivity.kt",
+      "bytes": 5155,
+      "sha256": "138fec5f31d86711b1b251f3b7959bfbf3027139ec184626d8afc3fde3d306fa"
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PlaybackDiagnostics.kt",
+      "bytes": 22311,
+      "sha256": "525f34fc9385dc4dd0f295f72a38209505f2cfe5dfdfad8e3543b6a51fc3f089"
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/PlaybackTextureProbe.kt",
+      "bytes": 14521,
+      "sha256": "bce797ccbe2f35e8c58e2242472eff8b222578f58cde052b53e73654ccb9284e"
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/StartupCodecRegistry.kt",
+      "bytes": 2615,
+      "sha256": "e386abdf0d685ad2276b05afc3c41fc15f227516017edbe9641fe3d14eef975a"
+    },
+    {
+      "path": "android/app/src/main/kotlin/com/personal/piliplus/StartupOrientationServices.kt",
+      "bytes": 2935,
+      "sha256": "48e182bff52c3c2302aacb2940b64b227a87d6597b3ea479f89033d532179be3"
+    },
+    {
+      "path": "android/app/src/profile/AndroidManifest.xml",
+      "bytes": 608,
+      "sha256": "a63ec21b80f50d4d8599dd54f382fdddd35b18b16856985d161c662d8a0e0f6d"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/.gitattributes",
+      "bytes": 142,
+      "sha256": "f9edd3bbca1ae6a0a7ae3932aa88892181304d08505409a3d9a4c4ca4d4d1060"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/README.md",
+      "bytes": 1226,
+      "sha256": "7825bbfb762adfd5bf7d40cec2b23e8e0ef3444a2b70c3994972ec8eb8a15d49"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-source-recovery.json",
+      "bytes": 7383,
+      "sha256": "693fdc48ef95e84bba3e3aef5279f6a6c08b07bd6cbca1051043739934abcee0"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/Makefile",
+      "bytes": 85253,
+      "sha256": "d4ce5203cc99d3a2afae4895dbcd30c4279f2f77cdab8e6a22b08a8df307e878"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/mediacodec_wrapper.c",
+      "bytes": 91272,
+      "sha256": "9ba765e3400724f386e8c09a0d220fc616c4ecabb057872cda217ed340dd542e"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/mediacodecdec.c",
+      "bytes": 26149,
+      "sha256": "2df5ebdc37f4ba0a9ee355b6a73a7e94c19003c09e4e4e5e34e33fe3a234c12b"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/mediacodecdec_common.c",
+      "bytes": 41830,
+      "sha256": "d51bca87d3933a0096cf669cef4e813d788ae04eb99abdd1bc8ccea9f0fb2ac3"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/mediacodecdec_common.h",
+      "bytes": 3090,
+      "sha256": "c60a7c62e29a9aaa95d65c774a80b8c578d259fd0232dcca1d0fbc2267277761"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/pili_codec_callback_wait.h",
+      "bytes": 238,
+      "sha256": "72e0de84d2a4787bc2d8440bcb78e969de4bd8ec7ac41772077dc3c67ec8c635"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/pili_codec_callbacks_dex.h",
+      "bytes": 59021,
+      "sha256": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/pili_codec_callbacks_jni.h",
+      "bytes": 9239,
+      "sha256": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/pili_codec_flush_trace.h",
+      "bytes": 1008,
+      "sha256": "f26606726c0505d31591737079ee7e0ff7d92fea830c56ff9833dea8ac773784"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/ffmpeg/libavcodec/pili_decode_only_trace.h",
+      "bytes": 907,
+      "sha256": "5576da6bccbe14a4016d01f305237211b2aca471b7a0934c8af9b023fc67673d"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/audio/decode/ad_lavc.c",
+      "bytes": 10101,
+      "sha256": "6a1334775dd92c4d4c90ff02097a2a69b7bfda4c8b6b125f1d6e67e4d19b00ac"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/audio/out/ao.c",
+      "bytes": 23437,
+      "sha256": "5fd091c800dbeb0d6f2c236ce9b1d88852266994c652f0c5317346ddc1d344e3"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/audio/out/buffer.c",
+      "bytes": 21871,
+      "sha256": "e053296cdfe58a07b6bd2aa5554774ff5c54ca57c622a56636fb6fe8f0fed105"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/filters/f_decoder_wrapper.c",
+      "bytes": 43222,
+      "sha256": "a8eed44458a3c388616899c5cbd227de181e6fb56cc860c156793a862a71c1ba"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/filters/f_decoder_wrapper.h",
+      "bytes": 4612,
+      "sha256": "9823c38a0393fe64bd639f7b92ac5d5fadae0119ac72dda7a12146f2f0e98615"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/filters/f_output_chain.c",
+      "bytes": 22955,
+      "sha256": "e24bc67cd49ce05b59d05089518accb68c641555606f2b08e859b02467a67ea6"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/filters/f_swresample.c",
+      "bytes": 23427,
+      "sha256": "4957706ffb199b15049c7ae91712a25a966057359b840a6429b8e553fd4950b4"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/filters/filter.c",
+      "bytes": 26940,
+      "sha256": "33d94c700f229c6f82c573c27990adc8fd13897b0982203713ec161126dcc540"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/include/mpv/client.h",
+      "bytes": 86520,
+      "sha256": "33b024cd0e32c4ec1413f700cd4dee27cc9c00aa714b7ffeabf66406e1b0aa1f"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/options/options.c",
+      "bytes": 45651,
+      "sha256": "51b3df080449c72de88b571a9a4fdbbb44360bf9858bf01bbd9c1bd2263089e8"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/options/options.h",
+      "bytes": 11158,
+      "sha256": "c12a5e6ab1398c5dc8bf7c2c0fab32f3540f933c3a11b1b0df53531df3b52297"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/audio.c",
+      "bytes": 36470,
+      "sha256": "476a649c36b38663afc90554e7bd536a92ba0763b256428df6f2ff319e0da13b"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/client.c",
+      "bytes": 70715,
+      "sha256": "f3451ccfe75d3ffe41317ae0b1d6088669c8356472cdddc94c2569e12a622299"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/core.h",
+      "bytes": 25185,
+      "sha256": "eef10b1e0faa454d559364a706a30ca32e4180fc2630f8ec9a29cbae95df900f"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/pili_audio_lead.h",
+      "bytes": 3017,
+      "sha256": "859ff04194a7ced14043c76926cabc276c0bdcb1bb2b47c594ab56a098ea97cc"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/pili_audio_lead_log.h",
+      "bytes": 3529,
+      "sha256": "55d11578641bc3b3cae9dd0f1aa95e273a0f00f13af131b0be858a366eb7322a"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/playloop.c",
+      "bytes": 47835,
+      "sha256": "1c7e7e82dd10f20ba5590f4cb6d718f142484d824f838d90d23e1ff27f9582b2"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/player/video.c",
+      "bytes": 46768,
+      "sha256": "ddc9761e699bdb7f65de08b51006ee6a4683870585fc598c288827984cc2c880"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/native-sources/mpv/video/decode/vd_lavc.c",
+      "bytes": 51221,
+      "sha256": "f8ccd6860c077a5c27235f17bcf6986b051552852b099b4317144ae0adf00e88"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/staged-whitespace-check.txt",
+      "bytes": 192,
+      "sha256": "18baa37dcde07ac72d3342753183e50e6a4876a36e25458f3ea5f8a2d673775b"
+    },
+    {
+      "path": "diagnostics/checkpoints/resume-before-r69-stack-20261101/verify-checkpoint.py",
+      "bytes": 4010,
+      "sha256": "038c1c5e21d412249beda97f6ea64c84396e05e3c2052181506f8d1cae4cc30d"
+    },
+    {
+      "path": "diagnostics/startup-20261018/rollback-baseline/memory-gate.ps1",
+      "bytes": 2370,
+      "sha256": "bd2a2c401053efb7961f62613729af8527803dc5ffa1df2cb5605a59582ae631"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/active-continuation.json",
+      "bytes": 2567,
+      "sha256": "c6e150121814d1551bcb4f176dd78caba320bb2958c884f276a4ab67d781dc43"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/analyze-async-input-spans.py",
+      "bytes": 9918,
+      "sha256": "d301adcaaf1fc58d8a96e910c8c0c57c587aef7da779337a9edde29b28dcc32d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-cancel-01/queue-restoration-reviewed.json",
+      "bytes": 1004,
+      "sha256": "b8395f2e5acb3bf734953fe15b99c9c465e874f560eb31aa3c37b162f692baa6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-cancel-01/reviewed.json",
+      "bytes": 3291,
+      "sha256": "a032161510a698d858ddb59f62d5b04c8f8bb32da9d4934ac1ed05de9a6f74df"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-candidate.build.json",
+      "bytes": 23192,
+      "sha256": "c7c9a2051f4b0ecc21adeecdc9d8937503bc7966f0eb0c5727ad100310fdc79d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/completed-samples.json",
+      "bytes": 113792,
+      "sha256": "822e6facff2b1a0e19f6cca367a6c66acb6bf6da704ee32f9a3e6da2b7d495e4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/device-reviewed.json",
+      "bytes": 14693,
+      "sha256": "b405f3c9c0d567b80fe8fc258969650655fc048daf2e5013a36fb5534b9a0182"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/net-gains-reviewed.json",
+      "bytes": 6749,
+      "sha256": "c4e442bc1826bc4b08e351bd55962e965f9c916963f35f79ff387d2a4805d172"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-observed-01/plan.json",
+      "bytes": 1058,
+      "sha256": "998d39cab2e24cf63fe47bde89a0026004ae141f469f1d76cab659c966c400e4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-input-seek-01/seek-reviewed.json",
+      "bytes": 5858,
+      "sha256": "84e683576c84787a7164faa59dfaf3fa590b623c57c94c5889217ca995c7fbd9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/completed-samples.json",
+      "bytes": 100063,
+      "sha256": "b08f135114ab8a455fa10979fa36bb6b1529cc6455ededcd3c45633a7dc2e97e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/net-gains-reviewed.json",
+      "bytes": 6773,
+      "sha256": "06695a793f6c8c441ad9c89866d0ec8da70f92f765a086d236447bd6d26cee36"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-observed-01/plan.json",
+      "bytes": 784,
+      "sha256": "b1df7b3e2149603edd331f748bdd92246676d49f2aa9f8287574bb6e57181150"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/async-wait-stacked-plan.json",
+      "bytes": 1011,
+      "sha256": "bfe689c5b0e03f87366cfc4768d349dbdcaed0d26ee47a850410fda23bdbc11b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/completed-samples.json",
+      "bytes": 61990,
+      "sha256": "f103a716ba01c10a12ffb2a1abf00bc2935f123ca0bfd0f79f57ac7078825c4c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/audio-lead-fair-observed-01/plan.json",
+      "bytes": 1446,
+      "sha256": "093c61a42327284dea074fa68460214dd098e994ebf3d4beb52dea0e883d9273"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/completed-samples.json",
+      "bytes": 70025,
+      "sha256": "57ee4d91886306245b19de971e56cb9364bff9f582e3aad304f95d4ca951e641"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/callback-wait-observed-01/plan.json",
+      "bytes": 1647,
+      "sha256": "8e79fa3716bb4f723940557fb6f8f57348371bd4897bc265ab6d13fcaf14c673"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/completed-samples.json",
+      "bytes": 67645,
+      "sha256": "df99d3fb5b405c6829485bb915d7eed76cc5d5cbf46e409b83c81da7b29399eb"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-observed-02/plan.json",
+      "bytes": 1663,
+      "sha256": "b8ef85e6cb97c04ee1197615b1b69b2f18d3bac28c5c07d96570b7ddbe49eb6a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/completed-samples.json",
+      "bytes": 64180,
+      "sha256": "fe71a6a7650d29be5b9583b2a1b8087789c0d8f4c193979c857af127f38ca1f1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/codec-callback-stack-observed-01/plan.json",
+      "bytes": 1624,
+      "sha256": "0931befeb4cd932707b2c2576cb3fceb2bc378163cdb44cdfc2f2b1d6946810d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/common-baseline-observed-01/net-gains-reviewed.json",
+      "bytes": 16044,
+      "sha256": "94bda8a1f10bcd3d392652d78840cd063c7a05716da774ff7ce112aea716ee99"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-candidate.build.json",
+      "bytes": 23953,
+      "sha256": "2e6de28237ba008cab532ab1d007e6f99881141199f41adf09b5d942b7129396"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/completed-samples.json",
+      "bytes": 65951,
+      "sha256": "f3b14e060839ccc2950011ee13f8a92b877f37b95234d62bdc4756f77642d430"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/decode-only-observed-02/plan.json",
+      "bytes": 1571,
+      "sha256": "1496db1239c41e8ed9b80fa377fb8463821f6b05fc73f149813ec0e9d4ffba0f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/experiment-ledger.md",
+      "bytes": 311603,
+      "sha256": "f8b3edaf7e7c3ca33df0f40617bb42ab7eb45c3bc03911e10ffeb8da88a062cb"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/completed-samples.json",
+      "bytes": 51328,
+      "sha256": "9e5640635167443187abc42d4cc1f20354a07319025a36ce7c65de94dba45c1e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/filtered-audio-format-observed-01/plan.json",
+      "bytes": 1399,
+      "sha256": "d2f8f6a322669765326ee8ca7fe5172b02f2f67cd12bcf2c823fa16c1cde0f7f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/further-research.md",
+      "bytes": 9888,
+      "sha256": "54bcd35fc8be581fee9460533decb85b059c4c5300029173a1c1f135eed83a2a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/completed-samples.json",
+      "bytes": 67058,
+      "sha256": "5baffab64b2620540493d929edbc1c62024b7324cfcbb13ebea700a1fe52c8a3"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/initial-body-hedge-observed-01/plan.json",
+      "bytes": 730,
+      "sha256": "625fb5796e2535d80062e89c936bce5e63168c496227738844b31ef25c2f3a58"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/EmbeddedLifecycleProbe.java",
+      "bytes": 9519,
+      "sha256": "f8ddb53a7abbafd86f912aeaa64ff6ab44e316b03cb083e7299f0d8cfd66e10f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/PiliCodecCallbacks.embedded.java",
+      "bytes": 13240,
+      "sha256": "b7b62148e06922698889fcb2c0f5648e8c8c42d5ef0ad8df89250cc9e7904870"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/PiliCodecCallbacks.java.before",
+      "bytes": 9415,
+      "sha256": "58f79942d469360a06b9b6d8e6411f24a5e443d2eeb64075916894ae09ce42d7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/build-embedded-helper.py",
+      "bytes": 1757,
+      "sha256": "538187e265844ef79ea41ba6a93f9babf9850c8904d823972c0383809fc50b0c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/build-native.py",
+      "bytes": 3726,
+      "sha256": "9e6262b3028579a0f259ce55ea1c8778f492b6e6a5ea7e34a1d059f3b78e0776"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/embedded-device-reviewed.json",
+      "bytes": 1634,
+      "sha256": "12aca885f9548dbd760cdc071934545c52565acd24b35073acb6d5437a250a8f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/native-build-01.json",
+      "bytes": 3881,
+      "sha256": "64e89a9682a9c76f2581db08082adc425d698aebc62e7b44b07639838554a239"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/pili_codec_callbacks_dex.h",
+      "bytes": 59021,
+      "sha256": "ca4151cfad829e0eb647c57f93515811ace3a73e11fd82c77c490ac1a607ad07"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/pili_codec_callbacks_jni.h",
+      "bytes": 9239,
+      "sha256": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/pili_codec_callbacks_jni.h.before",
+      "bytes": 8437,
+      "sha256": "38552a1038e64cc051f10ff552f8370d37baa1592b3bfa9423c5041723a15421"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/plan.json",
+      "bytes": 1058,
+      "sha256": "998d39cab2e24cf63fe47bde89a0026004ae141f469f1d76cab659c966c400e4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/prepare-build.py",
+      "bytes": 2435,
+      "sha256": "c4e434cf6e8854e11bcd100e5002976c832b8a90247073f2700aa00f71325422"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/repack-candidate.py",
+      "bytes": 4451,
+      "sha256": "8e3829c5657ed30b3c57893273c5c565514082f885d7ddb57f3de756de649fb9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/repack-verified.json",
+      "bytes": 786,
+      "sha256": "b59f01816ea9d037c039e177e0968f0dbabecabdcdec953f10e33cbd969299aa"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/run-build-restore.py",
+      "bytes": 4990,
+      "sha256": "f2913547a215376961077fff8a59ff7ce43b8f3fd1dbf8bed0de0ea3db9b112c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/source-provenance.json",
+      "bytes": 536,
+      "sha256": "ff6089e6bf28f20854c79ab49c14a0dcc98ed5a1faa7fe558710f273eda369bf"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native-async-input-integration-01/validate-embedded.py",
+      "bytes": 5233,
+      "sha256": "5b557dbe62a9346d95468d8597484bbe5bf06a0c2290fb941c06928f65ca085d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/native_sidx_host.py",
+      "bytes": 2464,
+      "sha256": "9fb8e55b693801e163897e8fdd5aaaa59d5e324f0f6fd06214e31b31999b5b0b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/net-gains.json",
+      "bytes": 74283,
+      "sha256": "60a83499062c11384e937dba36f7221101a8ac92d2c2c6e17a7c0942120d77f6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/net-gains.md",
+      "bytes": 19303,
+      "sha256": "e60e0cc51e24e79b6496a78fc4b01db2f95c374ba83d11b395f9e7b21618781e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/plan.md",
+      "bytes": 1760,
+      "sha256": "a4e788b3cf15c26450e2473feb3aef4427f307b1e080848e6111dd9173123e0c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/prepare-pre-stack-checkpoint.py",
+      "bytes": 6205,
+      "sha256": "af33ff9e2bd7542d4362eefd96826fd18c6c678e88306aa96db614dba0f2e8e7"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/record-stage88-findings.py",
+      "bytes": 4406,
+      "sha256": "c9d7bbfb3529464aa62d9875f1eb88a1be2327ad722195e44c8988de98ac65d6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/results.md",
+      "bytes": 2175,
+      "sha256": "26fd4e5149049f033a6a8a04bdac3b20a5b73de89557feca7a07b038c8488df5"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/completed-samples.json",
+      "bytes": 69192,
+      "sha256": "0b75d301f7075a00c9c1cf6721837eddc8d4993f3706dee830ed259bd3e5caa1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-alignment-observed-01/plan.json",
+      "bytes": 808,
+      "sha256": "933a6b496e0352aae4a50152a8d1e723312756deaefc58ec3d7f606a59617599"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/completed-samples.json",
+      "bytes": 75760,
+      "sha256": "d4321cf82e823093eafd916ecf6c88ed2266230ecc86d1f740df43737322c431"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/net-gains-reviewed.json",
+      "bytes": 5114,
+      "sha256": "15abb24b4bf2668069b1499ec98eeff920a49741f8f7df11b731e32b38053203"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-failover-observed-01/plan.json",
+      "bytes": 1672,
+      "sha256": "151ecef89d3e68c24625e41ea2d83e89a31fafae3089c71befcdc01e80900881"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/completed-samples.json",
+      "bytes": 87446,
+      "sha256": "8aeb87eeee46b0a29a84e7394a0b63c405cd1d49ce4aedd57d2430db8a943719"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/net-gains-reviewed.json",
+      "bytes": 5158,
+      "sha256": "bcf36ea5a83aecf1b29fa237471f8ccda2046ca865bb1bf79cf828e6568d92de"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/plan.json",
+      "bytes": 804,
+      "sha256": "60e13392875a8aed4d65d8e7a4c4bac0bd034e6cdb9b8a32a5e3a62667510201"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/resume-body-progress-observed-02/regressions-and-interruption-reviewed.json",
+      "bytes": 1918,
+      "sha256": "bbb9e313090a0bce1dfc08aa4752711dc39061d3482e840c4aaa5e042899f3a2"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/review-async-input-app87.py",
+      "bytes": 4169,
+      "sha256": "5fa70b19c5af2101ef66e014b145c96595864f5bf93def3b28d498e80509d466"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/review-async-wait-stacked.py",
+      "bytes": 4223,
+      "sha256": "3f665295fa44fba39f683d2e19744c0303da8e1f7713de1c452670ab3cdda7a4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/review-codec-stages88-isolated.py",
+      "bytes": 2702,
+      "sha256": "0738af7bfc5baaa6ff09f0ee05305fa4d06cf27d81cb3aca54b389946cc3472b"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/review-stage88-polling.py",
+      "bytes": 1312,
+      "sha256": "d801638ab26c227845bbcb852012873746ccb7df3a85e1d0f5745f0d23cba084"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/review-wait89-delivery.py",
+      "bytes": 1446,
+      "sha256": "e0eac64532c282cdeeb4149d6158f2734f3938faac8beabf13da4a3edfebabfb"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round54-time-attribution.md",
+      "bytes": 5578,
+      "sha256": "39fc0823ab06f5a14ddea4a6385b1329ed586cdf69a9d1883f7d23a44039cb7d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round55-time-attribution.md",
+      "bytes": 6370,
+      "sha256": "1841ccbdd95034070f3e4a9e5fd593bd331334cf237835a7cc16ef16093b6fd0"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round57-time-attribution.md",
+      "bytes": 5428,
+      "sha256": "68c2d1e556c8976c026a9492fb4cc8141e91eaedcec752033d94fb0e184def2a"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round58-audio-decode-queue.md",
+      "bytes": 6440,
+      "sha256": "b2f639c024b0053701a1e7d3d239bacb83f992c581363442529a079ea7a0261d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round59-segment-body.md",
+      "bytes": 5619,
+      "sha256": "097853da70d06279f019aa67c625ba4964226a3ec92f0cc9da9a87afae7285b6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round60-codec-registry.md",
+      "bytes": 1591,
+      "sha256": "fc46f24facc57ab8eeb449f7f4db643c99d3c3030d7ccfdd384f59f09daf23cd"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round61-persisted-index.md",
+      "bytes": 2536,
+      "sha256": "9be33068727d3f364be17a67b1bdb2ecff2b63e58a3630dcd9f6d6f4db138864"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round62-codec-reservation.md",
+      "bytes": 2757,
+      "sha256": "1206b6d928b7168a40c9bd037f51f7e9b913e87cee9fa9a9f3bbdc684933e859"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round63-closed-delivery.md",
+      "bytes": 2053,
+      "sha256": "f8789814d2203e90574f7506beaab36bc0e6949476e96568d36a223918446c2e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round64-current-tail.md",
+      "bytes": 3721,
+      "sha256": "f9165844ee436614e4258850bc41d38547cbecbcd720719227c682c7bddad2a1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round64-unused-flush.md",
+      "bytes": 2922,
+      "sha256": "6fea925b45cd79336c7555fa43d0a9850c734842b811a4a7e75cb112471c2354"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round67-native-spans.md",
+      "bytes": 2766,
+      "sha256": "c18de6945b590c57381fa5499a207387781d3aa8aa1179ef8ff9a862e633fc1e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round68-fair-audio.md",
+      "bytes": 4033,
+      "sha256": "70554fee47a4a553ee91cf72ac7ae55e249d2eccc4fdb11ad2dfe7d395a45c92"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round69-decode-only.md",
+      "bytes": 4725,
+      "sha256": "78fc93a426517147ebacc73943b41861d1efcb0aa03354b02df4191986d5abbf"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round70-codec-callback.md",
+      "bytes": 9687,
+      "sha256": "d5b089ae89532e7299afe09fe43bd753bace67ba74d6c5637b6743f6dccf5fa9"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round71-callback-decode-only-stack.md",
+      "bytes": 2449,
+      "sha256": "0b618115a86ac272dab7a0b08f2b987265aef1aa6d9357d57e819320cecf2ccc"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round72-callback-wait.md",
+      "bytes": 6909,
+      "sha256": "b71653e23c880e34333c9c4d19cd3eceb49f6a852a0eb13e0516ec91cfd9e28f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round73-decoder-overlap.md",
+      "bytes": 6324,
+      "sha256": "731d3617cd215640c872e6aadc4fada9c016352e9a759ffb8d1e44736919364e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round78-common-baseline-net-gains.md",
+      "bytes": 1773,
+      "sha256": "56c1cf4dbbf97ffa3830d98dca40fdf5d7f8bdcec12870a676e4c09bee67e9bd"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round80-video-thread-no-wait.md",
+      "bytes": 1413,
+      "sha256": "7a072bc4382e37e373c3e48f91475777d88da102c8b8f2861d4aab6430fc38e8"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round81-resume-body-failover.md",
+      "bytes": 1300,
+      "sha256": "464d09b19eab18c31fdab4338e58548f11c9f74f543b9a2a1faf65fbdf35f169"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round82-current-resume-waits.md",
+      "bytes": 3598,
+      "sha256": "30487171910a18b74cd78749ffc8f25e6f154eea61fc85b7d27df7857824498e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round85-resume-body-progress.md",
+      "bytes": 2080,
+      "sha256": "8ac99ce11fa60c94ffe6615e9c3f4e6ea81fbb3f855564022dada801b97d8489"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round86-startup-audio-decode-bound.md",
+      "bytes": 2142,
+      "sha256": "246dceb367a8f6cc6e3d7d77af56cbd1e114133d95a526fe025357d9148244ac"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round87-async-input.md",
+      "bytes": 1379,
+      "sha256": "da7f44875a0150857fc372979ab78bc60b0e54dd4ae045a0b93ffa4bf92e331e"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round88-codec-stages.md",
+      "bytes": 1829,
+      "sha256": "5a31aa6c2af33b61e8e022cd7be128ad7ec626996f730ef0a562d15860aad5d1"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/round89-async-wait-stacked.md",
+      "bytes": 1411,
+      "sha256": "126a66f401ebe5187afe995d985cd264d945d4d4f4c779a765e4e953403f5bea"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/run-async-input-cancel.py",
+      "bytes": 7548,
+      "sha256": "a13fbebf340a8589131b0e7b7b4a30c6f71196f33eb9bac01f7b05fb4c01f780"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/run-async-input-observed.py",
+      "bytes": 25428,
+      "sha256": "e899798d3618969ca11f14831d1170d3f8a60324e9839449972722a53876ac61"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/run-async-input-seek.py",
+      "bytes": 4794,
+      "sha256": "77733bcc325c7372588bab95add80bd94b19da9199849763d3cbf1b957dbe8a6"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/run-async-wait-stacked.py",
+      "bytes": 25472,
+      "sha256": "eb5d0d94cde6b022adc1c7bcbc9fcfa2634201059680025a42cb1a5d71313d4d"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/completed-samples.json",
+      "bytes": 90397,
+      "sha256": "6158bcf6fbaa204006fc8a2b447f920e4c8030f2e82836b7c84ee961545bbfc8"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/device-reviewed.json",
+      "bytes": 9898,
+      "sha256": "df2a26e5302ac57c25cfddead3aa4c0bb2a45dc7ce54c96bb731c9ebabc97ae4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/net-gains-reviewed.json",
+      "bytes": 14555,
+      "sha256": "c9b0e92d06ac69ff9fff3034bcd3915df5a1a494102af513eea651f0a915e226"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/startup-audio-decode-bound-observed-01/plan.json",
+      "bytes": 3178,
+      "sha256": "d446874597304255396fdf28654ad7b3dbfcbe0ccf6c6a0c34b07431f8fcdb67"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/update-net-gains.py",
+      "bytes": 14521,
+      "sha256": "64f7a3d73e365da8bcfb22c794d5718cc0d9b4fe66d97efce287ac9b4c7e134c"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/completed-samples.json",
+      "bytes": 64896,
+      "sha256": "53b91598ef095e81df841bd39d9c3c6f60f8793a74b6db6b45d4cde72de41ca4"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/net-gains-reviewed.json",
+      "bytes": 3547,
+      "sha256": "62885110e5856dbef0482307ca9f3705d04aa37508705fc6d276e33dcc436e11"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-no-wait-observed-01/plan.json",
+      "bytes": 909,
+      "sha256": "91413dee7622d55a15a1b4fa121d2d0d74efb4114da8db24bc20f89945f58e97"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/completed-samples.json",
+      "bytes": 64721,
+      "sha256": "6228902330682e891f7b1dc0e02fccf98ea5acdff8df1024d70291118be7513f"
+    },
+    {
+      "path": "diagnostics/startup-20261030/parallel-audio/video-thread-observed-01/plan.json",
+      "bytes": 957,
+      "sha256": "ca5ced8aae6886fba3a1731202fd8fe354350378e89452af5e357a87627144dd"
+    },
+    {
+      "path": "lib/grpc/dm.dart",
+      "bytes": 1769,
+      "sha256": "175e49146af0c1007912a1abd6e8eb5a16a743313ea4c095b20e56567afdada6"
+    },
+    {
+      "path": "lib/grpc/grpc_decode.dart",
+      "bytes": 2124,
+      "sha256": "f096579bf2242b00c59f2194ced6470d3d448deefe86019400ddab04ee14da6d"
+    },
+    {
+      "path": "lib/grpc/grpc_req.dart",
+      "bytes": 3940,
+      "sha256": "eccb13debe20b49743628e8582762f203efcbc1bfe1fe61d444dddbec06dcf54"
+    },
+    {
+      "path": "lib/http/init.dart",
+      "bytes": 12092,
+      "sha256": "abc2e6139b7b089d4b8c45a7f17bd2402630f8082b3cd3878b2683b8c681beb0"
+    },
+    {
+      "path": "lib/http/video.dart",
+      "bytes": 41558,
+      "sha256": "0e2cf1f5c58e301d002530b956a0c982ba2629e1bac9159e6e98fe156723d2fa"
+    },
+    {
+      "path": "lib/main.dart",
+      "bytes": 15216,
+      "sha256": "e558c9423337e8454f8bd94462411fd6c90abef8e41b91c101beebdd916b4f82"
+    },
+    {
+      "path": "lib/pages/common/common_intro_controller.dart",
+      "bytes": 8624,
+      "sha256": "946755ce19681e0b6fc25ff0da85d65daba192e5209433c0f2da2aa806fb639a"
+    },
+    {
+      "path": "lib/pages/danmaku/controller.dart",
+      "bytes": 4188,
+      "sha256": "b50507abd195a901b7e53015883653a498435659a7e70cc837f88dd1497e9f41"
+    },
+    {
+      "path": "lib/pages/rcmd/view.dart",
+      "bytes": 13104,
+      "sha256": "b94b28e533104f16203248e5804cbe3606306103fc43da22b4be2609ba73a377"
+    },
+    {
+      "path": "lib/pages/video/controller.dart",
+      "bytes": 68412,
+      "sha256": "1033f4b9ee0d42d64a42e13a61d7bdadbca1d50fe3c253246a4fc52b53c2db57"
+    },
+    {
+      "path": "lib/pages/video/introduction/ugc/controller.dart",
+      "bytes": 25201,
+      "sha256": "c5c97116cb89cf33458917bc353f69e7b08eb434d5f49649c678c97bd8e2f9ac"
+    },
+    {
+      "path": "lib/pages/video/related/controller.dart",
+      "bytes": 1247,
+      "sha256": "8c5bc8b2c9f960a3004e6dcac2560fa5ac65672d5b6016d9a5ba99493396cf60"
+    },
+    {
+      "path": "lib/pages/video/view.dart",
+      "bytes": 79611,
+      "sha256": "18a306bf6576dab61c169a68afa036f1af9ba97cfa94bd0f674eadbde02ecb16"
+    },
+    {
+      "path": "lib/plugin/pl_player/controller.dart",
+      "bytes": 110452,
+      "sha256": "d18b17d3baeb7aa44bad6b445d51a6749a959b8c931a9f5244ea74f8092139ba"
+    },
+    {
+      "path": "lib/plugin/pl_player/models/data_source.dart",
+      "bytes": 1161,
+      "sha256": "3e8192cdcc812adfae2673e1c01c354aadbd403b383914a16b2711d7462e1fde"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/bounded_body_warmup.dart",
+      "bytes": 2773,
+      "sha256": "eec21f8eb2aaa662b46c21709a0e1a466ebc0c38d308356616b309cdcd80de26"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/codec_registry_warmup.dart",
+      "bytes": 1370,
+      "sha256": "209d9920ad25de6e10bbb9d5ef80c3b32949e7dc82af6773811b905b4dd14eab"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/isolated_media_sources.dart",
+      "bytes": 11061,
+      "sha256": "a5c7d8f60c847ca0705ac6e36bf483b04cb4f09300916a40b411b33a8948cf7a"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/mp4_resume_range.dart",
+      "bytes": 3434,
+      "sha256": "50ea3b0fad5ac392f9b09659cb6cd31056aa5f3508712837d24f4f00c0af9766"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/mpv_async_property_reader.dart",
+      "bytes": 5698,
+      "sha256": "d0275567ce0845ce8bb3cf6553b1062dada6abc5024c8426bffb902a7574bf94"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/mpv_frame_gate.dart",
+      "bytes": 14072,
+      "sha256": "35eaf02ce4027e3b25bf5d2344c2053c75b1901e3116110c804b927f28ed9fb2"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/one_shot_prefetch.dart",
+      "bytes": 2645,
+      "sha256": "92be675b9cadef2d84218c42a1094ea3623cd45b81448e723a29c50fd03cb7b4"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/orientation_service_warmup.dart",
+      "bytes": 1310,
+      "sha256": "ef637e38b2d4ed4dfa27301e8bc60b225e503da0265b40c9e546b90f9fca9455"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/parallel_audio_source.dart",
+      "bytes": 27641,
+      "sha256": "cf6f93843679e810a92fb65922dfed0eed36595d99380e27010cfb997f5fdb5c"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/persisted_resume_index_hints.dart",
+      "bytes": 4300,
+      "sha256": "7cb49291f17ed95a63b0bbe59132aea82784913a62c84c91cbe47fdaff8cf6b2"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/playback_diagnostics.dart",
+      "bytes": 15408,
+      "sha256": "4b8dc76a5eb5b85d01d2d1dab781a5563faf7dbe320b698340bcaecae39d8389"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/playback_start.dart",
+      "bytes": 653,
+      "sha256": "cbf6772c8a173d52ab740e7473c44428e098e5d3db79d1f7f6a9b2d20ef46d47"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/prepared_media_engine.dart",
+      "bytes": 2402,
+      "sha256": "bca68c34f21cfa9e8418f481b58880e104ea1b5eab1c7b9a15bf31ec23172f64"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/prepared_resource.dart",
+      "bytes": 1119,
+      "sha256": "662efc614f2ed9a5cab5a8efacc833bf9c36a8556d22929c2f32c4fd56c5eb0a"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/resume_body_recovery.dart",
+      "bytes": 10210,
+      "sha256": "61b9adaf99d6d50b6e8adef5ba8b0a329ca2f209b6d3afa0e78b8bc3816c861a"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/resume_index_hint.dart",
+      "bytes": 1861,
+      "sha256": "c0669987c26bafc142aa6e7b0da24c43e854da86c9252a998b64b0f89df8871a"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/runtime_profile.dart",
+      "bytes": 6765,
+      "sha256": "6e89548f98cb8d7ebcf91d4f435104be7cc11f5ed3db9f1d3509c3f5143f2c9b"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/selected_codec_reservation.dart",
+      "bytes": 4361,
+      "sha256": "aa89924a8b0e2f042107ef818df283917f0368d6a67cb215b01418e61de939f4"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/selected_media_warmup.dart",
+      "bytes": 3804,
+      "sha256": "a39050e2480057cb1a08c8e50f5a3f7c09b1643f073bd0fa2934b20f7be46955"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/stable_output_gate.dart",
+      "bytes": 3698,
+      "sha256": "14084a5558f2a73a956876438936bcdd5c378353aedf6b059a76e431494d06cd"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/startup_audio_decode_queue.dart",
+      "bytes": 3081,
+      "sha256": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/startup_auxiliary_gate.dart",
+      "bytes": 1118,
+      "sha256": "9152b2e5473767a51977a646b3bd7d53e9743a034ae5b635ade67e5d35614bb0"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/startup_probe.dart",
+      "bytes": 6921,
+      "sha256": "c711bc9c38ecb59c1af7c4be0ebcf29104d2bacdd8a85f965deff4822dd7b22b"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/startup_text_inventory.dart",
+      "bytes": 3055,
+      "sha256": "06cb1e68c6caa19d37bf75de8d1142a6346fc4cbb2e61f5c41c3b02e937ce7e6"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/startup_text_warmup.dart",
+      "bytes": 5125,
+      "sha256": "0d4e5b1b3f6da84a152f0a5e0f9ef85ab8a713e6703662c0c7ad611cdeb2e0c9"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/startup_wait_trace.dart",
+      "bytes": 3515,
+      "sha256": "a57bf55a72ffd0e252d4f3ddde1cfb6aeabab39b0835d966207acad5759b23b1"
+    },
+    {
+      "path": "lib/plugin/pl_player/playback/visible_media_prefetch.dart",
+      "bytes": 4561,
+      "sha256": "04583e4c19af728ff2097741d614044396fbc0954c66ff4e338f8b8b6a9761f1"
+    },
+    {
+      "path": "lib/utils/accounts/account_manager/account_mgr.dart",
+      "bytes": 9824,
+      "sha256": "09b604d5c1782aa37129d7cac58bab416a4225cf8a687e58d4f6bda5a121e508"
+    },
+    {
+      "path": "test/bounded_body_warmup_test.dart",
+      "bytes": 2307,
+      "sha256": "1f7172d750281959be7c8ed64f67d8d8eb20d09113d98817fab0aad9327c78f4"
+    },
+    {
+      "path": "test/bounded_resume_init_test.dart",
+      "bytes": 5868,
+      "sha256": "d4fe3141f36767b13cf9bd63b4b0c40a2bff3990013549f018d70d7c97e58aaa"
+    },
+    {
+      "path": "test/fixtures/resume_index_fixture.dart",
+      "bytes": 992,
+      "sha256": "c2505337b5f4a4fb4277b2f754fc55acafcff305722513ce6d3a5161af794c24"
+    },
+    {
+      "path": "test/grpc_decode_test.dart",
+      "bytes": 3399,
+      "sha256": "995a09c7abedeecd2365ca2b470ec7ecfe31d9b863dd47cfd861b9fd08e7e384"
+    },
+    {
+      "path": "test/hedged_media_source_test.dart",
+      "bytes": 6649,
+      "sha256": "a923bfa3acae38ddc0f479919a7e2b9e353a38fdebf80731a53dbec1e29a9b51"
+    },
+    {
+      "path": "test/initial_body_hedge_test.dart",
+      "bytes": 7111,
+      "sha256": "e90dfee71d4ebd207cb12668ab7c18862bfc75779da8b35c7d6cc1fb2cb9cc5d"
+    },
+    {
+      "path": "test/isolated_media_disconnect_test.dart",
+      "bytes": 5786,
+      "sha256": "139ca3ba38784676228e5c1a3bc855bd7b117568c06159454863065cca0bdd32"
+    },
+    {
+      "path": "test/isolated_media_sources_test.dart",
+      "bytes": 6693,
+      "sha256": "5efed73626a5395076b1b86d91c3c088b867fb203f4091dc0544c88a901b9170"
+    },
+    {
+      "path": "test/isolated_resume_alignment_test.dart",
+      "bytes": 3848,
+      "sha256": "549575f5a8395379b745a7dd6fca49afdf0363abb3998c4fa41122872e616e75"
+    },
+    {
+      "path": "test/isolated_resume_index_test.dart",
+      "bytes": 5096,
+      "sha256": "38bf54047708cfead284c0827a4701e9f8496adb2b89c63c6436b0cba3e632c0"
+    },
+    {
+      "path": "test/mp4_resume_range_test.dart",
+      "bytes": 3620,
+      "sha256": "744d424112d6fe72745bde81d313b141f2a68664d684c5ae7c9f833b6a7b90de"
+    },
+    {
+      "path": "test/mpv_async_property_reader_test.dart",
+      "bytes": 3168,
+      "sha256": "4ca273bab13b776bfb0c6d4f3151adf83c42949378b9557bb3048399eeeac927"
+    },
+    {
+      "path": "test/mpv_frame_gate_test.dart",
+      "bytes": 7506,
+      "sha256": "4252d6117789f50421af00b39000b388b9110ab2d95ff4f89238a98b14f29eef"
+    },
+    {
+      "path": "test/one_shot_prefetch_test.dart",
+      "bytes": 6885,
+      "sha256": "797f5c2656f261dd698a930d3f2f4327e1e374b5941a93877b9d1246a2e85a5f"
+    },
+    {
+      "path": "test/orientation_service_warmup_test.dart",
+      "bytes": 1296,
+      "sha256": "fe787d1152070e745e520e9f0f4c6cea75c5757b1037afc55267cc17b3948ae6"
+    },
+    {
+      "path": "test/parallel_audio_source_test.dart",
+      "bytes": 9193,
+      "sha256": "ac4ac77315c22d2e0d06c288bd51373e4d93f40c0333520d4c6a605f8c9e86f8"
+    },
+    {
+      "path": "test/parallel_source_disconnect_test.dart",
+      "bytes": 5339,
+      "sha256": "ceab7d4f34389a1c45feb1f9416e0f0c21f0a283f69393476e10567c222fb019"
+    },
+    {
+      "path": "test/parallel_source_proxy_test.dart",
+      "bytes": 9039,
+      "sha256": "24c7963f7ea89f4ab4ed53badaada6add7c67db83528f3eb9b674a22115f2b78"
+    },
+    {
+      "path": "test/persisted_resume_index_hints_test.dart",
+      "bytes": 10102,
+      "sha256": "8408e93e372b364122180837ec3664be0e1bf7197238b96dc7fc6de9afb239d6"
+    },
+    {
+      "path": "test/playback_diagnostics_test.dart",
+      "bytes": 9042,
+      "sha256": "95f94e77873e79b71eb0c41a68cbd6602898f027e18ea4f2461f7a6eec02feaf"
+    },
+    {
+      "path": "test/playback_source_queue_test.dart",
+      "bytes": 6366,
+      "sha256": "6f30100e045980246ee3eb3e7adf137a045f4ce12bbd68773a520bb6f4a632da"
+    },
+    {
+      "path": "test/playback_start_test.dart",
+      "bytes": 2879,
+      "sha256": "d070578a01b3937e2747773853a40794c8866400179ac90bad13fc82f680f194"
+    },
+    {
+      "path": "test/prepared_resource_test.dart",
+      "bytes": 3517,
+      "sha256": "94c3552d40491754028e832dce930d906b00f4fa012274ce3c174293b83f092d"
+    },
+    {
+      "path": "test/resume_body_failover_source_test.dart",
+      "bytes": 5134,
+      "sha256": "5de959d0b495508ed85924aa1e916755f6006b87f1fbdafe1e7c95dd02b5fa57"
+    },
+    {
+      "path": "test/resume_body_hedge_test.dart",
+      "bytes": 6190,
+      "sha256": "ae851bf88356e4f5dfaf79d8449578fe4e7949f8a6a450ebebbd0b5d12d74968"
+    },
+    {
+      "path": "test/resume_body_progress_race_test.dart",
+      "bytes": 7009,
+      "sha256": "4f9c19bea37060ffd9ea6ef6bb11f98b9ad8542d16a2c241f178a68132216b62"
+    },
+    {
+      "path": "test/resume_body_recovery_test.dart",
+      "bytes": 8095,
+      "sha256": "e3596458efdc5aa27e7e86ef22adc53e603ea8396f9655f4ab59ab5fb5306a66"
+    },
+    {
+      "path": "test/resume_hint_hedge_test.dart",
+      "bytes": 9157,
+      "sha256": "cab1047836f5f4d860a4c1db7963b0800d09491996877559f1b54e595092bd2f"
+    },
+    {
+      "path": "test/resume_index_hint_test.dart",
+      "bytes": 1646,
+      "sha256": "98fc63d9c07ecee2caa795844b54c28d92cb17195e3c61c8ff5df92e977eae83"
+    },
+    {
+      "path": "test/resume_presentation_source_test.dart",
+      "bytes": 5542,
+      "sha256": "1974b756766f783167d2fe6f1ab7d2fdb6992c28b79ab45e377074dbb61c9089"
+    },
+    {
+      "path": "test/resume_range_source_test.dart",
+      "bytes": 14971,
+      "sha256": "f29d7883440aa77456ccdb845c0c50f86c3dbc97d1c6093ea73fd4810aedce97"
+    },
+    {
+      "path": "test/selected_media_warmup_test.dart",
+      "bytes": 11007,
+      "sha256": "28a91bbe1da1bd3e85acf6b4bd85f1b659cb1329208c5ed3dcef627e42346720"
+    },
+    {
+      "path": "test/source_preparation_test.dart",
+      "bytes": 2756,
+      "sha256": "fed94168ab603ca3c2e6278c5c94a352acff1498731c6f10893cda062e12f36e"
+    },
+    {
+      "path": "test/stable_output_dwell_test.dart",
+      "bytes": 4246,
+      "sha256": "9622349efeb5c5124722d61862e4e5de049cb9fe472c76886c7ff37b48e03853"
+    },
+    {
+      "path": "test/stable_output_gate_test.dart",
+      "bytes": 5543,
+      "sha256": "4026337352897c6f43bfb5d5d56e8a43e0cbbb60f952660c1b67ac7345078a30"
+    },
+    {
+      "path": "test/startup_audio_decode_queue_test.dart",
+      "bytes": 4904,
+      "sha256": "bb4d7037c4d456a9ca0bf7596300ab9f11d761bb3f4e05b59428c8963e3d6bac"
+    },
+    {
+      "path": "test/startup_auxiliary_gate_test.dart",
+      "bytes": 2489,
+      "sha256": "508f1887034edea601ebd2f43d068fb3fe9e26e29e526b49f533c80894803c4d"
+    },
+    {
+      "path": "test/startup_stream_readiness_test.dart",
+      "bytes": 2434,
+      "sha256": "85e6bf72be575857da79dd69091eb441c50912bdde718f5a30c30a9aee59bbb6"
+    },
+    {
+      "path": "test/utils/accounts/deleted_account_test.dart",
+      "bytes": 1912,
+      "sha256": "53bf013fee507e7a164fe11201ec80049858c14e9bc5dd6b450e76e5857a2b6f"
+    },
+    {
+      "path": "test/video_presentation_test.dart",
+      "bytes": 6735,
+      "sha256": "0b84c12c635f2653e7399f1db4f6af725e09c8d2957f25099924848b8e16e62b"
+    },
+    {
+      "path": "tool/analyze_first_resume_timeline.py",
+      "bytes": 8200,
+      "sha256": "d4827b80e1f73532a11bed2b36e8927a6540a19d3fd1c0339e0b94ca56158de6"
+    },
+    {
+      "path": "tool/analyze_startup_wait_trace.py",
+      "bytes": 8603,
+      "sha256": "304cb2b8e48b953dcdda453599403d97517b65a20985363ad10fdb7dadd0bfff"
+    },
+    {
+      "path": "tool/build_startup_standby.py",
+      "bytes": 36568,
+      "sha256": "c08d11e4cf16afdfcbb63851fa4415aa19623c659ab9c93b462228ac739428e5"
+    },
+    {
+      "path": "tool/capture_startup_listener.py",
+      "bytes": 49811,
+      "sha256": "681871878d0dbc3463a1155322df810e89cd9a878c6adbf6f78842d1eb20f93f"
+    },
+    {
+      "path": "tool/mpv_startup_review.py",
+      "bytes": 3955,
+      "sha256": "4fb65efaa90d50defaf6861b49f0d4e88a8382ab49c00b657bc258d24291986e"
+    },
+    {
+      "path": "tool/native_codec_callbacks/PiliCodecCallbacks.java",
+      "bytes": 13240,
+      "sha256": "b7b62148e06922698889fcb2c0f5648e8c8c42d5ef0ad8df89250cc9e7904870"
+    },
+    {
+      "path": "tool/native_codec_callbacks/pili_codec_callback_wait.h",
+      "bytes": 238,
+      "sha256": "72e0de84d2a4787bc2d8440bcb78e969de4bd8ec7ac41772077dc3c67ec8c635"
+    },
+    {
+      "path": "tool/native_codec_callbacks/pili_codec_callbacks_jni.h",
+      "bytes": 9239,
+      "sha256": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+    },
+    {
+      "path": "tool/ordinary_playback_analyze.py",
+      "bytes": 21774,
+      "sha256": "81f80f3f8f259e179f50f04f953c079c85ba9b6e69981be48c319f6b7795462f"
+    },
+    {
+      "path": "tool/ordinary_playback_tools_test.py",
+      "bytes": 8850,
+      "sha256": "1d8b6a21798af336987f31d0f91edcb7b9ed8fcd49d66bea5468e0a63ecaf9d6"
+    },
+    {
+      "path": "tool/playback_trace_files.py",
+      "bytes": 1789,
+      "sha256": "dd2e199382ae021c2d9b24779ce2237a59ddd7f8dcdd66736f57f743d80cfa93"
+    },
+    {
+      "path": "tool/playback_trace_files_test.py",
+      "bytes": 2042,
+      "sha256": "6e9a1c3b6cd8c009bc28777a80a1ff4879ee87c2695c71f2766803c46805cf50"
+    },
+    {
+      "path": "tool/repack_startup_dart.py",
+      "bytes": 7297,
+      "sha256": "8a90c36235bd5a1ad33a9e84f8fdf1a12f16540a499d5840ad9e93b9741a6370"
+    },
+    {
+      "path": "tool/review_output_stability_stages.py",
+      "bytes": 2962,
+      "sha256": "d2fce6b84b6bbf40a159919042660c0c45665fa2aad628df2c0ae544cf7a538e"
+    },
+    {
+      "path": "tool/review_startup_return_cleanup.py",
+      "bytes": 2152,
+      "sha256": "8f52f537208305029bd502c6403499bf7bdf8efc2e589949d107ab134443a04a"
+    },
+    {
+      "path": "tool/run_startup_pairs.py",
+      "bytes": 2609,
+      "sha256": "81ed438206a2d70b8a5e7e87f4c1b4d0b8543ed8e8450083fdf6968028b616e6"
+    },
+    {
+      "path": "tool/set_startup_controls_visibility.py",
+      "bytes": 3365,
+      "sha256": "7acbd057fcff29f21d6e0054bdec18414a24121f304683d4900e9dc7c25efd9e"
+    },
+    {
+      "path": "tool/start_startup_qa.ps1",
+      "bytes": 2138,
+      "sha256": "4601917e05651aa0d7be0712036bccafb6c7de30530744a74e0b9d608097ca9a"
+    },
+    {
+      "path": "tool/startup_adb_preparation_test.py",
+      "bytes": 1628,
+      "sha256": "ff4b2e6806fcfc725ac610d7a8a0df5121b0f9fd4775e8f21c274845ed57c2b2"
+    },
+    {
+      "path": "tool/startup_capture_window_test.py",
+      "bytes": 2122,
+      "sha256": "09653b74e443d424dfe778f8075d81a39a680f7db4025470eebd59e81e7af06c"
+    },
+    {
+      "path": "tool/startup_history_uri_test.py",
+      "bytes": 782,
+      "sha256": "e6ced47eeb7fa86d4ab5f93ac308ca4ce0156d3446a337fd4b0f2750f3945684"
+    },
+    {
+      "path": "tool/startup_home_card.py",
+      "bytes": 9467,
+      "sha256": "5c9e35fa0440d670ead27477de636cda66dccb16390fcd6e63ac859f6aaa40ba"
+    },
+    {
+      "path": "tool/startup_home_rearm_test.py",
+      "bytes": 2473,
+      "sha256": "fbe7c342ce4db72263f321a37d84986134aa8a69c56c288b5a74f6e616c6832c"
+    },
+    {
+      "path": "tool/startup_input_target.py",
+      "bytes": 1322,
+      "sha256": "3e260b91aae545244e9398ccab8dc7ce2f0704228e7bdcdaf6b6c303dd3774fa"
+    },
+    {
+      "path": "tool/startup_native_cpu.py",
+      "bytes": 6059,
+      "sha256": "970c6151a82a4fa4fcb4cc604acc78cfb5288d4eb4ef9f980968e4245f2ae32d"
+    },
+    {
+      "path": "tool/startup_native_library.py",
+      "bytes": 4338,
+      "sha256": "e1408b4d1cfdbc2f5e4508b37609b984bb1a2e8264844fb7b0fa4a9f51da31b9"
+    },
+    {
+      "path": "tool/startup_native_library_test.py",
+      "bytes": 3752,
+      "sha256": "33b9861d6f8bb405f60fb876811dc43da5ef16001b00eabe67d0b087b0c415f4"
+    },
+    {
+      "path": "tool/startup_orientation_async/OrientationEventListener.java",
+      "bytes": 9308,
+      "sha256": "b3ecd5b15b071d9b69d7ee41cb2d9ba9d5a7b2d57e0b264e740272f2ab89a1f8"
+    },
+    {
+      "path": "tool/startup_orientation_async/SerialSensorRegistration.java",
+      "bytes": 2343,
+      "sha256": "0199acb8f2d22f610c2b975ae591d12d78996cef124e81469084f17f141f918b"
+    },
+    {
+      "path": "tool/startup_orientation_async/SerialSensorRegistrationTest.java",
+      "bytes": 4564,
+      "sha256": "b3175c2b6d7c0bbb8dab843cd9d4ede52e1d084f1012c6db515e4cffddcb13df"
+    },
+    {
+      "path": "tool/startup_orientation_timing/NativeDeviceOrientationPlugin.java",
+      "bytes": 6341,
+      "sha256": "77d73ba03066bf2811ba2b290d0b7061e8e71cba0d8519da08dc39d1bd0f536c"
+    },
+    {
+      "path": "tool/startup_orientation_timing/OrientationEventListener.java",
+      "bytes": 8234,
+      "sha256": "783bf53c407ccf4e8b73dbc1ed311e110cfd298aa5166a87db7ab72a7e865b25"
+    },
+    {
+      "path": "tool/startup_orientation_timing/SensorOrientationListener.java",
+      "bytes": 6677,
+      "sha256": "2a53e65ff02cce5ecad2abfad2e0b4ed8242f73e224f868b244d55703b5ce259"
+    },
+    {
+      "path": "tool/startup_resource_profile.py",
+      "bytes": 2844,
+      "sha256": "c41732e9b545d60b0fe4626357431233554533e7bde5de6a52b77001ce6ee346"
+    },
+    {
+      "path": "tool/startup_resource_profile_test.py",
+      "bytes": 4019,
+      "sha256": "2759892f5f87a657323f8f9870130d7cf372e5d68c4ce0e3d5b7ab4f3094155c"
+    },
+    {
+      "path": "tool/startup_search_clear_test.py",
+      "bytes": 1661,
+      "sha256": "e3fb22221e1df7f8ea678321103e074fc31ac06b7d4c9faacb3d488de0b868e6"
+    },
+    {
+      "path": "tool/startup_search_input_test.py",
+      "bytes": 2095,
+      "sha256": "a2b98c1fd65cf1951d06bd26cb4e1ec977a0672b60189f840480da1f296db14b"
+    },
+    {
+      "path": "tool/startup_vm_timeline.py",
+      "bytes": 4508,
+      "sha256": "39fa7099e4ee59e68745bfcd6268fc3cf65cd2f565465040269ceda14d65ee9e"
+    },
+    {
+      "path": "tool/summarize_parallel_audio.py",
+      "bytes": 4245,
+      "sha256": "0f08afe020ddff97b463e9da959a82ece184a9084298bc1c3490090009e35b04"
+    },
+    {
+      "path": "tool/summarize_startup_codec.py",
+      "bytes": 3165,
+      "sha256": "5069a28ab56f71d65094f015fd1acb9ba32ee44d1f8a5fd46e30366d697acef2"
+    },
+    {
+      "path": "tool/summarize_startup_continuity.py",
+      "bytes": 5017,
+      "sha256": "916b2edadd742fe6dda3c5a2923d4679bdef5c6392e8bf8c826d1a0c5cfa8933"
+    },
+    {
+      "path": "tool/summarize_startup_skia.py",
+      "bytes": 3893,
+      "sha256": "6e4a9f27ae9c606b4ceac114f1dfdc31acf7c7c04e140f6e427e809d44cbe5fb"
+    },
+    {
+      "path": "tool/summarize_startup_transport.py",
+      "bytes": 3534,
+      "sha256": "ecde6aa2ffd1d4cefd2f622379e29da2ff0433909d8afd699b36cac7c72bf60b"
+    },
+    {
+      "path": "tool/summarize_startup_vm_timeline.py",
+      "bytes": 3231,
+      "sha256": "217ece93b456fce602537f3197af6f94a4939b2289adefcba4b5c7c252efeaa4"
+    },
+    {
+      "path": "tool/verify_idle_media_warmup.py",
+      "bytes": 3620,
+      "sha256": "9e9e39d774e6e6bc2e750ad73f14f15347da770ab3dd1f7ffa523d433287ac00"
+    },
+    {
+      "path": "tool/verify_idle_native_preload.py",
+      "bytes": 5138,
+      "sha256": "f9e50865dd5e59cdfc05162710c72b69f3d7ef713fa8c990f939bf5841b4ca4e"
+    },
+    {
+      "path": "tool/windows_thread_trace.py",
+      "bytes": 8042,
+      "sha256": "793f43c47e2b2e69d434ecadbe04b5b1e1d8cd85fef60b2309c14213e20e16f6"
+    }
+  ]
+}

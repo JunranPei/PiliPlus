@@ -1,0 +1,11 @@
+{
+  "round": 85,
+  "originalCohort": "resume-body-progress-observed-01",
+  "originalValidSamples": 3,
+  "originalFourth": "Actual playback began; QEMU stopped then exited. BACK and trace pulls timed out. Guest JSONL persisted empty after crash. Raw logcat, failures, old launch stdout and crashpad event retained; no causal actor assigned.",
+  "newCohort": "resume-body-progress-observed-02",
+  "protocol": "QA145 same preserved AVD/settings; excluded0s seed then fresh-process61.5s BAAB. Same two verified APKs. Read-only host process-state listener. Do not pool with interrupted QA144 cohort.",
+  "candidateSha256": "35169dba085ef7ff37670af24c2d8559cce36882427a5bb3f42f58e834d110b1",
+  "controlSha256": "39e8c73d6f81c1e83601b8220e31500040a5dc445c5e47b25af2fca44d952871",
+  "netGainMs": null
+}

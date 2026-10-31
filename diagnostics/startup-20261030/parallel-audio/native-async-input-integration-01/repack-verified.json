@@ -1,0 +1,13 @@
+{
+  "apkSha256": "f61c8fdbe6537a5c68356d3320fae9bcc01aef24dd86441c937d015865e6b06f",
+  "nativeSha256": "aad63c77a16a4a2d876fb62157bdac3bc25f48830d5db21249223191e42684a2",
+  "sameSigningCertificate": true,
+  "sameNonSignatureEntries": 707,
+  "payloadDifferences": [
+    "lib/x86_64/libmpv.so"
+  ],
+  "alignmentVerified": true,
+  "flutterAndDartUnchanged": true,
+  "sourceArchiveSha256": "cb27e56eed3c47c254219a2c9185157bd17d13c680c2005622e5bec1955a605a",
+  "newBehavior": "Reviewed asynchronous input worker behind debug.piliplus.async_input defaultoff. Same APK/native toggle, callbacks1/wait0/decode0 and bounded startup audio queue in both arms; no changes to PTS/confidence/audio clipping. Native closed snapshot reports all pending submissions and both worker states."
+}

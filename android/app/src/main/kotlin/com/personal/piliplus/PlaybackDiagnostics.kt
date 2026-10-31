@@ -11,6 +11,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.view.Choreographer
 import android.view.FrameMetrics
+import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.TextureView
@@ -67,6 +68,10 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
     @Volatile private var capped = false
     @Volatile private var ioError: String? = null
     @Volatile private var source: Map<String, Any?> = emptyMap()
+    private var geometryEnabled = true
+    private var framesEnabled = false
+    private var textureEnabled = false
+    private var continuityEnabled = false
     private val textureProbe = engine?.let { PlaybackTextureProbe(it, ::event) { source } }
     private var deadlineMonoNs = 0L
     private var scheduled = false
@@ -76,6 +81,14 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
     private var metricsListener: Window.OnFrameMetricsAvailableListener? = null
     private val observed = IdentityHashMap<SurfaceView, SurfaceHolder.Callback>()
     private var lastFlushNs = 0L // Accessed only on worker.
+    private var flushScheduled = false // Accessed only on worker.
+    private val idleFlush = Runnable {
+        flushScheduled = false
+        try {
+            writer?.flush()
+            lastFlushNs = System.nanoTime()
+        } catch (error: Exception) { failIo(error) }
+    }
 
     private val endCapture = Runnable { stopCapture("deadline") }
     private val drawListener = ViewTreeObserver.OnDrawListener {
@@ -104,6 +117,12 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
         try {
             when (call.method) {
                 "configure" -> {
+                    if (!configured) {
+                        geometryEnabled = call.argument<Boolean>("geometry") ?: true
+                        framesEnabled = call.argument<Boolean>("frames") ?: false
+                        textureEnabled = call.argument<Boolean>("texture") ?: false
+                        continuityEnabled = call.argument<Boolean>("continuity") ?: false
+                    }
                     configure()
                     result.success(info())
                 }
@@ -116,9 +135,16 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
                     result.success(info())
                 }
                 "mark" -> {
-                    if (active) textureProbe?.refresh()
                     @Suppress("UNCHECKED_CAST")
-                    event(call.argument<String>("name") ?: "mark", call.argument<Map<String, Any?>>("data") ?: emptyMap())
+                    val data = call.argument<Map<String, Any?>>("data") ?: emptyMap()
+                    val name = call.argument<String>("name") ?: "mark"
+                    if (active && name == "source.open.begin") {
+                        source = source + data.filterKeys { it in setOf(
+                            "requestId", "sourceRevision", "cid", "mediaSourceId", "playerId", "textureId",
+                        ) }
+                    }
+                    if (active && (geometryEnabled || textureEnabled)) textureProbe?.refresh()
+                    event(name, data)
                     result.success(null)
                 }
                 "stop" -> {
@@ -160,6 +186,8 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
         "configured" to configured, "active" to active, "deadlineMonoNs" to deadlineMonoNs,
         "written" to written.get(), "pending" to pending.get(), "dropped" to dropped.get(),
         "bytes" to bytes.get(), "fileLimit" to capped, "ioError" to ioError,
+        "geometryEnabled" to geometryEnabled,
+        "framesEnabled" to framesEnabled, "textureEnabled" to textureEnabled,
     )
 
     private fun arm(reason: String, durationMs: Long) {
@@ -169,19 +197,26 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
         if (!active) {
             active = true
             frameIndex = 0L
-            observer = activity.window.decorView.viewTreeObserver.also { it.addOnDrawListener(drawListener) }
-            installMetrics()
-            textureProbe?.start()
+            if (geometryEnabled) {
+                observer = activity.window.decorView.viewTreeObserver.also { it.addOnDrawListener(drawListener) }
+            }
+            if (geometryEnabled || framesEnabled) installMetrics()
+            if (geometryEnabled || textureEnabled) textureProbe?.start(
+                detailed = geometryEnabled, continuity = continuityEnabled,
+            )
         }
+        if (geometryEnabled || textureEnabled) textureProbe?.refresh()
         main.removeCallbacks(endCapture)
         main.postDelayed(endCapture, duration)
         event("trace.arm", mapOf(
             "reason" to reason, "durationMs" to duration,
             "sdk" to Build.VERSION.SDK_INT, "package" to activity.packageName,
-            "observationBoundary" to "View/window geometry and optional Flutter-consumed video texture metadata; compositor latch/present fences and actual video buffer dimensions are not observed",
+            "geometryEnabled" to geometryEnabled,
+            "textureEnabled" to textureEnabled, "framesEnabled" to framesEnabled,
+            "observationBoundary" to "Input/clock plus explicitly enabled window/texture observations; no physical display fence or independent pixel identity",
         ))
-        snapshot("arm", lastVsyncNs)
-        if (!scheduled) {
+        if (geometryEnabled) snapshot("arm", lastVsyncNs)
+        if (geometryEnabled && !scheduled) {
             scheduled = true
             Choreographer.getInstance().postFrameCallback(frame)
         }
@@ -225,6 +260,17 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
 
     fun lifecycle(name: String, data: Map<String, Any?> = emptyMap()) {
         event("activity.$name", data)
+    }
+
+    fun observeTouch(input: MotionEvent) {
+        if (!active || disposed || geometryEnabled) return
+        val action = input.actionMasked
+        if (action != MotionEvent.ACTION_DOWN && action != MotionEvent.ACTION_UP) return
+        event("input.touch", mapOf(
+            "action" to action, "eventUptimeMs" to input.eventTime,
+            "x" to input.x, "y" to input.y,
+            "scope" to "Activity dispatch; not Flutter gesture completion or display",
+        ))
     }
 
     private fun snapshot(reason: String, vsyncNs: Long) {
@@ -357,6 +403,13 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
                 if (count % 64L == 0L || now - lastFlushNs >= 1_000_000_000L) {
                     writer?.flush()
                     lastFlushNs = now
+                    worker?.removeCallbacks(idleFlush)
+                    flushScheduled = false
+                } else if (!flushScheduled) {
+                    // Sparse captures must also flush when no further event arrives.
+                    // One bounded task on the I/O worker; never poll the UI thread.
+                    flushScheduled = true
+                    worker?.postDelayed(idleFlush, 1000L)
                 }
             } catch (error: Exception) { failIo(error) }
             finally { pending.decrementAndGet() }
@@ -400,6 +453,8 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
         disposed = true
         channel.setMethodCallHandler(null)
         worker?.post {
+            worker?.removeCallbacks(idleFlush)
+            flushScheduled = false
             try { writer?.close() } catch (error: Exception) { failIo(error) }
             writer = null
             workerThread?.quitSafely()

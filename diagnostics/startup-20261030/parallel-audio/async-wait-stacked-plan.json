@@ -1,0 +1,11 @@
+{
+  "round": 89,
+  "baseline": "Same87 APK/native; async1/audioBound1/videoqueue1/decode0, failover1/progressRace0. Only callback_wait0/1 differs. Existing8ms bounded notification wait (wakes on either input/output), not fixed sleep.",
+  "basis": "88 actual independent endpoints trace shows756 zero-timeout polls before first unrendered output release; tiny actualget/copy/post means do not optimize copies.72 wait was slower before this stack;83/84 local tests not applicationproof.",
+  "cohort": "BAAB freshapp61.5s; retainedQA on5572, existingdiskindex checked eachsample; no重trace in timings.",
+  "netGainMs": -921.8102,
+  "required": "native waitedcounter positive onB, zeroA; worker exit/PTS/continuous/return, actualcancel/seek. Allsamplesincludingnegative retained.",
+  "status": "completed-negative-retained",
+  "decision": "callback_wait explicitly0; no extra wait-enabled cancel/seek because rejected configuration",
+  "review": "async-wait-stacked-observed-01/net-gains-reviewed.json"
+}

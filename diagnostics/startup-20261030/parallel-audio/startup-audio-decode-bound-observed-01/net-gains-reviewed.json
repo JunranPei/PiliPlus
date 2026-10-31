@@ -1,0 +1,469 @@
+{
+  "round": 86,
+  "sourceSha256": "6158bcf6fbaa204006fc8a2b447f920e4c8030f2e82836b7c84ee961545bbfc8",
+  "apkSha256": {
+    "control": "977ee9e6f63fda0919fdb92284b6d7b963ccbfccf66a8271d6e84a52a6aeb7f1",
+    "candidate": "8cf17a27bcda74f9378c4529b53d764ee29fc89dca8d7a0814381be9903928a3"
+  },
+  "nativeSha256": "b07a6e3cdad94bc0fe8576f55abea584781733cb3500f68af8be4f9bd1b6fca4",
+  "medians": {
+    "control": {
+      "textureMs": 1975.58445,
+      "coverMs": 2111.380599999905,
+      "openMs": 216.51059999990463,
+      "firstReceiveMs": 780.9844,
+      "receiveToDrainMs": 1140.7785000000001,
+      "drainToTextureMs": 53.82155
+    },
+    "candidate": {
+      "textureMs": 1809.7896999999998,
+      "coverMs": 1936.3214500000477,
+      "openMs": 248.41095000004768,
+      "firstReceiveMs": 783.6723999999999,
+      "receiveToDrainMs": 964.49585,
+      "drainToTextureMs": 61.62144999999987
+    }
+  },
+  "netGainsMs": {
+    "textureMs": 165.79475000000025,
+    "coverMs": 175.05914999985725,
+    "openMs": -31.90035000014305,
+    "firstReceiveMs": -2.6879999999998745,
+    "receiveToDrainMs": 176.2826500000001,
+    "drainToTextureMs": -7.799899999999866
+  },
+  "netGainPercent": 8.392187435976236,
+  "retryCount": 1,
+  "switchCount": 0,
+  "mechanismVerified": true,
+  "nativeSelectedPtsCount": 4,
+  "exactConsumedPtsCount": 2,
+  "returnPassedCount": 4,
+  "continuousConcerns": [],
+  "workerFaults": [],
+  "scope": "Same QA145/native72; callbacks1/wait0/decode0/videoqueue1, initial/resume winner gates off. Only STARTUP_AUDIO_DECODE_QUEUE_BOUNDED differs. Freshprocess61.5s BAAB,25s/back18. Allsamples retained. Not physicaldisplay or exact consumedPTS proof.",
+  "attributionLimit": "N2 per arm; Small paired cohort; native instrumentation must verify fewer decoded audio frames before video target release; source-ready restoration is separately checked. Different-thread intervals overlap. Never add this difference to prior85.",
+  "samples": [
+    {
+      "label": "01-candidate",
+      "pid": "8625",
+      "textureMs": 1936.8264,
+      "coverMs": 2072.7725,
+      "firstTexturePtsNs": 61566688000,
+      "maxPositiveGapMs": 122.4481,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": [],
+      "audioDecodeQueueMechanismVerified": true,
+      "audioDecodeQueueEvents": [
+        {
+          "event": "startup.audioDecodeQueue.limited",
+          "seq": 560,
+          "elapsedUs": 10617156,
+          "utcUs": 1793451004720888,
+          "source": {
+            "owner": 198721560,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "2ca9f540",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "requestId": 1,
+          "sourceRevision": 1,
+          "owner": 198721560,
+          "readyOwner": null,
+          "cid": 42790290231,
+          "mediaSourceId": null,
+          "playerId": 472728681,
+          "videoControllerId": 864977532,
+          "textureId": 0,
+          "textureRect": [
+            0.0,
+            0.0,
+            960.0,
+            540.0
+          ],
+          "decodedDisplaySize": [
+            960,
+            540
+          ],
+          "positionMs": 0,
+          "playing": false,
+          "buffering": false,
+          "requestedSize": [
+            1920,
+            1080
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false,
+          "previousSeconds": "2.000000",
+          "actualSeconds": "0.080000"
+        },
+        {
+          "event": "startup.audioDecodeQueue.restored",
+          "seq": 810,
+          "elapsedUs": 12324411,
+          "utcUs": 1793451006428141,
+          "source": {
+            "owner": 198721560,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "2ca9f540",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "requestId": 1,
+          "sourceRevision": 1,
+          "owner": 198721560,
+          "readyOwner": 198721560,
+          "cid": 42790290231,
+          "mediaSourceId": "14161531",
+          "playerId": 472728681,
+          "videoControllerId": 864977532,
+          "textureId": 0,
+          "textureRect": [
+            0.0,
+            0.0,
+            1920.0,
+            1080.0
+          ],
+          "decodedDisplaySize": [
+            1920,
+            1080
+          ],
+          "positionMs": 61633,
+          "playing": true,
+          "buffering": false,
+          "requestedSize": [
+            1920,
+            1080
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false,
+          "reason": "source-frame",
+          "previousSeconds": "0.080000",
+          "actualSeconds": "2.000000"
+        }
+      ]
+    },
+    {
+      "label": "02-control",
+      "pid": "9162",
+      "textureMs": 1834.725,
+      "coverMs": 1988.5492999999524,
+      "firstTexturePtsNs": 61500000000,
+      "maxPositiveGapMs": 101.7183,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": [],
+      "audioDecodeQueueMechanismVerified": true,
+      "audioDecodeQueueEvents": []
+    },
+    {
+      "label": "03-control",
+      "pid": "9554",
+      "textureMs": 2116.4439,
+      "coverMs": 2234.211899999857,
+      "firstTexturePtsNs": 61566688000,
+      "maxPositiveGapMs": 109.8071,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": [],
+      "audioDecodeQueueMechanismVerified": true,
+      "audioDecodeQueueEvents": []
+    },
+    {
+      "label": "04-candidate",
+      "pid": "10078",
+      "textureMs": 1682.753,
+      "coverMs": 1799.8704000000953,
+      "firstTexturePtsNs": 61500000000,
+      "maxPositiveGapMs": 138.1244,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [
+        {
+          "event": "isolated.audio.resume.bodyRecovery.begin",
+          "seq": 815,
+          "elapsedUs": 11708750,
+          "utcUs": 1793451138880001,
+          "source": {
+            "owner": 900300170,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "17704df3",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "reason": "no-progress",
+          "receivedBytes": 530653,
+          "overlapBytes": 65536,
+          "rangeStart": 1648910,
+          "stallMs": 350,
+          "workerElapsedUs": 1729555,
+          "workerUtcUs": 1793451138846765,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "bodyRecoverySwitches": [],
+      "workerFaults": [],
+      "audioDecodeQueueMechanismVerified": true,
+      "audioDecodeQueueEvents": [
+        {
+          "event": "startup.audioDecodeQueue.limited",
+          "seq": 562,
+          "elapsedUs": 9977845,
+          "utcUs": 1793451137149097,
+          "source": {
+            "owner": 900300170,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "17704df3",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "requestId": 1,
+          "sourceRevision": 1,
+          "owner": 900300170,
+          "readyOwner": null,
+          "cid": 42790290231,
+          "mediaSourceId": null,
+          "playerId": 673438141,
+          "videoControllerId": 150517011,
+          "textureId": 0,
+          "textureRect": [
+            0.0,
+            0.0,
+            960.0,
+            540.0
+          ],
+          "decodedDisplaySize": [
+            960,
+            540
+          ],
+          "positionMs": 0,
+          "playing": false,
+          "buffering": false,
+          "requestedSize": [
+            1920,
+            1080
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false,
+          "previousSeconds": "2.000000",
+          "actualSeconds": "0.080000"
+        },
+        {
+          "event": "startup.audioDecodeQueue.restored",
+          "seq": 788,
+          "elapsedUs": 11476119,
+          "utcUs": 1793451138647409,
+          "source": {
+            "owner": 900300170,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "17704df3",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "requestId": 1,
+          "sourceRevision": 1,
+          "owner": 900300170,
+          "readyOwner": 900300170,
+          "cid": 42790290231,
+          "mediaSourceId": "134ecc33",
+          "playerId": 673438141,
+          "videoControllerId": 150517011,
+          "textureId": 0,
+          "textureRect": [
+            0.0,
+            0.0,
+            1920.0,
+            1080.0
+          ],
+          "decodedDisplaySize": [
+            1920,
+            1080
+          ],
+          "positionMs": 61566,
+          "playing": true,
+          "buffering": false,
+          "requestedSize": [
+            1920,
+            1080
+          ],
+          "fit": "contain",
+          "flipX": false,
+          "flipY": false,
+          "onlyAudio": false,
+          "isLive": false,
+          "reason": "source-frame",
+          "previousSeconds": "0.080000",
+          "actualSeconds": "2.000000"
+        }
+      ]
+    }
+  ]
+}

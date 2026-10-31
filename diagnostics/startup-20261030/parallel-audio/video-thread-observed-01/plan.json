@@ -1,0 +1,29 @@
+{
+  "plan": [
+    [
+      "01-candidate",
+      "candidate"
+    ],
+    [
+      "02-control",
+      "control"
+    ],
+    [
+      "03-control",
+      "control"
+    ],
+    [
+      "04-candidate",
+      "candidate"
+    ]
+  ],
+  "firstWarmupExcluded": false,
+  "seedFrom": "QA143 verified persistent disk SIDX from callback-wait-observed-01; validated on every sample",
+  "sameEmulator": true,
+  "appRestartEverySample": true,
+  "startProgressMs": 61500,
+  "newObservedCohort": true,
+  "resourceProfile": "lean-monitored observation only",
+  "comparison": "Only STARTUP_VIDEO_DECODE_QUEUE differs; same source, native72, engine, assets. callbacks1/wait1/decodeonly0 both arms. One frame/16MiB/0.05s candidate queue. No Perfetto. CDN endpoint variation recorded, not automatically attributed to this flag.",
+  "acceptance": "Exact first consumed PTS is independent from exact native selected PTS. Keep all failed acceptance results."
+}

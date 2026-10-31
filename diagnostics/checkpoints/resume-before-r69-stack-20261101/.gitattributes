@@ -1,0 +1,3 @@
+native-sources/** -text
+# Preserve the original whitespace diagnostic, including the reported spaces.
+staged-whitespace-check.txt -whitespace

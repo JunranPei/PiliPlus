@@ -1,0 +1,153 @@
+{
+  "round": 85,
+  "sourceSha256": "8aeb87eeee46b0a29a84e7394a0b63c405cd1d49ce4aedd57d2430db8a943719",
+  "apkSha256": {
+    "control": "39e8c73d6f81c1e83601b8220e31500040a5dc445c5e47b25af2fca44d952871",
+    "candidate": "35169dba085ef7ff37670af24c2d8559cce36882427a5bb3f42f58e834d110b1"
+  },
+  "nativeSha256": "b07a6e3cdad94bc0fe8576f55abea584781733cb3500f68af8be4f9bd1b6fca4",
+  "medians": {
+    "control": {
+      "textureMs": 1829.648,
+      "coverMs": 1874.709150000006,
+      "openMs": 220.57465000000596,
+      "firstReceiveMs": 614.7574500000001,
+      "receiveToDrainMs": 1155.51075,
+      "drainToTextureMs": 59.37979999999993
+    },
+    "candidate": {
+      "textureMs": 1636.2640999999999,
+      "coverMs": 1723.7020499999971,
+      "openMs": 233.030049999997,
+      "firstReceiveMs": 634.85815,
+      "receiveToDrainMs": 960.062,
+      "drainToTextureMs": 41.34394999999995
+    }
+  },
+  "netGainsMs": {
+    "textureMs": 193.38390000000004,
+    "coverMs": 151.0071000000089,
+    "openMs": -12.455399999991045,
+    "firstReceiveMs": -20.10069999999996,
+    "receiveToDrainMs": 195.4487499999999,
+    "drainToTextureMs": 18.035849999999982
+  },
+  "netGainPercent": 10.569459262109435,
+  "retryCount": 1,
+  "switchCount": 0,
+  "mechanismVerified": true,
+  "nativeSelectedPtsCount": 4,
+  "exactConsumedPtsCount": 2,
+  "returnPassedCount": 4,
+  "continuousConcerns": [],
+  "workerFaults": [],
+  "scope": "Same QA145/native72; callbacks1/wait0/decode0/videoqueue1, initial/resume winner gates off. Only RESUME_BODY_PROGRESS_RACE differs. Freshprocess61.5s BAAB,25s/back18. Allsamples retained. Not physicaldisplay or exact consumedPTS proof.",
+  "attributionLimit": "N2 per arm; Small paired cohort; attribute speed only if the alternate actually supplies earlier pre-target bytes. Controlled slow-prefix HTTP evidence is separate. Never add this difference to prior81.",
+  "samples": [
+    {
+      "label": "01-candidate",
+      "pid": "4225",
+      "textureMs": 1611.672,
+      "coverMs": 1683.6332999999822,
+      "firstTexturePtsNs": 61500000000,
+      "maxPositiveGapMs": 130.4658,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    },
+    {
+      "label": "02-control",
+      "pid": "4692",
+      "textureMs": 1816.397,
+      "coverMs": 1863.1750999999642,
+      "firstTexturePtsNs": 61566688000,
+      "maxPositiveGapMs": 122.6911,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    },
+    {
+      "label": "03-control",
+      "pid": "5084",
+      "textureMs": 1842.899,
+      "coverMs": 1886.2432000000476,
+      "firstTexturePtsNs": 61533313000,
+      "maxPositiveGapMs": 117.4889,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    },
+    {
+      "label": "04-candidate",
+      "pid": "5625",
+      "textureMs": 1660.8562,
+      "coverMs": 1763.7708000000118,
+      "firstTexturePtsNs": 61500000000,
+      "maxPositiveGapMs": 231.0051,
+      "functionalCleanup": true,
+      "bodyRecoveryMechanismVerified": true,
+      "bodyRecoveryRetries": [
+        {
+          "event": "isolated.video.resume.bodyRecovery.begin",
+          "seq": 813,
+          "elapsedUs": 11895677,
+          "utcUs": 1793449579187467,
+          "source": {
+            "owner": 767657203,
+            "cid": 42790290231,
+            "revision": 1,
+            "routeActive": true,
+            "videoState": false,
+            "frameReady": false,
+            "preparing": false,
+            "autoPlay": true,
+            "coverSourceId": "1",
+            "mediaSourceId": "11abca3b",
+            "player": {
+              "requestId": null,
+              "sourceRevision": 0,
+              "owner": null,
+              "readyOwner": null,
+              "cid": null,
+              "mediaSourceId": null,
+              "playerId": null,
+              "videoControllerId": null,
+              "textureId": null,
+              "textureRect": null,
+              "decodedDisplaySize": null,
+              "positionMs": null,
+              "playing": null,
+              "buffering": null,
+              "requestedSize": [
+                null,
+                null
+              ],
+              "fit": "contain",
+              "flipX": false,
+              "flipY": false,
+              "onlyAudio": false,
+              "isLive": false
+            }
+          },
+          "reason": "no-progress",
+          "receivedBytes": 579805,
+          "overlapBytes": 65536,
+          "rangeStart": 6814791,
+          "stallMs": 350,
+          "workerElapsedUs": 1586955,
+          "workerUtcUs": 1793449579131048,
+          "requestId": 1,
+          "cid": 42790290231
+        }
+      ],
+      "bodyRecoverySwitches": [],
+      "workerFaults": []
+    }
+  ]
+}

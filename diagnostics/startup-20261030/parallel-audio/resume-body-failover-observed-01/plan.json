@@ -1,0 +1,26 @@
+{
+  "round": 81,
+  "previousGoalTurn": "no progress: package status delivery only; resumed concrete transport implementation now",
+  "hypothesis": "Observed76 target body stopped after112860B. Replace77 upfront256KiB wait with one late Range retry after350ms unpaused mid-body gap. Select only after64KiB(or all shorter received bytes) overlap exactly matches; no pre-body splice.",
+  "comparison": "Same source/native72, callbacks1/wait0/decode-only0/videoqueue1. B RESUME_BODY_FAILOVER=true vs A false. Bounded init and initial/resume body winner gates all false. Same retainedQA144; new process61.5s each, BAAB,25s/back18s; all timings retained.",
+  "netGainMs": null,
+  "netGainStatus": "unmeasured, do not substitute HTTP fixture latency for app gain",
+  "invariants": [
+    "Fresh authorized alternate only",
+    "Validate206 exactRange,total,length,identity; compare overlap before splice",
+    "Immediate original streaming; at mostone retry",
+    "Suspend both timers during consumer pause; bounded64KiB ring",
+    "Cancel retry if primary resumes;close on cancel/return",
+    "No codec/quality/PTS guards changed"
+  ],
+  "tests": "resume-body-recovery-tests-02.txt:52 focused tests passed; source integration bothwarmup paths; negativecontrol stall remains untilrelease",
+  "sourceResearch": [
+    "https://api.dart.dev/dart-async/StreamSubscription/pause.html",
+    "https://api.dart.dev/dart-io/HttpClient/close.html"
+  ],
+  "unresolved": [
+    "Exact firstconsumed PTS later than61.5 inmanyprior samples",
+    "78A8continuousstall/latecleanup not diagnosed",
+    "80wholecohortslow duringforeignbuild; no stablecausal278msclaim"
+  ]
+}

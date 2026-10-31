@@ -1,0 +1,48 @@
+{
+  "formalSource": "D:\\workplace\\antigravity\\PiliPlus\\diagnostics\\startup-20261030\\parallel-audio\\resume-body-progress-observed-02\\completed-samples.json",
+  "formalNetGainMs": 193.38390000000004,
+  "stableCausalGainEstablished": false,
+  "noSlowProgressRetryOrSwitch": true,
+  "actualCancel": {
+    "pid": "13242",
+    "passed": true,
+    "beforeVideoDrain": true
+  },
+  "actualSeek": {
+    "pid": "13679",
+    "passed": true,
+    "firstNewPositionAfterGestureMs": 1597.2067
+  },
+  "hostProcessStates": [
+    {
+      "hostTime": 1793449372.4392426,
+      "hostPerfNs": 10101164652500,
+      "status": "running"
+    }
+  ],
+  "olderInterruptedCohort": {
+    "completeSamples": [
+      {
+        "label": "01-candidate",
+        "textureMs": 1727.7389,
+        "coverMs": 1812.2218000001908,
+        "pid": "14090"
+      },
+      {
+        "label": "02-control",
+        "textureMs": 3354.8359,
+        "coverMs": 3403.313099999428,
+        "pid": "14517"
+      },
+      {
+        "label": "03-control",
+        "textureMs": 2118.9423,
+        "coverMs": 2225.4756000003813,
+        "pid": "14898"
+      }
+    ],
+    "fourth": "Original host emulator stopped and then exited; crashpad handler Event1000 and graphics context errors saved. Root crash cause unproved. Recovered guest JSONLs empty after restart; original logcat/errors retained. Not counted as startup sample or discarded because slow.",
+    "initialRecoveryAttempt": "ADB device disappeared before pull; later pull succeeded after verified new boot but files were empty. Host recovery helper initially used missing cid key, corrected to announced capture CID; original failures retained."
+  },
+  "decision": "Keep experimental code default-off; no phone rebuild, no speed default change. Keep all interrupted and complete measurements. Next use existing trace to bound avoidable audio decode work."
+}

@@ -1,0 +1,11 @@
+{
+  "round": 87,
+  "baseline": "Round86 candidate audio queue bounded; native72 all code retained except embedded callback helper+JNI integration. Same new APK with debug.piliplus.async_input0/1; callbacks1/wait0/decode0/videoqueue1.",
+  "hypothesis": "Input worker releases owner to consume outputs during codec submission service waits; work itself still exists. Prior83 local+9.672ms is not application gain.",
+  "lifecycle": "Use reviewed83 exact helper; run embedded loader lifecycle on both modes, prior boundary/exception proofs then real mpv cancellation/seek/continuity/return. Snapshot15 mandatory and nonzero pending/alive/failure flags treated as native error.",
+  "netGainMs": null,
+  "priorTurnClassification": "package delivery complete and verified; no new speed evidence last turn, continuing native integration now",
+  "default": "off; no phone release rebuilt",
+  "javaSha256": "b7b62148e06922698889fcb2c0f5648e8c8c42d5ef0ad8df89250cc9e7904870",
+  "jniSha256": "cbcb709432a80de5e58ccaa2bdb25076bae7e2ebdd622cba319c186440bd4a51"
+}
