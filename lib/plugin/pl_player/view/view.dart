@@ -46,6 +46,7 @@ import 'package:PiliPlus/plugin/pl_player/models/fullscreen_mode.dart';
 import 'package:PiliPlus/plugin/pl_player/models/gesture_type.dart';
 import 'package:PiliPlus/plugin/pl_player/models/video_fit_type.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/app_bar_ani.dart';
+import 'package:PiliPlus/plugin/pl_player/widgets/startup_video_texture.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/backward_seek.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/bottom_control.dart';
 import 'package:PiliPlus/plugin/pl_player/widgets/common_btn.dart';
@@ -2128,11 +2129,31 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         ? (plPlayerController.width! /
                               plPlayerController.height!)
                         : null);
-                final video = SimpleVideo(
-                  controller: plPlayerController.videoController!,
-                  fill: widget.fill,
-                  aspectRatio: aspect,
-                );
+                final video =
+                    const bool.fromEnvironment('EARLY_STARTUP_TEXTURE') &&
+                        Platform.isAndroid &&
+                        widget.videoDetailController != null
+                    ? StartupVideoTexture(
+                        controller: plPlayerController.videoController!,
+                        warm: widget
+                            .videoDetailController!
+                            .preparingPlayback
+                            .value,
+                        fallbackSize: Size(
+                          plPlayerController.width?.toDouble() ?? 0,
+                          plPlayerController.height?.toDouble() ?? 0,
+                        ),
+                        fill: widget.fill,
+                        aspectRatio: aspect,
+                        traceData: PlaybackDiagnostics.enabled
+                            ? plPlayerController.playbackTraceState
+                            : null,
+                      )
+                    : SimpleVideo(
+                        controller: plPlayerController.videoController!,
+                        fill: widget.fill,
+                        aspectRatio: aspect,
+                      );
                 return Transform.flip(
                   flipX: plPlayerController.flipX.value,
                   flipY: plPlayerController.flipY.value,

@@ -1,0 +1,48 @@
+{
+  "apk": "D:\\workplace\\antigravity\\PiliPlus\\output\\releases\\PiliPlus-resume-r116-arm64-release-20261101.apk",
+  "sha256": "a291c6c72615ccf4b291944bd9fe5142826f67842fec6bff6258174e00ed3e3d",
+  "bytes": 25544018,
+  "samePreviousPhoneSigner": "2f1be29e2d55ae2f4040dfbaeb64f16ae78ab9cfd0ae4c6afe79c52dae4a7fdf",
+  "releaseNonDebuggable": true,
+  "arm64Only": true,
+  "elfLoadAlignments": [
+    16384,
+    16384,
+    16384
+  ],
+  "apkAlignmentVerified": true,
+  "historicalProductionSourceFilesMatched": 51,
+  "optimizationFlagsMatched": true,
+  "dependencyRevisionAndSourceMatched": true,
+  "orientationDependencyWhitespaceOnlyDifferences": [
+    "SensorOrientationListener.java"
+  ],
+  "supplementaryFrozenSources": {
+    "lib/plugin/pl_player/playback/startup_audio_decode_queue.dart": "67320d41e85dcfbfbe7cbad7d02e93ab2859c8ff1a4da6d60c98c9ad5a5d60a1",
+    "lib/plugin/pl_player/view/view.dart": "9e007eaf7937ebcd3979cb3b6c433d636ec4ba68bb3102505908ce2c1695364e",
+    "lib/plugin/pl_player/widgets/startup_video_texture.dart": "3dc808302349fec98904a12c70496bae6a01618835f9971afd1474af76ac15b3"
+  },
+  "diagnosticAndFixtureDisabled": true,
+  "nativeDefaultsMatchMeasured116": [
+    "codec_callbacks",
+    "decode_only",
+    "skip_empty_info",
+    "video_progress"
+  ],
+  "nativeSha256": "5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f",
+  "intermediatePayloadDifferences": [],
+  "removedOtherAbiEntries": [
+    "lib/armeabi-v7a/libdartjni.so",
+    "lib/armeabi-v7a/libdatastore_shared_counter.so",
+    "lib/armeabi-v7a/libmedia_kit_native_event_loop.so",
+    "lib/armeabi-v7a/libmediakitandroidhelper.so",
+    "lib/armeabi-v7a/libmpv.so",
+    "lib/x86_64/libdartjni.so",
+    "lib/x86_64/libdatastore_shared_counter.so",
+    "lib/x86_64/libmedia_kit_native_event_loop.so",
+    "lib/x86_64/libmediakitandroidhelper.so",
+    "lib/x86_64/libmpv.so"
+  ],
+  "sourcesSha256": "1ff0cbd3b3e7198b022bc376c36f28d465ef103ee4e3c11fdb684fc08f0c6572",
+  "phoneSpeedMeasured": false
+}

@@ -30,7 +30,6 @@ class BoundedBodyWarmup {
           if (first) onEvent?.call('firstChunk', {'bytes': chunk.length});
           if (prefetchedBytes >= limit) {
             _pause(true);
-            if (!_ready.isCompleted) _ready.complete(true);
             onEvent?.call('paused', {
               'prefetchedBytes': prefetchedBytes,
               'limit': limit,
@@ -40,13 +39,9 @@ class BoundedBodyWarmup {
         }
       },
       onError: (Object error, StackTrace stack) {
-        if (!_ready.isCompleted) _ready.complete(false);
         if (!_closed) _output.addError(error, stack);
       },
-      onDone: () {
-        if (!_ready.isCompleted) _ready.complete(false);
-        _output.close().ignore();
-      },
+      onDone: () => _output.close().ignore(),
     );
   }
 
@@ -58,13 +53,8 @@ class BoundedBodyWarmup {
   bool _paused = false;
   bool _closed = false;
   int prefetchedBytes = 0;
-  final _ready = Completer<bool>();
 
   Stream<List<int>> get stream => _output.stream;
-
-  /// True when the unclaimed prefix reached its bound; false on early EOF,
-  /// error, or close. Claiming the stream itself never waits for this future.
-  Future<bool> get ready => _ready.future;
 
   void _pause(bool paused) {
     if (_closed || _paused == paused) return;
@@ -79,7 +69,6 @@ class BoundedBodyWarmup {
   Future<void> close() async {
     if (_closed) return;
     _closed = true;
-    if (!_ready.isCompleted) _ready.complete(false);
     await _input.cancel();
     // A controller closed before being claimed completes only after a listener
     // drains it. Cancellation must not wait on a listener that will never exist.

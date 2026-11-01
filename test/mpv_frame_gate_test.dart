@@ -13,6 +13,123 @@ void main() {
     seeking: false,
   );
 
+  MpvFrameGateProtocol withSnapshot({bool seeking = false}) => gate()
+    ..onStartFile(42)
+    ..onFileLoaded(source)
+    ..onPlaybackRestart(source, currentVo: 'gpu', seeking: seeking);
+
+  void drainSnapshot(MpvFrameGateProtocol protocol) {
+    final snapshot = protocol.takeRestartSnapshot()!;
+    protocol.onQueueDrained(
+      path: snapshot.path,
+      currentVo: snapshot.currentVo,
+      seeking: snapshot.seeking,
+    );
+  }
+
+  test('one fresh restart snapshot proves readiness only after queue drain', () {
+    final protocol = withSnapshot();
+    expect(protocol.isReady, isFalse);
+    drainSnapshot(protocol);
+    expect(protocol.isReady, isTrue);
+    expect(protocol.takeRestartSnapshot(), isNull);
+  });
+
+  test('snapshot with seeking still requires a subsequent restart', () {
+    final protocol = withSnapshot(seeking: true);
+    drainSnapshot(protocol);
+    drain(protocol);
+    expect(protocol.isReady, isFalse);
+    protocol.onPlaybackRestart(source, currentVo: 'gpu', seeking: false);
+    drainSnapshot(protocol);
+    expect(protocol.isReady, isTrue);
+  });
+
+  test('snapshot is consumed once and cannot cross a poll boundary', () {
+    final protocol = withSnapshot();
+    expect(protocol.takeRestartSnapshot(), isNotNull);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    protocol
+      ..onPlaybackRestart(source, currentVo: 'gpu', seeking: false)
+      ..discardRestartSnapshot();
+    expect(protocol.takeRestartSnapshot(), isNull);
+    // A non-invalidating event or poll boundary retains the candidate, but the
+    // owner must read fresh properties. A changed VO then rejects the restart.
+    protocol.onQueueDrained(path: source, currentVo: 'null', seeking: false);
+    drain(protocol);
+    expect(protocol.isReady, isFalse);
+  });
+
+  test('seek or reconfiguration during property reads discards snapshot', () {
+    final protocol = withSnapshot()..onOutputInvalidated();
+    expect(protocol.takeRestartSnapshot(), isNull);
+    drain(protocol);
+    expect(protocol.isReady, isFalse);
+    protocol.onPlaybackRestart(source, currentVo: 'gpu', seeking: false);
+    drainSnapshot(protocol);
+    expect(protocol.isReady, isTrue);
+  });
+
+  test('same URI reopen requires a fresh loaded event and snapshot', () {
+    final protocol = withSnapshot()..onStartFile(43);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    protocol.onPlaybackRestart(source, currentVo: 'gpu', seeking: false);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    drain(protocol);
+    expect(protocol.isReady, isFalse);
+    protocol
+      ..onFileLoaded(source)
+      ..onPlaybackRestart(source, currentVo: 'gpu', seeking: false);
+    drainSnapshot(protocol);
+    expect(protocol.isReady, isTrue);
+  });
+
+  test('different loaded source discards old restart snapshot', () {
+    final protocol = withSnapshot()..onFileLoaded(otherSource);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    protocol.onPlaybackRestart(otherSource, currentVo: 'gpu', seeking: false);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    drain(protocol);
+    expect(protocol.isReady, isFalse);
+  });
+
+  test('different restart path and null output cannot produce snapshot', () {
+    for (final vo in ['', 'null', 'gpu']) {
+      final protocol = withSnapshot()
+        ..onPlaybackRestart(
+          vo == 'gpu' ? otherSource : source,
+          currentVo: vo,
+          seeking: false,
+        );
+      expect(protocol.takeRestartSnapshot(), isNull);
+      drain(protocol);
+      expect(protocol.isReady, isFalse);
+    }
+  });
+
+  test('end during reads makes cached snapshot unusable', () {
+    final protocol = withSnapshot()..onEndFile(42, reason: 2);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    drain(protocol);
+    expect(protocol.isReady, isFalse);
+    expect(protocol.isFinished, isTrue);
+  });
+
+  test('unrelated end discards snapshot but allows fresh confirmation', () {
+    final protocol = withSnapshot()..onEndFile(41, reason: 2);
+    expect(protocol.takeRestartSnapshot(), isNull);
+    drain(protocol);
+    expect(protocol.isReady, isTrue);
+  });
+
+  test('legacy restart without seeking never supplies cached snapshot', () {
+    final protocol = withSnapshot()
+      ..onPlaybackRestart(source, currentVo: 'gpu');
+    expect(protocol.takeRestartSnapshot(), isNull);
+    drain(protocol);
+    expect(protocol.isReady, isTrue);
+  });
+
   test('old loaded and restart events cannot open a new gate', () {
     final protocol = gate()
       ..onFileLoaded(source)

@@ -34,6 +34,30 @@ def force_stop_before_capture(adb, package, sleep=time.sleep):
         try:
             adb('shell', 'am', 'force-stop', package)
             return
+        except subprocess.TimeoutExpired:
+            # A lost/late shell completion is not proof the stop failed. Verify
+            # the requested state before considering another destructive call.
+            def read(*args):
+                value = adb(*args)
+                return value.decode('utf-8', errors='replace') if isinstance(value, bytes) else value
+            try:
+                user = read('shell', 'am', 'get-current-user')
+                details = read('shell', 'dumpsys', 'package', package)
+                processes = read('shell', 'ps', '-A', '-o', 'NAME')
+                if not all(isinstance(v, str) for v in [user, details, processes]):
+                    raise ValueError('Preparation adapter did not return observations')
+                user = user.strip()
+                stopped = user.isdigit() and re.search(
+                    rf'^\s*User {user}:.*\bstopped=true\b', details, re.MULTILINE)
+                alive = any(name.strip() == package or name.strip().startswith(package + ':')
+                            for name in processes.splitlines())
+                if stopped and not alive:
+                    return {'commandTimedOut': True, 'verifiedStopped': True,
+                            'currentUser': user, 'packageProcessCount': 0,
+                            'packageState': stopped.group(0).strip()}
+            except (subprocess.SubprocessError, ValueError):
+                pass
+            raise
         except subprocess.CalledProcessError as error:
             stderr = (error.stderr or b'').decode('utf-8', errors='replace').lower()
             transient = any(message in stderr for message in [
@@ -44,6 +68,36 @@ def force_stop_before_capture(adb, package, sleep=time.sleep):
             if not transient or attempt == 2:
                 raise
             sleep(1)
+
+
+def dump_pre_input_ui(adb, remote, out, sleep=time.sleep):
+    """Retry only a read-only UI dump before measured input; preserve attempts."""
+    for attempt in range(3):
+        record = {'remote': remote, 'attempt': attempt + 1,
+                  'hostNs': time.perf_counter_ns()}
+        try:
+            result = adb('shell', 'uiautomator', 'dump', remote)
+            record['exit'] = 0
+            return result
+        except subprocess.TimeoutExpired:
+            record['timeout'] = True
+            if attempt == 2:
+                raise
+        except subprocess.CalledProcessError as error:
+            stderr = (error.stderr or b'').decode('utf8', errors='replace')
+            stdout = (error.stdout or b'').decode('utf8', errors='replace')
+            record.update(exit=error.returncode, stdout=stdout, stderr=stderr)
+            empty_transport_exit = error.returncode == 255 and not (stdout.strip() or stderr.strip())
+            transient = any(s in stderr.lower() for s in [
+                'could not read ok from adb server', 'cannot connect to daemon',
+                'device offline', 'error: closed',
+            ])
+            if not (empty_transport_exit or transient) or attempt == 2:
+                raise
+        finally:
+            with (out/'pre-input-ui-dump-attempts.jsonl').open('a', encoding='utf8') as stream:
+                stream.write(json.dumps(record) + '\n')
+        sleep(.25)
 
 
 def search_video_uri(video, progress_ms=0, history_resume=False):
@@ -86,7 +140,7 @@ def fill_verified_search_uri(adb, out, uri, sleep=time.sleep):
     observations=[]
     def read(label):
         remote='/sdcard/piliplus-listener-input.xml'
-        adb('shell','uiautomator','dump',remote)
+        dump_pre_input_ui(adb,remote,out,sleep=sleep)
         xml=adb('shell','cat',remote)
         (out/(label+'.xml')).write_bytes(xml)
         nodes=list(ET.fromstring(xml).iter('node'))
@@ -151,7 +205,7 @@ def hide_search_ime_before_input(adb, out, uri):
                 raise RuntimeError('IME did not hide before measured input')
             time.sleep(.04)
     remote='/sdcard/piliplus-listener-hidden-ime.xml'
-    adb('shell','uiautomator','dump',remote)
+    dump_pre_input_ui(adb,remote,out)
     xml=adb('shell','cat',remote)
     (out/'search-with-hidden-ime.xml').write_bytes(xml)
     editors=[n for n in ET.fromstring(xml).iter('node')
@@ -328,7 +382,7 @@ def main():
     parser.add_argument('--start-progress-ms',type=int,default=0,help='Nonzero resume regression; never mix into zero-start speed comparisons')
     parser.add_argument('--history-resume',action='store_true',help='Search entry without a progress override; observe the actual saved history position')
     parser.add_argument('--seconds',type=int,default=25)
-    parser.add_argument('--resource-profile',choices=['default','lean-short','lean-monitored'],default='default',
+    parser.add_argument('--resource-profile',choices=['default','lean-short','lean-monitored','minimum-startup-v2'],default='default',
         help='Explicit calibrated profile for22..25s lean release only; heavy/default limits unchanged')
     parser.add_argument('--pre-input-memory-wait-seconds',type=float,default=0,
         help='Lean-only bounded settling after app setup, before measured input; unchanged memory floors')
@@ -346,6 +400,7 @@ def main():
     parser.add_argument('--pause-after', type=float, help='Regression only: send Android media pause after this many seconds')
     parser.add_argument('--resume-after', type=float, help='Regression only: send Android media play after the pause')
     parser.add_argument('--apk',type=Path,required=True,help='Expected already-installed APK; never installs')
+    parser.add_argument('--conditions-lock',type=Path,help='Reviewed fixed hardware/app condition manifest; checked before the only measured tap')
     parser.add_argument('--expire-url-before-rearm',action='store_true',help='Same-card diagnostic: wait for original 10s URL TTL before immediate scroll/click')
     args = parser.parse_args()
     if args.wait_trace and not args.perfetto:
@@ -366,6 +421,14 @@ def main():
         parser.error('--native-offcpu-trace requires --native-cpu-trace')
     if args.native_cpu_trace and not args.vm_skia_trace:
         parser.error('--native-cpu-trace requires the profile-only --vm-skia-trace mode')
+    if args.resource_profile == 'minimum-startup-v2' and (
+            args.start_progress_ms != 61500 or args.back_after != 18 or not args.verify_input_target
+            or args.index != 5 or args.home_card or args.reuse_home or args.reuse_search
+            or args.history_resume or args.seek_after is not None or args.pause_after is not None
+            or args.resume_after is not None or args.hide_ime_before_input):
+        parser.error('minimum-startup-v2 requires the fixed first-process 61.5s search fixture and 18s return')
+    if args.resource_profile == 'minimum-startup-v2' and not args.conditions_lock:
+        parser.error('A fixed condition manifest is required before minimum-startup-v2 can start')
     if args.vm_skia_trace and (args.perfetto or args.engine_skia_trace or not args.home_card or args.reuse_home is not None):
         parser.error('--vm-skia-trace requires cold home without Perfetto/systrace')
     if args.engine_skia_trace and (not args.perfetto or not args.home_card or args.reuse_home is not None):
@@ -419,6 +482,8 @@ def main():
         if check: result.check_returncode()
         return result.stdout
     def check_memory(start=False):
+        if args.resource_profile == 'minimum-startup-v2':
+            return None
         sample=memory_module.memory()
         metadata['memorySamples'].append(sample)
         if args.resource_profile == 'lean-monitored':
@@ -454,7 +519,10 @@ def main():
                          'guestResolutionNs':10000000})
         metadata.setdefault('hostClockBrackets',{})[label]=rows
     try:
-        if args.resource_profile == 'lean-monitored':
+        if args.resource_profile == 'minimum-startup-v2':
+            (out/'resource-policy.txt').write_text(
+                'No host sampling or resource thresholds; only fixed sparse timing observers.\n', encoding='utf-8')
+        elif args.resource_profile == 'lean-monitored':
             # Process presence does not establish contention: idle/shared
             # compilers caused valid short captures to be vetoed before input.
             # This profile measures live resources throughout the capture.
@@ -526,12 +594,16 @@ def main():
             # Retry only this idempotent pre-launch operation on an ADB server
             # handshake failure. Never retry a measured tap or restart the
             # shared server. Each failed attempt remains in adbFailures.
-            force_stop_before_capture(adb, PACKAGE)
+            stop_recovery = force_stop_before_capture(adb, PACKAGE)
+            if stop_recovery is not None:
+                metadata['forceStopRecovery'] = stop_recovery
+                save()
         log_file=(out/'logcat.txt').open('wb')
-        logcat=subprocess.Popen(base+['logcat','-v','epoch','-T','1',
+        log_tags = ['flutter:I','PiliPlaybackTrace:I','AndroidRuntime:E','*:S'] if args.resource_profile == 'minimum-startup-v2' else [
             'flutter:I','PiliPlaybackTrace:V','MediaCodec:I','CCodec:I','AudioTrack:I',
             'AndroidRuntime:E','StartupListener:I','PiliOrientationTiming:I',
-            'PiliCodecReserve:I','PiliCodecFlush:I','PiliAudioLead:I','PiliDecodeOnly:I','PiliCodecCallbacks:I','*:S'],stdout=log_file,stderr=subprocess.STDOUT)
+            'PiliCodecReserve:I','PiliCodecFlush:I','PiliAudioLead:I','PiliDecodeOnly:I','PiliCodecCallbacks:I','PiliCodecSignal:I','PiliPrerollQueue:I','*:S']
+        logcat=subprocess.Popen(base+['logcat','-v','epoch','-T','1']+log_tags,stdout=log_file,stderr=subprocess.STDOUT)
         if args.home_card:
             if previous is None:
                 adb('shell','am','start','-W','-a','android.intent.action.MAIN',
@@ -550,7 +622,7 @@ def main():
                 # Use its actual semantically identified clear action, then
                 # require the entire replacement URI to match below.
                 remote_clear='/sdcard/piliplus-listener-clear.xml'
-                adb('shell','uiautomator','dump',remote_clear)
+                dump_pre_input_ui(adb,remote_clear,out)
                 clear_xml=adb('shell','cat',remote_clear)
                 (out/'search-before-clear.xml').write_bytes(clear_xml)
                 clear_xy=search_clear_target(clear_xml)
@@ -650,6 +722,11 @@ data_sources {{ config {{ name: "linux.process_stats" process_stats_config {{ sc
             metadata['inputTarget']=target
             if target['window'].split(' ',1)[-1] != PACKAGE+'/com.personal.piliplus.MainActivity':
                 raise RuntimeError('Measured input is covered by '+target['window'])
+        if args.resource_profile == 'minimum-startup-v2':
+            from startup_conditions import verify_pre_input
+            metadata['preInputConditions']=verify_pre_input(
+                adb,pid,args.conditions_lock,metadata['apkSha256'],out/'conditions-before-input.json')
+            save()
         adb('shell','log','-t','StartupListener','measured-input')
         if args.vm_skia_trace:
             from startup_vm_timeline import StartupVmTimeline
@@ -684,7 +761,8 @@ data_sources {{ config {{ name: "linux.process_stats" process_stats_config {{ sc
             'stderr':tap_result.stderr.decode('utf-8',errors='replace')}
         tap_result.check_returncode()
         metadata['status']='capturing'
-        save()
+        if args.resource_profile != 'minimum-startup-v2':
+            save()
         print(json.dumps({'event':'capturing','output':str(out),'cid':video['cid']}),flush=True)
         capture_start=time.monotonic()
         until=capture_start+args.seconds
@@ -694,7 +772,7 @@ data_sources {{ config {{ name: "linux.process_stats" process_stats_config {{ sc
             (args.pause_after,'KEYCODE_MEDIA_PAUSE','pauseSentAfterSeconds'),
             (args.resume_after,'KEYCODE_MEDIA_PLAY','resumeSentAfterSeconds')]
         while time.monotonic()<until:
-            next_wake = min(until, time.monotonic()+2)
+            next_wake = until if args.resource_profile == 'minimum-startup-v2' else min(until, time.monotonic()+2)
             if args.back_after is not None and not returned:
                 next_wake = min(next_wake, capture_start+args.back_after)
             if args.seek_after is not None and not sought:
@@ -740,6 +818,12 @@ data_sources {{ config {{ name: "linux.process_stats" process_stats_config {{ sc
                     metadata['seekInputAfterSeconds']=time.monotonic()-capture_start
                     adb('shell','input','tap',str(x),str((y1+y2)//2))
                 sought=True
+        if args.resource_profile == 'minimum-startup-v2':
+            from startup_conditions import device_conditions
+            after=device_conditions(adb)
+            (out/'conditions-after-window.json').write_text(json.dumps(after,indent=2),encoding='utf8')
+            if after!=metadata['preInputConditions']['observed']['device']:
+                raise RuntimeError('Conditions changed during capture; sample is invalid')
         metadata['status']='captured'
     except Exception as error:
         metadata['status']='failed'
@@ -800,7 +884,7 @@ data_sources {{ config {{ name: "linux.process_stats" process_stats_config {{ sc
                       'summary':metadata.get('summary')}),flush=True)
     return int(metadata['status']!='captured' or bool(metadata['errors']) or
                not metadata.get('summary',{}).get('validInput') or
-               (metadata.get('build',{}).get('frameTrace') and
+               ((metadata.get('build',{}).get('frameTrace') or args.resource_profile == 'minimum-startup-v2') and
                 not metadata.get('summary',{}).get('validTextureObservation')))
 
 

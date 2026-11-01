@@ -24,6 +24,11 @@ def wait_startup_memory(read_memory, profile, maximum_wait_seconds, *,
 
 
 def startup_resource_profile(name, *, seconds, build, heavy):
+    if name == 'minimum-startup-v2':
+        from startup_minimum_profile import validate_minimum_build
+        if heavy or seconds != 25:
+            raise ValueError('minimum-startup-v2 requires 25 seconds without heavy tracing')
+        return validate_minimum_build(build)
     if name == 'default':
         commit = 8
     elif name in ('lean-short', 'lean-monitored'):

@@ -6,7 +6,6 @@ import 'dart:typed_data';
 import 'package:PiliPlus/plugin/pl_player/playback/bounded_body_warmup.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mp4_resume_range.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/resume_index_hint.dart';
-import 'package:PiliPlus/plugin/pl_player/playback/resume_body_recovery.dart';
 
 /// Starts a selected track's HTTP request before mpv consumes that track.
 /// Only the winning response is streamed,
@@ -37,14 +36,6 @@ class ParallelAudioSource {
     ),
     this.resumeIndexHint,
     this.boundedResumeInit = const bool.fromEnvironment('BOUNDED_RESUME_INIT'),
-    this.initialBodyHedge = const bool.fromEnvironment('HEDGE_INITIAL_BODY'),
-    this.resumeBodyHedge = const bool.fromEnvironment('HEDGE_RESUME_BODY'),
-    this.resumeBodyFailover = const bool.fromEnvironment(
-      'RESUME_BODY_FAILOVER',
-    ),
-    this.resumeBodyProgressRace = const bool.fromEnvironment(
-      'RESUME_BODY_PROGRESS_RACE',
-    ),
     this.onResumeIndex,
     this.waitForResumeAlignment = false,
     this.onResumeSegment,
@@ -65,10 +56,6 @@ class ParallelAudioSource {
   final bool hedgeFreshResumePrefetch;
   final ResumeIndexHint? resumeIndexHint;
   final bool boundedResumeInit;
-  final bool initialBodyHedge;
-  final bool resumeBodyHedge;
-  final bool resumeBodyFailover;
-  final bool resumeBodyProgressRace;
   final void Function(ResumeIndexHint)? onResumeIndex;
   final bool waitForResumeAlignment;
   final void Function(Duration)? onResumeSegment;
@@ -96,9 +83,6 @@ class ParallelAudioSource {
   Duration? _alignedResumePosition;
   ParallelAudioSource? _resumeSource;
   BoundedBodyWarmup? _bodyWarmup;
-  ResumeBodyRecovery? _bodyRecovery;
-  int? _selectionBodyLimit;
-  final _pendingInitialBodies = <BoundedBodyWarmup>{};
   int _prefixLength = 0;
   int receivedBytes = 0;
   int deliveredBytes = 0;
@@ -115,19 +99,6 @@ class ParallelAudioSource {
     if (!const ['https', 'http'].contains(uri.scheme)) return original;
     _original = uri;
     _resumePrimary = uri;
-    // Alignment may arrive while the local server bind is awaiting. Publish
-    // both endpoints first so that early audio resume can race them too.
-    final backup = alternatives
-        .map(Uri.tryParse)
-        .whereType<Uri>()
-        .where(
-          (v) =>
-              const ['https', 'http'].contains(v.scheme) &&
-              v.authority != uri.authority,
-        )
-        .firstOrNull;
-    _resumeBackup = backup;
-    _resumeHedgeDelay = hedgeAfter;
     final hint = resumeIndexHint;
     if (boundedResumeInit &&
         resumePosition > Duration.zero &&
@@ -161,6 +132,17 @@ class ParallelAudioSource {
         }),
       );
     });
+    final backup = alternatives
+        .map(Uri.tryParse)
+        .whereType<Uri>()
+        .where(
+          (v) =>
+              const ['https', 'http'].contains(v.scheme) &&
+              v.authority != uri.authority,
+        )
+        .firstOrNull;
+    _resumeBackup = backup;
+    _resumeHedgeDelay = hedgeAfter;
     _opening = backup == null
         ? _open(uri)
         : _openHedged(uri, backup, hedgeAfter);
@@ -173,8 +155,8 @@ class ParallelAudioSource {
   }
 
   /// At most one backup connection, only after the preferred endpoint is slow
-  /// or fails. Initial-body racing optionally waits for a small fresh prefix
-  /// before choosing a response. Losing sockets close before native consumption.
+  /// or fails. The first complete, valid response headers win; all losing
+  /// sockets close before native consumption. No quality or codec is changed.
   Future<HttpClientResponse?> _openHedged(
     Uri primary,
     Uri backup,
@@ -185,65 +167,13 @@ class ParallelAudioSource {
     var startedBackup = false;
     var failures = 0;
     Future<void> attempt(Uri uri, HttpClient client, HttpClient loser) async {
-      var response = await _open(uri, client: client);
+      final response = await _open(uri, client: client);
       if (_closed || selected.isCompleted) return;
-      BoundedBodyWarmup? warmup;
-      final selectionBodyLimit =
-          _selectionBodyLimit ??
-          (initialBodyHedge &&
-                  resumePosition > Duration.zero &&
-                  resumeIndexHint != null &&
-                  _initialOffset == 0
-              ? math.max(
-                  8192,
-                  math.min(resumeIndexHint!.prefix.length, 64 * 1024),
-                )
-              : null);
-      if (response != null &&
-          _length(response) != null &&
-          selectionBodyLimit != null) {
-        final limit = math.min(
-          response.contentLength,
-          selectionBodyLimit,
-        );
-        warmup = BoundedBodyWarmup(
-          response,
-          limit: limit,
-          onEvent: _selectionBodyLimit == null
-              ? null
-              : (name, data) => _event('bodyWarmup.$name', data),
-        );
-        _pendingInitialBodies.add(warmup);
-        final ready = await warmup.ready;
-        _pendingInitialBodies.remove(warmup);
-        _event(
-          _selectionBodyLimit == null
-              ? 'initialBody.ready'
-              : 'bodyWarmup.ready',
-          {
-            'host': uri.host,
-            'backup': uri == backup,
-            'ready': ready,
-            'limit': limit,
-            'prefetchedBytes': warmup.prefetchedBytes,
-          },
-        );
-        if (_closed || selected.isCompleted || !ready) {
-          await warmup.close();
-          if (_closed || selected.isCompleted) return;
-          response = null;
-        }
-      }
       if (response != null && _length(response) != null) {
-        _bodyWarmup = warmup;
         _original = uri;
         _hedgeTimer?.cancel();
         loser.close(force: true);
-        _event('selected', {
-          'host': uri.host,
-          'backup': uri == backup,
-          'bodyPrefetchedBytes': warmup?.prefetchedBytes ?? 0,
-        });
+        _event('selected', {'host': uri.host, 'backup': uri == backup});
         selected.complete(response);
       } else {
         client.close(force: true);
@@ -445,7 +375,7 @@ class ParallelAudioSource {
     }
     _claimed = true;
     _event('delivery.begin');
-    final body = _bodyWarmup?.stream ?? _bodyRecovery?.stream ?? upstream;
+    final body = _bodyWarmup?.stream ?? upstream;
     if (cancelClosedDelivery) {
       var rangeComplete = false;
       Stream<List<int>> rangeBody() async* {
@@ -479,7 +409,6 @@ class ParallelAudioSource {
         _client.close(force: true);
         _hedgeClient?.close(force: true);
         _bodyWarmup?.close().ignore();
-        _bodyRecovery?.close().ignore();
         _event('delivery.upstreamClosed', {
           'rangeComplete': rangeComplete,
           'receivedBytes': receivedBytes,
@@ -657,7 +586,6 @@ class ParallelAudioSource {
           )
           .._initialOffset = range.offset
           .._expectedTotal = totalBytes
-          .._selectionBodyLimit = resumeBodyHedge ? bodyWarmupLimit : null
           .._original = _original;
     if (_transferTrace) resume._transferClock = Stopwatch()..start();
     _event('resume.plan', {
@@ -689,41 +617,12 @@ class ParallelAudioSource {
         ? resume._open(_original!)
         : resume._openHedged(_original!, backup, _resumeHedgeDelay);
     resume._opening = opening.then((response) {
-      final alternate = [_resumePrimary, _resumeBackup]
-          .whereType<Uri>()
-          .where((uri) => uri.authority != resume._original!.authority)
-          .firstOrNull;
-      if (resumeBodyFailover &&
-          alternate != null &&
-          resume._bodyWarmup == null &&
-          !resume._closed &&
-          response != null &&
-          resume._length(response) != null) {
-        resume._bodyRecovery = ResumeBodyRecovery(
-          source: response,
-          alternate: alternate,
-          headers: headers,
-          offset: range.offset,
-          total: totalBytes,
-          progressRace: resumeBodyProgressRace,
-          closePrimary: () {
-            resume._client.close(force: true);
-            resume._hedgeClient?.close(force: true);
-          },
-          onEvent: (name, data) => resume._event('bodyRecovery.$name', data),
-        );
-        resume._event('bodyRecovery.armed', {
-          'offset': range.offset,
-          'progressRace': resumeBodyProgressRace,
-        });
-      }
       if (resumeBodyWarmup &&
-          resume._bodyWarmup == null &&
           !resume._closed &&
           response != null &&
           resume._length(response) != null) {
         resume._bodyWarmup = BoundedBodyWarmup(
-          resume._bodyRecovery?.stream ?? response,
+          response,
           limit: bodyWarmupLimit,
           onEvent: (name, data) => resume._event('bodyWarmup.$name', data),
         );
@@ -736,11 +635,7 @@ class ParallelAudioSource {
   void close() {
     if (_closed) return;
     _closed = true;
-    for (final body in _pendingInitialBodies.toList()) {
-      body.close().ignore();
-    }
     _bodyWarmup?.close().ignore();
-    _bodyRecovery?.close().ignore();
     _hedgeTimer?.cancel();
     if (_selection case final selection? when !selection.isCompleted) {
       selection.complete(null);

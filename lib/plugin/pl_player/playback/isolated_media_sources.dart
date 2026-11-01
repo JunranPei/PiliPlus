@@ -126,38 +126,8 @@ class IsolatedMediaSources {
               );
           }
         } else {
-          // Never log the error message: it can include an authorized URL.
-          // Keep only its type and bounded stack frames so a failed forwarding
-          // stream does not become an unexplained worker exit.
-          if (message is List && message.length == 2) {
-            final type = RegExp(
-              r'^([A-Za-z][A-Za-z0-9_ ]{0,63})(?=[:(])',
-            ).firstMatch(message[0].toString())?.group(1);
-            final frames = message[1]
-                .toString()
-                .split('\n')
-                .where((line) => RegExp(r'^#\d+\s').hasMatch(line))
-                .take(12)
-                .map((line) {
-                  final method = line.split(' (').first;
-                  final location = RegExp(
-                    r'\((dart:[a-z_]+/[^:()\s]+|package:PiliPlus/[^:()\s]+):(\d+):(\d+)\)$',
-                  ).firstMatch(line);
-                  return {
-                    'method': method.replaceAll(
-                      RegExp(r'[^#A-Za-z0-9_.$<> ]'),
-                      '',
-                    ),
-                    if (location != null) 'source': location.group(1),
-                    if (location != null) 'line': int.parse(location.group(2)!),
-                  };
-                })
-                .toList(growable: false);
-            onEvent?.call('isolated.workerError', {
-              'type': type ?? 'Unknown',
-              'frames': frames,
-            });
-          }
+          // Null denotes normal isolate exit; an error list is intentionally not
+          // logged, as exception strings can contain signed URLs.
           if (!_ready.isCompleted) {
             _ready.completeError(StateError('Transport worker exited'));
           }

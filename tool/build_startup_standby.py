@@ -39,6 +39,9 @@ parser.add_argument('--prioritize-play-url', action='store_true', help='For know
 parser.add_argument('--autosync-zero', action='store_true', help='Android diagnostic comparison: use mpv default audio delay timing without smoothing; does not change saved preference')
 parser.add_argument('--aaudio-first', action='store_true', help='Android diagnostic: prefer AAudio, preserving fallback and saved preference')
 parser.add_argument('--audio-decode-queue', action='store_true', help='Experimental bounded independent audio decoding; preserve final video/audio synchronization')
+parser.add_argument('--bounded-audio-decode-queue', action='store_true', help='Restore the normal audio queue after the current first-frame gate')
+parser.add_argument('--bounded-resume-init', action='store_true', help='Use the tested 64KiB initialization prefix for resume')
+parser.add_argument('--inline-video', action='store_true', help='Use the measured116 inline-video decode configuration')
 parser.add_argument('--filtered-audio-lead', action='store_true', help='Boundedly prime already-filtered audio before the video sync position is known; requires patched native mpv')
 parser.add_argument('--ndk-codec', action='store_true', help='Android diagnostic: use the FFmpeg NDK MediaCodec wrapper for the same selected track')
 parser.add_argument('--reserve-selected-codec', action='store_true', help='Overlap first selected resume decoder creation with source initialization; requires native reservation exports')
@@ -229,6 +232,12 @@ try:
         flags.append('STARTUP_AAUDIO_FIRST=true')
     if args.audio_decode_queue:
         flags.append('STARTUP_AUDIO_DECODE_QUEUE=true')
+    if args.bounded_audio_decode_queue:
+        flags.append('STARTUP_AUDIO_DECODE_QUEUE_BOUNDED=true')
+    if args.bounded_resume_init:
+        flags.append('BOUNDED_RESUME_INIT=true')
+    if args.inline_video:
+        flags += ['STARTUP_VIDEO_DECODE_QUEUE=false', 'EARLY_STARTUP_TEXTURE=false']
     if args.filtered_audio_lead:
         flags.append('STARTUP_FILTERED_AUDIO_LEAD=true')
     if args.warm_codec_registry:
