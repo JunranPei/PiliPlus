@@ -1,6 +1,6 @@
 param(
     [string]$Adb = 'D:\Android_Studio_Sdk\platform-tools\adb.exe',
-    [string]$Serial = 'emulator-5554',
+    [string]$Serial = 'emulator-5562',
     [string]$Package = 'com.personal.piliplus',
     [ValidateSet('Home', 'Manual')][string]$Entry = 'Home',
     [int]$ButtonX = -1,
@@ -8,6 +8,12 @@ param(
     [string]$OutputDirectory = 'diagnostics/pip-research-20260910'
 )
 $ErrorActionPreference = 'Stop'
+$gateRecord = Join-Path $OutputDirectory 'pip-test-gate.json'
+$gate = & D:/Python/python.exe (Join-Path $PSScriptRoot 'pip_test_gate.py') `
+    --start --serial $Serial --package $Package --record $gateRecord
+if ($LASTEXITCODE -ne 0) {
+    throw "PiP test gate failed; no input or capture is permitted. Evidence: $gateRecord"
+}
 function Invoke-Adb([string[]]$Arguments) {
     $result = & $Adb -s $Serial @Arguments
     if ($LASTEXITCODE -ne 0) { throw "adb failed: $Arguments" }
