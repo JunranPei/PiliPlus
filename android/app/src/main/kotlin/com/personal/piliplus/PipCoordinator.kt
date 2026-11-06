@@ -315,10 +315,16 @@ class PipCoordinator(
             AndroidHelper.isPipMode = true
         } else {
             setAutoEnterPending(false, "mode-exited")
+            // Leaving PiP is a terminal decision for this video entry. Do not
+            // keep the old video page's auto-enter flag armed: after the user
+            // returns to Home, the next system background gesture would put
+            // Home itself into a new PiP window.
+            autoEnterRequested = false
             setPhase(Phase.IDLE, "mode-changed")
             sourceRect = null
             entrySourceRect = null
             AndroidHelper.isPipMode = false
+            applyParams()
         }
     }
 
