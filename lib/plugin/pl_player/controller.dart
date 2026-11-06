@@ -517,6 +517,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   }
 
   Future<bool> enterPip({bool autoEnter = false}) async {
+    if (!_isCurrVideoPage) return false;
     if (Platform.isIOS) {
       final player = videoPlayerController;
       final textureId = videoController?.id.value;
@@ -549,17 +550,22 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       isPlaying: player.state.playing,
       sourceRect: getVideoRectCallback?.call(),
     );
-    if (!configured || autoEnter) return configured;
+    if (!configured) return false;
+    if (!_isCurrVideoPage || videoPlayerController != player) {
+      await AndroidPipController.instance.disableAutoEnter();
+      return false;
+    }
+    if (autoEnter) return true;
     return AndroidPipController.instance.enter();
   }
 
   void _disableAutoEnterPip() {
-    if (_isAutoEnterPip) {
-      if (Platform.isIOS) {
-        IOSPipHelper.disableAutoEnter();
-      } else {
-        unawaited(AndroidPipController.instance.disableAutoEnter());
-      }
+    // Android retains Activity PiP parameters across player routes. Clear them
+    // even when this player was entered manually or the preference is off.
+    if (Platform.isAndroid) {
+      unawaited(AndroidPipController.instance.disableAutoEnter());
+    } else if (Platform.isIOS && _isAutoEnterPip) {
+      IOSPipHelper.disableAutoEnter();
     }
   }
 
@@ -3211,6 +3217,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
   void onPopInvokedWithResult(bool didPop, Object? result) {
     if (didPop) {
+      _disableAutoEnterPip();
       if (playerStatus.isPlaying) {
         pause();
       }
@@ -3218,7 +3225,6 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
       setPlayCallBack(null);
 
       if (Platform.isAndroid && _playerCount <= 1) {
-        _disableAutoEnterPip();
         if (!setSystemBrightness) {
           ScreenBrightnessPlatform.instance.resetApplicationScreenBrightness();
         }

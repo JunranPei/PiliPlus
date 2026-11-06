@@ -488,12 +488,13 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     introController.cancelTimer();
 
-    // 只在确实处于画中画模式时跳过暂停，不再依赖 isEnteringPip
-    // 因为 didPushNext 是应用内页面切换触发的，不可能是"正在进入PiP"
+    // A PiP activity still owns this Flutter root. Letting the route remain
+    // active here causes the next page (usually Home) to be rendered inside
+    // the existing PiP window. Always detach the video route when covered;
+    // PiP state and the player lifecycle are handled independently.
     if (AndroidPipController.instance.isActive) {
-      return; // 已在画中画，保留播放器状态，不进行注销与暂停
+      unawaited(AndroidPipController.instance.disableAutoEnter());
     }
-
     videoDetailController.leavePlaybackRoute();
     _cancelPlaybackRouteWaits();
     videoDetailController.cancelBlockListener();
@@ -587,6 +588,11 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
   void didPop() {
     super.didPop();
     isShowing = false;
+    // The Activity survives this route. Disarm before the exit animation or
+    // asynchronous player teardown, including after returning from PiP.
+    if (Platform.isAndroid) {
+      unawaited(AndroidPipController.instance.disableAutoEnter());
+    }
     videoDetailController.leavePlaybackRoute(permanently: true);
     _cancelPlaybackRouteWaits();
     plPlayerController

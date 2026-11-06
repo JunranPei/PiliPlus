@@ -163,6 +163,10 @@ class AccountManager extends Interceptor {
   }
 
   static void toast(DioException err) {
+    // Cancellation is caller-owned control flow (for example, a discarded
+    // video prefetch), not a network failure requiring the user's attention.
+    // Keep propagating the error to the caller; suppress only this toast.
+    if (CancelToken.isCancel(err)) return;
     const skipShow = [
       'heartbeat',
       'history/report',

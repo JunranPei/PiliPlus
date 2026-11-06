@@ -143,7 +143,16 @@ class PipCoordinator(
             }
             "disableAutoEnter" -> {
                 autoEnterRequested = false
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) applyParams()
+                setAutoEnterPending(false, "disabled")
+                // Disarming must not depend on media actions: their receiver
+                // may already be gone when the player route is disposed.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    activity.setPictureInPictureParams(
+                        PictureInPictureParams.Builder()
+                            .setAutoEnterEnabled(false)
+                            .build(),
+                    )
+                }
                 result.success(true)
             }
             else -> result.notImplemented()
