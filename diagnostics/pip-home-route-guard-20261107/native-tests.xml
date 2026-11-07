@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.personal.piliplus.PipRouteGuardTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-11-07T09:06:30.701Z" hostname="JUNRAN的没有薯" time="6.083">
+  <properties/>
+  <testcase name="previousVideoCannotControlNewVideo" classname="com.personal.piliplus.PipRouteGuardTest" time="5.65"/>
+  <testcase name="homeRejectsLateVideoCommandsAndRouteUpdates" classname="com.personal.piliplus.PipRouteGuardTest" time="0.132"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

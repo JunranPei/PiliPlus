@@ -31,6 +31,23 @@ final class AndroidPipController extends ChangeNotifier {
   bool _renderHostLocked = false;
   Future<void> _lastCommand = Future<void>.value();
   Rect? _sourceRect;
+  String? _route;
+  int _routeRevision = 0;
+  bool get _routeAllowed => _route == '/videoV' || _route == '/liveRoom';
+
+  void setPlaybackRoute(String? route) {
+    if (!Platform.isAndroid) return;
+    _route = route;
+    _routeRevision++;
+    // Send immediately, before route teardown callbacks. Never wait behind
+    // configure/updateActions commands belonging to the video being removed.
+    unawaited(_channel.invokeMethod<void>('setPlaybackRoute', {
+      'route': route,
+      'revision': _routeRevision,
+    }).catchError((Object error) {
+      debugPrint('[PIP_V2] route sync failed: $error');
+    }));
+  }
 
   Rect? get sourceRect => _sourceRect;
 
@@ -97,14 +114,21 @@ final class AndroidPipController extends ChangeNotifier {
   }
 
   Future<T?> _invoke<T>(String method, [Object? arguments]) {
+    final revision = _routeRevision;
+    final guarded = const {'configure', 'enter', 'updateActions', 'setSourceRect'}
+        .contains(method);
     PipDiagnostics.event('command.queued', {
       'method': method,
       'arguments': arguments,
     });
     final command = _lastCommand.then((_) async {
+      if (guarded && (!_routeAllowed || revision != _routeRevision)) return null;
       try {
         PipDiagnostics.event('command.begin', {'method': method});
-        final result = await _channel.invokeMethod<T>(method, arguments);
+        final result = await _channel.invokeMethod<T>(method, guarded ? {
+          if (arguments is Map) ...arguments,
+          'routeRevision': revision,
+        } : arguments);
         PipDiagnostics.event('command.end', {
           'method': method,
           'result': result,

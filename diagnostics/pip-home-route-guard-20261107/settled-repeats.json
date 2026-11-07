@@ -1,0 +1,50 @@
+[
+  {
+    "trial": 1,
+    "entryConfirmed": true,
+    "returnConfirmed": true,
+    "homeRouteConfirmed": true,
+    "homePinned": false,
+    "viaRecents": false
+  },
+  {
+    "trial": 2,
+    "entryConfirmed": true,
+    "returnConfirmed": true,
+    "homeRouteConfirmed": true,
+    "homePinned": false,
+    "viaRecents": true
+  },
+  {
+    "trial": 3,
+    "entryConfirmed": true,
+    "returnConfirmed": true,
+    "homeRouteConfirmed": true,
+    "homePinned": false,
+    "viaRecents": false
+  },
+  {
+    "trial": 4,
+    "entryConfirmed": true,
+    "returnConfirmed": true,
+    "homeRouteConfirmed": true,
+    "homePinned": false,
+    "viaRecents": true
+  },
+  {
+    "trial": 5,
+    "entryConfirmed": true,
+    "returnConfirmed": true,
+    "homeRouteConfirmed": true,
+    "homePinned": false,
+    "viaRecents": false
+  },
+  {
+    "trial": 6,
+    "entryConfirmed": true,
+    "returnConfirmed": true,
+    "homeRouteConfirmed": true,
+    "homePinned": false,
+    "viaRecents": true
+  }
+]

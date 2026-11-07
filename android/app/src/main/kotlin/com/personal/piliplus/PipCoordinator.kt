@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.PictureInPictureParams
 import android.app.RemoteAction
 import android.content.ComponentName
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.drawable.Icon
@@ -44,6 +45,10 @@ class PipCoordinator(
     private var isLive = false
     private var isPlaying = false
     private var autoEnterRequested = false
+    private var playbackRoute: String? = null
+    private var routeRevision = -1
+    private val routeAllowed: Boolean
+        get() = playbackRoute == "/videoV" || playbackRoute == "/liveRoom"
     // onUserLeaveHint is also delivered when the user opens Recent Apps. Keep
     // playback alive while auto-enter is armed, but do not expose PiP geometry
     // to Flutter until SystemUI confirms the actual PiP transition.
@@ -108,6 +113,33 @@ class PipCoordinator(
         diagnostics.event("channel.receive", mapOf("method" to call.method, "arguments" to call.arguments.toString()))
         if (destroyed) {
             result.error("PIP_DESTROYED", "PiP coordinator is no longer attached", null)
+            return
+        }
+        if (call.method == "setPlaybackRoute") {
+            val args = call.arguments as? Map<*, *>
+            val revision = args?.int("revision") ?: -1
+            if (revision > routeRevision) {
+                routeRevision = revision
+                playbackRoute = args?.get("route") as? String
+                if (!routeAllowed) {
+                    autoEnterRequested = false
+                    isPlaying = false
+                    setAutoEnterPending(false, "route-revoked")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        activity.setPictureInPictureParams(PictureInPictureParams.Builder()
+                            .setAutoEnterEnabled(false).build())
+                    }
+                    restoreForbiddenPip()
+                }
+                Log.i(TAG, "route=$playbackRoute revision=$routeRevision allowed=$routeAllowed")
+            }
+            result.success(null)
+            return
+        }
+        if (call.method in setOf("configure", "enter", "updateActions", "setSourceRect") &&
+            (!routeAllowed || (call.arguments as? Map<*, *>)?.int("routeRevision") != routeRevision)) {
+            Log.i(TAG, "reject ${call.method} route=$playbackRoute revision=$routeRevision")
+            result.success(false)
             return
         }
         when (call.method) {
@@ -191,6 +223,7 @@ class PipCoordinator(
 
     private fun enter(reason: String): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
+        if (!routeAllowed) return false
         if (phase == Phase.ACTIVE || phase == Phase.ENTERING) return true
         if (!isPlaying) {
             Log.w(TAG, "reject enter while paused")
@@ -222,7 +255,7 @@ class PipCoordinator(
         diagnostics.event("params.apply")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         try {
-            activity.setPictureInPictureParams(buildParams(autoEnterRequested && isPlaying))
+            activity.setPictureInPictureParams(buildParams(routeAllowed && autoEnterRequested && isPlaying))
         } catch (error: Throwable) {
             Log.w(TAG, "setPictureInPictureParams failed", error)
         }
@@ -272,6 +305,7 @@ class PipCoordinator(
     fun onUserLeaveHint() {
         diagnostics.arm("userLeaveHint")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
+            !routeAllowed ||
             !autoEnterRequested ||
             !isPlaying ||
             phase != Phase.IDLE
@@ -310,6 +344,11 @@ class PipCoordinator(
         diagnostics.arm("modeChanged:$isInPictureInPictureMode")
         diagnostics.event("mode.callback", mapOf("active" to isInPictureInPictureMode, "config" to newConfig.toString()))
         if (isInPictureInPictureMode) {
+            if (!routeAllowed) {
+                Log.w(TAG, "reject mode-active route=$playbackRoute revision=$routeRevision")
+                restoreForbiddenPip()
+                return
+            }
             setAutoEnterPending(false, "mode-active")
             setPhase(Phase.ACTIVE, "mode-changed")
             AndroidHelper.isPipMode = true
@@ -336,7 +375,7 @@ class PipCoordinator(
         // WindowManager resize. Once mode-changed has reported ACTIVE, a late
         // transition callback must not send Dart back through ENTERING and
         // apply the entry geometry a second time.
-        if (state.isTransitioningToPip && phase == Phase.IDLE) {
+        if (routeAllowed && state.isTransitioningToPip && phase == Phase.IDLE) {
             setAutoEnterPending(false, "ui-transition")
             entrySourceRect = sourceRect?.let(::Rect)
             setPhase(Phase.ENTERING, "ui-transition")
@@ -367,6 +406,13 @@ class PipCoordinator(
         channel.invokeMethod("stateChanged", stateMap(reason))
     }
 
+    private fun restoreForbiddenPip() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && activity.isInPictureInPictureMode) {
+            activity.startActivity(Intent(activity, activity.javaClass)
+                .addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+        }
+    }
+
     private fun setAutoEnterPending(value: Boolean, reason: String) {
         if (autoEnterPending == value) return
         autoEnterPending = value
@@ -376,6 +422,9 @@ class PipCoordinator(
 
     private fun stateMap(reason: String? = null): Map<String, Any?> = mapOf(
         "phase" to phase.name.lowercase(),
+        "route" to playbackRoute,
+        "routeRevision" to routeRevision,
+        "routeAllowed" to routeAllowed,
         "generation" to generation,
         "reason" to reason,
         "isInPip" to (phase == Phase.ACTIVE),
