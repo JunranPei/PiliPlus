@@ -1,0 +1,61 @@
+{
+  "name": "r116-preserved",
+  "defines": {
+    "PLAYBACK_TRACE": "false",
+    "STARTUP_TIMING": "false",
+    "PLAYER_STANDBY": "true",
+    "ASYNC_SOURCE_FRAME_GATE": "true",
+    "PREFETCH_RESUME_BODY": "true",
+    "REUSE_RESUME_INDEX": "true",
+    "PERSIST_RESUME_INDEX": "true",
+    "HEDGE_RESUME_PREFETCH": "true",
+    "HEDGE_FRESH_RESUME_PREFETCH": "true",
+    "DEFER_VIDEO_AUXILIARY": "true",
+    "PRIORITIZE_PLAY_URL": "true",
+    "STARTUP_AAUDIO_FIRST": "true",
+    "STARTUP_AUDIO_DECODE_QUEUE": "true",
+    "STARTUP_AUDIO_DECODE_QUEUE_BOUNDED": "true",
+    "BOUNDED_RESUME_INIT": "true",
+    "STARTUP_VIDEO_DECODE_QUEUE": "false",
+    "EARLY_STARTUP_TEXTURE": "false",
+    "STARTUP_FILTERED_AUDIO_LEAD": "true",
+    "RESERVE_SELECTED_CODEC": "true",
+    "SKIP_UNUSED_CODEC_FLUSH": "true",
+    "VISIBLE_URL_PREFETCH": "true",
+    "VISIBLE_MEDIA_PREFETCH": "true",
+    "VISIBLE_NATIVE_PRELOAD": "true",
+    "VISIBLE_RESUME_PRELOAD": "true",
+    "RETAIN_COMPLETED_PLAY_URL": "true",
+    "SOURCE_BUFFER_READY_GATE": "true",
+    "SOURCE_FRAME_READY_GATE": "true",
+    "WARM_ORIENTATION_SERVICE": "true",
+    "SOURCE_EARLY_PREPARE": "true",
+    "PARALLEL_AUDIO_SOURCE": "true",
+    "CANCEL_CLOSED_MEDIA_DELIVERY": "true",
+    "PARALLEL_RESUME_MEDIA": "true",
+    "PREFETCH_RESUME_RANGE": "true",
+    "PREFETCH_RESUME_AUDIO_MASTER": "true",
+    "PREFETCH_RESUME_PRESENTATION_TIME": "true",
+    "ISOLATED_MEDIA_SOURCES": "true",
+    "HEDGE_AUDIO_SOURCE": "true",
+    "HEDGE_MEDIA_SOURCE": "true",
+    "MEDIA_HEDGE_DELAY_MS": "0",
+    "UNCUT_DASH_TRACKS": "true"
+  },
+  "native": {
+    "android-arm64": {
+      "artifact": "output/releases/PiliPlus-resume-r116-arm64-release-20261101.apk",
+      "artifactSha256": "a291c6c72615ccf4b291944bd9fe5142826f67842fec6bff6258174e00ed3e3d",
+      "entry": "lib/arm64-v8a/libmpv.so",
+      "sha256": "5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f"
+    },
+    "android-x64": {
+      "artifact": "diagnostics/startup-20261030/parallel-audio/minimum127-r116-checked.apk",
+      "artifactSha256": "95fd7b3c61d321ae1b0482711e49b738f48f85bde1041829c17f3f446b533e0f",
+      "entry": "lib/x86_64/libmpv.so",
+      "sha256": "35e8847edc59d9cd4ac84ee3e47506929ed079d0b0cad62f41fa479981c8ee86"
+    }
+  },
+  "dependencySource": "tool/startup_gpu_standby/android_video_controller.dart",
+  "dependencySourceSha256": "3739a1bbe557d01594ec70a45f931fd148aca956ba7204614494b26f7aa94f92"
+}

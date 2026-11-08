@@ -1,6 +1,8 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import org.jetbrains.kotlin.konan.properties.Properties
 import java.util.Base64
+import java.security.MessageDigest
+import groovy.json.JsonSlurper
 
 plugins {
     id("com.android.application")
@@ -120,4 +122,46 @@ dependencies {
 
 tasks.withType<Test>().configureEach {
     systemProperty("robolectric.dependency.repo.url", "https://repo.maven.apache.org/maven2")
+}
+
+// Release builds must retain the verified playback profile. Experiments opt out
+// explicitly; an ordinary build may never silently ship the default player.
+if (!project.hasProperty("piliStartupExperiment")) {
+    val profile = JsonSlurper().parse(rootProject.file("../tool/release_profile.json")) as Map<*, *>
+    val expected = profile["defines"] as Map<*, *>
+    val configured = providers.gradleProperty("dart-defines").orNull.orEmpty()
+        .split(",").mapNotNull { encoded ->
+            runCatching { String(Base64.getDecoder().decode(encoded), Charsets.UTF_8) }.getOrNull()
+        }.mapNotNull { value ->
+            val split = value.indexOf('=')
+            if (split < 0) null else value.substring(0, split) to value.substring(split + 1)
+        }.toMap()
+    tasks.matching { it.name == "compileFlutterBuildRelease" }.configureEach {
+        doFirst {
+            val missing = expected.filter { (key, value) ->
+                // Instrumentation may be enabled in an explicit benchmark build.
+                key !in listOf("PLAYBACK_TRACE", "STARTUP_TIMING") && configured[key] != value
+            }
+            check(missing.isEmpty()) {
+                "Missing preserved r116 playback flags: ${missing.keys}. Build with tool/build_verified_release.py"
+            }
+        }
+    }
+    tasks.matching { it.name == "mergeReleaseNativeLibs" }.configureEach {
+        doLast {
+            val natives = profile["native"] as Map<*, *>
+            val platforms = providers.gradleProperty("target-platform").orNull.orEmpty().split(',')
+            for (platform in platforms) {
+                val spec = natives[platform] as? Map<*, *> ?: error("No verified player for $platform")
+                val abi = (spec["entry"] as String).split('/')[1]
+                val libraries = outputs.files.asFileTree.matching { include("**/$abi/libmpv.so") }.files
+                check(libraries.isNotEmpty()) { "Missing native player for $abi" }
+                libraries.forEach { library ->
+                    val hash = MessageDigest.getInstance("SHA-256").digest(library.readBytes())
+                        .joinToString("") { "%02x".format(it.toInt() and 0xff) }
+                    check(hash == spec["sha256"]) { "Unverified libmpv for $abi: $hash" }
+                }
+            }
+        }
+    }
 }
