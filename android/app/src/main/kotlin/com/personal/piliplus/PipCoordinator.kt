@@ -337,6 +337,11 @@ class PipCoordinator(
             setPhase(Phase.IDLE, "resume-without-pip")
             applyParams()
         }
+        // Returning from an actual PiP window leaves the player route alive.
+        // Re-arm the same playing video so the next Home gesture can enter
+        // PiP again. Route changes to Home are still rejected above before
+        // this method can arm anything.
+        rearmAutoEnterIfEligible("resume")
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -354,17 +359,24 @@ class PipCoordinator(
             AndroidHelper.isPipMode = true
         } else {
             setAutoEnterPending(false, "mode-exited")
-            // Leaving PiP is a terminal decision for this video entry. Do not
-            // keep the old video page's auto-enter flag armed: after the user
-            // returns to Home, the next system background gesture would put
-            // Home itself into a new PiP window.
-            autoEnterRequested = false
             setPhase(Phase.IDLE, "mode-changed")
-            sourceRect = null
             entrySourceRect = null
             AndroidHelper.isPipMode = false
-            applyParams()
+            rearmAutoEnterIfEligible("mode-exited")
         }
+    }
+
+    private fun rearmAutoEnterIfEligible(reason: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+            !routeAllowed ||
+            !isPlaying ||
+            phase != Phase.IDLE
+        ) return
+        if (!autoEnterRequested) {
+            autoEnterRequested = true
+            Log.i(TAG, "auto-enter rearmed reason=$reason route=$playbackRoute revision=$routeRevision")
+        }
+        applyParams()
     }
 
     @RequiresApi(Build.VERSION_CODES.VANILLA_ICE_CREAM)

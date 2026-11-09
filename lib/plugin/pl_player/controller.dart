@@ -569,6 +569,20 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     }
   }
 
+  void _armAutoEnterPipAfterStableOutput() {
+    if (!Platform.isAndroid ||
+        !_isAutoEnterPip ||
+        !_isCurrVideoPage ||
+        _videoPlayerController?.state.playing != true) {
+      if (Platform.isAndroid && !_isCurrVideoPage) _disableAutoEnterPip();
+      return;
+    }
+    // PlaybackStart has already completed its presentation gate here. Arm
+    // Android's gesture entry only after the current texture is a visible,
+    // stable output; do not add the channel round-trip to play()'s wait.
+    unawaited(enterPip(autoEnter: true));
+  }
+
   Map<String, Object> _iosPipState(PlayerState state, [Duration? position]) {
     return {
       'isPlaying': playerStatus.isPlaying,
@@ -2318,13 +2332,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
           _updatePlaybackState();
           WakelockPlus.enable();
 
-          if (_isAutoEnterPip) {
-            if (_isCurrVideoPage) {
-              enterPip(autoEnter: true);
-            } else {
-              _disableAutoEnterPip();
-            }
-          }
+          if (_isAutoEnterPip && !_isCurrVideoPage) _disableAutoEnterPip();
         } else {
           playerStatus = .paused;
           _startWakeLockTimer();
@@ -2618,6 +2626,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         playerStatus = .playing;
       },
     );
+    _armAutoEnterPipAfterStableOutput();
   }
 
   /// 暂停播放
