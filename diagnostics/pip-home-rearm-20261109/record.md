@@ -41,3 +41,13 @@
 - 视频：`BV1TPWn6eE8n`。
 - 第一次退主页：`ui-transition` → `active`，窗口缩为 `598x299`，进入 PiP。
 - 返回应用后第二次退主页：再次出现 `ui-transition` → `active`，窗口缩为 `598x299`，仍进入 PiP；未出现后台播放。
+
+## 手机包架构纠正
+
+- 之前提供的 `r2-version7.apk` 是 `android-x64` 模拟器包，不能在 ARM64 手机上运行；模拟器启动正常，手机安装后无法打开由此产生。
+- 最终 ARM64 源包：`output/releases/PiliPlus-2.1.7+6-pip-rearm-stable-output-arm64-20261109-r3.apk`
+- ARM64 源包 SHA-256：`af9be4b6b54cc3bf82b0afc5265804f08da7d2a99bceb3599406976b9e99794e`
+- ARM64 `libmpv.so` SHA-256：`5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f`
+- 手机 versionCode 7 安装副本：`output/releases/PiliPlus-2.1.7+6-pip-rearm-stable-output-arm64-20261109-r3-version7.apk`
+- 安装副本 SHA-256：`eb2d6de86112c2f4d4679d751aa594af7cee77cd17630803afd8d1133b9bfcdb`
+- 另修复了 `PipCoordinator` 对空 MethodChannel 参数的诊断 NPE；Kotlin 编译通过。
