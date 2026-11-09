@@ -30,3 +30,14 @@
 - Dart 格式化：通过，文件无格式改动。
 - 完整 Flutter 单元测试构建：未完成；依赖编译阶段 Dart 进程内存耗尽，未产生测试结果。
 - 本轮 x64 release 构建：未完成；在 CMake 多 ABI 阶段中断，未生成新 APK，旧 `build/app/outputs/apk/release/app-release.apk` 未作为本轮产物使用。
+
+## 真实回归结果
+
+- x64 release 源包：`output/releases/PiliPlus-2.1.7+6-pip-rearm-stable-output-x64-20261109-r2.apk`
+- 源包 SHA-256：`ffe509d86e0d37efb977f59f5f4ed72921770afe7d5d3c454a56113550415423`
+- x64 `libmpv.so` SHA-256：`35e8847edc59d9cd4ac84ee3e47506929ed079d0b0cad62f41fa479981c8ee86`
+- 由于模拟器已有 versionCode 7，生成了只改变 manifest versionCode 的安装副本：`output/releases/PiliPlus-2.1.7+6-pip-rearm-stable-output-x64-20261109-r2-version7.apk`；未卸载应用，保留测试数据。
+- 设备：`emulator-5562`，AVD：`PiliPlusStartupIsolated_20261018`。
+- 视频：`BV1TPWn6eE8n`。
+- 第一次退主页：`ui-transition` → `active`，窗口缩为 `598x299`，进入 PiP。
+- 返回应用后第二次退主页：再次出现 `ui-transition` → `active`，窗口缩为 `598x299`，仍进入 PiP；未出现后台播放。
