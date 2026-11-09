@@ -29,7 +29,7 @@
 - `:app:testDebugUnitTest --tests com.personal.piliplus.PipRouteGuardTest -x :app:compileFlutterBuildDebug`：通过。
 - Dart 格式化：通过，文件无格式改动。
 - 完整 Flutter 单元测试构建：未完成；依赖编译阶段 Dart 进程内存耗尽，未产生测试结果。
-- 本轮 x64 release 构建：未完成；在 CMake 多 ABI 阶段中断，未生成新 APK，旧 `build/app/outputs/apk/release/app-release.apk` 未作为本轮产物使用。
+- 第一次 x64 release 构建：未完成；在 CMake 多 ABI 阶段中断，旧 `build/app/outputs/apk/release/app-release.apk` 未作为本轮产物使用。随后用干净的临时 override 状态重跑成功，见下方产物记录。
 
 ## 真实回归结果
 
