@@ -322,6 +322,15 @@ class PipCoordinator(
             enter("legacy-user-leave")
         } else {
             setAutoEnterPending(true, "user-leave-pending")
+            // Lock the Flutter buffer before SystemUI starts the automatic
+            // transition.  Waiting for uiStateChanged leaves a short window
+            // where the host can be resized to the large PiP bounds while
+            // the source frame is still unlocked, which produces the icon
+            // handoff and the settled top black strip.
+            if (sourceRect != null) {
+                entrySourceRect = sourceRect?.let(::Rect)
+                setPhase(Phase.ENTERING, "user-leave-pending")
+            }
             Log.i(TAG, "auto-enter pending api=${Build.VERSION.SDK_INT}")
         }
     }

@@ -41,7 +41,7 @@ class PipRenderHostTest {
         assertEquals(1f, view.scaleX, 0f)
     }
 
-    @Test fun pipMeasuresSameChildAtNormalSizeAndFitsFrozenSource() {
+    @Test fun pipMeasuresSameChildAtNormalSizeAndCoversFrozenSource() {
         val view = View(RuntimeEnvironment.getApplication())
         val host = PipRenderHost(view.context, view, { _, _ -> }, {})
         layout(host, 400, 900)
@@ -51,9 +51,23 @@ class PipRenderHostTest {
         assertEquals(400, view.measuredWidth)
         assertEquals(900, view.measuredHeight)
         assertEquals(source, view.clipBounds)
-        assertEquals(128f / 225, view.scaleX, .0001f)
-        assertEquals(-24 * view.scaleX, view.translationY, .0001f)
+        // Cover keeps an expanded or slightly different-ratio PiP host free
+        // of letterbox bars; the source clip still bounds the visible video.
+        assertEquals(228f / 400, view.scaleX, .0001f)
+        assertEquals((128f - source.height() * view.scaleX) / 2f - source.top * view.scaleY,
+            view.translationY, .0001f)
         assertTrue(view.translationX >= 0)
+    }
+
+    @Test fun expandedHostUsesCoverScaleAndNeverLeavesTopLetterbox() {
+        val view = View(RuntimeEnvironment.getApplication())
+        val host = PipRenderHost(view.context, view, { _, _ -> }, {})
+        layout(host, 1000, 1600)
+        host.enter(source)
+        layout(host, 700, 300)
+        assertEquals(700f / 400, view.scaleX, .0001f)
+        assertTrue(view.translationY <= 0f)
+        assertEquals(source, view.clipBounds)
     }
 
     @Test fun exitHoldsSmallBoundsAndReleasesOnRestoredRotatedWindow() {

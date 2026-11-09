@@ -87,7 +87,12 @@ class PipRenderHost(
         val reduced = width < normalWidth * .9 && height < normalHeight * .9
         val source = crop!!
         if (reduced) {
-            val scale = min(width.toFloat() / source.width(), height.toFloat() / source.height())
+            // Cover the PiP host instead of fitting it.  A fitting scale
+            // letterboxes whenever SystemUI expands PiP to a different
+            // aspect ratio; the resulting top strip is rendered by this
+            // host's black background.  The crop is already constrained to
+            // the source video, so covering only trims the excess edge.
+            val scale = maxOf(width.toFloat() / source.width(), height.toFloat() / source.height())
             flutter.pivotX = 0f
             flutter.pivotY = 0f
             flutter.scaleX = scale
@@ -151,7 +156,12 @@ class PipRenderHost(
         // Protect both data collection and delivery. A diagnostic-only null
         // or broken writer must never abort Android's layout traversal.
         try {
-            reportEvent(name, data())
+            val values = data()
+            // Keep the geometry listener available in release builds too.
+            // This is lifecycle metadata only; it never reads pixels or
+            // triggers a redraw.
+            android.util.Log.i("PiliPlusPiPTrace", "renderHost.$name $values")
+            reportEvent(name, values)
         } catch (error: Exception) {
             android.util.Log.e("PiliPlusPiPTrace", "renderHost trace failed: $name", error)
         }
