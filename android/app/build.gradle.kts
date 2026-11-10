@@ -20,6 +20,13 @@ if (!isBuiltInKotlinEnabled) {
     apply(plugin = "org.jetbrains.kotlin.android")
 }
 
+val seekDiagnosticsEnabled = providers.gradleProperty("dart-defines").orNull
+    .orEmpty().split(",").any {
+        runCatching {
+            String(Base64.getDecoder().decode(it), Charsets.UTF_8) == "SEEK_RUNTIME_TRACE=true"
+        }.getOrDefault(false)
+    }
+
 android {
     namespace = "com.personal.piliplus"
     compileSdk = 37
@@ -36,6 +43,7 @@ android {
         targetSdk = 37
         versionCode = flutter.versionCode
         versionName = "${flutter.versionName}-功耗修复"
+        buildConfigField("boolean", "SEEK_DIAGNOSTICS", seekDiagnosticsEnabled.toString())
     }
 
     packagingOptions.jniLibs.useLegacyPackaging = true
@@ -58,6 +66,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         if (project.hasProperty("dev")) {
             resValues = true
         }

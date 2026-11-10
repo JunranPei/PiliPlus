@@ -84,7 +84,11 @@ class PipRenderHost(
             return
         }
         flutter.layout(0, 0, normalWidth, normalHeight)
-        val reduced = width < normalWidth * .9 && height < normalHeight * .9
+        // Expanded landscape PiP may be almost as wide as the portrait
+        // screen. Compare orientation-independent dimensions, just as the
+        // restore gate does, instead of mistaking that PiP for a full page.
+        val reduced = min(width, height) < min(normalWidth, normalHeight) * .9 &&
+            maxOf(width, height) < maxOf(normalWidth, normalHeight) * .9
         val source = crop!!
         if (reduced) {
             // Cover the PiP host instead of fitting it.  A fitting scale

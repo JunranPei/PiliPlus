@@ -51,6 +51,7 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
     }
 
     private val channel = MethodChannel(messenger, CHANNEL)
+    private var controlBridge: DiagnosticControlBridge? = null
     private val main = Handler(Looper.getMainLooper())
     private var workerThread: HandlerThread? = null
     private var worker: Handler? = null
@@ -117,6 +118,9 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
         try {
             when (call.method) {
                 "configure" -> {
+                    if (BuildConfig.SEEK_DIAGNOSTICS && call.argument<Boolean>("control") == true && controlBridge == null) {
+                        controlBridge = DiagnosticControlBridge(activity, channel)
+                    }
                     if (!configured) {
                         geometryEnabled = call.argument<Boolean>("geometry") ?: true
                         framesEnabled = call.argument<Boolean>("frames") ?: false
@@ -182,6 +186,9 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
     )
 
     private fun info(): Map<String, Any?> = clock() + mapOf(
+        "manufacturer" to Build.MANUFACTURER, "brand" to Build.BRAND,
+        "model" to Build.MODEL, "sdk" to Build.VERSION.SDK_INT,
+        "androidRelease" to Build.VERSION.RELEASE, "buildId" to Build.DISPLAY,
         "directory" to directory?.absolutePath, "filePath" to file?.absolutePath,
         "configured" to configured, "active" to active, "deadlineMonoNs" to deadlineMonoNs,
         "written" to written.get(), "pending" to pending.get(), "dropped" to dropped.get(),
@@ -449,6 +456,8 @@ class PlaybackDiagnostics(private val activity: Activity, messenger: BinaryMesse
 
     fun dispose() {
         if (disposed) return
+        controlBridge?.dispose()
+        controlBridge = null
         stopCapture("destroy")
         disposed = true
         channel.setMethodCallHandler(null)

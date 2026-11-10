@@ -70,6 +70,24 @@ class PipRenderHostTest {
         assertEquals(source, view.clipBounds)
     }
 
+    @Test fun expandedPipNearFullScreenWidthRetainsVideoCrop() {
+        val view = View(RuntimeEnvironment.getApplication())
+        val host = PipRenderHost(view.context, view, { _, _ -> }, {})
+        layout(host, 1080, 2400)
+        val video = Rect(0, 63, 1080, 670)
+        host.enter(video)
+        layout(host, 1038, 584)
+        assertEquals(video, view.clipBounds)
+        assertTrue(view.scaleX < 1f)
+        val top = video.top * view.scaleY + view.translationY
+        val bottom = video.bottom * view.scaleY + view.translationY
+        assertTrue(top <= .01f)
+        assertTrue(bottom >= 584f - .01f)
+        layout(host, 598, 336)
+        assertEquals(video, view.clipBounds)
+        assertTrue(host.locked)
+    }
+
     @Test fun exitHoldsSmallBoundsAndReleasesOnRestoredRotatedWindow() {
         val view = View(RuntimeEnvironment.getApplication())
         var released = 0

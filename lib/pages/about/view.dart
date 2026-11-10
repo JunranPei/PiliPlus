@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:PiliPlus/build_config.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/seek_diagnostic_export.dart';
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/style.dart';
@@ -100,6 +101,16 @@ class _AboutPageState extends State<AboutPage> {
           bottom: padding.bottom + 100,
         ),
         children: [
+          if (SeekDiagnosticExport.enabled)
+            ListTile(
+              leading: const Icon(Icons.file_upload_outlined),
+              title: const Text('导出播放诊断'),
+              subtitle: const Text('复现进度跳转卡住后，导出本次播放记录'),
+              onTap: () async {
+                try { await SeekDiagnosticExport.share(); }
+                catch (error) { SmartDialog.showToast('导出失败：$error'); }
+              },
+            ),
           GestureDetector(
             onTap: () {
               if (++_pressCount == 5) {

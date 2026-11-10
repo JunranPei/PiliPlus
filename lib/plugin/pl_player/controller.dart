@@ -27,6 +27,8 @@ import 'package:PiliPlus/plugin/pl_player/playback/selected_codec_reservation.da
 import 'package:PiliPlus/plugin/pl_player/playback/prepared_media_engine.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/prepared_resource.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mpv_frame_gate.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/mpv_async_property_reader.dart';
+import 'package:PiliPlus/plugin/pl_player/playback/android_audio_output_policy.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/parallel_audio_source.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_diagnostics.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/playback_source_queue.dart';
@@ -1278,6 +1280,7 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
         const bool.fromEnvironment('STARTUP_AAUDIO_FIRST')) {
       ao = 'aaudio,audiotrack,opensles';
     }
+    ao = AndroidAudioOutputPolicy.apply(ao);
     const codecOperatingRate = int.fromEnvironment(
       'STARTUP_CODEC_OPERATING_RATE',
     );
@@ -1348,7 +1351,9 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
 
     final player = await Player.create(
       configuration: PlayerConfiguration(
-        logLevel: StartupProbe.deep
+        logLevel: const bool.fromEnvironment('SEEK_RUNTIME_TRACE')
+            ? .debug
+            : StartupProbe.deep
             ? .trace
             : StartupProbe.verbose
             ? .debug
@@ -2295,6 +2300,14 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
     Stopwatch? timingClock;
     var lastTimingUs = -100000;
     _subscriptions = [
+      if (const bool.fromEnvironment('SEEK_RUNTIME_TRACE'))
+        stream.log.listen((log) {
+          if (log.prefix.startsWith('ao') || log.level == 'error' || log.level == 'fatal') {
+            PlaybackDiagnostics.event('seek.audio.log', {
+              'prefix': log.prefix, 'level': log.level, 'text': log.text,
+            });
+          }
+        }),
       if (StartupProbe.verbose) stream.log.listen(StartupProbe.onLog),
       if (PlaybackDiagnostics.enabled) ...[
         stream.videoParams.listen(
@@ -2535,15 +2548,87 @@ class PlPlayerController with BlockConfigMixin, AudioNormalizationMixin {
   }
 
   Future<void> seek(Duration position, {bool isSeek = false}) async {
+    final traceClock = PlaybackDiagnostics.enabled ? (Stopwatch()..start()) : null;
+    if (PlaybackDiagnostics.enabled) {
+      final observedPlayer = _videoPlayerController;
+      final revision = _sourceRevision;
+      PlaybackDiagnostics.arm('command.seek', playbackTraceState(), durationMs: 15000);
+      PlaybackDiagnostics.event('command.seek.request', {
+        ...playbackTraceState(),
+        'targetMs': position.inMilliseconds,
+        'waitForBuffer': isSeek,
+      });
+      // Read cached player state only. No synchronous mpv property reads,
+      // redraw requests or recovery commands while diagnosing a stalled seek.
+      var samples = 0;
+      var busy = false;
+      MpvAsyncPropertyReader? reader;
+      if (const bool.fromEnvironment('SEEK_RUNTIME_TRACE')) {
+        final native = observedPlayer;
+        if (native != null) {
+          try { reader = MpvAsyncPropertyReader.native(native); } catch (_) {}
+        }
+      }
+      Timer.periodic(const Duration(milliseconds: 500), (timer) async {
+        if (++samples > 20 || revision != _sourceRevision ||
+            !identical(observedPlayer, _videoPlayerController) ||
+            !PlaybackDiagnostics.active) {
+          timer.cancel();
+          reader?.dispose();
+          return;
+        }
+        PlaybackDiagnostics.event('command.seek.progress', {
+          'targetMs': position.inMilliseconds,
+          'elapsedUs': traceClock!.elapsedMicroseconds,
+          'positionMs': observedPlayer?.state.position.inMilliseconds,
+          'playing': observedPlayer?.state.playing,
+          'buffering': observedPlayer?.state.buffering,
+          'uiPositionSeconds': this.position.value,
+        });
+        if (reader == null || busy) return;
+        busy = true;
+        final readClock = Stopwatch()..start();
+        const properties = ['current-ao', 'audio-pts', 'video-pts', 'time-pos', 'avsync', 'seeking', 'paused-for-cache'];
+        try {
+          final values = await Future.wait(properties.map(reader.read))
+              .timeout(const Duration(milliseconds: 400));
+          PlaybackDiagnostics.event('command.seek.native', {
+            'targetMs': position.inMilliseconds,
+            'elapsedUs': traceClock.elapsedMicroseconds,
+            'readUs': readClock.elapsedMicroseconds,
+            for (var i = 0; i < properties.length; i++) properties[i]: values[i],
+          });
+        } catch (error) {
+          PlaybackDiagnostics.event('command.seek.nativeError', {
+            'targetMs': position.inMilliseconds, 'error': error.toString(),
+          });
+        } finally { busy = false; }
+      });
+    }
     if (isSeek) {
       /// 拖动进度条调节时，不等待第一帧，防止抖动
       await _videoPlayerController?.stream.buffer.first;
     }
     danmakuController?.clear();
     try {
+      if (PlaybackDiagnostics.enabled) {
+        PlaybackDiagnostics.event('command.seek.begin', {
+          'targetMs': position.inMilliseconds, 'elapsedUs': traceClock!.elapsedMicroseconds,
+        });
+      }
       await _videoPlayerController?.seek(position);
+      if (PlaybackDiagnostics.enabled) {
+        PlaybackDiagnostics.event('command.seek.return', {
+          'targetMs': position.inMilliseconds, 'elapsedUs': traceClock!.elapsedMicroseconds,
+        });
+      }
       _updateIOSPip(position);
     } catch (e) {
+      if (PlaybackDiagnostics.enabled) {
+        PlaybackDiagnostics.event('command.seek.error', {
+          'targetMs': position.inMilliseconds, 'error': e.toString(),
+        });
+      }
       if (kDebugMode) debugPrint('seek failed: $e');
     }
   }

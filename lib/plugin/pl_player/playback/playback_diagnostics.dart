@@ -15,6 +15,7 @@ import 'package:flutter/widgets.dart';
 /// FrameTiming describes Flutter raster work, not decoded video presentation.
 abstract final class PlaybackDiagnostics {
   static const enabled = bool.fromEnvironment('PLAYBACK_TRACE');
+  static const minimumStartup = bool.fromEnvironment('MINIMUM_STARTUP_BENCHMARK');
   static const geometryEnabled = bool.fromEnvironment(
     'PLAYBACK_TRACE_GEOMETRY',
     defaultValue: true,
@@ -78,7 +79,7 @@ abstract final class PlaybackDiagnostics {
       });
       if (_sink == null && !_opening && !_failed) unawaited(_open());
       unawaited(_nativeArm(reason, source));
-      _flushTimer ??= Timer.periodic(const Duration(milliseconds: 250), (_) {
+      _flushTimer ??= Timer.periodic(Duration(milliseconds: minimumStartup ? 20000 : 250), (_) {
         unawaited(_flush());
       });
       _stopTimer?.cancel();
@@ -125,6 +126,7 @@ abstract final class PlaybackDiagnostics {
           'frames': framesEnabled,
           'texture': textureEnabled,
           'continuity': continuityEnabled,
+          'control': const bool.fromEnvironment('SEEK_RUNTIME_TRACE'),
         },
       );
       final received = _clock.elapsedMicroseconds;
@@ -205,6 +207,9 @@ abstract final class PlaybackDiagnostics {
 
   static void event(String name, [Map<String, Object?> data = const {}]) {
     if (!active) return;
+    // Keep source association and the same endpoint as diagnostic captures.
+    // Exclude repeated gate, transport and playback-property serialization.
+    if (minimumStartup && !_minimumEvents.contains(name)) return;
     _write(name, data);
     if (name == 'media.textureId' ||
         name == 'media.controller.created' ||
@@ -212,6 +217,36 @@ abstract final class PlaybackDiagnostics {
       // Shorten native observer discovery latency; never wait on playback.
       unawaited(_markNative(name, data));
     }
+  }
+
+  static const _minimumEvents = <String>{
+    'seek.audio.log',
+    'command.seek.native',
+    'command.seek.nativeError',
+    'command.seek.request',
+    'command.seek.begin',
+    'command.seek.return',
+    'command.seek.error',
+    'command.seek.progress',
+    'trace.arm',
+    'query.primary.begin',
+    'query.primary.end',
+    'media.textureId',
+    'media.controller.created',
+    'source.open.begin',
+    'source.open.accepted',
+    'source.open.return',
+    'ui.frameReady.after',
+  };
+
+  static Future<Map<String, dynamic>> finishForExport() async {
+    _write('trace.export', {'pid': pid});
+    _untilUs = 0;
+    _stopTimer?.cancel();
+    _flushTimer?.cancel();
+    await _flush();
+    await _sink?.flush();
+    return await _channel.invokeMapMethod<String, dynamic>('stop') ?? {};
   }
 
   static Future<void> _markNative(
