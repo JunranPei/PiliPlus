@@ -1,0 +1,14 @@
+{
+  "version": "2.2.0+8",
+  "package": "package: name='com.personal.piliplus' versionCode='8' versionName='2.2.0-功耗修复' platformBuildVersionName='17' platformBuildVersionCode='37' compileSdkVersion='37' compileSdkVersionCodename='17'",
+  "sha256": "4c06cffc25e2910b7b5da4e807ee61956608b737056bdac42fdec54b1f1a6c39",
+  "nativeSha256": "5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f",
+  "signatureVerified": true,
+  "commit": "6645bfd79",
+  "nativeCliActionAbsent": true,
+  "nativeCliClassAbsent": true,
+  "dartCliHandlerAbsent": true,
+  "detailedSeekTraceAbsent": true,
+  "diagnosticExportAbsent": true,
+  "diagnosticCollectionEnabled": false
+}

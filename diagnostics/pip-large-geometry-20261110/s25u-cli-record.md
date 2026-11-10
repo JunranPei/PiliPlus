@@ -67,3 +67,11 @@ CLI 点击 50% 后回读 97.166688s、pause=no。随后手机还发生了原始�
 起播耗时净收益未测，不把此次诊断结果当作性能成绩。用户指定发布版本为 2.2.0+8，替代此前 2.1.8+8。旧版本构建作废、不交付；最终包重新按 2.2.0+8 构建并核对。
 
 正式 release 使用普通入口，不安装 Dart CLI 处理器；Android 的 SEEK_DIAGNOSTICS 构建常量为 false，控制桥分支由 R8 裁掉。详细跳转采样、导出入口只在 SEEK_RUNTIME_TRACE=true 的独立诊断入口启用。最终 APK 还须核对版本号、签名、libmpv 哈希和控制桥／诊断字符串是否移除。
+
+## 2.2.0 正式包及安装
+
+`output/releases/PiliPlus-2.2.0+8-arm64-release-20261110.apk` 已完成构建及 v2 签名验证。APK 中版本为 2.2.0-功耗修复、versionCode=8，SHA-256 为 `4c06cffc25e2910b7b5da4e807ee61956608b737056bdac42fdec54b1f1a6c39`。libmpv 哈希仍为 r116 的 `5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f`。
+
+独立扫描 APK 的 DEX／libapp.so 确认原生 CLI 接收 action 和控制桥类、Dart CLI handler、详细 seek trace 及诊断导出文件名前缀均不存在；三星设备策略仍在。构建清单 diagnosticCollectionEnabled=false、seekDiagnostics=false。核对结果见 `release-2.2.0-verification.json`。
+
+按用户追加要求，已通过 install -r 覆盖安装三星，未清除数据；手机实际安装 APK 的 sha256sum 与上述 APK 完全一致，系统读回 versionCode=8、versionName=2.2.0-功耗修复。启动 Activity 返回 ok，进程 PID=10084；手机当时前台为锁屏 Bouncer，不宣称已经显示应用界面。
