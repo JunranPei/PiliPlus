@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const startup = 'aaudio,audiotrack,opensles';
-  test('Samsung Android 16 bypasses the stalled AAudio clock', () {
+  test('Samsung Android 16 and later bypass the stalled AAudio clock', () {
     expect(
       audioOutputForAndroidDevice(
         configured: startup,
@@ -20,6 +20,16 @@ void main() {
       ),
       'audiotrack',
     );
+    for (final sdk in [37, 38]) {
+      expect(
+        audioOutputForAndroidDevice(
+          configured: startup,
+          manufacturer: 'samsung',
+          sdk: sdk,
+        ),
+        'audiotrack,opensles',
+      );
+    }
   });
   test(
     'other devices and earlier Android retain the startup backend order',
@@ -29,14 +39,6 @@ void main() {
           configured: startup,
           manufacturer: 'samsung',
           sdk: 35,
-        ),
-        startup,
-      );
-      expect(
-        audioOutputForAndroidDevice(
-          configured: startup,
-          manufacturer: 'samsung',
-          sdk: 37,
         ),
         startup,
       );

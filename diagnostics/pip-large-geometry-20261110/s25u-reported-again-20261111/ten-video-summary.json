@@ -1,0 +1,306 @@
+[
+  {
+    "number": 1,
+    "bvid": "BV1xU4E6iE9y",
+    "cid": 43406134202,
+    "title": "用户原始视频",
+    "checks": [
+      {
+        "action": "click",
+        "cid": 43406134202,
+        "fromMs": 96833,
+        "toMs": 100166,
+        "elapsedMs": 3356,
+        "textureSamples": 6,
+        "distinctTexturePts": 6,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 43406134202,
+        "fromMs": 48466,
+        "toMs": 51833,
+        "elapsedMs": 3367,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 2,
+    "bvid": "BV1zXTC63EWV",
+    "title": "当前观看记录视频",
+    "checks": [
+      {
+        "action": "click",
+        "cid": 39667892368,
+        "fromMs": 323406,
+        "toMs": 326726,
+        "elapsedMs": 3329,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 39667892368,
+        "fromMs": 161344,
+        "toMs": 165598,
+        "elapsedMs": 5117,
+        "textureSamples": 10,
+        "distinctTexturePts": 10,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "HTTP seek failure observed on repeat"
+  },
+  {
+    "number": 3,
+    "bvid": "BV1UB4v67Exr",
+    "cid": 43375264631,
+    "title": "《再飞行！》MV：终于完整的旋律，是我们继续出发的BGM！",
+    "duration": 188,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 43375264631,
+        "fromMs": 94600,
+        "toMs": 97960,
+        "elapsedMs": 3363,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 43375264631,
+        "fromMs": 47320,
+        "toMs": 50680,
+        "elapsedMs": 3353,
+        "textureSamples": 6,
+        "distinctTexturePts": 6,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 4,
+    "bvid": "BV19v4y1M7sK",
+    "cid": 757426177,
+    "title": "○牛奶咖啡● 星游记ED《next world》 原版伴奏 卡拉ok，请收藏！来自牛奶咖啡",
+    "duration": 116,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 757426177,
+        "fromMs": 58576,
+        "toMs": 61943,
+        "elapsedMs": 3355,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 757426177,
+        "fromMs": 29076,
+        "toMs": 32310,
+        "elapsedMs": 3348,
+        "textureSamples": 9,
+        "distinctTexturePts": 8,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 5,
+    "bvid": "BV1ve4y1C7vu",
+    "cid": 828307112,
+    "title": "【星游记】超燃现场！用 wota艺 的方式演绎《next world》",
+    "duration": 186,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 828307112,
+        "fromMs": 92879,
+        "toMs": 96113,
+        "elapsedMs": 3327,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 828307112,
+        "fromMs": 46179,
+        "toMs": 50279,
+        "elapsedMs": 5044,
+        "textureSamples": 12,
+        "distinctTexturePts": 11,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 6,
+    "bvid": "BV1q3411w7rE",
+    "cid": 758283733,
+    "title": "【4K60FPS】牛奶咖啡《越长大越孤单》经典现场！那些年的青春回忆！",
+    "duration": 353,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 758283733,
+        "fromMs": 176017,
+        "toMs": 180033,
+        "elapsedMs": 5894,
+        "textureSamples": 11,
+        "distinctTexturePts": 9,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 758283733,
+        "fromMs": 87785,
+        "toMs": 91450,
+        "elapsedMs": 4183,
+        "textureSamples": 10,
+        "distinctTexturePts": 10,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 7,
+    "bvid": "BV1KJ411k7K5",
+    "cid": 42815521509,
+    "title": "紫雨carol《巫师3：狂猎》4K高清重新制作版【石之心、血与酒全系列】",
+    "duration": 114003,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 42815521509,
+        "fromMs": 1597500,
+        "toMs": 1601166,
+        "elapsedMs": 5031,
+        "textureSamples": 0,
+        "distinctTexturePts": 0,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 42815521509,
+        "fromMs": 796795,
+        "toMs": 800282,
+        "elapsedMs": 4220,
+        "textureSamples": 9,
+        "distinctTexturePts": 9,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified on supplemental click",
+    "supplementalClick": {
+      "fromMs": 1597500,
+      "toMs": 1600832,
+      "distinctTexturePts": 10,
+      "bufferingFirst": true,
+      "bufferingLast": false
+    }
+  },
+  {
+    "number": 8,
+    "bvid": "BV1r1421r78r",
+    "cid": 1590922279,
+    "title": "完结《艾尔登法环：黄金树幽影》全收集、全流程、全剧情攻略，老头环DLC攻略合集",
+    "duration": 57964,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 1590922279,
+        "fromMs": 1058000,
+        "toMs": 1061512,
+        "elapsedMs": 5907,
+        "textureSamples": 13,
+        "distinctTexturePts": 10,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 1590922279,
+        "fromMs": 527728,
+        "toMs": 531215,
+        "elapsedMs": 5003,
+        "textureSamples": 10,
+        "distinctTexturePts": 8,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 9,
+    "bvid": "BV1AE411a7qB",
+    "cid": 130746380,
+    "title": "【紫雨carol翻唱】《巫师3血与酒》主题曲【Lullaby Of Woe】中英文字幕",
+    "duration": 163,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 130746380,
+        "fromMs": 82117,
+        "toMs": 85450,
+        "elapsedMs": 3342,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 130746380,
+        "fromMs": 40900,
+        "toMs": 44233,
+        "elapsedMs": 3344,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  },
+  {
+    "number": 10,
+    "bvid": "BV1uE411x7GH",
+    "cid": 160048029,
+    "title": "紫雨小姐姐发展史",
+    "duration": 3948,
+    "checks": [
+      {
+        "action": "click",
+        "cid": 160048029,
+        "fromMs": 1974080,
+        "toMs": 1977440,
+        "elapsedMs": 3347,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      },
+      {
+        "action": "drag",
+        "cid": 160048029,
+        "fromMs": 985000,
+        "toMs": 988360,
+        "elapsedMs": 3341,
+        "textureSamples": 7,
+        "distinctTexturePts": 7,
+        "ao": "audiotrack"
+      }
+    ],
+    "result": "continuous progress and texture verified"
+  }
+]

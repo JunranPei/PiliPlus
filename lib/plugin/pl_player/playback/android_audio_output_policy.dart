@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:PiliPlus/utils/device_utils.dart';
 import 'package:jni/jni.dart';
 
-/// Samsung Android 16 AAudio can keep playing sound while its reported clock
+/// Samsung Android 16 and later AAudio can keep playing sound while its reported clock
 /// stops after a seek. Keep that clock out of mpv's A/V synchronization path.
 String audioOutputForAndroidDevice({
   required String configured,
   required String manufacturer,
   required int sdk,
 }) {
-  if (sdk != 36 || manufacturer.toLowerCase() != 'samsung') return configured;
+  if (sdk < 36 || manufacturer.toLowerCase() != 'samsung') return configured;
   final outputs = configured.split(',');
   if (!outputs.contains('aaudio')) return configured;
   return [
@@ -37,7 +37,7 @@ abstract final class AndroidAudioOutputPolicy {
   }
 
   static String apply(String configured) {
-    if (!Platform.isAndroid || DeviceUtils.sdkInt != 36) return configured;
+    if (!Platform.isAndroid || DeviceUtils.sdkInt < 36) return configured;
     return audioOutputForAndroidDevice(
       configured: configured,
       manufacturer: _manufacturer,

@@ -42,7 +42,7 @@ android {
         minSdk = flutter.minSdkVersion
         targetSdk = 37
         versionCode = flutter.versionCode
-        versionName = "${flutter.versionName}-功耗修复"
+        versionName = "${project.findProperty("pili.releaseVersionName") ?: flutter.versionName}-功耗修复"
         buildConfigField("boolean", "SEEK_DIAGNOSTICS", seekDiagnosticsEnabled.toString())
     }
 

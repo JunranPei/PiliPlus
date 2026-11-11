@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/mpv_async_property_reader.dart';
 import 'package:PiliPlus/plugin/pl_player/playback/seek_diagnostic_export.dart';
+import 'package:PiliPlus/utils/device_utils.dart';
 
 abstract final class SeekDiagnosticCli {
   static const channel = MethodChannel('piliplus/playback_diagnostics');
@@ -66,6 +67,7 @@ abstract final class SeekDiagnosticCli {
       }
       final result = <String, Object?>{
         ...controller.playbackTraceState(),
+        'deviceSdk': DeviceUtils.sdkInt,
         'controlsVisible': controller.showControls.value,
         'fullscreen': controller.isFullScreen.value,
         'speed': controller.playbackSpeed,
@@ -77,6 +79,7 @@ abstract final class SeekDiagnosticCli {
         final reader = MpvAsyncPropertyReader.native(player);
         const names = [
           'current-ao',
+          'options/ao',
           'time-pos',
           'audio-pts',
           'video-pts',

@@ -67,11 +67,15 @@ def main():
         ROOT / 'build/media_kit_libs_android_video', native, work / 'native.jar', args.target_platform)
     version = next(line.split(':', 1)[1].strip() for line in (ROOT / 'pubspec.yaml').read_text().splitlines() if line.startswith('version:'))
     name, code = version.split('+')
+    pubspec_version = version
+    name = profile.get('versionName', name)
+    version = name + '+' + code
     flags.update({'pili.name': name, 'pili.code': code})
     encoded = ','.join(base64.b64encode((key + '=' + value).encode()).decode()
                        for key, value in flags.items())
     command = [str(ROOT / 'android/gradlew.bat'), '-p', 'android', 'assembleRelease',
                '-Ptarget-platform=' + args.target_platform, '-Ptarget=' + args.target,
+               '-Ppili.releaseVersionName=' + name,
                '-Pdart-defines=' + encoded, '--max-workers=1', '--no-daemon',
                '-Dorg.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8',
                '-Pkotlin.compiler.execution.strategy=in-process', '--console=plain']
@@ -92,6 +96,7 @@ def main():
     sources = [p for base in ['lib', 'android/app/src/main'] for p in (ROOT / base).rglob('*') if p.is_file()]
     hashes = {p.relative_to(ROOT).as_posix(): digest(p.read_bytes()) for p in sources}
     manifest = {'apk': str(output), 'sha256': digest(output.read_bytes()), 'version': version,
+                'pubspecVersion': pubspec_version,
                 'profile': profile['name'], 'profileSha256': digest(profile_path.read_bytes()),
                 'buildMode': 'release', 'targetPlatform': args.target_platform,
                 'defines': [key + '=' + value for key, value in flags.items()],
