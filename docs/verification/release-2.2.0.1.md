@@ -7,3 +7,7 @@
 三星SM-S9380、SDK37上的10个不同视频已执行点击和拖动进度条。9个视频有持续进度及纹理；BV1zXTC63EWV另有HTTP超时、seek未完成和慢样本，按失败保留。第7视频初次点击纹理采集提前结束，已补测；末尾第10视频小窗恢复后跳转也有持续进度。逐视频资料见diagnostics/pip-large-geometry-20261110/s25u-reported-again-20261111/ten-video-results.md。
 
 本次发布关闭CLI及详细监听，保持r116原生库SHA-256为5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f。构建后核对APK签名、版本、实际原生库和诊断代码裁剪，并通过install -r覆盖安装三星，保留应用数据；最终安装核对另存JSON。
+
+构建和安装已完成。APK为output/releases/PiliPlus-2.2.0.1+9-arm64-release-20261111.apk，SHA-256 c041c2c239e07d63d820b734da7c653e0fb247bcc110b5ee792fb0513d486da9。v2签名通过；DEX中的原生CLI接收action、Dart CLI handler、详细seek监听及诊断导出标识均不存在。
+
+三星实际安装versionName=2.2.0.1-功耗修复、versionCode=9，安装APK哈希与交付包一致。Activity启动成功，进程29121，前台为PiliPlus MainActivity。核对结果位于diagnostics/pip-large-geometry-20261110/s25u-reported-again-20261111/release-2.2.0.1-verification.json。

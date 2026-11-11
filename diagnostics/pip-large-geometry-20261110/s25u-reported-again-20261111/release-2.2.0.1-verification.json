@@ -1,0 +1,23 @@
+{
+  "version": "2.2.0.1+9",
+  "package": "package: name='com.personal.piliplus' versionCode='9' versionName='2.2.0.1-功耗修复' platformBuildVersionName='17' platformBuildVersionCode='37' compileSdkVersion='37' compileSdkVersionCodename='17'",
+  "sha256": "c041c2c239e07d63d820b734da7c653e0fb247bcc110b5ee792fb0513d486da9",
+  "nativeSha256": "5d93acb683355870dc8cc5a1f119f92f9a421565e049072a51542fe60497748f",
+  "signatureVerified": true,
+  "sourceCommit": "713e40631",
+  "nativeCliAbsent": true,
+  "dartCliAbsent": true,
+  "detailedSeekTraceAbsent": true,
+  "diagnosticExportAbsent": true,
+  "serial": "R5CY13T5Z3J",
+  "installedSha256": "c041c2c239e07d63d820b734da7c653e0fb247bcc110b5ee792fb0513d486da9",
+  "installedPackageVersion": [
+    "versionCode=9 minSdk=24 targetSdk=37",
+    "versionName=2.2.0.1-功耗修复"
+  ],
+  "installMode": "replace preserving app data",
+  "appPid": "29121",
+  "focus": [
+    "mCurrentFocus=Window{a950309 u0 com.personal.piliplus/com.personal.piliplus.MainActivity}"
+  ]
+}
